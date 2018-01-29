@@ -14,6 +14,7 @@ export default class App {
         this.initDatabase();
         this.getTickets();
         this.initHtml();
+        this.initAutosave();
         this.initKeyboardNavigation();
     }
 
@@ -91,15 +92,41 @@ export default class App {
         tickets.forEach((tickets__value) => {
             $('.ticket_table tbody').append(this.createHtmlLine(tickets__value.doc));
         });
+        /*
         $('#app').append('<a href="#" class="button_save">Speichern</a>');
         $('#app').on('click', '.button_save', () =>
         {
-            this.saveState();
+            this.updateTickets();
             return false;
+        });
+        */
+    }
+
+    updateTicket(id)
+    {
+        let el = $('.ticket_entry[data-id="'+id+'"]');
+        let data = {
+            _id: el.attr('data-id'),
+            _rev: el.attr('data-rev'),
+            priority: el.find('[name="priority"]').val(),
+            date: el.find('[name="date"]').val(),
+            time: el.find('[name="time"]').val(),
+            project: el.find('[name="project"]').val(),
+            description: el.find('[name="description"]').val(),
+            attachment: el.find('[name="attachment"]').val(),
+        }
+        console.log(data);
+        this.db.put(data).then((response) =>
+        {
+            console.log(response);
+            $(ticket).closest('.ticket_entry').attr('data-rev', response.rev);
+        }).catch((error) =>
+        {
+            console.log(error);
         });
     }
 
-    saveState()
+    updateTickets()
     {
         let tickets = [];
         $('#app .ticket_entry').each(function() 
@@ -115,10 +142,13 @@ export default class App {
                 attachment: $(this).find('[name="attachment"]').val(),
             });
         });
-        console.log(tickets);
         this.db.bulkDocs(tickets).then((result) =>
         {
-            console.log(result); 
+            console.log(result);
+            result.forEach((value) =>
+            {
+                $('.ticket_entry[data-id="'+value.id+'"]').attr('data-rev',value.rev);
+            });
         }).catch((error) =>
         {
             console.log(error);
@@ -189,10 +219,18 @@ export default class App {
                 }).catch((error) =>
                 {
                     console.log(error);
-                });;
-                
+                });                
             }
         });
+    }
+
+    initAutosave()
+    {
+        setInterval(() => 
+        {
+            this.updateTickets();
+            console.log('autosave successful');
+        },10000);
     }
 
 }
