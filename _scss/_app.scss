@@ -1,7 +1,7 @@
 #app
 {
-    width:500px;
-    height:500px;
+    width:800px;
+    height:400px;
     background-color:green;
     color:#fff;
     font-size:8px;
@@ -14,4 +14,16 @@ input
 textarea
 {
     height:10px;
+}
+.ticket_entry
+{
+    border:5px solid grey;
+}
+.ticket_entry--changed
+{
+    border-color:yellow;
+}
+.ticket_entry--locked
+{
+    border-color:red;
 }

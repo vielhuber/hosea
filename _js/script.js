@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', function()
 {
     const app = new App();
     app.init();
+    /* make publically available to run from outside for debugging purposes */
+    window.app = app;
 });
 
 window.onload = function()

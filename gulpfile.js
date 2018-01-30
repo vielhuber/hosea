@@ -62,7 +62,7 @@ gulp.task('html', function() {
 
 // watch
 gulp.task('watch', function() {
-	browserSync.init({ proxy: 'hosea.local' });
+	//browserSync.init({ proxy: 'hosea.local' });
     gulp.watch('./_js/*.js', ['js']);    
     gulp.watch('./_scss/**/*.scss', ['css']);
     gulp.watch('./_html/*.html', ['html']);
