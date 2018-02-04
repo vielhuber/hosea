@@ -22,7 +22,7 @@ html
 
 body
 {
-	overflow-y:scroll;
+	overflow-y:hidden;
 	overflow-x:hidden;
 }
 
@@ -99,4 +99,18 @@ a
 {
 	background:$color-greenlight;
 	color:#ffffff;
+}
+
+
+::-webkit-scrollbar
+{
+  width:4px;
+}
+::-webkit-scrollbar-track
+{
+  background-color: transparent;
+}
+::-webkit-scrollbar-thumb
+{
+    background-color: #000;
 }

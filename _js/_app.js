@@ -1,12 +1,28 @@
 import Helpers from './_helpers';
 import PouchDB from 'pouchdb';
 import jQuery from 'jquery'; window.$ = window.jQuery = jQuery;
+import 'fullcalendar';
+import 'fullcalendar/dist/locale/de';
 
-export default class App {
+export default class App
+{
 
-    constructor() {
+    constructor()
+    {       
         this.db = null;
-        this.tickets = null;
+        this.tickets = null;        
+        this.url = 'http://localhost:5984/hosea';        
+        this.cols = [
+            'person',
+            'status',
+            'priority',
+            'date',
+            'time',
+            'worked',
+            'project',
+            'description'
+        ];
+        this.dates = null;
     }
 
     async init()
@@ -15,28 +31,33 @@ export default class App {
     await this.cleanDatabase();
     await this.fetchTickets();
           this.buildHtml();
+          this.textareaAutoHeight();
           this.setupBindings();
           this.initKeyboardNavigation();
-          this.initSaveManually();
-        /*
-        */
-        //this.initAutosaveAfterChange();
-        //this.initAutosaveAfterTime();
+          this.initScheduler();
     }
 
+    setupBindings()
+    {
+        this.bindChangeTracking();
+        this.bindUpload();
+        this.bindDownload();
+        this.bindDeleteAttachment();
+        this.bindDelete();
+        this.bindSave();
+    }
+    
     initDatabase()
     {
-        this.db = new PouchDB('http://localhost:5984/hosea');
-
+        this.db = new PouchDB(this.url);
     }
 
     cleanDatabase()
     {
         return new Promise((resolve,reject) =>
         {
-            this.db.compact().then((info) => {
-                //console.log('compaction complete');
-                //console.log(info);
+            this.db.compact().then((info) => 
+            {
                 resolve();
             }).catch((error) =>
             {
@@ -70,21 +91,20 @@ export default class App {
 
     buildHtml()
     {        
-        $('#app').append('<table class="ticket_table"></table>');
-        $('.ticket_table').append(`
-            <thead>
-                <tr>
-                    <td>priority</td>
-                    <td>date</td>
-                    <td>time</td>
-                    <td>project</td>
-                    <td>description</td>
-                    <td>attachment</td>
-                    <td>delete</td>
-                </tr>
-            </thead>
+        $('#app').append(`
+            <table class="ticket_table">
+                <thead>
+                    <tr></tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
         `);
-        $('.ticket_table').append('<tbody></tbody>');
+        this.cols.forEach((cols__value) =>
+        {
+            $('.ticket_table thead tr').append('<td>'+cols__value+'</td>');
+        });
+        $('.ticket_table thead tr').append('<td>attachments</td><td>delete</td>');
         this.tickets.forEach((tickets__value) => {
             $('.ticket_table tbody').append(
                 this.createHtmlLine(tickets__value)
@@ -92,6 +112,11 @@ export default class App {
         });
         $('#app').append('<a href="#" class="button_save">Speichern</a>');
     }    
+
+    textareaAutoHeight()
+    {
+        Helpers.textareaAutoHeight('#app textarea');
+    }
 
     getTicketData( document_id )
     {
@@ -129,46 +154,39 @@ export default class App {
 
     createHtmlLine(ticket)
     {
-        let html = ``;
+        let html = '';
 
-        html += `
-            <tr
-                class="ticket_entry"
-                data-id="${ticket._id}"
-            >
-                <td>
-                    <input name="priority" type="text" value="${ticket.priority||''}" />
-                </td>
-                <td>
-                    <input name="date" type="text" value="${ticket.date||''}" />
-                </td>
-                <td>
-                    <input name="time" type="text" value="${ticket.time||''}" />
-                </td>
-                <td>
-                    <input name="project" type="text" value="${ticket.project||''}" />
-                </td>
-                <td>
-                    <textarea name="description">${ticket.description||''}</textarea>
-                </td>
-                <td>
-        `;
-        html += `<ul class="ticket_entry__attachments">`;
-        if( ticket._attachments !== undefined && Object.keys(ticket._attachments).length > 0 )
+        html += '<tr class="ticket_entry" data-id="'+ticket._id+'">';
+
+        this.cols.forEach((cols__value) =>
         {
-            Object.entries(ticket._attachments).forEach(([attachment__key, attachment__value]) =>
-            {
-                html += this.createHtmlDownloadLine(attachment__key);
-            });
-        }
-        html += `</ul>`;
-        html += `<input name="attachment" type="file" />`;        
-        html += `
-                </td>
+            html += `
                 <td>
-                    <a href="#" class="ticket_entry__delete">x</a>
+                    <textarea name="${cols__value}">${ticket[cols__value]||''}</textarea>
                 </td>
-            </tr>
+            `;
+        });
+        
+        html += `
+            <td>
+                <ul class="ticket_entry__attachments">`;
+                if( ticket._attachments !== undefined && Object.keys(ticket._attachments).length > 0 )
+                {
+                    Object.entries(ticket._attachments).forEach(([attachment__key, attachment__value]) =>
+                    {
+                        html += this.createHtmlDownloadLine(attachment__key);
+                    });
+                }
+        html += `
+                </ul>
+
+                <input type="file" name="attachments" multiple="multiple" />
+   
+            </td>
+            <td>
+                <a href="#" class="ticket_entry__delete">x</a>
+            </td>
+        </tr>
         `;
         return html;
     }
@@ -188,19 +206,44 @@ export default class App {
         `;
     }
 
-    setupBindings()
+    bindSave()
     {
-        this.bindChangeTracking();
-        this.bindUpload();
-        this.bindDownload();
-        this.bindDeleteAttachment();
-        this.bindDelete();
+        // button click
+        $('#app').on('click', '.button_save', () =>
+        {
+            this.saveTickets().then(() => { }).catch((error) => { console.log(error); });
+            return false;
+        });
+
+        // ctrl+s
+        $(window).bind('keydown', (event) =>
+        {
+            let focus = $(':focus');
+            if(event.ctrlKey || event.metaKey)
+            {
+                if(String.fromCharCode(event.which).toLowerCase() === 's')
+                {
+                    this.saveTickets().then(() => {
+                        if( focus.length > 0 )
+                        {
+                            focus.focus();
+                        }
+                    }).catch((error) => { console.log(error); });
+                    return false;
+                }
+            }
+        });
     }
+
 
     bindChangeTracking()
     {
-        $('#app').on('change', '.ticket_entry :input', (el) =>
+        $('#app').on('input', '.ticket_entry :input', (el) =>
         {
+            if( $(el.currentTarget).is('[type="file"]') )
+            {
+                return;
+            }
             $(el.currentTarget).closest('.ticket_entry').addClass('ticket_entry--changed');
         });
     }
@@ -209,42 +252,59 @@ export default class App {
     {
         $('#app').on('change', '.ticket_entry input[type="file"]', (e) =>
         {
-            this.startUpload(
+            this.startUploads(
                 $(e.currentTarget).closest('.ticket_entry').attr('data-id'),
-                e.currentTarget.files[0]
-            ).then((attachment_id) =>
+                e.currentTarget.files
+            ).then((attachment_ids) =>
             {
+                console.log(attachment_ids);
                 $(e.currentTarget).val('');
-                $(e.currentTarget).closest('.ticket_entry').find('.ticket_entry__attachments').append(
-                    this.createHtmlDownloadLine(attachment_id)
-                );
+                attachment_ids.forEach((attachment_ids__value) =>
+                {
+                    $(e.currentTarget).closest('.ticket_entry').find('.ticket_entry__attachments').append(
+                        this.createHtmlDownloadLine(attachment_ids__value)
+                    );
+                });
             }).catch((error) =>
             {
                 console.log(error);
-            });;
+            });
         });
+    }
+
+    async startUploads( document_id, files )
+    {
+        let attachment_ids = [];
+
+        for(let files__value of Array.from(files))
+        {
+            this.lockTicket(document_id);            
+            let result = await this.startUpload( document_id, files__value );
+            this.unlockTicket(document_id, result.rev, true);
+            attachment_ids.push(result.attachment_id);
+        }
+
+        return attachment_ids;
     }
 
     startUpload( document_id, file )
     {
-        return new Promise((resolve,reject) => {
-            this.lockTicket(document_id);
-            let attachment_id = Helpers.guid()+'#'+file.name;
-            this.db.putAttachment(
-                document_id,
-                attachment_id,
-                this.getTicketData(document_id)._rev,
-                file,
-                file.type
-            ).then((result) =>
-            {
-                this.unlockTicket(document_id, result.rev);
-                resolve(attachment_id);
-            }).catch((error) =>
-            {
-                console.log(error);
-                reject();
-            });
+        let attachment_id = Helpers.guid()+'#'+file.name;
+        return this.db.putAttachment(
+            document_id,
+            attachment_id,
+            this.getTicketData(document_id)._rev,
+            file,
+            file.type
+        ).then((result) =>
+        {
+            return {
+                rev: result.rev,
+                attachment_id: attachment_id
+            };
+        }).catch((error) =>
+        {
+            console.log(error);
         });
     }
 
@@ -287,6 +347,11 @@ export default class App {
             let document_id = $(e.currentTarget).closest('.ticket_entry').attr('data-id');
             if( this.ticketIsLocked(document_id) )
             {
+                return false;
+            }
+            if( $('#app .ticket_entry').length === 1 )
+            {
+                alert('don\'t delete the genesis block!');
                 return false;
             }
             this.deleteTicket( document_id ).then((result) => { }).catch((error) => { });
@@ -346,11 +411,14 @@ export default class App {
         });
     }
 
-    unlockTicket(document_id, rev)
+    unlockTicket(document_id, rev, leave_changed = false)
     {
         this.setTicketData(document_id, '_rev', rev);
         console.log('unlocking ticket '+document_id);
-        $('.ticket_entry[data-id="'+document_id+'"]').removeClass('ticket_entry--changed');
+        if( leave_changed === false )
+        {
+            $('.ticket_entry[data-id="'+document_id+'"]').removeClass('ticket_entry--changed');
+        }
         $('.ticket_entry[data-id="'+document_id+'"]').removeClass('ticket_entry--locked');
         $('.ticket_entry[data-id="'+document_id+'"]').find(':input').each((index,el) =>
         {
@@ -378,7 +446,7 @@ export default class App {
                 this.getTicketData(document_id)._rev
             ).then((result) =>
             {
-                this.unlockTicket(document_id, result.rev);
+                this.unlockTicket(document_id, result.rev, true);
                 resolve();
             }).catch((error) =>
             {
@@ -390,34 +458,39 @@ export default class App {
 
     saveTickets()
     {
-        let changed = [];
-        $('.ticket_entry--changed').each((index,el) =>
+        return new Promise((resolve, reject) =>
         {
-            this.setTicketData(
-                $(el).attr('data-id'),
-                {
-                    priority: $(el).find('[name="priority"]').val(),
-                    date: $(el).find('[name="date"]').val(),
-                    time: $(el).find('[name="time"]').val(),
-                    project: $(el).find('[name="project"]').val(),
-                    description: $(el).find('[name="description"]').val(),
-                }
-            );
-            this.lockTicket( $(el).attr('data-id') );
-            changed.push(
-                this.getTicketData( $(el).attr('data-id') )
-            );
-        });
-        this.db.bulkDocs(changed).then((result) =>
-        {
-            console.log(result);
-            result.forEach((value) =>
+            let changed = [];
+            $('.ticket_entry--changed').each((index,el) =>
             {
-                this.unlockTicket(value.id, value.rev);
+                let data = {};
+                this.cols.forEach((cols__value) =>
+                {
+                    data[cols__value] = $(el).find('[name="'+cols__value+'"]').val();    
+                });
+                this.setTicketData(
+                    $(el).attr('data-id'),
+                    data
+                );
+                this.lockTicket( $(el).attr('data-id') );
+                changed.push(
+                    this.getTicketData( $(el).attr('data-id') )
+                );
             });
-        }).catch((error) =>
-        {
-            console.log(error);
+            this.db.bulkDocs(changed).then((result) =>
+            {
+                console.log(result);
+                result.forEach((value) =>
+                {
+                    this.unlockTicket(value.id, value.rev);
+                });
+                this.refreshScheduler();
+                resolve();
+            }).catch((error) =>
+            {
+                console.log(error);
+                reject();
+            }); 
         });
     }
 
@@ -436,18 +509,22 @@ export default class App {
                 $(e.currentTarget).closest('td').prev('td').find(':input').focus();
             }
             // arrow top (switch)
-            if( e.keyCode === 38 && $(e.currentTarget).closest('tr').prev('tr').length > 0 )
+            if( e.keyCode === 38 && $(e.currentTarget).closest('tr').prev('tr').length > 0 && e.currentTarget.selectionEnd <= 0 )
             {
                 $(e.currentTarget).closest('tr').prev('tr').find('td:nth-child('+($(e.currentTarget).closest('td').prevAll('td').length+1)+')').find(':input').focus();
             }
             // arrow down (switch)
-            if( e.keyCode === 40 && $(e.currentTarget).closest('tr').next('tr').length > 0 )
+            if( e.keyCode === 40 && $(e.currentTarget).closest('tr').next('tr').length > 0 && e.currentTarget.selectionEnd >= $(e.currentTarget).val().length )
             {
                 $(e.currentTarget).closest('tr').next('tr').find('td:nth-child('+($(e.currentTarget).closest('td').prevAll('td').length+1)+')').find(':input').focus();
             }
             // arrow down (create)
-            if( e.keyCode === 40 && $(e.currentTarget).closest('tr').next('tr').length === 0 )
+            if( e.keyCode === 40 && $(e.currentTarget).closest('tr').next('tr').length === 0 && e.currentTarget.selectionEnd >= $(e.currentTarget).val().length )
             {
+                if( this.lastLineIsEmpty() )
+                {
+                    return false;
+                }
                 this.createTicket().then((ticket) =>
                 {
                     $('.ticket_table tbody').append(this.createHtmlLine(ticket));
@@ -455,28 +532,32 @@ export default class App {
                 }).catch((error) =>
                 {
                     console.log(error);
-                });                
-            }
+                });            }
         });
     }
 
-    createTicket(
-        priority = null,
-        date = null,
-        time = null,
-        project = null,
-        description = null
-    )
+    lastLineIsEmpty()
+    {
+        let empty = true;
+        $('.ticket_entry:last-child :input').each((index,el) =>
+        {
+            if( $(el).val() != '' )
+            {
+                empty = false;    
+            }
+        });
+        return empty;
+    }
+
+    createTicket(data = {})
     {
         return new Promise((resolve, reject) =>
         {
-            let ticket = {
-                priority: priority,
-                date: date,
-                time: time,
-                project: project,
-                description: description
-            }
+            let ticket = {};
+            this.cols.forEach((cols__value) =>
+            {
+                ticket[cols__value] = data[cols__value]||null;
+            });
             this.db.post(ticket).then((response) =>
             {
                 ticket._id = response.id;
@@ -490,30 +571,79 @@ export default class App {
         });
     }
 
-    initAutosaveAfterTime()
+    initScheduler()
     {
-        setInterval(() => 
-        {
-            this.saveTickets();
-            console.log('autosave successful');
-        },10000);
-    }
-
-    initAutosaveAfterChange()
-    {
-        $('#app').on('change', '.ticket_entry :input', (e) =>
-        {
-
+        $('#scheduler').fullCalendar({
+            weekends: false,
+            locale: 'de',
+            editable: false,
+            events: this.generateDates(),
+            defaultView: 'agendaWeek',
+            weekends: true,
+            allDaySlot: false,
+            /*
+            aspectRatio: 3,
+            */
+            height: 'auto',
+            contentHeight: 'auto',
+            businessHours: {
+                dow: [ 1, 2, 3, 4, 5 ],
+                start: '09:00',
+                end: '18:00'
+            },
+            minTime: '09:00:00',
+            //maxTime: '24:00:00',
         });
     }
 
-    initSaveManually()
+    sizeScheduler()
     {
-        $('#app').on('click', '.button_save', () =>
+        let h1 = $(window).height(),
+            h2 = $('#scheduler .fc-header-toolbar').outerHeight(true),
+            h3 = h1-h2;
+        $('#scheduler .fc-time-grid .fc-slats td').height('auto');
+        $('#scheduler .fc-time-grid-container').height('auto');
+        $('#scheduler').fullCalendar('option', 'height', h1);
+        $('#scheduler').fullCalendar('option', 'contentHeight', h3);
+        let h4 = $('.fc-time-grid').height(),
+            h5 = h4/$('#scheduler .fc-time-grid .fc-slats tr').length;
+        $('#scheduler .fc-time-grid .fc-slats td').height(h5);
+        $('#scheduler').fullCalendar('rerenderEvents');
+    }
+
+    refreshScheduler()
+    {
+        $('#scheduler').fullCalendar('destroy');
+        this.initScheduler();
+    }
+
+    generateDates()
+    {    
+        this.dates = [];
+        this.tickets.forEach((tickets__value) =>
         {
-            this.saveTickets();
-            return false;
+            if( tickets__value.date !== null )
+            {
+                let date = null;
+                let title = tickets__value.project+'\n'+(tickets__value.description||'').substring(0,100);
+                let ticket_dates = tickets__value.date.split('\n');
+                ticket_dates.forEach((ticket_dates__value, ticket_dates__key) =>
+                {
+                    if( (ticket_dates__key%2) === 0 )
+                    {
+                        date = {
+                            title: title
+                        };
+                    }
+                    date[(((ticket_dates__key%2)===0)?('start'):('end'))] = ticket_dates__value;
+                    if( (ticket_dates__key%2) === 1 )
+                    {
+                        this.dates.push(date);
+                    }
+                });
+            }   
         });
+        return this.dates;
     }
 
 }
