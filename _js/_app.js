@@ -11,7 +11,7 @@ export default class App
     {       
         this.db = null;
         this.tickets = null;        
-        this.url = 'http://localhost:5984/hosea';        
+        this.couchdb = 'http://localhost:5984/hosea';
         this.cols = [
             'person',
             'status',
@@ -22,6 +22,12 @@ export default class App
             'project',
             'description'
         ];
+        this.colors = {
+            'idle': '#b3e5fc',
+            'done': '#fff59d',
+            'billed': '#81c784',
+            'working': '#ef9a9a'
+        };
         this.dates = null;
     }
 
@@ -29,12 +35,17 @@ export default class App
     {
           this.initDatabase();
     await this.cleanDatabase();
+    //await this.backupDatabase();
     await this.fetchTickets();
           this.buildHtml();
           this.textareaAutoHeight();
           this.setupBindings();
           this.initKeyboardNavigation();
           this.initScheduler();
+          this.initFilter();
+          this.initSort();
+          this.updateColors();
+          this.updateSum();
     }
 
     setupBindings()
@@ -49,7 +60,7 @@ export default class App
     
     initDatabase()
     {
-        this.db = new PouchDB(this.url);
+        this.db = new PouchDB(this.couchdb);
     }
 
     cleanDatabase()
@@ -63,7 +74,30 @@ export default class App
             {
                 console.log(error);
                 reject();
-            });
+            });            
+        });
+    }
+
+    backupDatabase()
+    {
+        return new Promise((resolve,reject) =>
+        {
+            resolve();
+            /*
+            const couchbackup = require('@cloudant/couchbackup');
+            couchbackup.backup(
+                this.couchdb,
+                fs.createWriteStream('backup.txt'),
+                  {parallelism: 2},
+                  function(err, data) {
+                    if (err) {
+                      console.error("Failed! " + err);
+                    } else {
+                        console.log('backup complete!');
+                        resolve();
+                    }
+                  });
+                  */
         });
     }
 
@@ -80,6 +114,16 @@ export default class App
                 tickets.rows.forEach((tickets__value) =>
                 {
                     this.tickets.push(tickets__value.doc);
+                });
+                this.tickets = this.tickets.sort((a, b) =>
+                {
+                    if( a.date < b.date ) { return -1; }
+                    if( a.date > b.date ) { return 1; }
+                    if( a.status < b.status ) { return 1; }
+                    if( a.status > b.status ) { return -1; }
+                    if( a._id < b._id ) { return -1; }
+                    if( a._id > b._id ) { return 1; }
+                    return 0;
                 });
                 resolve();
             }).catch((error) =>
@@ -98,19 +142,24 @@ export default class App
                 </thead>
                 <tbody>
                 </tbody>
+                <tfoot>
+                    <tr></tr>
+                </tfoot>
             </table>
+            <a href="#" class="button_save">Speichern</a>
         `);
         this.cols.forEach((cols__value) =>
         {
             $('.ticket_table thead tr').append('<td>'+cols__value+'</td>');
+            $('.ticket_table tfoot tr').append('<td>'+((cols__value=='time')?('<span class="sum"></span>'):(''))+'</td>');
         });
         $('.ticket_table thead tr').append('<td>attachments</td><td>delete</td>');
+        $('.ticket_table tfoot tr').append('<td></td><td></td>');
         this.tickets.forEach((tickets__value) => {
             $('.ticket_table tbody').append(
                 this.createHtmlLine(tickets__value)
             );
         });
-        $('#app').append('<a href="#" class="button_save">Speichern</a>');
     }    
 
     textareaAutoHeight()
@@ -485,6 +534,7 @@ export default class App
                     this.unlockTicket(value.id, value.rev);
                 });
                 this.refreshScheduler();
+                this.updateColors();
                 resolve();
             }).catch((error) =>
             {
@@ -581,6 +631,7 @@ export default class App
             defaultView: 'agendaWeek',
             weekends: true,
             allDaySlot: false,
+            eventTextColor: '#000000',
             /*
             aspectRatio: 3,
             */
@@ -632,7 +683,8 @@ export default class App
                     if( (ticket_dates__key%2) === 0 )
                     {
                         date = {
-                            title: title
+                            title: title,
+                            backgroundColor: this.getColor(tickets__value.status),
                         };
                     }
                     date[(((ticket_dates__key%2)===0)?('start'):('end'))] = ticket_dates__value;
@@ -644,6 +696,138 @@ export default class App
             }   
         });
         return this.dates;
+    }
+
+    initFilter()
+    {
+        $('#meta #filter').remove();
+        $('#meta').append('<div id="filter"></div>');
+        ['person', 'status', 'priority', 'date', 'project'].forEach((columns__value) =>
+        {
+            $('#filter').append(`
+                <select name="${columns__value}">
+                    <option value="*">${columns__value}</option>
+                </select>
+            `);
+            let options = [];
+            this.tickets.forEach((tickets__value) =>
+            {
+                let options_value = tickets__value[columns__value];
+                if( columns__value == 'date' && options_value != '' )
+                {
+                    options_value = options_value.substring(0,10);
+                }
+                if( !options.includes(options_value) )
+                {
+                    options.push(options_value);
+                }
+            });
+            options.sort();
+            options.forEach((options__value) =>
+            {
+                $('#filter select[name="'+columns__value+'"]').append('<option value="'+options__value+'">'+options__value+'</option>');
+            });
+            $('#filter select').change((el) =>
+            {
+                this.tickets.forEach((tickets__value) =>
+                {
+                    let visible = true;
+                    $('#filter select').each((index,el) =>
+                    {
+                        let val_search = $(el).val();
+                        let val_target = tickets__value[$(el).attr('name')];
+                        if( $(el).attr('name') == 'date' )
+                        {
+                            val_target = val_target.substring(0,10);
+                        }
+                        if( val_search != '*' && val_target != val_search )
+                        {
+                            visible = false;
+                        }
+                    });
+                    if( visible === false )
+                    {
+                        tickets__value.visible = false;
+                        $('#app .ticket_entry[data-id="'+tickets__value._id+'"]').hide();
+                    }
+                    else
+                    {
+                        $('#app .ticket_entry[data-id="'+tickets__value._id+'"]').show();
+                        tickets__value.visible = true;
+                    }                    
+                });
+                this.updateSum();
+            });
+        });
+    }
+
+    initSort()
+    {
+        $('#meta #sort').remove();
+        $('#meta').append('<div id="sort"></div>');
+        [1,2].forEach((step) =>
+        {
+            $('#sort').append('<select name="sort_'+step+'"><option value="">sort #'+step+'</option></select>');
+            this.cols.forEach((columns__value) =>
+            {
+                $('#sort select[name="sort_'+step+'"]').append('<option value="'+columns__value+'">'+columns__value+'</option>');
+            });
+        });
+        $('#sort select').change((el) =>
+        {
+            let sort_1 = $('#sort select[name="sort_1"]').val(),
+                sort_2 = $('#sort select[name="sort_2"]').val();
+            if( sort_1 != '' )
+            {
+                let sorted = $('#app .ticket_table tbody .ticket_entry').sort((a, b) =>
+                {
+                    if( $(a).find('[name="'+sort_1+'"]').val() < $(b).find('[name="'+sort_1+'"]').val() ) { return -1; }
+                    if( $(a).find('[name="'+sort_1+'"]').val() > $(b).find('[name="'+sort_1+'"]').val() ) { return 1; }
+                    if( sort_2 != '' )
+                    {
+                        if( $(a).find('[name="'+sort_2+'"]').val() < $(b).find('[name="'+sort_2+'"]').val() ) { return -1; }
+                        if( $(a).find('[name="'+sort_2+'"]').val() > $(b).find('[name="'+sort_2+'"]').val() ) { return 1; }
+                    }
+                    if( $(a).find('[name="status"]').val() < $(b).find('[name="status"]').val() ) { return 1; }
+                    if( $(a).find('[name="status"]').val() > $(b).find('[name="status"]').val() ) { return -1; }
+                    if( $(a).attr('data-id') < $(b).attr('data-id') ) { return -1; }
+                    if( $(a).attr('data-id') > $(b).attr('data-id') ) { return 1; }
+                    return 0;
+                });
+                $('#app .ticket_table tbody').html(sorted);
+            }
+        });
+    }
+
+    getColor(status)
+    {
+        let color = '#f2f2f2';
+        if( status !== null && status != '' && this.colors.hasOwnProperty(status) )
+        {
+            color = this.colors[status];
+        }
+        return color;
+    }
+
+    updateColors()
+    {
+        this.tickets.forEach((tickets__value) =>
+        {
+            $('#app .ticket_entry[data-id="'+tickets__value._id+'"]').css('background-color',this.getColor(tickets__value.status));
+        });   
+    }
+
+    updateSum()
+    {
+        let sum = 0;
+        this.tickets.forEach((tickets__value) =>
+        {
+            if( tickets__value.visible !== false && tickets__value.time !== null )
+            {
+                sum += parseFloat(tickets__value.time.replace(',','.'));
+            }
+        });
+        $('#app .ticket_table tfoot .sum').text(sum);
     }
 
 }
