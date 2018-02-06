@@ -26,7 +26,8 @@ export default class App
             'idle': '#b3e5fc',
             'done': '#fff59d',
             'billed': '#81c784',
-            'working': '#ef9a9a'
+            'working': '#ef9a9a',
+            'delegated': '#ce93d8'
         };
         this.dates = null;
     }
@@ -114,16 +115,6 @@ export default class App
                 tickets.rows.forEach((tickets__value) =>
                 {
                     this.tickets.push(tickets__value.doc);
-                });
-                this.tickets = this.tickets.sort((a, b) =>
-                {
-                    if( a.date < b.date ) { return -1; }
-                    if( a.date > b.date ) { return 1; }
-                    if( a.status < b.status ) { return 1; }
-                    if( a.status > b.status ) { return -1; }
-                    if( a._id < b._id ) { return -1; }
-                    if( a._id > b._id ) { return 1; }
-                    return 0;
                 });
                 resolve();
             }).catch((error) =>
@@ -727,38 +718,57 @@ export default class App
             {
                 $('#filter select[name="'+columns__value+'"]').append('<option value="'+options__value+'">'+options__value+'</option>');
             });
+            this.doFilter();
             $('#filter select').change((el) =>
             {
-                this.tickets.forEach((tickets__value) =>
-                {
-                    let visible = true;
-                    $('#filter select').each((index,el) =>
-                    {
-                        let val_search = $(el).val();
-                        let val_target = tickets__value[$(el).attr('name')];
-                        if( $(el).attr('name') == 'date' )
-                        {
-                            val_target = val_target.substring(0,10);
-                        }
-                        if( val_search != '*' && val_target != val_search )
-                        {
-                            visible = false;
-                        }
-                    });
-                    if( visible === false )
-                    {
-                        tickets__value.visible = false;
-                        $('#app .ticket_entry[data-id="'+tickets__value._id+'"]').hide();
-                    }
-                    else
-                    {
-                        $('#app .ticket_entry[data-id="'+tickets__value._id+'"]').show();
-                        tickets__value.visible = true;
-                    }                    
-                });
-                this.updateSum();
+                this.doFilter();
             });
         });
+    }
+
+    doFilter()
+    {
+        this.tickets.forEach((tickets__value) =>
+        {
+            let visible = true;
+            $('#filter select').each((index,el) =>
+            {
+                let val_search = $(el).val();
+                let val_target = tickets__value[$(el).attr('name')];
+                if( $(el).attr('name') == 'date' )
+                {
+                    val_target = val_target.substring(0,10);
+                }
+                if( val_search != '*' && val_target != val_search )
+                {
+                    visible = false;
+                }
+                /* hide billed in overview */
+                if(
+                    $(el).attr('name') == 'status'
+                    &&
+                    val_search == '*'
+                    &&
+                    val_target == 'billed'
+                    &&
+                    ($('#filter select[name="date"]').val() == '*' || $('#filter select[name="date"]').val() == '')
+                )
+                {
+                    visible = false;
+                }                
+            });
+            if( visible === false )
+            {
+                tickets__value.visible = false;
+                $('#app .ticket_entry[data-id="'+tickets__value._id+'"]').hide();
+            }
+            else
+            {
+                $('#app .ticket_entry[data-id="'+tickets__value._id+'"]').show();
+                tickets__value.visible = true;
+            }                    
+        });
+        this.updateSum();
     }
 
     initSort()
@@ -773,30 +783,42 @@ export default class App
                 $('#sort select[name="sort_'+step+'"]').append('<option value="'+columns__value+'">'+columns__value+'</option>');
             });
         });
+        this.doSort();
         $('#sort select').change((el) =>
         {
-            let sort_1 = $('#sort select[name="sort_1"]').val(),
-                sort_2 = $('#sort select[name="sort_2"]').val();
-            if( sort_1 != '' )
+            this.doSort();
+        });
+    }
+
+
+    doSort()
+    {
+        let sort_1 = $('#sort select[name="sort_1"]').val(),
+            sort_2 = $('#sort select[name="sort_2"]').val(),
+            sorted = $('#app .ticket_table tbody .ticket_entry').sort((a, b) =>
             {
-                let sorted = $('#app .ticket_table tbody .ticket_entry').sort((a, b) =>
+                if( sort_1 != '' )
                 {
                     if( $(a).find('[name="'+sort_1+'"]').val() < $(b).find('[name="'+sort_1+'"]').val() ) { return -1; }
                     if( $(a).find('[name="'+sort_1+'"]').val() > $(b).find('[name="'+sort_1+'"]').val() ) { return 1; }
-                    if( sort_2 != '' )
-                    {
-                        if( $(a).find('[name="'+sort_2+'"]').val() < $(b).find('[name="'+sort_2+'"]').val() ) { return -1; }
-                        if( $(a).find('[name="'+sort_2+'"]').val() > $(b).find('[name="'+sort_2+'"]').val() ) { return 1; }
-                    }
-                    if( $(a).find('[name="status"]').val() < $(b).find('[name="status"]').val() ) { return 1; }
-                    if( $(a).find('[name="status"]').val() > $(b).find('[name="status"]').val() ) { return -1; }
-                    if( $(a).attr('data-id') < $(b).attr('data-id') ) { return -1; }
-                    if( $(a).attr('data-id') > $(b).attr('data-id') ) { return 1; }
-                    return 0;
-                });
-                $('#app .ticket_table tbody').html(sorted);
-            }
-        });
+                }
+                else
+                {
+                    if( $(a).find('[name="date"]').val() < $(b).find('[name="date"]').val() ) { return -1; }
+                    if( $(a).find('[name="date"]').val() > $(b).find('[name="date"]').val() ) { return 1; }
+                }
+                if( sort_2 != '' )
+                {
+                    if( $(a).find('[name="'+sort_2+'"]').val() < $(b).find('[name="'+sort_2+'"]').val() ) { return -1; }
+                    if( $(a).find('[name="'+sort_2+'"]').val() > $(b).find('[name="'+sort_2+'"]').val() ) { return 1; }
+                }
+                if( $(a).find('[name="status"]').val() < $(b).find('[name="status"]').val() ) { return 1; }
+                if( $(a).find('[name="status"]').val() > $(b).find('[name="status"]').val() ) { return -1; }
+                if( $(a).attr('data-id') < $(b).attr('data-id') ) { return -1; }
+                if( $(a).attr('data-id') > $(b).attr('data-id') ) { return 1; }
+                return 0;
+            });
+        $('#app .ticket_table tbody').html(sorted);
     }
 
     getColor(status)
@@ -817,16 +839,19 @@ export default class App
         });   
     }
 
+
     updateSum()
     {
         let sum = 0;
         this.tickets.forEach((tickets__value) =>
         {
-            if( tickets__value.visible !== false && tickets__value.time !== null )
+            if( tickets__value.visible !== false && tickets__value.time !== null && tickets__value.time != '' )
             {
                 sum += parseFloat(tickets__value.time.replace(',','.'));
             }
         });
+        sum = (Math.round(sum*100)/100);
+        sum = sum.replace('.',',');
         $('#app .ticket_table tfoot .sum').text(sum);
     }
 
