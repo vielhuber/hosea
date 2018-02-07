@@ -83,22 +83,14 @@ export default class App
     {
         return new Promise((resolve,reject) =>
         {
-            resolve();
-            /*
-            const couchbackup = require('@cloudant/couchbackup');
-            couchbackup.backup(
-                this.couchdb,
-                fs.createWriteStream('backup.txt'),
-                  {parallelism: 2},
-                  function(err, data) {
-                    if (err) {
-                      console.error("Failed! " + err);
-                    } else {
-                        console.log('backup complete!');
-                        resolve();
-                    }
-                  });
-                  */
+            let remote = new PouchDB('https://0e83f576-77fc-4b6e-bd3f-c10a1ad83b2a-bluemix:7e9f08c47e293b97d0eb241db52a155b79f80f1fb8841849f762b67b1e2fbd94@0e83f576-77fc-4b6e-bd3f-c10a1ad83b2a-bluemix.cloudant.com/hosea');
+            this.db.replicate.to(remote).on('complete',() =>
+            {
+              console.log('OK');
+            }).on('error', (error) =>
+            {
+                console.log(error);
+            });
         });
     }
 
@@ -157,6 +149,7 @@ export default class App
     {
         Helpers.textareaAutoHeight('#app textarea');
     }
+
 
     getTicketData( document_id )
     {
@@ -394,8 +387,12 @@ export default class App
                 alert('don\'t delete the genesis block!');
                 return false;
             }
-            this.deleteTicket( document_id ).then((result) => { }).catch((error) => { });
-            $(e.currentTarget).closest('.ticket_entry').remove();
+            var result = confirm('Sind Sie sicher?');
+            if( result )
+            {
+                this.deleteTicket( document_id ).then((result) => { }).catch((error) => { });
+                $(e.currentTarget).closest('.ticket_entry').remove();
+            }
             return false;
         });
     }
@@ -539,48 +536,59 @@ export default class App
     {
         $('#app').on('keydown', '.ticket_entry :input', (e) =>
         {
+            let left = $(e.currentTarget).closest('td').prev('td'),
+                right = $(e.currentTarget).closest('td').next('td'),
+                top = $(e.currentTarget).closest('tr').prevAll(':visible').first(),
+                down = $(e.currentTarget).closest('tr').nextAll(':visible').first(),
+                index = ($(e.currentTarget).closest('td').prevAll('td').length+1);
+
+            console.log(top);
+            console.log(down);
+
             // arrow right (switch)
-            if( e.keyCode === 39 && $(e.currentTarget).closest('td').next('td').length > 0 && e.currentTarget.selectionEnd >= $(e.currentTarget).val().length )
+            if( e.keyCode === 39 && right.length > 0 && e.currentTarget.selectionEnd >= $(e.currentTarget).val().length )
             {
-                $(e.currentTarget).closest('td').next('td').find(':input').focus();
+                right.find(':input').focus();
             }
             // arrow left (switch)
-            if( e.keyCode === 37 && $(e.currentTarget).closest('td').prev('td').length > 0 && e.currentTarget.selectionEnd <= 0 )
+            if( e.keyCode === 37 && left.length > 0 && e.currentTarget.selectionEnd <= 0 )
             {
-                $(e.currentTarget).closest('td').prev('td').find(':input').focus();
+                left.find(':input').focus();
             }
             // arrow top (switch)
-            if( e.keyCode === 38 && $(e.currentTarget).closest('tr').prev('tr').length > 0 && e.currentTarget.selectionEnd <= 0 )
+            if( e.keyCode === 38 && top.length > 0 && e.currentTarget.selectionEnd <= 0 )
             {
-                $(e.currentTarget).closest('tr').prev('tr').find('td:nth-child('+($(e.currentTarget).closest('td').prevAll('td').length+1)+')').find(':input').focus();
+                top.find('td:nth-child('+index+')').find(':input').focus();
             }
             // arrow down (switch)
-            if( e.keyCode === 40 && $(e.currentTarget).closest('tr').next('tr').length > 0 && e.currentTarget.selectionEnd >= $(e.currentTarget).val().length )
+            if( e.keyCode === 40 && down.length > 0 && e.currentTarget.selectionEnd >= $(e.currentTarget).val().length )
             {
-                $(e.currentTarget).closest('tr').next('tr').find('td:nth-child('+($(e.currentTarget).closest('td').prevAll('td').length+1)+')').find(':input').focus();
+                down.find('td:nth-child('+index+')').find(':input').focus();
             }
             // arrow down (create)
-            if( e.keyCode === 40 && $(e.currentTarget).closest('tr').next('tr').length === 0 && e.currentTarget.selectionEnd >= $(e.currentTarget).val().length )
+            if( e.keyCode === 40 && down.length === 0 && e.currentTarget.selectionEnd >= $(e.currentTarget).val().length )
             {
-                if( this.lastLineIsEmpty() )
-                {
-                    return false;
-                }
                 this.createTicket().then((ticket) =>
                 {
                     $('.ticket_table tbody').append(this.createHtmlLine(ticket));
-                    $(e.currentTarget).closest('tr').next('tr').find('td:nth-child('+($(e.currentTarget).closest('td').prevAll('td').length+1)+')').find(':input').focus();
+                    $('.ticket_table tbody .ticket_entry:last-child').find('td:nth-child('+index+')').find(':input').focus();
                 }).catch((error) =>
                 {
                     console.log(error);
-                });            }
+                });
+            }
         });
     }
 
     lastLineIsEmpty()
     {
         let empty = true;
-        $('.ticket_entry:last-child :input').each((index,el) =>
+        let last = $('.ticket_entry:last-child');
+        while( !last.is(':visible') && last.prev('.ticket_entry').length > 0 )
+        {
+            last = last.prev('.ticket_entry');
+        }
+        last.find(':input').each((index,el) =>
         {
             if( $(el).val() != '' )
             {
@@ -664,7 +672,7 @@ export default class App
         this.dates = [];
         this.tickets.forEach((tickets__value) =>
         {
-            if( tickets__value.date !== null )
+            if( tickets__value.date !== null && tickets__value.date != '' )
             {
                 let date = null;
                 let title = tickets__value.project+'\n'+(tickets__value.description||'').substring(0,100);
@@ -704,7 +712,7 @@ export default class App
             this.tickets.forEach((tickets__value) =>
             {
                 let options_value = tickets__value[columns__value];
-                if( columns__value == 'date' && options_value != '' )
+                if( columns__value == 'date' && options_value != null && options_value != '' )
                 {
                     options_value = options_value.substring(0,10);
                 }
@@ -735,7 +743,7 @@ export default class App
             {
                 let val_search = $(el).val();
                 let val_target = tickets__value[$(el).attr('name')];
-                if( $(el).attr('name') == 'date' )
+                if( $(el).attr('name') == 'date' && val_target !== null )
                 {
                     val_target = val_target.substring(0,10);
                 }
@@ -851,7 +859,7 @@ export default class App
             }
         });
         sum = (Math.round(sum*100)/100);
-        sum = sum.replace('.',',');
+        sum = sum.toString().replace('.',',');
         $('#app .ticket_table tfoot .sum').text(sum);
     }
 
