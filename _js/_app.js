@@ -57,6 +57,7 @@ export default class App
         this.bindDeleteAttachment();
         this.bindDelete();
         this.bindSave();
+        this.bindCreate();
     }
     
     initDatabase()
@@ -148,6 +149,11 @@ export default class App
     textareaAutoHeight()
     {
         Helpers.textareaAutoHeight('#app textarea');
+    }
+
+    textareaSetHeights()
+    {
+        Helpers.textareaSetHeights('#app textarea');
     }
 
 
@@ -262,6 +268,29 @@ export default class App
                             focus.focus();
                         }
                     }).catch((error) => { console.log(error); });
+                    return false;
+                }
+            }
+        });
+    }
+
+    bindCreate()
+    {
+        // ctrl+z
+        $(window).bind('keydown', (event) =>
+        {
+            if(event.ctrlKey || event.metaKey)
+            {
+                if(String.fromCharCode(event.which).toLowerCase() === 'z')
+                {
+                    this.createTicket().then((ticket) =>
+                    {
+                        $('.ticket_table tbody').append(this.createHtmlLine(ticket));
+                        $('.ticket_table tbody .ticket_entry:last-child').find('td:nth-child(1)').find(':input').focus();
+                    }).catch((error) =>
+                    {
+                        console.log(error);
+                    }); 
                     return false;
                 }
             }
@@ -392,6 +421,7 @@ export default class App
             {
                 this.deleteTicket( document_id ).then((result) => { }).catch((error) => { });
                 $(e.currentTarget).closest('.ticket_entry').remove();
+                this.updateSum();
             }
             return false;
         });
@@ -523,6 +553,7 @@ export default class App
                 });
                 this.refreshScheduler();
                 this.updateColors();
+                this.updateSum();
                 resolve();
             }).catch((error) =>
             {
@@ -541,9 +572,6 @@ export default class App
                 top = $(e.currentTarget).closest('tr').prevAll(':visible').first(),
                 down = $(e.currentTarget).closest('tr').nextAll(':visible').first(),
                 index = ($(e.currentTarget).closest('td').prevAll('td').length+1);
-
-            console.log(top);
-            console.log(down);
 
             // arrow right (switch)
             if( e.keyCode === 39 && right.length > 0 && e.currentTarget.selectionEnd >= $(e.currentTarget).val().length )
@@ -564,18 +592,6 @@ export default class App
             if( e.keyCode === 40 && down.length > 0 && e.currentTarget.selectionEnd >= $(e.currentTarget).val().length )
             {
                 down.find('td:nth-child('+index+')').find(':input').focus();
-            }
-            // arrow down (create)
-            if( e.keyCode === 40 && down.length === 0 && e.currentTarget.selectionEnd >= $(e.currentTarget).val().length )
-            {
-                this.createTicket().then((ticket) =>
-                {
-                    $('.ticket_table tbody').append(this.createHtmlLine(ticket));
-                    $('.ticket_table tbody .ticket_entry:last-child').find('td:nth-child('+index+')').find(':input').focus();
-                }).catch((error) =>
-                {
-                    console.log(error);
-                });
             }
         });
     }
@@ -636,11 +652,18 @@ export default class App
             */
             height: 'auto',
             contentHeight: 'auto',
-            businessHours: {
-                dow: [ 1, 2, 3, 4, 5 ],
-                start: '09:00',
-                end: '18:00'
-            },
+            businessHours: [
+                {
+                    dow: [ 1, 2, 3, 4, 5 ],
+                    start: '09:00',
+                    end: '13:00'
+                },
+                {
+                    dow: [ 1, 2, 3, 4, 5 ],
+                    start: '14:00',
+                    end: '18:00'
+                }
+            ],
             minTime: '09:00:00',
             //maxTime: '24:00:00',
         });
@@ -721,7 +744,10 @@ export default class App
                     options.push(options_value);
                 }
             });
-            options.sort();
+            options.sort((a, b) =>
+            {
+                return a.toLowerCase().localeCompare(b.toLowerCase());
+            });
             options.forEach((options__value) =>
             {
                 $('#filter select[name="'+columns__value+'"]').append('<option value="'+options__value+'">'+options__value+'</option>');
@@ -776,7 +802,9 @@ export default class App
                 tickets__value.visible = true;
             }                    
         });
+        this.doSort();
         this.updateSum();
+        this.textareaSetHeights()
     }
 
     initSort()
@@ -853,7 +881,12 @@ export default class App
         let sum = 0;
         this.tickets.forEach((tickets__value) =>
         {
-            if( tickets__value.visible !== false && tickets__value.time !== null && tickets__value.time != '' )
+            if(
+                tickets__value.visible !== false &&
+                tickets__value.time !== null &&
+                tickets__value.time != '' &&
+                !['idle', 'done', 'billed', 'delegated'].includes(tickets__value.status)
+            )
             {
                 sum += parseFloat(tickets__value.time.replace(',','.'));
             }
