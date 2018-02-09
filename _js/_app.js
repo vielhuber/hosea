@@ -69,7 +69,7 @@ export default class App
     {
         return new Promise((resolve,reject) =>
         {
-            this.db.compact().then((info) => 
+            this.db.compact().then(() => 
             {
                 resolve();
             }).catch((error) =>
@@ -88,9 +88,11 @@ export default class App
             this.db.replicate.to(remote).on('complete',() =>
             {
               console.log('OK');
+              resolve();
             }).on('error', (error) =>
             {
                 console.log(error);
+                reject();
             });
         });
     }
@@ -319,7 +321,6 @@ export default class App
                 e.currentTarget.files
             ).then((attachment_ids) =>
             {
-                console.log(attachment_ids);
                 $(e.currentTarget).val('');
                 attachment_ids.forEach((attachment_ids__value) =>
                 {
@@ -385,7 +386,6 @@ export default class App
     { 
         this.db.getAttachment( document_id, attachment_id ).then((blob) =>
         {                
-            console.log(blob);
             let a = $('<a style="display: none;" />');
             let url = URL.createObjectURL(blob);
             a.attr('href', url);
@@ -422,6 +422,8 @@ export default class App
                 this.deleteTicket( document_id ).then((result) => { }).catch((error) => { });
                 $(e.currentTarget).closest('.ticket_entry').remove();
                 this.updateSum();
+                this.updateFilter();
+                return false;
             }
             return false;
         });
@@ -481,7 +483,7 @@ export default class App
     unlockTicket(document_id, rev, leave_changed = false)
     {
         this.setTicketData(document_id, '_rev', rev);
-        console.log('unlocking ticket '+document_id);
+        //console.log('unlocking ticket '+document_id);
         if( leave_changed === false )
         {
             $('.ticket_entry[data-id="'+document_id+'"]').removeClass('ticket_entry--changed');
@@ -554,6 +556,7 @@ export default class App
                 this.refreshScheduler();
                 this.updateColors();
                 this.updateSum();
+                this.updateFilter();
                 resolve();
             }).catch((error) =>
             {
@@ -639,7 +642,6 @@ export default class App
     initScheduler()
     {
         $('#scheduler').fullCalendar({
-            weekends: false,
             locale: 'de',
             editable: false,
             events: this.generateDates(),
@@ -722,7 +724,26 @@ export default class App
 
     initFilter()
     {
-        $('#meta #filter').remove();
+        this.initUpdateFilter(false);
+    }
+
+    updateFilter()
+    {
+        this.initUpdateFilter(true);
+    }
+
+    initUpdateFilter(update)
+    {
+        let selected = {};
+        if( update === true )
+        {
+            $('#meta #filter select').each((index, el) =>
+            {
+                selected[$(el).attr('name')] = $(el).val();
+            });
+            $('#meta #filter').remove();
+        } 
+
         $('#meta').append('<div id="filter"></div>');
         ['person', 'status', 'priority', 'date', 'project'].forEach((columns__value) =>
         {
@@ -752,11 +773,22 @@ export default class App
             {
                 $('#filter select[name="'+columns__value+'"]').append('<option value="'+options__value+'">'+options__value+'</option>');
             });
-            this.doFilter();
-            $('#filter select').change((el) =>
+
+            if( update === false )
             {
                 this.doFilter();
-            });
+                $('#meta').on('change', '#filter select', () =>
+                {
+                    this.doFilter();
+                });
+            }
+            else
+            {
+                Object.entries(selected).forEach(([selected__key, selected__value]) =>
+                {
+                    $('#meta #filter [name="'+selected__key+'"]').val(selected__value);
+                });
+            }
         });
     }
 
@@ -804,12 +836,11 @@ export default class App
         });
         this.doSort();
         this.updateSum();
-        this.textareaSetHeights()
+        this.textareaSetHeights();
     }
 
     initSort()
     {
-        $('#meta #sort').remove();
         $('#meta').append('<div id="sort"></div>');
         [1,2].forEach((step) =>
         {
@@ -820,7 +851,7 @@ export default class App
             });
         });
         this.doSort();
-        $('#sort select').change((el) =>
+        $('#meta').on('change', '#sort select', () =>
         {
             this.doSort();
         });
