@@ -11,7 +11,8 @@ export default class App
     {       
         this.db = null;
         this.tickets = null;        
-        this.couchdb = 'http://localhost:5984/hosea';
+        this.url = null;
+        this.backup = null;
         this.cols = [
             'person',
             'status',
@@ -34,9 +35,10 @@ export default class App
 
     async init()
     {
+    await this.readConfig();
           this.initDatabase();
     await this.cleanDatabase();
-    //await this.backupDatabase();
+    await this.backupDatabase();
     await this.fetchTickets();
           this.buildHtml();
           this.textareaAutoHeight();
@@ -59,10 +61,27 @@ export default class App
         this.bindSave();
         this.bindCreate();
     }
+
+    readConfig()
+    {        
+        return new Promise((resolve,reject) =>
+        {
+            Helpers.get('config.json', (data) =>
+            {
+                this.url = data.url;
+                this.backup = data.backup;
+                resolve();
+            }, () =>
+            {
+                reject();
+                console.log(error);
+            });          
+        });
+    }
     
     initDatabase()
     {
-        this.db = new PouchDB(this.couchdb);
+        this.db = new PouchDB(this.url);
     }
 
     cleanDatabase()
@@ -80,21 +99,25 @@ export default class App
         });
     }
 
+
     backupDatabase()
     {
         return new Promise((resolve,reject) =>
         {
-            let remote = new PouchDB('https://0e83f576-77fc-4b6e-bd3f-c10a1ad83b2a-bluemix:7e9f08c47e293b97d0eb241db52a155b79f80f1fb8841849f762b67b1e2fbd94@0e83f576-77fc-4b6e-bd3f-c10a1ad83b2a-bluemix.cloudant.com/hosea');
-            this.db.replicate.to(remote).on('complete',() =>
+            let remote = new PouchDB(this.backup);
+            let replication = PouchDB.replicate(this.db, remote, {
+                live: false,
+                retry: false
+            }).on('complete', (info) =>
             {
-              console.log('OK');
-              resolve();
+                console.log('backuped database to local couchdb instance');
+                resolve();
             }).on('error', (error) =>
             {
                 console.log(error);
                 reject();
             });
-        });
+        });        
     }
 
     fetchTickets()
@@ -150,12 +173,12 @@ export default class App
 
     textareaAutoHeight()
     {
-        Helpers.textareaAutoHeight('#app textarea');
+        //Helpers.textareaAutoHeight('#app textarea');
     }
 
     textareaSetHeights()
     {
-        Helpers.textareaSetHeights('#app textarea');
+        //Helpers.textareaSetHeights('#app textarea');
     }
 
 
@@ -278,11 +301,13 @@ export default class App
 
     bindCreate()
     {
-        // ctrl+z
+        // ctrl+*
         $(window).bind('keydown', (event) =>
         {
             if(event.ctrlKey || event.metaKey)
             {
+                console.log(event.which);
+                console.log(String.fromCharCode(event.which).toLowerCase());
                 if(String.fromCharCode(event.which).toLowerCase() === 'z')
                 {
                     this.createTicket().then((ticket) =>
