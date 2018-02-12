@@ -173,12 +173,12 @@ export default class App
 
     textareaAutoHeight()
     {
-        //Helpers.textareaAutoHeight('#app textarea');
+        Helpers.textareaAutoHeight('#app textarea');
     }
 
     textareaSetHeights()
     {
-        //Helpers.textareaSetHeights('#app textarea');
+        Helpers.textareaSetHeights('#app textarea');
     }
 
 
@@ -306,9 +306,7 @@ export default class App
         {
             if(event.ctrlKey || event.metaKey)
             {
-                console.log(event.which);
-                console.log(String.fromCharCode(event.which).toLowerCase());
-                if(String.fromCharCode(event.which).toLowerCase() === 'z')
+                if(event.which === 187)
                 {
                     this.createTicket().then((ticket) =>
                     {
