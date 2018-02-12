@@ -6,9 +6,9 @@ import 'fullcalendar/dist/locale/de';
 
 export default class App
 {
-
     constructor()
-    {       
+    {
+
         this.db = null;
         this.tickets = null;        
         this.url = null;
@@ -179,7 +179,7 @@ export default class App
 
     textareaSetHeights()
     {
-        Helpers.textareaSetHeights('#app textarea.autosize:visible');
+        Helpers.textareaSetHeights('#app textarea.autosize');
     }
 
 
