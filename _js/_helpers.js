@@ -244,7 +244,7 @@ export default class Helpers
     static textareaAutoHeight(selector)
     {
 
-        this.textareaSetHeights(selector);
+        //this.textareaSetHeights(selector);
 
         window.addEventListener('resize', () =>
         {

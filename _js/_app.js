@@ -164,7 +164,8 @@ export default class App
         });
         $('.ticket_table thead tr').append('<td>attachments</td><td>delete</td>');
         $('.ticket_table tfoot tr').append('<td></td><td></td>');
-        this.tickets.forEach((tickets__value) => {
+        this.tickets.forEach((tickets__value) =>
+        {
             $('.ticket_table tbody').append(
                 this.createHtmlLine(tickets__value)
             );
@@ -173,12 +174,12 @@ export default class App
 
     textareaAutoHeight()
     {
-        Helpers.textareaAutoHeight('#app textarea');
+        Helpers.textareaAutoHeight('#app textarea.autosize');
     }
 
     textareaSetHeights()
     {
-        Helpers.textareaSetHeights('#app textarea');
+        Helpers.textareaSetHeights('#app textarea.autosize:visible');
     }
 
 
@@ -224,11 +225,9 @@ export default class App
 
         this.cols.forEach((cols__value) =>
         {
-            html += `
-                <td>
-                    <textarea name="${cols__value}">${ticket[cols__value]||''}</textarea>
-                </td>
-            `;
+            html += '<td>';
+                html += '<textarea '+((['date','description'].includes(cols__value))?(' class="autosize"'):(''))+' name="'+cols__value+'">'+(ticket[cols__value]||'')+'</textarea>';
+            html += '</td>';
         });
         
         html += `
@@ -244,7 +243,9 @@ export default class App
         html += `
                 </ul>
 
-                <input type="file" name="attachments" multiple="multiple" />
+                <label class="ticket_entry__upload">
+                    <input type="file" name="attachments" multiple="multiple" />
+                </label>
    
             </td>
             <td>
@@ -264,8 +265,8 @@ export default class App
     {
         return `
             <li class="ticket_entry__attachment" data-id="${attachment_id}">
-                <a class="ticket_entry__attachment_download" href="#">${ this.getFilename(attachment_id) }</a>
-                <a class="ticket_entry__attachment_delete" href="#">löschen</a>
+                <a class="ticket_entry__attachment_download" href="#" title="${ this.getFilename(attachment_id) }"></a>
+                <a class="ticket_entry__attachment_delete" href="#" title="Löschen"></a>
             </li>
         `;
     }
@@ -277,7 +278,7 @@ export default class App
         {
             this.saveTickets().then(() => { }).catch((error) => { console.log(error); });
             return false;
-        });
+        });        
 
         // ctrl+s
         $(window).bind('keydown', (event) =>
@@ -287,12 +288,16 @@ export default class App
             {
                 if(String.fromCharCode(event.which).toLowerCase() === 's')
                 {
-                    this.saveTickets().then(() => {
+                    this.saveTickets().then(() =>
+                    {
                         if( focus.length > 0 )
                         {
                             focus.focus();
                         }
-                    }).catch((error) => { console.log(error); });
+                    }).catch((error) =>
+                    {
+                        console.log(error);
+                    });
                     return false;
                 }
             }
@@ -402,6 +407,7 @@ export default class App
                 $(e.currentTarget).closest('.ticket_entry').attr('data-id'),
                 $(e.currentTarget).closest('.ticket_entry__attachment').attr('data-id')
             );
+            return false;
         });   
     }
 
@@ -442,10 +448,12 @@ export default class App
             var result = confirm('Sind Sie sicher?');
             if( result )
             {
-                this.deleteTicket( document_id ).then((result) => { }).catch((error) => { });
-                $(e.currentTarget).closest('.ticket_entry').remove();
-                this.updateSum();
-                this.updateFilter();
+                this.deleteTicket( document_id ).then((result) =>
+                {
+                    $(e.currentTarget).closest('.ticket_entry').remove();
+                    this.updateSum();
+                    this.updateFilter();
+                }).catch((error) => { });
                 return false;
             }
             return false;
@@ -454,7 +462,8 @@ export default class App
 
     deleteTicket( document_id )
     {
-        return new Promise((resolve,reject) => {
+        return new Promise((resolve,reject) =>
+        {
             this.db.remove(
                 document_id,
                 this.getTicketData(document_id)._rev
@@ -487,8 +496,12 @@ export default class App
             this.deleteAttachment(
                 $(e.currentTarget).closest('.ticket_entry').attr('data-id'),
                 $(e.currentTarget).closest('.ticket_entry__attachment').attr('data-id')
-            ).then((result) => { }).catch((error) => { });
-            $(e.currentTarget).closest('.ticket_entry__attachment').remove();
+            ).then((result) =>
+            {
+                $(e.currentTarget).closest('.ticket_entry__attachment').remove();
+            }).catch((error) =>
+            {                
+            });
             return false;
         });
     }
@@ -530,7 +543,8 @@ export default class App
 
     deleteAttachment( document_id, attachment_id )
     {
-        return new Promise((resolve,reject) => {
+        return new Promise((resolve,reject) =>
+        {
             this.lockTicket(document_id);
             this.db.removeAttachment(
                 document_id,
