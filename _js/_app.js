@@ -375,6 +375,9 @@ export default class App
             attachment_ids.push(result.attachment_id);
         }
 
+        // fetch entire doc to get newest attachment object
+        await this.updateLocalTicket(document_id);
+
         return attachment_ids;
     }
 
@@ -553,6 +556,7 @@ export default class App
             ).then((result) =>
             {
                 this.unlockTicket(document_id, result.rev, true);
+                this.removeAttachmentFromLocalTicket( document_id, attachment_id );
                 resolve();
             }).catch((error) =>
             {
@@ -601,6 +605,31 @@ export default class App
                 reject();
             }); 
         });
+    }
+
+    updateLocalTicket(document_id)
+    {
+        return this.db.get(document_id).then((data) =>
+        {
+            this.setTicketData(
+                document_id,
+                data
+            );
+        }).catch((error) =>
+        {
+            console.log(error);
+        });
+    }
+
+    removeAttachmentFromLocalTicket( document_id, attachment_id )
+    {
+        this.tickets.forEach((tickets__value) =>
+        {
+            if( tickets__value._id == document_id )
+            {
+                delete tickets__value._attachments[attachment_id];
+            }
+        });   
     }
 
     initKeyboardNavigation()
