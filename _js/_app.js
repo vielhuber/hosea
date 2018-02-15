@@ -313,10 +313,21 @@ export default class App
             {
                 if(event.which === 187)
                 {
-                    this.createTicket().then((ticket) =>
+                    let current = $('.ticket_table tbody .ticket_entry:visible').last();
+                    if( $(':focus').closest('.ticket_entry').length > 0 )
                     {
-                        $('.ticket_table tbody').append(this.createHtmlLine(ticket));
-                        $('.ticket_table tbody .ticket_entry:last-child').find('td:nth-child(1)').find(':input').focus();
+                        current = $(':focus').closest('.ticket_entry');
+                    }
+                    this.createTicket(this.getTicketData(current.attr('data-id'))).then((ticket) =>
+                    {
+
+                        current.after( this.createHtmlLine(ticket) );
+                        current.next('.ticket_entry').find('td:nth-child(1)').find(':input').focus();
+                        this.refreshScheduler();
+                        this.updateColors();
+                        this.updateSum();
+                        this.updateFilter();
+                        this.textareaSetHeights();
                     }).catch((error) =>
                     {
                         console.log(error);
@@ -454,6 +465,7 @@ export default class App
                 this.deleteTicket( document_id ).then((result) =>
                 {
                     $(e.currentTarget).closest('.ticket_entry').remove();
+                    this.refreshScheduler();
                     this.updateSum();
                     this.updateFilter();
                 }).catch((error) => { });
