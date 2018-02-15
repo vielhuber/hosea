@@ -219,6 +219,11 @@ export default class Helpers
         return (obj !== null && typeof obj === 'object');
     }
 
+    static isDate(string)
+    {
+        return (new Date(string) !== 'Invalid Date') && !isNaN(new Date(string));
+    }
+
     static isVisible(el)
     {
         return !!( el.offsetWidth || el.offsetHeight || el.getClientRects().length );

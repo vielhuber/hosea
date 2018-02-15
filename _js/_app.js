@@ -53,6 +53,7 @@ export default class App
 
     setupBindings()
     {
+        this.bindAutoTime();
         this.bindChangeTracking();
         this.bindUpload();
         this.bindDownload();
@@ -306,12 +307,12 @@ export default class App
 
     bindCreate()
     {
-        // ctrl+*
+        // ctrl+d
         $(window).bind('keydown', (event) =>
         {
             if(event.ctrlKey || event.metaKey)
             {
-                if(event.which === 187)
+                if(String.fromCharCode(event.which).toLowerCase() === 'd')
                 {
                     let current = $('.ticket_table tbody .ticket_entry:visible').last();
                     if( $(':focus').closest('.ticket_entry').length > 0 )
@@ -348,6 +349,36 @@ export default class App
                 return;
             }
             $(el.currentTarget).closest('.ticket_entry').addClass('ticket_entry--changed');
+        });
+    }
+
+    bindAutoTime()
+    {
+        $('#app').on('change', '.ticket_entry [name="date"]', (e) =>
+        {
+            if( $(e.currentTarget).val() != '' )
+            {
+                let ticket_dates = $(e.currentTarget).val().split('\n'),
+                    begin = null,
+                    end = null;
+                ticket_dates.forEach((ticket_dates__value, ticket_dates__key) =>
+                {
+                    if( (ticket_dates__key%2) === 0 )
+                    {
+                        begin = ticket_dates__value;
+                    }
+                    else
+                    {
+                        end = ticket_dates__value;
+                        if( Helpers.isDate(begin) && Helpers.isDate(end) )
+                        {
+                            $(e.currentTarget).closest('.ticket_entry').find('[name="time"]').val(
+                                (Math.round((Math.abs(new Date(end) - new Date(begin))/(1000*60*60))*100)/100).toString().replace('.',',')
+                            );
+                        }
+                    }
+                });
+            }
         });
     }
 
@@ -849,7 +880,15 @@ export default class App
             });
             options.forEach((options__value) =>
             {
-                $('#filter select[name="'+columns__value+'"]').append('<option value="'+options__value+'">'+options__value+'</option>');
+                let active = false;
+                // select current day
+                if( columns__value == 'date' && options__value == ((new Date()).getFullYear()+'-'+('0'+((new Date()).getMonth()+1)).slice(-2)+'-'+('0'+(new Date()).getDate()).slice(-2)) )
+                {
+                    active = true;
+                }
+                $('#filter select[name="'+columns__value+'"]').append(
+                    '<option'+((active===true)?(' selected="selected"'):(''))+' value="'+options__value+'">'+options__value+'</option>'
+                );
             });
 
             if( update === false )
