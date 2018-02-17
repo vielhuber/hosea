@@ -1,8 +1,8 @@
 import Helpers from './_helpers';
 import PouchDB from 'pouchdb';
 import jQuery from 'jquery'; window.$ = window.jQuery = jQuery;
-import 'fullcalendar';
-import 'fullcalendar/dist/locale/de';
+import 'fullcalendar'; import 'fullcalendar/dist/locale/de';
+import moment from 'moment'; import de from 'moment/locale/de'; import { utc } from 'moment'; moment.locale('de');
 
 export default class App
 {
@@ -28,7 +28,11 @@ export default class App
             'done': '#fff59d',
             'billed': '#81c784',
             'working': '#ef9a9a',
-            'delegated': '#ce93d8'
+            'delegated': '#ce93d8',
+            
+            'windows': '#42A5F5', 
+            'mac': '#8D6E63',            
+            'linux': '#9CCC65',
         };
         this.dates = null;
     }
@@ -756,11 +760,8 @@ export default class App
             events: this.generateDates(),
             defaultView: 'agendaWeek',
             weekends: true,
-            allDaySlot: false,
+            allDaySlot: true,
             eventTextColor: '#000000',
-            /*
-            aspectRatio: 3,
-            */
             height: 'auto',
             contentHeight: 'auto',
             businessHours: [
@@ -775,8 +776,7 @@ export default class App
                     end: '18:00'
                 }
             ],
-            minTime: '09:00:00',
-            //maxTime: '24:00:00',
+            minTime: '09:00:00'
         });
     }
 
@@ -804,6 +804,31 @@ export default class App
     generateDates()
     {    
         this.dates = [];
+        // add pseudo environment full day dates
+        for( let i = -100; i < 100; i++ )
+        {
+            if( ((i+2) % 7) === 0 || ((i+1) % 7) === 0 )
+            {
+                continue;
+            }
+            let type = null,
+                day = moment().startOf('isoWeek').add(i, 'days');
+            switch(day.format('dddd'))
+            {
+                case 'Montag': type = 'windows'; break;
+                case 'Dienstag': type = 'linux'; break;
+                case 'Mittwoch': type = 'mac'; break;
+                case 'Donnerstag': type = 'mac'; break;
+                case 'Freitag': type = 'windows'; break;
+                default: type = 'windows'; break;
+            }
+            this.dates.push({
+                start: day.format('YYYY-MM-DD'),
+                end: day.format('YYYY-MM-DD'),
+                title: '_'+type.toUpperCase(),
+                backgroundColor: this.getColor(type)
+            });
+        }
         this.tickets.forEach((tickets__value) =>
         {
             if( tickets__value.date !== null && tickets__value.date != '' )
