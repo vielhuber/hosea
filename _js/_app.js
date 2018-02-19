@@ -692,22 +692,26 @@ export default class App
             // arrow right (switch)
             if( e.keyCode === 39 && right.length > 0 && e.currentTarget.selectionEnd >= $(e.currentTarget).val().length )
             {
-                right.find(':input').focus();
+                right.find(':input').focus().select();
+                return false;
             }
             // arrow left (switch)
-            if( e.keyCode === 37 && left.length > 0 && e.currentTarget.selectionEnd <= 0 )
+            else if( e.keyCode === 37 && left.length > 0 && e.currentTarget.selectionEnd <= 0 )
             {
-                left.find(':input').focus();
+                left.find(':input').focus().select();
+                return false;
             }
             // arrow top (switch)
-            if( e.keyCode === 38 && top.length > 0 && e.currentTarget.selectionEnd <= 0 )
+            else if( e.keyCode === 38 && top.length > 0 && e.currentTarget.selectionEnd <= 0 )
             {
-                top.find('td:nth-child('+index+')').find(':input').focus();
+                top.find('td:nth-child('+index+')').find(':input').focus().select();
+                return false;
             }
             // arrow down (switch)
-            if( e.keyCode === 40 && down.length > 0 && e.currentTarget.selectionEnd >= $(e.currentTarget).val().length )
+            else if( e.keyCode === 40 && down.length > 0 && e.currentTarget.selectionEnd >= $(e.currentTarget).val().length )
             {
-                down.find('td:nth-child('+index+')').find(':input').focus();
+                down.find('td:nth-child('+index+')').find(':input').focus().select();
+                return false;
             }
         });
     }
