@@ -886,6 +886,10 @@ export default class App
                     <option value="*">${columns__value}</option>
                 </select>
             `);
+            if( columns__value === 'date' )
+            {
+                $('#filter [name="date"]').append('<option selected="selected" value="'+moment().format('YYYY-MM-DD')+'">today</option>');
+            }
             let options = [];
             this.tickets.forEach((tickets__value) =>
             {
@@ -901,16 +905,12 @@ export default class App
             });
             options.sort((a, b) =>
             {
+                if( a === null ) { a = ''; } if( b === null ) { b = ''; }                
                 return a.toLowerCase().localeCompare(b.toLowerCase());
             });
             options.forEach((options__value) =>
             {
                 let active = false;
-                // select current day
-                if( columns__value == 'date' && options__value == ((new Date()).getFullYear()+'-'+('0'+((new Date()).getMonth()+1)).slice(-2)+'-'+('0'+(new Date()).getDate()).slice(-2)) )
-                {
-                    active = true;
-                }
                 $('#filter select[name="'+columns__value+'"]').append(
                     '<option'+((active===true)?(' selected="selected"'):(''))+' value="'+options__value+'">'+options__value+'</option>'
                 );
