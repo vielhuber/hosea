@@ -892,7 +892,8 @@ export default class App
             `);
             if( columns__value === 'date' )
             {
-                $('#filter [name="date"]').append('<option selected="selected" value="'+moment().format('YYYY-MM-DD')+'">today</option>');
+                $('#filter [name="date"]').append('<option selected="selected" value="'+moment().format('YYYY-MM-DD')+'">_today</option>');
+                $('#filter [name="date"]').append('<option value="'+moment().add(1, 'days').format('YYYY-MM-DD')+'">_tomorrow</option>');
             }
             let options = [];
             this.tickets.forEach((tickets__value) =>
