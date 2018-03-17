@@ -29,6 +29,8 @@ export default class App
             'billed': '#81c784',
             'working': '#ef9a9a',
             'delegated': '#ce93d8',
+            'weekend': '#bbdefb',
+            'big': '#e1bee7',
             
             'windows': '#42A5F5', 
             'mac': '#8D6E63',            
