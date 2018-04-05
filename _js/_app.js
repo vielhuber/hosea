@@ -66,6 +66,7 @@ export default class App
         this.bindDeleteAttachment();
         this.bindDelete();
         this.bindSave();
+        this.bindRefresh();
         this.bindCreate();
     }
 
@@ -307,6 +308,20 @@ export default class App
                     });
                     return false;
                 }
+            }
+        });
+    }
+
+
+    bindRefresh()
+    {
+        // f5
+        $(window).bind('keydown', (event) =>
+        {
+            if( event.keyCode === 116 )
+            {
+                this.doFilter();
+                return false;
             }
         });
     }
@@ -1019,18 +1034,21 @@ export default class App
                     if( $(a).find('[name="'+sort_1+'"]').val() < $(b).find('[name="'+sort_1+'"]').val() ) { return -1; }
                     if( $(a).find('[name="'+sort_1+'"]').val() > $(b).find('[name="'+sort_1+'"]').val() ) { return 1; }
                 }
-                else
+                else if( $(a).find('[name="status"]').val() != $(b).find('[name="status"]').val() )
                 {
-                    if( $(a).find('[name="date"]').val() < $(b).find('[name="date"]').val() ) { return -1; }
-                    if( $(a).find('[name="date"]').val() > $(b).find('[name="date"]').val() ) { return 1; }
+                    for(let status__value of ['billed','done','working','scheduled','weekend','delegated','idle','big'])
+                    {
+                        if( $(a).find('[name="status"]').val() === status__value ) { return -1; }
+                        if( $(b).find('[name="status"]').val() === status__value ) { return 1; }
+                    }
                 }
                 if( sort_2 != '' )
                 {
                     if( $(a).find('[name="'+sort_2+'"]').val() < $(b).find('[name="'+sort_2+'"]').val() ) { return -1; }
                     if( $(a).find('[name="'+sort_2+'"]').val() > $(b).find('[name="'+sort_2+'"]').val() ) { return 1; }
                 }
-                if( $(a).find('[name="status"]').val() < $(b).find('[name="status"]').val() ) { return 1; }
-                if( $(a).find('[name="status"]').val() > $(b).find('[name="status"]').val() ) { return -1; }
+                if( $(a).find('[name="date"]').val() < $(b).find('[name="date"]').val() ) { return -1; }
+                if( $(a).find('[name="date"]').val() > $(b).find('[name="date"]').val() ) { return 1; }
                 if( $(a).attr('data-id') < $(b).attr('data-id') ) { return -1; }
                 if( $(a).attr('data-id') > $(b).attr('data-id') ) { return 1; }
                 return 0;
