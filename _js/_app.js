@@ -1049,6 +1049,8 @@ export default class App
                 }
                 if( $(a).find('[name="date"]').val() < $(b).find('[name="date"]').val() ) { return -1; }
                 if( $(a).find('[name="date"]').val() > $(b).find('[name="date"]').val() ) { return 1; }
+                if( $(a).find('[name="priority"]').val() < $(b).find('[name="priority"]').val() ) { return -1; }
+                if( $(a).find('[name="priority"]').val() > $(b).find('[name="priority"]').val() ) { return 1; }
                 if( $(a).attr('data-id') < $(b).attr('data-id') ) { return -1; }
                 if( $(a).attr('data-id') > $(b).attr('data-id') ) { return 1; }
                 return 0;
