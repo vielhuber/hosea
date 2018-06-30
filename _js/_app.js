@@ -827,7 +827,7 @@ export default class App
     {    
         this.dates = [];
         // add pseudo environment full day dates
-        for( let i = -100; i < 100; i++ )
+        for( let i = -365; i < 365; i++ )
         {
             if( ((i+2) % 7) === 0 || ((i+1) % 7) === 0 )
             {
