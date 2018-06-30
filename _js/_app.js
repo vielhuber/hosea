@@ -27,6 +27,7 @@ export default class App
             'idle': '#b3e5fc',
             'done': '#fff59d',
             'billed': '#81c784',
+            'recurring': '#ffe9ff',
             'working': '#ef9a9a',
             'delegated': '#ce93d8',
             'weekend': '#bbdefb',
@@ -1036,7 +1037,7 @@ export default class App
                 }
                 else if( $(a).find('[name="status"]').val() != $(b).find('[name="status"]').val() )
                 {
-                    for(let status__value of ['billed','done','working','scheduled','weekend','delegated','idle','big'])
+                    for(let status__value of ['billed','done','working','scheduled','recurring','weekend','delegated','idle','big'])
                     {
                         if( $(a).find('[name="status"]').val() === status__value ) { return -1; }
                         if( $(b).find('[name="status"]').val() === status__value ) { return 1; }

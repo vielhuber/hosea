@@ -56,8 +56,8 @@ gulp.task('html', function() {
   return gulp.src('./_html/*.html')
     .pipe(htmlmin({collapseWhitespace: true}))
     .on('error', function(err) { console.log(err.toString()); this.emit('end'); })
-    .pipe(gulp.dest('./'))
-    .pipe(browserSync.reload({stream: true}));
+    .pipe(gulp.dest('./'));
+    //.pipe(browserSync.reload({stream: true}));
 });
 
 // watch
