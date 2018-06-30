@@ -27,7 +27,7 @@ export default class App
             'idle': '#b3e5fc',
             'done': '#fff59d',
             'billed': '#81c784',
-            'recurring': '#ffe9ff',
+            'recurring': '#ffeded',
             'working': '#ef9a9a',
             'delegated': '#ce93d8',
             'weekend': '#bbdefb',
