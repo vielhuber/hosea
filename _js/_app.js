@@ -183,12 +183,12 @@ export default class App
 
     textareaAutoHeight()
     {
-        Helpers.textareaAutoHeight('#app textarea.autosize');
+        //Helpers.textareaAutoHeight('#app textarea.autosize');
     }
 
     textareaSetHeights()
     {
-        Helpers.textareaSetHeights('#app textarea.autosize');
+        //Helpers.textareaSetHeights('#app textarea.autosize');
     }
 
 

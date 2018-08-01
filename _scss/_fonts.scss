@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Roboto:300,400,500|Quicksand:300,400,500');
+@import url('https://fonts.googleapis.com/css?family=Inconsolata:400,700');
 
 html,
 body,
@@ -7,14 +7,7 @@ input,
 select,
 textarea
 {
-	font-family: 'Roboto', sans-serif;
-    font-weight: normal;
-    font-style: normal;
-}
-
-@mixin font-heading
-{
-	font-family: 'Quicksand', sans-serif;
-    font-weight: normal;
+	font-family: 'Inconsolata', monospace;
+    font-weight: 700;
     font-style: normal;
 }
