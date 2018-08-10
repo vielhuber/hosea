@@ -3,3 +3,6 @@
 /_backup/
 /config.json
 /.vscode/
+/.env
+/composer.lock
+/vendor/

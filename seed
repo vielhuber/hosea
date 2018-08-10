@@ -1,0 +1,4 @@
+<?php
+require_once(__DIR__.'/_cli/index.php');
+$cli = new Cli();
+$cli->seed();
