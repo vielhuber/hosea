@@ -1,5 +1,7 @@
 # ☕ hosea ☕
 
+hosea is a personal assistant.
+
 ## features
 
 -   supports mysql/postgres databases
