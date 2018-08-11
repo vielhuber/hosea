@@ -26,6 +26,19 @@ class Cli
     function migrate()
     {
         $this->db->query('
+            DROP TABLE IF EXISTS users
+        ');
+        $this->db->query(
+            '
+            CREATE TABLE IF NOT EXISTS users
+            (
+                id SERIAL PRIMARY KEY,
+                email TEXT DEFAULT NULL,
+                password TEXT DEFAULT NULL
+            )
+        '
+        );
+        $this->db->query('
             DROP TABLE IF EXISTS tickets
         ');
         $this->db->query(
@@ -39,7 +52,27 @@ class Cli
                 time TEXT DEFAULT NULL,
                 project TEXT DEFAULT NULL,
                 description TEXT DEFAULT NULL,
-                user TEXT DEFAULT NULL
+                user_id INT DEFAULT NULL
+            )
+        '
+        );
+        $this->db->query(
+            '
+            DROP TABLE IF EXISTS attachments
+        '
+        );
+        $this->db->query(
+            '
+            CREATE TABLE IF NOT EXISTS attachments
+            (
+                id SERIAL PRIMARY KEY,
+                name TEXT DEFAULT NULL,
+                data ' .
+                (($this->db->engine === 'postgres')
+                    ? ('BYTEA')
+                    : ('MEDIUMBLOB')) .
+                ' DEFAULT NULL,
+                ticket_id INT DEFAULT NULL
             )
         '
         );
@@ -47,6 +80,12 @@ class Cli
 
     function seed()
     {
+        $this->db->clear('users');
+        $this->db->insert('users', [
+            'email' => 'david@vielhuber.de',
+            'password' => password_hash('secret', PASSWORD_DEFAULT)
+        ]);
+
         $this->db->clear('tickets');
         $this->db->insert('tickets', [
             'status' => 'scheduled',
@@ -55,7 +94,7 @@ class Cli
             'time' => '9',
             'project' => 'HovawartDB',
             'description' => 'Siehe Word',
-            'user' => 'david@vielhuber.de'
+            'user_id' => 1
         ]);
         $this->db->insert('tickets', [
             'status' => 'scheduled',
@@ -64,7 +103,7 @@ class Cli
             'time' => '9',
             'project' => 'HovawartDB',
             'description' => 'Siehe Word',
-            'user' => 'david@vielhuber.de'
+            'user_id' => 1
         ]);
         $this->db->insert('tickets', [
             'status' => 'scheduled',
@@ -73,7 +112,16 @@ class Cli
             'time' => '9',
             'project' => 'HovawartDB',
             'description' => 'Siehe Word',
-            'user' => 'david@vielhuber.de'
+            'user_id' => 1
         ]);
+
+        file_put_contents('test.txt', str_repeat('abc', 999999));
+        $this->db->clear('attachments');
+        $this->db->insert('attachments', [
+            'name' => 'test.txt',
+            'data' => file_get_contents('test.txt'),
+            'ticket_id' => 1
+        ]);
+        unlink('test.txt');
     }
 }

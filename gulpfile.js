@@ -1,20 +1,32 @@
 // include modules
-var gulp = require('gulp'),
-    babelify = require('babelify'),
-    browserify = require('browserify'),
-    vueify = require('gulp-vueify'),
-    source = require('vinyl-source-stream'),
-    htmlmin = require('gulp-htmlmin'),
-    sass = require('gulp-sass'),
-    autoprefixer = require('gulp-autoprefixer'),
-    sourcemaps = require('gulp-sourcemaps'),
-    cleanCSS = require('gulp-clean-css'),
-    rename = require('gulp-rename'),
-    uglify = require('gulp-uglify'),
-    buffer = require('vinyl-buffer'),
-    runSequence = require('run-sequence'),
-    browserSync = require('browser-sync').create();
+var gulp            = require('gulp'),
+    autoprefixer    = require('gulp-autoprefixer'),
+    babel           = require('gulp-babel'),
+    babelify        = require('babelify'),
+    buffer          = require('vinyl-buffer'),
+    browserify      = require('browserify'),
+    browserSync     = require('browser-sync').create(),
+    criticalCss     = require('gulp-penthouse'),
+    cleanCSS        = require('gulp-clean-css'),
+    concat          = require('gulp-concat'),
+    htmlmin         = require('gulp-htmlmin'),
+    jest            = require('gulp-jest').default,
+    rename          = require('gulp-rename'),
+    runSequence     = require('run-sequence'),
+    sass            = require('gulp-sass'),
+    source          = require('vinyl-source-stream'),
+    sourcemaps      = require('gulp-sourcemaps'),
+    through         = require('through-gulp'),
+    uglify          = require('gulp-uglify'),
+    vueify          = require('vueify');
 	
+// external libs
+var libs = {
+    css: [
+        'node_modules/fullcalendar/dist/fullcalendar.css'
+    ]
+}
+
 // js
 gulp.task('js', function(){
     return browserify({
@@ -29,7 +41,7 @@ gulp.task('js', function(){
     .pipe(source('bundle.js'))
     .pipe(buffer())
     .pipe(uglify())
-    .pipe(gulp.dest('./_build'))
+    .pipe(gulp.dest('./_public/_build'))
     .pipe(browserSync.reload({stream: true}));
 });
 
@@ -47,7 +59,7 @@ gulp.task('css', function(){
         .pipe(sourcemaps.write())
         .pipe(rename('bundle.css'))
         .pipe(cleanCSS({compatibility: 'ie8'}))
-        .pipe(gulp.dest('./_build'))
+        .pipe(gulp.dest('./_public/_build'))
         .pipe(browserSync.stream());
 });
 
@@ -56,17 +68,26 @@ gulp.task('html', function() {
   return gulp.src('./_html/*.html')
     .pipe(htmlmin({collapseWhitespace: true}))
     .on('error', function(err) { console.log(err.toString()); this.emit('end'); })
-    .pipe(gulp.dest('./'));
+    .pipe(gulp.dest('./_public/'));
     //.pipe(browserSync.reload({stream: true}));
+});
+
+// libs
+gulp.task('css-libs', function()
+{
+  return gulp
+        .src(libs.css.concat(['_public/_build/bundle.css']))
+        .pipe(concat('bundle.css'))
+        .pipe(gulp.dest('./_public/_build/'));
 });
 
 // watch
 gulp.task('watch', function() {
 	//browserSync.init({ proxy: 'hosea.local' });
     gulp.watch('./_js/*.js', ['js']);    
-    gulp.watch('./_scss/**/*.scss', ['css']);
+    gulp.watch('./_scss/**/*.scss', ['css','css-libs']);
     gulp.watch('./_html/*.html', ['html']);
 });
 
 // default
-gulp.task('default', ['js','css','html','watch']);
+gulp.task('default', ['js','css','css-libs','html','watch']);

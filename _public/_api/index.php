@@ -1,4 +1,9 @@
 <?php
+require_once __DIR__ . '/../../vendor/autoload.php';
+
+use vielhuber\simpleauth\simpleauth;
+use vielhuber\dbhelper\dbhelper;
+
 class Api
 {
     public function __construct()
@@ -10,9 +15,17 @@ class Api
     {
         if (
             $this->getRequestMethod() === 'GET' &&
-            $this->getRequestPathFirst() === 'tickets'
+            $this->getRequestPathFirst() === 'tickets' &&
+            $this->getRequestPathSecond() === null
         ) {
             return $this->index();
+        }
+        if (
+            $this->getRequestMethod() === 'GET' &&
+            $this->getRequestPathFirst() === 'tickets' &&
+            is_numeric($this->getRequestPathSecond())
+        ) {
+            return $this->show($this->getRequestPathSecond());
         }
         if (
             $this->getRequestMethod() === 'POST' &&
@@ -77,6 +90,14 @@ class Api
     }
 
     private function index()
+    {
+        return $this->response([
+            'success' => true,
+            'data' => 'todo'
+        ]);
+    }
+
+    private function show($id)
     {
         return $this->response([
             'success' => true,

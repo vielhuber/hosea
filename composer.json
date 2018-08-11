@@ -1,6 +1,7 @@
 {
     "require": {
         "vielhuber/dbhelper": "^1.8",
-        "vlucas/phpdotenv": "^2.5"
+        "vlucas/phpdotenv": "^2.5",
+        "vielhuber/simpleauth": "^1.0"
     }
 }

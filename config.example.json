@@ -1,4 +1,0 @@
-{
-    "url": "http://username:password@ip:5984/db",
-    "backup": "http://localhost:5984/db"
-}

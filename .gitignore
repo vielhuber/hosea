@@ -1,7 +1,7 @@
-/_build/
+/_public/_build/
+/_public/config.json
 /node_modules/
 /_backup/
-/config.json
 /.vscode/
 /.env
 /composer.lock
