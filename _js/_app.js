@@ -3,12 +3,14 @@ import PouchDB from 'pouchdb';
 import jQuery from 'jquery'; window.$ = window.jQuery = jQuery;
 import 'fullcalendar'; import 'fullcalendar/dist/locale/de';
 import moment from 'moment'; import de from 'moment/locale/de'; import { utc } from 'moment'; moment.locale('de');
+import jwtbutler from 'jwtbutler';
 
 export default class App
 {
     constructor()
     {
 
+        this.api = null;
         this.db = null;
         this.tickets = null;        
         this.url = null;
@@ -42,6 +44,7 @@ export default class App
 
     async init()
     {
+    await this.login();
     await this.readConfig();
           this.initDatabase();
     await this.cleanDatabase();
@@ -69,6 +72,14 @@ export default class App
         this.bindSave();
         this.bindRefresh();
         this.bindCreate();
+    }
+
+    login()
+    {
+        this.api = new jwtbutler({
+            auth_server: '/auth'
+        });
+        return this.api.login();
     }
 
     readConfig()
