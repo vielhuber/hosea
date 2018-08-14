@@ -14,7 +14,7 @@ class Cli
         $this->db = new dbhelper();
         $this->db->connect(
             'pdo',
-            getenv('DB_ENGINE'),
+            getenv('DB_CONNECTION'),
             getenv('DB_HOST'),
             getenv('DB_USERNAME'),
             getenv('DB_PASSWORD'),

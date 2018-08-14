@@ -77,7 +77,7 @@ export default class App
     login()
     {
         this.api = new jwtbutler({
-            auth_server: '/auth'
+            auth_server: '/_auth'
         });
         return this.api.login();
     }
