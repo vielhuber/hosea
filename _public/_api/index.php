@@ -19,14 +19,27 @@ class Api
     private function checkAuth()
     {
         $this->auth = new simpleauth(__DIR__ . '/../../.env');
-        print_r($this->auth->getCurrentUserId());
-        die();
         if (!$this->auth->isLoggedIn()) {
             $this->response(
                 [
                     'success' => false,
                     'message' => 'auth not successful',
                     'public_message' => 'Authentifizierung fehlgeschlagen'
+                ],
+                401
+            );
+        }
+    }
+
+    private function checkId($id)
+    {
+        if( $this->db->fetch_var('SELECT COUNT(*) FROM tickets WHERE id = ? AND user_id = ?', $id, $this->auth->getCurrentUserId()) == 0 )
+        {
+            $this->response(
+                [
+                    'success' => false,
+                    'message' => 'unauthorized',
+                    'public_message' => 'Nicht authentifiziert'
                 ],
                 401
             );
@@ -127,40 +140,86 @@ class Api
         return $_SERVER['REQUEST_METHOD'];
     }
 
+    private function getInput($key)
+    {
+        $p1 = $_POST;
+        $p2 = json_decode(file_get_contents('php://input'), true);
+        parse_str(file_get_contents('php://input'), $p3);
+        if( isset($p1) && !empty($p1) && array_key_exists($key, $p1) ) {
+            return $p1[$key];
+        }
+        if( isset($p2) && !empty($p2) && array_key_exists($key, $p2) ) {
+            return $p2[$key];
+        }        
+        if( isset($p3) && !empty($p3) )
+        {
+            foreach($p3 as $p3__key => $p3__value)
+            {
+                unset($p3[$p3__key]);
+                $p3[str_replace('amp;', '', $p3__key)] = $p3__value;
+            }
+            if( array_key_exists($key, $p3) ) {
+                return $p3[$key];
+            }
+        }
+        return null;
+    }
+
     private function index()
     {
         $this->response([
             'success' => true,
-            'data' => 'todo'
+            'data' => $this->db->fetch_all('SELECT * FROM tickets WHERE user_id = ?', $this->auth->getCurrentUserId())
         ]);
     }
 
     private function show($id)
     {
+        $this->checkId($id);
         $this->response([
             'success' => true,
-            'data' => 'todo'
+            'data' => $this->db->fetch_all('SELECT * FROM tickets WHERE id = ? AND user_id = ?', $id, $this->auth->getCurrentUserId())
         ]);
     }
 
     private function create()
     {
+        $values = [];
+        foreach(['status','priority','date','time','project','description'] as $columns__value)
+        {
+            $values[$columns__value] = $this->getInput($columns__value);
+        }
+        $values['user_id'] = $this->auth->getCurrentUserId();
+        $this->db->insert('tickets', $values);
         $this->response([
-            'success' => true,
-            'data' => 'todo'
+            'success' => true
         ]);
     }
 
     private function update($id)
     {
+        $this->checkId($id);
+        $values = [];
+        foreach(['status','priority','date','time','project','description'] as $columns__value)
+        {
+            if( $this->getInput($columns__value) !== null )
+            {
+                $values[$columns__value] = $this->getInput($columns__value);
+            }
+        }
+        if( !empty($values) )
+        {
+            $this->db->update('tickets', $values, ['id' => $id]);
+        }
         $this->response([
-            'success' => true,
-            'data' => 'todo'
+            'success' => true
         ]);
     }
 
     private function delete($id)
     {
+        $this->checkId($id);
+        $this->db->delete('tickets', ['id' => $id]);
         $this->response([
             'success' => true
         ]);
