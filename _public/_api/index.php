@@ -6,9 +6,47 @@ use vielhuber\dbhelper\dbhelper;
 
 class Api
 {
+    private $db = null;
+    private $auth = null;
+
     public function __construct()
     {
+        $this->checkAuth();
+        $this->initDb();
         $this->getRequest();
+    }
+
+    private function checkAuth()
+    {
+        $this->auth = new simpleauth(__DIR__ . '/../../.env');
+        print_r($this->auth->getCurrentUserId());
+        die();
+        if (!$this->auth->isLoggedIn()) {
+            $this->response(
+                [
+                    'success' => false,
+                    'message' => 'auth not successful',
+                    'public_message' => 'Authentifizierung fehlgeschlagen'
+                ],
+                401
+            );
+        }
+    }
+
+    private function initDb()
+    {
+        $dotenv = new Dotenv\Dotenv(__DIR__ . '/../../');
+        $dotenv->load();
+        $this->db = new dbhelper();
+        $this->db->connect(
+            'pdo',
+            getenv('DB_CONNECTION'),
+            getenv('DB_HOST'),
+            getenv('DB_USERNAME'),
+            getenv('DB_PASSWORD'),
+            getenv('DB_DATABASE'),
+            getenv('DB_PORT')
+        );
     }
 
     private function getRequest()
@@ -48,7 +86,7 @@ class Api
         ) {
             return $this->delete($this->getRequestPathSecond());
         }
-        return $this->response(
+        $this->response(
             [
                 'success' => false,
                 'message' => 'unknown route',
@@ -91,7 +129,7 @@ class Api
 
     private function index()
     {
-        return $this->response([
+        $this->response([
             'success' => true,
             'data' => 'todo'
         ]);
@@ -99,7 +137,7 @@ class Api
 
     private function show($id)
     {
-        return $this->response([
+        $this->response([
             'success' => true,
             'data' => 'todo'
         ]);
@@ -107,7 +145,7 @@ class Api
 
     private function create()
     {
-        return $this->response([
+        $this->response([
             'success' => true,
             'data' => 'todo'
         ]);
@@ -115,7 +153,7 @@ class Api
 
     private function update($id)
     {
-        return $this->response([
+        $this->response([
             'success' => true,
             'data' => 'todo'
         ]);
@@ -123,7 +161,7 @@ class Api
 
     private function delete($id)
     {
-        return $this->response([
+        $this->response([
             'success' => true
         ]);
     }
@@ -131,6 +169,7 @@ class Api
     private function response($data, $code = 200)
     {
         http_response_code($code);
+        header('Content-Type: application/json');
         echo json_encode($data);
         die();
     }
