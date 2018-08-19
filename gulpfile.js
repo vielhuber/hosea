@@ -20,17 +20,10 @@ var gulp            = require('gulp'),
     uglify          = require('gulp-uglify'),
     vueify          = require('vueify');
 	
-// external libs
-var libs = {
-    css: [
-        'node_modules/fullcalendar/dist/fullcalendar.css'
-    ]
-}
-
 // js
 gulp.task('js', function(){
     return browserify({
-        entries: ['./_js/script.js']
+        entries: ['./_js_new/script.js']
     })
     .transform(babelify.configure({
         presets : ['es2015', 'es2017'],
@@ -41,7 +34,7 @@ gulp.task('js', function(){
     .pipe(source('bundle.js'))
     .pipe(buffer())
     .pipe(uglify())
-    .pipe(gulp.dest('./_public/_build'))
+    .pipe(gulp.dest('./_public_new/_build'))
     .pipe(browserSync.reload({stream: true}));
 });
 
@@ -59,7 +52,7 @@ gulp.task('css', function(){
         .pipe(sourcemaps.write())
         .pipe(rename('bundle.css'))
         .pipe(cleanCSS({compatibility: 'ie8'}))
-        .pipe(gulp.dest('./_public/_build'))
+        .pipe(gulp.dest('./_public_new/_build'))
         .pipe(browserSync.stream());
 });
 
@@ -68,26 +61,17 @@ gulp.task('html', function() {
   return gulp.src('./_html/*.html')
     .pipe(htmlmin({collapseWhitespace: true}))
     .on('error', function(err) { console.log(err.toString()); this.emit('end'); })
-    .pipe(gulp.dest('./_public/'));
+    .pipe(gulp.dest('./_public_new/'));
     //.pipe(browserSync.reload({stream: true}));
-});
-
-// libs
-gulp.task('css-libs', function()
-{
-  return gulp
-        .src(libs.css.concat(['_public/_build/bundle.css']))
-        .pipe(concat('bundle.css'))
-        .pipe(gulp.dest('./_public/_build/'));
 });
 
 // watch
 gulp.task('watch', function() {
 	//browserSync.init({ proxy: 'hosea.local' });
-    gulp.watch('./_js/*.js', ['js']);    
-    gulp.watch('./_scss/**/*.scss', ['css','css-libs']);
+    gulp.watch('./_js_new/*.js', ['js']);    
+    gulp.watch('./_scss/**/*.scss', ['css']);
     gulp.watch('./_html/*.html', ['html']);
 });
 
 // default
-gulp.task('default', ['js','css','css-libs','html','watch']);
+gulp.task('default', ['js','css','html','watch']);
