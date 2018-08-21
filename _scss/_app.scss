@@ -103,26 +103,6 @@
   display: none;
 }
 
-#scheduler {
-  width: 33.33%;
-  height: 100%;
-  right: 0;
-  top: 0;
-  position: absolute;
-  overflow-y: scroll;
-  overflow-x: hidden;
-  background-color: #eee;
-  color: #000;
-  font-size: 10px;
-}
-#scheduler .appointment
-{
-    position: absolute;
-    width: 12.5%;
-    border: 1px solid #000;
-    overflow:hidden;
-}
-
 #meta {
   position: absolute;
   top: 0;

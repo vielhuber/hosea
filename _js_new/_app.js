@@ -53,9 +53,9 @@ export default class App
     await this.fetchTickets();
           this.buildHtml();
           this.textareaAutoHeight();
-          this.setupBindings();
           this.initKeyboardNavigation();
           this.initScheduler();
+          this.setupBindings();
           this.initFilter();
           this.initSort();
           this.updateColors();
@@ -73,6 +73,7 @@ export default class App
         this.bindSave();
         this.bindRefresh();
         this.bindCreate();
+        this.bindScheduler();
     }
 
     login()
@@ -103,7 +104,7 @@ export default class App
     initSessionVariables()
     {
         this.session = {
-            currentDay: new Date()
+            activeDay: new Date()
         };
     }
     
@@ -154,7 +155,7 @@ export default class App
         $('#app').append(`
             <div id="meta"></div>
             <div id="tickets"></div>
-            <div id="scheduler"></div>
+            <div class="scheduler"></div>
         `);
 
         $('#tickets').append(`
@@ -350,7 +351,7 @@ export default class App
 
                         current.after( this.createHtmlLine(ticket) );
                         current.next('.ticket_entry').find('td:nth-child(1)').find(':input').focus();
-                        this.refreshScheduler();
+                        this.initScheduler();
                         this.updateColors();
                         this.updateSum();
                         this.updateFilter();
@@ -522,7 +523,7 @@ export default class App
                 this.deleteTicket( document_id ).then((result) =>
                 {
                     $(e.currentTarget).closest('.ticket_entry').remove();
-                    this.refreshScheduler();
+                    this.initScheduler();
                     this.updateSum();
                     this.updateFilter();
                 }).catch((error) => { });
@@ -663,7 +664,7 @@ export default class App
                 {
                     this.unlockTicket(value.id, value.rev);
                 });
-                this.refreshScheduler();
+                this.initScheduler();
                 this.updateColors();
                 this.updateSum();
                 this.updateFilter();
@@ -780,89 +781,92 @@ export default class App
 
     initScheduler()
     {
-        $('#scheduler').html(`
-            <table>
-                <tr>
-                    <td></td>   
-                    ${Array(7).join(0).split(0).map((item, i) => `<td>${this.dateFormat(this.getDayOfCurrentWeek(i+1), 'D d.m.')}</td>`).join('')}                 
-                </tr>
-                <tr>
-                    <td>Ganztätig</td>
-                    ${Array(7).join(0).split(0).map((item, i) => `<td></td>`).join('')}
-                </tr>
-                ${Array(15).join(0).split(0).map((item, i) => {
-                    i=i+9;
-                    return `
-                        <tr>
-                            <td>${('0'+(i)).slice(-2)}&ndash;${('0'+(i+1)).slice(-2)}</td>
-                            ${Array(7).join(0).split(0).map((item, i) => `<td></td>`).join('')}
-                        </tr>
-                    `
-                }).join('')}
+        $('.scheduler').html(`
+            <div class="scheduler__navigation">
+                <span class="scheduler__navigation-week"></span>
+                <a href="#" class="scheduler__navigation-next">next</a>
+                <a href="#" class="scheduler__navigation-prev">prev</a>
+                <a href="#" class="scheduler__navigation-today">today</a>
+            </div>
+
+            <table class="scheduler__table">
+                <tbody class="scheduler__table-body">
+                    <tr class="scheduler__row">
+                        <td class="scheduler__cell"></td>   
+                        ${Array(7).join(0).split(0).map((item, i) => `
+                            <td class="scheduler__cell${(this.sameDay(this.getDayOfActiveWeek(i+1),this.getCurrentDate())?(' scheduler__cell--curday'):(''))}">
+                                ${this.dateFormat(this.getDayOfActiveWeek(i+1), 'D d.m.')}
+                                <br/>
+                                KW ${this.weekNumber(this.getDayOfActiveWeek(i+1))}
+                            </td>
+                        `).join('')}
+                    </tr>
+                    <tr class="scheduler__row">
+                        <td class="scheduler__cell">Ganztätig</td>
+                        ${Array(7).join(0).split(0).map((item, i) => `<td class="scheduler__cell${(this.sameDay(this.getDayOfActiveWeek(i+1),this.getCurrentDate())?(' scheduler__cell--curday'):(''))}"></td>`).join('')}
+                    </tr>
+                    ${Array(15).join(0).split(0).map((item, j) => {
+                        j=j+9;
+                        return `
+                            <tr class="scheduler__row">
+                                <td class="scheduler__cell">${('0'+(j)).slice(-2)}&ndash;${('0'+(j+1)).slice(-2)}</td>
+                                ${Array(7).join(0).split(0).map((item, i) => `
+                                    <td class="
+                                        scheduler__cell
+                                        ${(this.sameDay(this.getDayOfActiveWeek(i+1),this.getCurrentDate())?(' scheduler__cell--curday'):(''))}
+                                        ${((i<5 && ((j>=9 && j<13) || (j>=14 && j<18)))?(' scheduler__cell--main'):(''))}
+                                    ">
+                                    </td>
+                                `).join('')}
+                            </tr>
+                        `
+                    }).join('')}
+                </tbody>
             </table>
-        `);
+
+            <div class="scheduler__appointments">
+            </div>
+        `);        
 
         this.generateDates().forEach((date__value) =>
         {
-            $('#scheduler').append(`
-                <div class="appointment" title="${date__value.title}" style="
+            $('.scheduler__appointments').append(`
+                <div class="scheduler__appointment" title="${date__value.title}" style="
                     left:${12.5*date__value.day}%;
                     top:${6.25*(date__value.begin-8)}%;
                     bottom:${100-(6.25*(date__value.end-8))}%;
                     background-color:${date__value.backgroundColor};
                 ">
                     ${date__value.title}
-                </div>';
+                </div>
             `);
         });
 
-        /*
-        $('#scheduler').fullCalendar({
-            locale: 'de',
-            editable: false,
-            events: this.generateDates(),
-            defaultView: 'agendaWeek',
-            weekends: true,
-            allDaySlot: true,
-            eventTextColor: '#000000',
-            height: 'auto',
-            contentHeight: 'auto',
-            businessHours: [
-                {
-                    dow: [ 1, 2, 3, 4, 5 ],
-                    start: '09:00',
-                    end: '13:00'
-                },
-                {
-                    dow: [ 1, 2, 3, 4, 5 ],
-                    start: '14:00',
-                    end: '18:00'
-                }
-            ],
-            minTime: '09:00:00'
+        $('.scheduler__navigation-week').html(`
+            ${this.dateFormat( this.getDayOfActiveWeek(1), 'd. F Y' )} &ndash; ${this.dateFormat( this.getDayOfActiveWeek(7), 'd. F Y' )}
+        `);
+    }
+
+    bindScheduler()
+    {
+        $('.scheduler').on('click', '.scheduler__navigation-today', () =>
+        {
+            this.session.activeDay = new Date();
+            this.initScheduler();
+            return false;
         });
-        */
-    }
-
-    sizeScheduler()
-    {
-        let h1 = $(window).height(),
-            h2 = $('#scheduler .fc-header-toolbar').outerHeight(true),
-            h3 = h1-h2;
-        $('#scheduler .fc-time-grid .fc-slats td').height('auto');
-        $('#scheduler .fc-time-grid-container').height('auto');
-        $('#scheduler').fullCalendar('option', 'height', h1);
-        $('#scheduler').fullCalendar('option', 'contentHeight', h3);
-        let h4 = $('.fc-time-grid').height(),
-            h5 = h4/$('#scheduler .fc-time-grid .fc-slats tr').length;
-        $('#scheduler .fc-time-grid .fc-slats td').height(h5);
-        $('#scheduler').fullCalendar('rerenderEvents');
-    }
-
-    refreshScheduler()
-    {
-        $('#scheduler').fullCalendar('destroy');
-        this.initScheduler();
+        $('.scheduler').on('click', '.scheduler__navigation-prev', () =>
+        {
+            this.session.activeDay.setDate(this.session.activeDay.getDate()-7);
+            this.initScheduler();
+            return false;
+        });
+        $('.scheduler').on('click', '.scheduler__navigation-next', () =>
+        {
+            this.session.activeDay.setDate(this.session.activeDay.getDate()+7);
+            this.initScheduler();
+            return false;
+        });
     }
 
     generateDates()
@@ -870,7 +874,7 @@ export default class App
         let dates = [];
         this.tickets.forEach((tickets__value) =>
         {
-            if( this.dateIsInCurrentWeek(tickets__value.date.split('\n')[0]) )
+            if( this.dateIsInActiveWeek(tickets__value.date.split('\n')[0]) )
             {
                 let title = tickets__value.project+'\n'+(tickets__value.description||'').substring(0,100),
                     ticket_dates = tickets__value.date.split('\n'),
@@ -1114,9 +1118,14 @@ export default class App
         $('#tickets .ticket_table tfoot .sum').text(sum);
     }
 
-    getDayOfCurrentWeek(shift)
+    getCurrentDate()
     {
-        return this.getDayOfWeek(shift, this.session.currentDay);
+        return new Date();
+    }
+
+    getDayOfActiveWeek(shift)
+    {
+        return this.getDayOfWeek(shift, this.session.activeDay);
     }
 
     getDayOfWeek(shift, date)
@@ -1133,22 +1142,35 @@ export default class App
         {
             return ['SO','MO','DI','MI','DO','FR','SA'][d.getDay()]+' '+('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+'.';
         }
+        if( format === 'd. F Y' )
+        {
+            return ('0'+d.getDate()).slice(-2)+'. '+['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'][d.getMonth()]+' '+d.getFullYear();
+        }
         return ('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+'.'+d.getFullYear()+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)+':'+('0'+d.getSeconds()).slice(-2);
     }
 
-    dateIsInCurrentWeek(d)
+    dateIsInActiveWeek(d)
     {
         if( d === null || d === '' )
         {
             return false;
         }
         d = new Date(d);
-        return this.sameDay( this.getDayOfWeek(1, d), this.getDayOfWeek(1, new Date()) );
+        return this.sameDay( this.getDayOfWeek(1, d), this.getDayOfActiveWeek(1) );
     }
 
     sameDay(d1, d2)
     {
         return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate();
+    }
+
+    weekNumber(d)
+    {
+        d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+        let dayNum = d.getUTCDay() || 7;
+        d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+        let yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+        return Math.ceil((((d - yearStart) / 86400000) + 1)/7);
     }
 
 }
