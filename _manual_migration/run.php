@@ -47,7 +47,8 @@ foreach($backup->docs as $docs__value)
         {
             $db->insert('attachments', [
                 'name' => explode('#',$attachments__key)[1],
-                'data' => $attachments__value->data,
+                //'data' => $attachments__value->data,
+                'data' => file_get_contents('test.msg'),
                 'ticket_id' => $ticket_id
             ]);
         }

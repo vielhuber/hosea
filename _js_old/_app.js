@@ -40,22 +40,21 @@ export default class App
             'linux': '#9CCC65',
         };
         this.dates = null;
-        this.session = null;
     }
 
     async init()
     {
     await this.login();
     await this.readConfig();
-          this.initSessionVariables();
           this.initDatabase();
     await this.cleanDatabase();
+    await this.backupDatabase();
     await this.fetchTickets();
           this.buildHtml();
           this.textareaAutoHeight();
+          this.setupBindings();
           this.initKeyboardNavigation();
           this.initScheduler();
-          this.setupBindings();
           this.initFilter();
           this.initSort();
           this.updateColors();
@@ -73,7 +72,6 @@ export default class App
         this.bindSave();
         this.bindRefresh();
         this.bindCreate();
-        this.bindScheduler();
     }
 
     login()
@@ -100,13 +98,6 @@ export default class App
             });          
         });
     }
-
-    initSessionVariables()
-    {
-        this.session = {
-            activeDay: new Date()
-        };
-    }
     
     initDatabase()
     {
@@ -126,6 +117,27 @@ export default class App
                 reject();
             });            
         });
+    }
+
+
+    backupDatabase()
+    {
+        return new Promise((resolve,reject) =>
+        {
+            let remote = new PouchDB(this.backup);
+            let replication = PouchDB.replicate(this.db, remote, {
+                live: false,
+                retry: false
+            }).on('complete', (info) =>
+            {
+                console.log('backuped database to local couchdb instance');
+                resolve();
+            }).on('error', (error) =>
+            {
+                console.log(error);
+                reject();
+            });
+        });        
     }
 
     fetchTickets()
@@ -153,12 +165,6 @@ export default class App
     buildHtml()
     {        
         $('#app').append(`
-            <div id="meta"></div>
-            <div id="tickets"></div>
-            <div class="scheduler"></div>
-        `);
-
-        $('#tickets').append(`
             <table class="ticket_table">
                 <thead>
                     <tr></tr>
@@ -188,12 +194,12 @@ export default class App
 
     textareaAutoHeight()
     {
-        //Helpers.textareaAutoHeight('#tickets textarea.autosize');
+        //Helpers.textareaAutoHeight('#app textarea.autosize');
     }
 
     textareaSetHeights()
     {
-        //Helpers.textareaSetHeights('#tickets textarea.autosize');
+        //Helpers.textareaSetHeights('#app textarea.autosize');
     }
 
 
@@ -288,7 +294,7 @@ export default class App
     bindSave()
     {
         // button click
-        $('#tickets').on('click', '.button_save', () =>
+        $('#app').on('click', '.button_save', () =>
         {
             this.saveTickets().then(() => { }).catch((error) => { console.log(error); });
             return false;
@@ -351,7 +357,7 @@ export default class App
 
                         current.after( this.createHtmlLine(ticket) );
                         current.next('.ticket_entry').find('td:nth-child(1)').find(':input').focus();
-                        this.initScheduler();
+                        this.refreshScheduler();
                         this.updateColors();
                         this.updateSum();
                         this.updateFilter();
@@ -369,7 +375,7 @@ export default class App
 
     bindChangeTracking()
     {
-        $('#tickets').on('input', '.ticket_entry :input', (el) =>
+        $('#app').on('input', '.ticket_entry :input', (el) =>
         {
             if( $(el.currentTarget).is('[type="file"]') )
             {
@@ -381,7 +387,7 @@ export default class App
 
     bindAutoTime()
     {
-        $('#tickets').on('change', '.ticket_entry [name="date"]', (e) =>
+        $('#app').on('change', '.ticket_entry [name="date"]', (e) =>
         {
             if( $(e.currentTarget).val() != '' )
             {
@@ -411,7 +417,7 @@ export default class App
 
     bindUpload()
     {
-        $('#tickets').on('change', '.ticket_entry input[type="file"]', (e) =>
+        $('#app').on('change', '.ticket_entry input[type="file"]', (e) =>
         {
             this.startUploads(
                 $(e.currentTarget).closest('.ticket_entry').attr('data-id'),
@@ -473,7 +479,7 @@ export default class App
 
     bindDownload()
     {
-        $('#tickets').on('click', '.ticket_entry__attachment_download', (e) => 
+        $('#app').on('click', '.ticket_entry__attachment_download', (e) => 
         {
             this.startDownload(
                 $(e.currentTarget).closest('.ticket_entry').attr('data-id'),
@@ -505,14 +511,14 @@ export default class App
 
     bindDelete()
     {
-        $('#tickets').on('click', '.ticket_entry__delete', (e) =>
+        $('#app').on('click', '.ticket_entry__delete', (e) =>
         {
             let document_id = $(e.currentTarget).closest('.ticket_entry').attr('data-id');
             if( this.ticketIsLocked(document_id) )
             {
                 return false;
             }
-            if( $('#tickets .ticket_entry').length === 1 )
+            if( $('#app .ticket_entry').length === 1 )
             {
                 alert('don\'t delete the genesis block!');
                 return false;
@@ -523,7 +529,7 @@ export default class App
                 this.deleteTicket( document_id ).then((result) =>
                 {
                     $(e.currentTarget).closest('.ticket_entry').remove();
-                    this.initScheduler();
+                    this.refreshScheduler();
                     this.updateSum();
                     this.updateFilter();
                 }).catch((error) => { });
@@ -560,7 +566,7 @@ export default class App
 
     bindDeleteAttachment()
     {
-        $('#tickets').on('click', '.ticket_entry__attachment_delete', (e) =>
+        $('#app').on('click', '.ticket_entry__attachment_delete', (e) =>
         {
             if( this.ticketIsLocked($(e.currentTarget).closest('.ticket_entry').attr('data-id')) )
             {
@@ -664,7 +670,7 @@ export default class App
                 {
                     this.unlockTicket(value.id, value.rev);
                 });
-                this.initScheduler();
+                this.refreshScheduler();
                 this.updateColors();
                 this.updateSum();
                 this.updateFilter();
@@ -704,7 +710,7 @@ export default class App
 
     initKeyboardNavigation()
     {
-        $('#tickets').on('keydown', '.ticket_entry :input', (e) =>
+        $('#app').on('keydown', '.ticket_entry :input', (e) =>
         {
             let left = $(e.currentTarget).closest('td').prev('td'),
                 right = $(e.currentTarget).closest('td').next('td'),
@@ -781,121 +787,106 @@ export default class App
 
     initScheduler()
     {
-        $('.scheduler').html(`
-            <div class="scheduler__navigation">
-                <span class="scheduler__navigation-week"></span>
-                <a href="#" class="scheduler__navigation-next">next</a>
-                <a href="#" class="scheduler__navigation-prev">prev</a>
-                <a href="#" class="scheduler__navigation-today">today</a>
-            </div>
-
-            <table class="scheduler__table">
-                <tbody class="scheduler__table-body">
-                    <tr class="scheduler__row">
-                        <td class="scheduler__cell"></td>   
-                        ${Array(7).join(0).split(0).map((item, i) => `
-                            <td class="scheduler__cell${(this.sameDay(this.getDayOfActiveWeek(i+1),this.getCurrentDate())?(' scheduler__cell--curday'):(''))}">
-                                ${this.dateFormat(this.getDayOfActiveWeek(i+1), 'D d.m.')}
-                                <br/>
-                                KW ${this.weekNumber(this.getDayOfActiveWeek(i+1))}
-                            </td>
-                        `).join('')}
-                    </tr>
-                    <tr class="scheduler__row">
-                        <td class="scheduler__cell">Ganztätig</td>
-                        ${Array(7).join(0).split(0).map((item, i) => `<td class="scheduler__cell${(this.sameDay(this.getDayOfActiveWeek(i+1),this.getCurrentDate())?(' scheduler__cell--curday'):(''))}"></td>`).join('')}
-                    </tr>
-                    ${Array(15).join(0).split(0).map((item, j) => {
-                        j=j+9;
-                        return `
-                            <tr class="scheduler__row">
-                                <td class="scheduler__cell">${('0'+(j)).slice(-2)}&ndash;${('0'+(j+1)).slice(-2)}</td>
-                                ${Array(7).join(0).split(0).map((item, i) => `
-                                    <td class="
-                                        scheduler__cell
-                                        ${(this.sameDay(this.getDayOfActiveWeek(i+1),this.getCurrentDate())?(' scheduler__cell--curday'):(''))}
-                                        ${((i<5 && ((j>=9 && j<13) || (j>=14 && j<18)))?(' scheduler__cell--main'):(''))}
-                                    ">
-                                    </td>
-                                `).join('')}
-                            </tr>
-                        `
-                    }).join('')}
-                </tbody>
-            </table>
-
-            <div class="scheduler__appointments">
-            </div>
-        `);        
-
-        this.generateDates().forEach((date__value) =>
-        {
-            $('.scheduler__appointments').append(`
-                <div class="scheduler__appointment" title="${date__value.title}" style="
-                    left:${12.5*date__value.day}%;
-                    top:${6.25*(date__value.begin-8)}%;
-                    bottom:${100-(6.25*(date__value.end-8))}%;
-                    background-color:${date__value.backgroundColor};
-                ">
-                    ${date__value.title}
-                </div>
-            `);
+        $('#scheduler').fullCalendar({
+            locale: 'de',
+            editable: false,
+            events: this.generateDates(),
+            defaultView: 'agendaWeek',
+            weekends: true,
+            allDaySlot: true,
+            eventTextColor: '#000000',
+            height: 'auto',
+            contentHeight: 'auto',
+            businessHours: [
+                {
+                    dow: [ 1, 2, 3, 4, 5 ],
+                    start: '09:00',
+                    end: '13:00'
+                },
+                {
+                    dow: [ 1, 2, 3, 4, 5 ],
+                    start: '14:00',
+                    end: '18:00'
+                }
+            ],
+            minTime: '09:00:00'
         });
-
-        $('.scheduler__navigation-week').html(`
-            ${this.dateFormat( this.getDayOfActiveWeek(1), 'd. F Y' )} &ndash; ${this.dateFormat( this.getDayOfActiveWeek(7), 'd. F Y' )}
-        `);
     }
 
-    bindScheduler()
+    sizeScheduler()
     {
-        $('.scheduler').on('click', '.scheduler__navigation-today', () =>
-        {
-            this.session.activeDay = new Date();
-            this.initScheduler();
-            return false;
-        });
-        $('.scheduler').on('click', '.scheduler__navigation-prev', () =>
-        {
-            this.session.activeDay.setDate(this.session.activeDay.getDate()-7);
-            this.initScheduler();
-            return false;
-        });
-        $('.scheduler').on('click', '.scheduler__navigation-next', () =>
-        {
-            this.session.activeDay.setDate(this.session.activeDay.getDate()+7);
-            this.initScheduler();
-            return false;
-        });
+        let h1 = $(window).height(),
+            h2 = $('#scheduler .fc-header-toolbar').outerHeight(true),
+            h3 = h1-h2;
+        $('#scheduler .fc-time-grid .fc-slats td').height('auto');
+        $('#scheduler .fc-time-grid-container').height('auto');
+        $('#scheduler').fullCalendar('option', 'height', h1);
+        $('#scheduler').fullCalendar('option', 'contentHeight', h3);
+        let h4 = $('.fc-time-grid').height(),
+            h5 = h4/$('#scheduler .fc-time-grid .fc-slats tr').length;
+        $('#scheduler .fc-time-grid .fc-slats td').height(h5);
+        $('#scheduler').fullCalendar('rerenderEvents');
+    }
+
+    refreshScheduler()
+    {
+        $('#scheduler').fullCalendar('destroy');
+        this.initScheduler();
     }
 
     generateDates()
-    {
-        let dates = [];
+    {    
+        this.dates = [];
+        // add pseudo environment full day dates
+        for( let i = -365; i < 365; i++ )
+        {
+            if( ((i+2) % 7) === 0 || ((i+1) % 7) === 0 )
+            {
+                continue;
+            }
+            let type = null,
+                day = moment().startOf('isoWeek').add(i, 'days');
+            switch(day.format('dddd'))
+            {
+                case 'Montag': type = 'windows'; break;
+                case 'Dienstag': type = 'linux'; break;
+                case 'Mittwoch': type = 'mac'; break;
+                case 'Donnerstag': type = 'mac'; break;
+                case 'Freitag': type = 'windows'; break;
+                default: type = 'windows'; break;
+            }
+            this.dates.push({
+                start: day.format('YYYY-MM-DD'),
+                end: day.format('YYYY-MM-DD'),
+                title: '_'+type.toUpperCase(),
+                backgroundColor: this.getColor(type)
+            });
+        }
         this.tickets.forEach((tickets__value) =>
         {
-            if( this.dateIsInActiveWeek(tickets__value.date.split('\n')[0]) )
+            if( tickets__value.date !== null && tickets__value.date != '' )
             {
-                let title = tickets__value.project+'\n'+(tickets__value.description||'').substring(0,100),
-                    ticket_dates = tickets__value.date.split('\n'),
-                    cur = 0;
-                while( ticket_dates[cur] !== undefined )
+                let date = null;
+                let title = tickets__value.project+'\n'+(tickets__value.description||'').substring(0,100);
+                let ticket_dates = tickets__value.date.split('\n');
+                ticket_dates.forEach((ticket_dates__value, ticket_dates__key) =>
                 {
-                    let d1 = new Date(ticket_dates[cur]),
-                        d2 = new Date(ticket_dates[cur+1]);
-                    dates.push({
-                        day: ((d1.getDay()+6)%7)+1,
-                        begin: (d1.getHours()+(d1.getMinutes()/60))||24,
-                        end: (d2.getHours()+(d2.getMinutes()/60))||24,
-                        title: title,
-                        backgroundColor: this.getColor(tickets__value.status)
-                    });
-                    cur += 2;
-                }
+                    if( (ticket_dates__key%2) === 0 )
+                    {
+                        date = {
+                            title: title,
+                            backgroundColor: this.getColor(tickets__value.status),
+                        };
+                    }
+                    date[(((ticket_dates__key%2)===0)?('start'):('end'))] = ticket_dates__value;
+                    if( (ticket_dates__key%2) === 1 )
+                    {
+                        this.dates.push(date);
+                    }
+                });
             }   
         });
-        console.log(dates);
-        return dates;
+        return this.dates;
     }
 
     initFilter()
@@ -1012,11 +1003,11 @@ export default class App
             if( visible === false )
             {
                 tickets__value.visible = false;
-                $('#tickets .ticket_entry[data-id="'+tickets__value._id+'"]').hide();
+                $('#app .ticket_entry[data-id="'+tickets__value._id+'"]').hide();
             }
             else
             {
-                $('#tickets .ticket_entry[data-id="'+tickets__value._id+'"]').show();
+                $('#app .ticket_entry[data-id="'+tickets__value._id+'"]').show();
                 tickets__value.visible = true;
             }                    
         });
@@ -1048,7 +1039,7 @@ export default class App
     {
         let sort_1 = $('#sort select[name="sort_1"]').val(),
             sort_2 = $('#sort select[name="sort_2"]').val(),
-            sorted = $('#tickets .ticket_table tbody .ticket_entry').sort((a, b) =>
+            sorted = $('#app .ticket_table tbody .ticket_entry').sort((a, b) =>
             {
                 if( sort_1 != '' )
                 {
@@ -1076,7 +1067,7 @@ export default class App
                 if( $(a).attr('data-id') > $(b).attr('data-id') ) { return 1; }
                 return 0;
             });
-        $('#tickets .ticket_table tbody').html(sorted);
+        $('#app .ticket_table tbody').html(sorted);
     }
 
     getColor(status)
@@ -1093,7 +1084,7 @@ export default class App
     {
         this.tickets.forEach((tickets__value) =>
         {
-            $('#tickets .ticket_entry[data-id="'+tickets__value._id+'"]').css('background-color',this.getColor(tickets__value.status));
+            $('#app .ticket_entry[data-id="'+tickets__value._id+'"]').css('background-color',this.getColor(tickets__value.status));
         });   
     }
 
@@ -1115,62 +1106,7 @@ export default class App
         });
         sum = (Math.round(sum*100)/100);
         sum = sum.toString().replace('.',',');
-        $('#tickets .ticket_table tfoot .sum').text(sum);
-    }
-
-    getCurrentDate()
-    {
-        return new Date();
-    }
-
-    getDayOfActiveWeek(shift)
-    {
-        return this.getDayOfWeek(shift, this.session.activeDay);
-    }
-
-    getDayOfWeek(shift, date)
-    {
-        let d = new Date(date),
-            day = d.getDay(),
-            diff = d.getDate() - day + (day == 0 ? -6 : 1) + (shift-1);
-        return new Date(d.setDate(diff));
-    }
-
-    dateFormat(d, format)
-    {
-        if( format === 'D d.m.' )
-        {
-            return ['SO','MO','DI','MI','DO','FR','SA'][d.getDay()]+' '+('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+'.';
-        }
-        if( format === 'd. F Y' )
-        {
-            return ('0'+d.getDate()).slice(-2)+'. '+['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'][d.getMonth()]+' '+d.getFullYear();
-        }
-        return ('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+'.'+d.getFullYear()+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)+':'+('0'+d.getSeconds()).slice(-2);
-    }
-
-    dateIsInActiveWeek(d)
-    {
-        if( d === null || d === '' )
-        {
-            return false;
-        }
-        d = new Date(d);
-        return this.sameDay( this.getDayOfWeek(1, d), this.getDayOfActiveWeek(1) );
-    }
-
-    sameDay(d1, d2)
-    {
-        return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate();
-    }
-
-    weekNumber(d)
-    {
-        d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-        let dayNum = d.getUTCDay() || 7;
-        d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-        let yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
-        return Math.ceil((((d - yearStart) / 86400000) + 1)/7);
+        $('#app .ticket_table tfoot .sum').text(sum);
     }
 
 }

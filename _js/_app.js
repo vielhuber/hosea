@@ -16,12 +16,10 @@ export default class App
         this.url = null;
         this.backup = null;
         this.cols = [
-            'person',
             'status',
             'priority',
             'date',
             'time',
-            'worked',
             'project',
             'description'
         ];
@@ -40,25 +38,26 @@ export default class App
             'linux': '#9CCC65',
         };
         this.dates = null;
+        this.session = null;
     }
 
     async init()
     {
     await this.login();
     await this.readConfig();
-          this.initDatabase();
-    await this.cleanDatabase();
-    await this.backupDatabase();
+          this.initSessionVariables();
     await this.fetchTickets();
           this.buildHtml();
           this.textareaAutoHeight();
-          this.setupBindings();
           this.initKeyboardNavigation();
           this.initScheduler();
+          this.setupBindings();
+        /*
           this.initFilter();
           this.initSort();
           this.updateColors();
           this.updateSum();
+      */
     }
 
     setupBindings()
@@ -72,6 +71,7 @@ export default class App
         this.bindSave();
         this.bindRefresh();
         this.bindCreate();
+        this.bindScheduler();
     }
 
     login()
@@ -98,66 +98,32 @@ export default class App
             });          
         });
     }
-    
-    initDatabase()
-    {
-        this.db = new PouchDB(this.url);
-    }
 
-    cleanDatabase()
+    initSessionVariables()
     {
-        return new Promise((resolve,reject) =>
-        {
-            this.db.compact().then(() => 
-            {
-                resolve();
-            }).catch((error) =>
-            {
-                console.log(error);
-                reject();
-            });            
-        });
-    }
-
-
-    backupDatabase()
-    {
-        return new Promise((resolve,reject) =>
-        {
-            let remote = new PouchDB(this.backup);
-            let replication = PouchDB.replicate(this.db, remote, {
-                live: false,
-                retry: false
-            }).on('complete', (info) =>
-            {
-                console.log('backuped database to local couchdb instance');
-                resolve();
-            }).on('error', (error) =>
-            {
-                console.log(error);
-                reject();
-            });
-        });        
+        this.session = {
+            activeDay: new Date()
+        };
     }
 
     fetchTickets()
     {
         return new Promise((resolve,reject) =>
         {
-            this.db.allDocs({
-                include_docs: true,
-                attachments: false
-            }).then((tickets) =>
+            this.api.fetch('/_api/tickets', {
+                method: 'GET',
+                cache: 'no-cache',
+                headers: { 'content-type': 'application/json' }
+            }).then(res => res.json()).catch(err => {
+                reject(err);
+            }).then(response =>
             {
                 this.tickets = [];
-                tickets.rows.forEach((tickets__value) =>
+                response.data.forEach((tickets__value) =>
                 {
-                    this.tickets.push(tickets__value.doc);
+                    this.tickets.push(tickets__value);
                 });
                 resolve();
-            }).catch((error) =>
-            {
-                reject(error);
             });
         });
     }
@@ -165,6 +131,12 @@ export default class App
     buildHtml()
     {        
         $('#app').append(`
+            <div id="meta"></div>
+            <div id="tickets"></div>
+            <div class="scheduler"></div>
+        `);
+
+        $('#tickets').append(`
             <table class="ticket_table">
                 <thead>
                     <tr></tr>
@@ -194,12 +166,12 @@ export default class App
 
     textareaAutoHeight()
     {
-        //Helpers.textareaAutoHeight('#app textarea.autosize');
+        //Helpers.textareaAutoHeight('#tickets textarea.autosize');
     }
 
     textareaSetHeights()
     {
-        //Helpers.textareaSetHeights('#app textarea.autosize');
+        //Helpers.textareaSetHeights('#tickets textarea.autosize');
     }
 
 
@@ -241,7 +213,7 @@ export default class App
     {
         let html = '';
 
-        html += '<tr class="ticket_entry" data-id="'+ticket._id+'">';
+        html += '<tr class="ticket_entry" data-id="'+ticket.id+'">';
 
         this.cols.forEach((cols__value) =>
         {
@@ -253,11 +225,11 @@ export default class App
         html += `
             <td>
                 <ul class="ticket_entry__attachments">`;
-                if( ticket._attachments !== undefined && Object.keys(ticket._attachments).length > 0 )
+                if( ticket.attachments !== undefined && ticket.attachments.length > 0 )
                 {
-                    Object.entries(ticket._attachments).forEach(([attachment__key, attachment__value]) =>
+                    ticket.attachments.forEach((attachments__value, attachments__key) =>
                     {
-                        html += this.createHtmlDownloadLine(attachment__key);
+                        html += this.createHtmlDownloadLine(attachments__value);
                     });
                 }
         html += `
@@ -281,11 +253,11 @@ export default class App
         return attachment_id.split('#')[1];
     }
 
-    createHtmlDownloadLine( attachment_id )
+    createHtmlDownloadLine( attachment )
     {
         return `
-            <li class="ticket_entry__attachment" data-id="${attachment_id}">
-                <a class="ticket_entry__attachment_download" href="#" title="${ this.getFilename(attachment_id) }"></a>
+            <li class="ticket_entry__attachment" data-id="${ attachment.id }">
+                <a class="ticket_entry__attachment_download" href="#" title="${ attachment.name }"></a>
                 <a class="ticket_entry__attachment_delete" href="#" title="Löschen"></a>
             </li>
         `;
@@ -294,7 +266,7 @@ export default class App
     bindSave()
     {
         // button click
-        $('#app').on('click', '.button_save', () =>
+        $('#tickets').on('click', '.button_save', () =>
         {
             this.saveTickets().then(() => { }).catch((error) => { console.log(error); });
             return false;
@@ -357,7 +329,7 @@ export default class App
 
                         current.after( this.createHtmlLine(ticket) );
                         current.next('.ticket_entry').find('td:nth-child(1)').find(':input').focus();
-                        this.refreshScheduler();
+                        this.initScheduler();
                         this.updateColors();
                         this.updateSum();
                         this.updateFilter();
@@ -375,7 +347,7 @@ export default class App
 
     bindChangeTracking()
     {
-        $('#app').on('input', '.ticket_entry :input', (el) =>
+        $('#tickets').on('input', '.ticket_entry :input', (el) =>
         {
             if( $(el.currentTarget).is('[type="file"]') )
             {
@@ -387,7 +359,7 @@ export default class App
 
     bindAutoTime()
     {
-        $('#app').on('change', '.ticket_entry [name="date"]', (e) =>
+        $('#tickets').on('change', '.ticket_entry [name="date"]', (e) =>
         {
             if( $(e.currentTarget).val() != '' )
             {
@@ -417,7 +389,7 @@ export default class App
 
     bindUpload()
     {
-        $('#app').on('change', '.ticket_entry input[type="file"]', (e) =>
+        $('#tickets').on('change', '.ticket_entry input[type="file"]', (e) =>
         {
             this.startUploads(
                 $(e.currentTarget).closest('.ticket_entry').attr('data-id'),
@@ -479,46 +451,51 @@ export default class App
 
     bindDownload()
     {
-        $('#app').on('click', '.ticket_entry__attachment_download', (e) => 
+        $('#tickets').on('click', '.ticket_entry__attachment_download', (e) => 
         {
             this.startDownload(
-                $(e.currentTarget).closest('.ticket_entry').attr('data-id'),
                 $(e.currentTarget).closest('.ticket_entry__attachment').attr('data-id')
             );
             return false;
         });   
     }
 
-    startDownload( document_id, attachment_id )
+    startDownload( attachment_id )
     { 
-        this.db.getAttachment( document_id, attachment_id ).then((blob) =>
-        {                
+        this.api.fetch('/_api/attachments/'+attachment_id, {
+            method: 'GET',
+            cache: 'no-cache',
+            headers: { 'content-type': 'application/json' }
+        }).then(res => res.json()).catch(err => {
+            console.log(err);
+        }).then(response =>
+        {
+            let blob = new Blob([response.data.data], {type: 'application/octet-stream'});
+            
             let a = $('<a style="display: none;" />');
-            let url = URL.createObjectURL(blob);
+            let url = window.URL.createObjectURL(blob);
             a.attr('href', url);
-            a.attr('download', this.getFilename(attachment_id));
+            a.attr('download', 'test.msg');
             $('body').append(a);
             a.get(0).click();
-            URL.revokeObjectURL(url);
+            //window.URL.revokeObjectURL(url);
+            
             a.remove();
-            //console.log('<div>Filesize: ' + JSON.stringify(Math.floor(blob.size/1024)) + 'KB, Content-Type: ' + JSON.stringify(blob.type) + "</div>"+'<div>Download link: <a href="' + url + '">' + url + '</div>');
-        }).catch((error) =>
-        {
-            console.log(error);
+            resolve();
         });
         return false;
     }
 
     bindDelete()
     {
-        $('#app').on('click', '.ticket_entry__delete', (e) =>
+        $('#tickets').on('click', '.ticket_entry__delete', (e) =>
         {
             let document_id = $(e.currentTarget).closest('.ticket_entry').attr('data-id');
             if( this.ticketIsLocked(document_id) )
             {
                 return false;
             }
-            if( $('#app .ticket_entry').length === 1 )
+            if( $('#tickets .ticket_entry').length === 1 )
             {
                 alert('don\'t delete the genesis block!');
                 return false;
@@ -529,7 +506,7 @@ export default class App
                 this.deleteTicket( document_id ).then((result) =>
                 {
                     $(e.currentTarget).closest('.ticket_entry').remove();
-                    this.refreshScheduler();
+                    this.initScheduler();
                     this.updateSum();
                     this.updateFilter();
                 }).catch((error) => { });
@@ -566,7 +543,7 @@ export default class App
 
     bindDeleteAttachment()
     {
-        $('#app').on('click', '.ticket_entry__attachment_delete', (e) =>
+        $('#tickets').on('click', '.ticket_entry__attachment_delete', (e) =>
         {
             if( this.ticketIsLocked($(e.currentTarget).closest('.ticket_entry').attr('data-id')) )
             {
@@ -670,7 +647,7 @@ export default class App
                 {
                     this.unlockTicket(value.id, value.rev);
                 });
-                this.refreshScheduler();
+                this.initScheduler();
                 this.updateColors();
                 this.updateSum();
                 this.updateFilter();
@@ -710,7 +687,7 @@ export default class App
 
     initKeyboardNavigation()
     {
-        $('#app').on('keydown', '.ticket_entry :input', (e) =>
+        $('#tickets').on('keydown', '.ticket_entry :input', (e) =>
         {
             let left = $(e.currentTarget).closest('td').prev('td'),
                 right = $(e.currentTarget).closest('td').next('td'),
@@ -787,106 +764,121 @@ export default class App
 
     initScheduler()
     {
-        $('#scheduler').fullCalendar({
-            locale: 'de',
-            editable: false,
-            events: this.generateDates(),
-            defaultView: 'agendaWeek',
-            weekends: true,
-            allDaySlot: true,
-            eventTextColor: '#000000',
-            height: 'auto',
-            contentHeight: 'auto',
-            businessHours: [
-                {
-                    dow: [ 1, 2, 3, 4, 5 ],
-                    start: '09:00',
-                    end: '13:00'
-                },
-                {
-                    dow: [ 1, 2, 3, 4, 5 ],
-                    start: '14:00',
-                    end: '18:00'
-                }
-            ],
-            minTime: '09:00:00'
+        $('.scheduler').html(`
+            <div class="scheduler__navigation">
+                <span class="scheduler__navigation-week"></span>
+                <a href="#" class="scheduler__navigation-next">next</a>
+                <a href="#" class="scheduler__navigation-prev">prev</a>
+                <a href="#" class="scheduler__navigation-today">today</a>
+            </div>
+
+            <table class="scheduler__table">
+                <tbody class="scheduler__table-body">
+                    <tr class="scheduler__row">
+                        <td class="scheduler__cell"></td>   
+                        ${Array(7).join(0).split(0).map((item, i) => `
+                            <td class="scheduler__cell${(this.sameDay(this.getDayOfActiveWeek(i+1),this.getCurrentDate())?(' scheduler__cell--curday'):(''))}">
+                                ${this.dateFormat(this.getDayOfActiveWeek(i+1), 'D d.m.')}
+                                <br/>
+                                KW ${this.weekNumber(this.getDayOfActiveWeek(i+1))}
+                            </td>
+                        `).join('')}
+                    </tr>
+                    <tr class="scheduler__row">
+                        <td class="scheduler__cell">Ganztätig</td>
+                        ${Array(7).join(0).split(0).map((item, i) => `<td class="scheduler__cell${(this.sameDay(this.getDayOfActiveWeek(i+1),this.getCurrentDate())?(' scheduler__cell--curday'):(''))}"></td>`).join('')}
+                    </tr>
+                    ${Array(15).join(0).split(0).map((item, j) => {
+                        j=j+9;
+                        return `
+                            <tr class="scheduler__row">
+                                <td class="scheduler__cell">${('0'+(j)).slice(-2)}&ndash;${('0'+(j+1)).slice(-2)}</td>
+                                ${Array(7).join(0).split(0).map((item, i) => `
+                                    <td class="
+                                        scheduler__cell
+                                        ${(this.sameDay(this.getDayOfActiveWeek(i+1),this.getCurrentDate())?(' scheduler__cell--curday'):(''))}
+                                        ${((i<5 && ((j>=9 && j<13) || (j>=14 && j<18)))?(' scheduler__cell--main'):(''))}
+                                    ">
+                                    </td>
+                                `).join('')}
+                            </tr>
+                        `
+                    }).join('')}
+                </tbody>
+            </table>
+
+            <div class="scheduler__appointments">
+            </div>
+        `);        
+
+        this.generateDates().forEach((date__value) =>
+        {
+            $('.scheduler__appointments').append(`
+                <div class="scheduler__appointment" title="${date__value.title}" style="
+                    left:${12.5*date__value.day}%;
+                    top:${6.25*(date__value.begin-8)}%;
+                    bottom:${100-(6.25*(date__value.end-8))}%;
+                    background-color:${date__value.backgroundColor};
+                ">
+                    ${date__value.title}
+                </div>
+            `);
         });
+
+        $('.scheduler__navigation-week').html(`
+            ${this.dateFormat( this.getDayOfActiveWeek(1), 'd. F Y' )} &ndash; ${this.dateFormat( this.getDayOfActiveWeek(7), 'd. F Y' )}
+        `);
     }
 
-    sizeScheduler()
+    bindScheduler()
     {
-        let h1 = $(window).height(),
-            h2 = $('#scheduler .fc-header-toolbar').outerHeight(true),
-            h3 = h1-h2;
-        $('#scheduler .fc-time-grid .fc-slats td').height('auto');
-        $('#scheduler .fc-time-grid-container').height('auto');
-        $('#scheduler').fullCalendar('option', 'height', h1);
-        $('#scheduler').fullCalendar('option', 'contentHeight', h3);
-        let h4 = $('.fc-time-grid').height(),
-            h5 = h4/$('#scheduler .fc-time-grid .fc-slats tr').length;
-        $('#scheduler .fc-time-grid .fc-slats td').height(h5);
-        $('#scheduler').fullCalendar('rerenderEvents');
-    }
-
-    refreshScheduler()
-    {
-        $('#scheduler').fullCalendar('destroy');
-        this.initScheduler();
+        $('.scheduler').on('click', '.scheduler__navigation-today', () =>
+        {
+            this.session.activeDay = new Date();
+            this.initScheduler();
+            return false;
+        });
+        $('.scheduler').on('click', '.scheduler__navigation-prev', () =>
+        {
+            this.session.activeDay.setDate(this.session.activeDay.getDate()-7);
+            this.initScheduler();
+            return false;
+        });
+        $('.scheduler').on('click', '.scheduler__navigation-next', () =>
+        {
+            this.session.activeDay.setDate(this.session.activeDay.getDate()+7);
+            this.initScheduler();
+            return false;
+        });
     }
 
     generateDates()
-    {    
-        this.dates = [];
-        // add pseudo environment full day dates
-        for( let i = -365; i < 365; i++ )
-        {
-            if( ((i+2) % 7) === 0 || ((i+1) % 7) === 0 )
-            {
-                continue;
-            }
-            let type = null,
-                day = moment().startOf('isoWeek').add(i, 'days');
-            switch(day.format('dddd'))
-            {
-                case 'Montag': type = 'windows'; break;
-                case 'Dienstag': type = 'linux'; break;
-                case 'Mittwoch': type = 'mac'; break;
-                case 'Donnerstag': type = 'mac'; break;
-                case 'Freitag': type = 'windows'; break;
-                default: type = 'windows'; break;
-            }
-            this.dates.push({
-                start: day.format('YYYY-MM-DD'),
-                end: day.format('YYYY-MM-DD'),
-                title: '_'+type.toUpperCase(),
-                backgroundColor: this.getColor(type)
-            });
-        }
+    {
+        let dates = [];
         this.tickets.forEach((tickets__value) =>
         {
-            if( tickets__value.date !== null && tickets__value.date != '' )
+            if( this.dateIsInActiveWeek(tickets__value.date.split('\n')[0]) )
             {
-                let date = null;
-                let title = tickets__value.project+'\n'+(tickets__value.description||'').substring(0,100);
-                let ticket_dates = tickets__value.date.split('\n');
-                ticket_dates.forEach((ticket_dates__value, ticket_dates__key) =>
+                let title = tickets__value.project+'\n'+(tickets__value.description||'').substring(0,100),
+                    ticket_dates = tickets__value.date.split('\n'),
+                    cur = 0;
+                while( ticket_dates[cur] !== undefined )
                 {
-                    if( (ticket_dates__key%2) === 0 )
-                    {
-                        date = {
-                            title: title,
-                            backgroundColor: this.getColor(tickets__value.status),
-                        };
-                    }
-                    date[(((ticket_dates__key%2)===0)?('start'):('end'))] = ticket_dates__value;
-                    if( (ticket_dates__key%2) === 1 )
-                    {
-                        this.dates.push(date);
-                    }
-                });
+                    let d1 = new Date(ticket_dates[cur]),
+                        d2 = new Date(ticket_dates[cur+1]);
+                    dates.push({
+                        day: ((d1.getDay()+6)%7)+1,
+                        begin: (d1.getHours()+(d1.getMinutes()/60))||24,
+                        end: (d2.getHours()+(d2.getMinutes()/60))||24,
+                        title: title,
+                        backgroundColor: this.getColor(tickets__value.status)
+                    });
+                    cur += 2;
+                }
             }   
         });
-        return this.dates;
+        console.log(dates);
+        return dates;
     }
 
     initFilter()
@@ -1003,11 +995,11 @@ export default class App
             if( visible === false )
             {
                 tickets__value.visible = false;
-                $('#app .ticket_entry[data-id="'+tickets__value._id+'"]').hide();
+                $('#tickets .ticket_entry[data-id="'+tickets__value._id+'"]').hide();
             }
             else
             {
-                $('#app .ticket_entry[data-id="'+tickets__value._id+'"]').show();
+                $('#tickets .ticket_entry[data-id="'+tickets__value._id+'"]').show();
                 tickets__value.visible = true;
             }                    
         });
@@ -1039,7 +1031,7 @@ export default class App
     {
         let sort_1 = $('#sort select[name="sort_1"]').val(),
             sort_2 = $('#sort select[name="sort_2"]').val(),
-            sorted = $('#app .ticket_table tbody .ticket_entry').sort((a, b) =>
+            sorted = $('#tickets .ticket_table tbody .ticket_entry').sort((a, b) =>
             {
                 if( sort_1 != '' )
                 {
@@ -1067,7 +1059,7 @@ export default class App
                 if( $(a).attr('data-id') > $(b).attr('data-id') ) { return 1; }
                 return 0;
             });
-        $('#app .ticket_table tbody').html(sorted);
+        $('#tickets .ticket_table tbody').html(sorted);
     }
 
     getColor(status)
@@ -1084,7 +1076,7 @@ export default class App
     {
         this.tickets.forEach((tickets__value) =>
         {
-            $('#app .ticket_entry[data-id="'+tickets__value._id+'"]').css('background-color',this.getColor(tickets__value.status));
+            $('#tickets .ticket_entry[data-id="'+tickets__value._id+'"]').css('background-color',this.getColor(tickets__value.status));
         });   
     }
 
@@ -1106,7 +1098,62 @@ export default class App
         });
         sum = (Math.round(sum*100)/100);
         sum = sum.toString().replace('.',',');
-        $('#app .ticket_table tfoot .sum').text(sum);
+        $('#tickets .ticket_table tfoot .sum').text(sum);
+    }
+
+    getCurrentDate()
+    {
+        return new Date();
+    }
+
+    getDayOfActiveWeek(shift)
+    {
+        return this.getDayOfWeek(shift, this.session.activeDay);
+    }
+
+    getDayOfWeek(shift, date)
+    {
+        let d = new Date(date),
+            day = d.getDay(),
+            diff = d.getDate() - day + (day == 0 ? -6 : 1) + (shift-1);
+        return new Date(d.setDate(diff));
+    }
+
+    dateFormat(d, format)
+    {
+        if( format === 'D d.m.' )
+        {
+            return ['SO','MO','DI','MI','DO','FR','SA'][d.getDay()]+' '+('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+'.';
+        }
+        if( format === 'd. F Y' )
+        {
+            return ('0'+d.getDate()).slice(-2)+'. '+['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'][d.getMonth()]+' '+d.getFullYear();
+        }
+        return ('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+'.'+d.getFullYear()+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)+':'+('0'+d.getSeconds()).slice(-2);
+    }
+
+    dateIsInActiveWeek(d)
+    {
+        if( d === null || d === '' )
+        {
+            return false;
+        }
+        d = new Date(d);
+        return this.sameDay( this.getDayOfWeek(1, d), this.getDayOfActiveWeek(1) );
+    }
+
+    sameDay(d1, d2)
+    {
+        return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate();
+    }
+
+    weekNumber(d)
+    {
+        d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+        let dayNum = d.getUTCDay() || 7;
+        d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+        let yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+        return Math.ceil((((d - yearStart) / 86400000) + 1)/7);
     }
 
 }

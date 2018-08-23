@@ -31,27 +31,21 @@
   width: 5%;
 }
 #tickets table td:nth-child(3) {
-  width: 5%;
-}
-#tickets table td:nth-child(4) {
   width: 10%;
 }
-#tickets table td:nth-child(5) {
+#tickets table td:nth-child(4) {
   width: 5%;
 }
+#tickets table td:nth-child(5) {
+  width: 10%;
+}
 #tickets table td:nth-child(6) {
-  width: 5%;
+  width: auto;
 }
 #tickets table td:nth-child(7) {
   width: 10%;
 }
 #tickets table td:nth-child(8) {
-  width: auto;
-}
-#tickets table td:nth-child(9) {
-  width: 10%;
-}
-#tickets table td:nth-child(10) {
   width: 5%;
 }
 #tickets table td {

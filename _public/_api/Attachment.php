@@ -63,13 +63,15 @@ class Attachment extends Api
     protected function show($id)
     {
         $this->checkId($id);
+        $data = $this::$db->fetch_row(
+            'SELECT '.implode(',',$this->cols).' FROM attachments WHERE id = ? AND ticket_id IN (SELECT id FROM tickets WHERE user_id = ?)',
+            $id,
+            $this::$auth->getCurrentUserId()
+        );
+        $data['data'] = base64_encode($data['data']); // base64 encode for proper json encoding
         $this->response([
             'success' => true,
-            'data' => $this::$db->fetch_row(
-                'SELECT '.implode(',',$this->cols).' FROM attachments WHERE id = ? AND ticket_id IN (SELECT id FROM tickets WHERE user_id = ?)',
-                $id,
-                $this::$auth->getCurrentUserId()
-            )
+            'data' => $data
         ]);
     }
 

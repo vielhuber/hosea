@@ -23,7 +23,7 @@ var gulp            = require('gulp'),
 // js
 gulp.task('js', function(){
     return browserify({
-        entries: ['./_js_new/script.js']
+        entries: ['./_js/script.js']
     })
     .transform(babelify.configure({
         presets : ['es2015', 'es2017'],
@@ -34,7 +34,7 @@ gulp.task('js', function(){
     .pipe(source('bundle.js'))
     .pipe(buffer())
     .pipe(uglify())
-    .pipe(gulp.dest('./_public_new/_build'))
+    .pipe(gulp.dest('./_public/_build'))
     .pipe(browserSync.reload({stream: true}));
 });
 
@@ -52,7 +52,7 @@ gulp.task('css', function(){
         .pipe(sourcemaps.write())
         .pipe(rename('bundle.css'))
         .pipe(cleanCSS({compatibility: 'ie8'}))
-        .pipe(gulp.dest('./_public_new/_build'))
+        .pipe(gulp.dest('./_public/_build'))
         .pipe(browserSync.stream());
 });
 
@@ -61,14 +61,14 @@ gulp.task('html', function() {
   return gulp.src('./_html/*.html')
     .pipe(htmlmin({collapseWhitespace: true}))
     .on('error', function(err) { console.log(err.toString()); this.emit('end'); })
-    .pipe(gulp.dest('./_public_new/'));
+    .pipe(gulp.dest('./_public/'));
     //.pipe(browserSync.reload({stream: true}));
 });
 
 // watch
 gulp.task('watch', function() {
 	//browserSync.init({ proxy: 'hosea.local' });
-    gulp.watch('./_js_new/*.js', ['js']);    
+    gulp.watch('./_js/*.js', ['js']);    
     gulp.watch('./_scss/**/*.scss', ['css']);
     gulp.watch('./_html/*.html', ['html']);
 });
