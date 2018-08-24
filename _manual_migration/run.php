@@ -9,7 +9,7 @@ ini_set('max_execution_time', 3000);
 ini_set('memory_limit','2000M');
 
 // read json backup
-$backup = file_get_contents('../_backup/_08_22_2018.json');
+$backup = file_get_contents('../_backup/_08_25_2018.json');
 $backup = json_decode($backup);
 
 // include database
@@ -47,8 +47,7 @@ foreach($backup->docs as $docs__value)
         {
             $db->insert('attachments', [
                 'name' => explode('#',$attachments__key)[1],
-                //'data' => $attachments__value->data,
-                'data' => file_get_contents('test.msg'),
+                'data' => base64_decode($attachments__value->data),
                 'ticket_id' => $ticket_id
             ]);
         }

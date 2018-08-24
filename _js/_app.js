@@ -470,20 +470,39 @@ export default class App
             console.log(err);
         }).then(response =>
         {
-            let blob = new Blob([response.data.data], {type: 'application/octet-stream'});
-            
+            let blob = this.base64toblob(response.data.data);
             let a = $('<a style="display: none;" />');
             let url = window.URL.createObjectURL(blob);
             a.attr('href', url);
             a.attr('download', 'test.msg');
             $('body').append(a);
             a.get(0).click();
-            //window.URL.revokeObjectURL(url);
-            
+            window.URL.revokeObjectURL(url);            
             a.remove();
-            resolve();
         });
         return false;
+    }
+
+    base64toblob(base64, contentType = '')
+    {
+        let sliceSize = 512,
+            byteCharacters = atob(base64),
+            byteArrays = [];
+      
+        for (let offset = 0; offset < byteCharacters.length; offset += sliceSize)
+        {
+            let slice = byteCharacters.slice(offset, offset + sliceSize),
+                byteNumbers = new Array(slice.length);
+            for (let i = 0; i < slice.length; i++)
+            {
+                byteNumbers[i] = slice.charCodeAt(i);
+            }
+            let byteArray = new Uint8Array(byteNumbers);
+            byteArrays.push(byteArray);
+        }
+
+        let blob = new Blob(byteArrays, {type: contentType});
+        return blob;
     }
 
     bindDelete()

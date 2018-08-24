@@ -68,7 +68,7 @@ class Attachment extends Api
             $id,
             $this::$auth->getCurrentUserId()
         );
-        $data['data'] = base64_encode($data['data']); // base64 encode for proper json encoding
+        $data['data'] = base64_encode($data['data']); // base64 encode for proper json support
         $this->response([
             'success' => true,
             'data' => $data
