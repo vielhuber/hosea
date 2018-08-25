@@ -64,9 +64,8 @@ class Attachment extends Api
     {
         $this->checkId($id);
         $data = $this::$db->fetch_row(
-            'SELECT '.implode(',',$this->cols).' FROM attachments WHERE id = ? AND ticket_id IN (SELECT id FROM tickets WHERE user_id = ?)',
-            $id,
-            $this::$auth->getCurrentUserId()
+            'SELECT '.implode(',',$this->cols).' FROM attachments WHERE id = ?',
+            $id
         );
         $data['data'] = base64_encode($data['data']); // base64 encode for proper json support
         $this->response([
@@ -83,11 +82,20 @@ class Attachment extends Api
             $this->colsWithout('id')
             as $columns__value
         ) {
-            $values[$columns__value] = $this->getInput($columns__value);
+            $input = $this->getInput($columns__value);
+            if( $columns__value === 'data' )
+            {
+                $input = base64_decode($input);
+            }
+            $values[$columns__value] = $input;
         }
-        $this::$db->insert('attachments', $values);
+        $id = $this::$db->insert('attachments', $values);
         $this->response([
-            'success' => true
+            'success' => true,
+            'data' => $this::$db->fetch_row(
+                'SELECT '.implode(',',$this->colsWithout('data')).' FROM attachments WHERE id = ?',
+                $id
+            )
         ]);
     }
 
@@ -99,8 +107,13 @@ class Attachment extends Api
             $this->colsWithout('id','ticket_id')
             as $columns__value
         ) {
-            if ($this->getInput($columns__value) !== null) {
-                $values[$columns__value] = $this->getInput($columns__value);
+            $input = $this->getInput($columns__value);
+            if( $columns__value === 'data' )
+            {
+                $input = base64_decode($input);
+            }
+            if ($input !== null) {
+                $values[$columns__value] = $input;
             }
         }
         if (!empty($values)) {

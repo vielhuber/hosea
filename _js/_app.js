@@ -192,7 +192,7 @@ export default class App
     {
         this.tickets.forEach((tickets__value) =>
         {
-            if( tickets__value._id == document_id )
+            if( tickets__value.id == document_id )
             {
                 if( Helpers.isObject(property) )
                 {
@@ -394,13 +394,13 @@ export default class App
             this.startUploads(
                 $(e.currentTarget).closest('.ticket_entry').attr('data-id'),
                 e.currentTarget.files
-            ).then((attachment_ids) =>
+            ).then((attachments) =>
             {
                 $(e.currentTarget).val('');
-                attachment_ids.forEach((attachment_ids__value) =>
+                attachments.forEach((attachments__value) =>
                 {
                     $(e.currentTarget).closest('.ticket_entry').find('.ticket_entry__attachments').append(
-                        this.createHtmlDownloadLine(attachment_ids__value)
+                        this.createHtmlDownloadLine(attachments__value)
                     );
                 });
             }).catch((error) =>
@@ -412,24 +412,48 @@ export default class App
 
     async startUploads( document_id, files )
     {
-        let attachment_ids = [];
+        let attachments = [];
 
         for(let files__value of Array.from(files))
         {
             this.lockTicket(document_id);            
-            let result = await this.startUpload( document_id, files__value );
-            this.unlockTicket(document_id, result.rev, true);
-            attachment_ids.push(result.attachment_id);
+            let attachment = await this.startUpload( document_id, files__value );
+            this.unlockTicket(document_id, true);
+            attachments.push(attachment);
         }
+
+        console.log(attachments);
 
         // fetch entire doc to get newest attachment object
         await this.updateLocalTicket(document_id);
 
-        return attachment_ids;
+        return attachments;
     }
 
     startUpload( document_id, file )
     {
+        return new Promise((resolve,reject) =>
+        {
+            this.filetobase64(file).then((base64) =>
+            {
+                this.api.fetch('/_api/attachments', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        name: file.name,
+                        data: base64,
+                        ticket_id: document_id
+                    }),
+                    cache: 'no-cache',
+                    headers: { 'content-type': 'application/json' }
+                }).then(res => res.json()).catch(err => {
+                    console.log(err);
+                }).then(response =>
+                {
+                    resolve(response.data);
+                });
+            });
+        });
+        /*
         let attachment_id = Helpers.guid()+'#'+file.name;
         return this.db.putAttachment(
             document_id,
@@ -447,6 +471,7 @@ export default class App
         {
             console.log(error);
         });
+        */
     }
 
     bindDownload()
@@ -470,39 +495,19 @@ export default class App
             console.log(err);
         }).then(response =>
         {
-            let blob = this.base64toblob(response.data.data);
-            let a = $('<a style="display: none;" />');
-            let url = window.URL.createObjectURL(blob);
-            a.attr('href', url);
-            a.attr('download', 'test.msg');
-            $('body').append(a);
-            a.get(0).click();
-            window.URL.revokeObjectURL(url);            
+            let base64 = response.data.data,
+                filename = response.data.name,
+                url = 'data:application/octet-stream;base64,'+base64;
+
+            let a = document.createElement('a');
+            a.setAttribute('style','display:none');
+            a.setAttribute('download', filename);
+            a.setAttribute('href', url);
+            document.body.appendChild(a);
+            a.click();
             a.remove();
         });
         return false;
-    }
-
-    base64toblob(base64, contentType = '')
-    {
-        let sliceSize = 512,
-            byteCharacters = atob(base64),
-            byteArrays = [];
-      
-        for (let offset = 0; offset < byteCharacters.length; offset += sliceSize)
-        {
-            let slice = byteCharacters.slice(offset, offset + sliceSize),
-                byteNumbers = new Array(slice.length);
-            for (let i = 0; i < slice.length; i++)
-            {
-                byteNumbers[i] = slice.charCodeAt(i);
-            }
-            let byteArray = new Uint8Array(byteNumbers);
-            byteArrays.push(byteArray);
-        }
-
-        let blob = new Blob(byteArrays, {type: contentType});
-        return blob;
     }
 
     bindDelete()
@@ -591,9 +596,8 @@ export default class App
         });
     }
 
-    unlockTicket(document_id, rev, leave_changed = false)
+    unlockTicket(document_id, leave_changed = false)
     {
-        this.setTicketData(document_id, '_rev', rev);
         //console.log('unlocking ticket '+document_id);
         if( leave_changed === false )
         {
@@ -627,7 +631,7 @@ export default class App
                 this.getTicketData(document_id)._rev
             ).then((result) =>
             {
-                this.unlockTicket(document_id, result.rev, true);
+                this.unlockTicket(document_id, true);
                 this.removeAttachmentFromLocalTicket( document_id, attachment_id );
                 resolve();
             }).catch((error) =>
@@ -664,7 +668,7 @@ export default class App
                 console.log(result);
                 result.forEach((value) =>
                 {
-                    this.unlockTicket(value.id, value.rev);
+                    this.unlockTicket(value.id);
                 });
                 this.initScheduler();
                 this.updateColors();
@@ -681,15 +685,22 @@ export default class App
 
     updateLocalTicket(document_id)
     {
-        return this.db.get(document_id).then((data) =>
+        return new Promise((resolve,reject) =>
         {
-            this.setTicketData(
-                document_id,
-                data
-            );
-        }).catch((error) =>
-        {
-            console.log(error);
+            this.api.fetch('/_api/tickets/'+document_id, {
+                method: 'GET',
+                cache: 'no-cache',
+                headers: { 'content-type': 'application/json' }
+            }).then(res => res.json()).catch(err => {
+                reject(err);
+            }).then(response =>
+            {
+                this.setTicketData(
+                    document_id,
+                    response.data
+                );
+                resolve();
+            });
         });
     }
 
@@ -1173,6 +1184,16 @@ export default class App
         d.setUTCDate(d.getUTCDate() + 4 - dayNum);
         let yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
         return Math.ceil((((d - yearStart) / 86400000) + 1)/7);
+    }
+
+    filetobase64(file)
+    {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = error => reject(error);
+        });
     }
 
 }

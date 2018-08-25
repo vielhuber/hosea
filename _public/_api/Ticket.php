@@ -93,9 +93,12 @@ class Ticket extends Api
             $values[$columns__value] = $this->getInput($columns__value);
         }
         $values['user_id'] = $this::$auth->getCurrentUserId();
-        $this::$db->insert('tickets', $values);
+        $id = $this::$db->insert('tickets', $values);
         $this->response([
-            'success' => true
+            'success' => true,
+            'data' => [
+                'id' => $id
+            ]
         ]);
     }
 
