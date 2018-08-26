@@ -41,6 +41,13 @@ class Ticket extends Api
             return $this->update($this->getRequestPathSecond());
         }
         if (
+            $this->getRequestMethod() === 'PUT' &&
+            $this->getRequestPathFirst() === 'tickets' &&
+            $this->getRequestPathSecond() === null
+        ) {
+            return $this->bulkUpdate();
+        }
+        if (
             $this->getRequestMethod() === 'DELETE' &&
             $this->getRequestPathFirst() === 'tickets' &&
             is_numeric($this->getRequestPathSecond())
@@ -115,7 +122,35 @@ class Ticket extends Api
             $this::$db->update('tickets', $values, ['id' => $id]);
         }
         $this->response([
-            'success' => true
+            'success' => true,
+            'data' => [
+                'id' => $id
+            ]
+        ]);
+    }
+
+    protected function bulkUpdate()
+    {
+        $tickets = $this->getInput('tickets');
+        $ids = [];
+        foreach($tickets as $tickets__value)
+        {
+            $values = [];
+            foreach ( $this->colsWithout('id','user_id') as $columns__value ) {
+                if (isset($tickets__value[$columns__value]) && $tickets__value[$columns__value] != '') {
+                    $values[$columns__value] = $tickets__value[$columns__value];
+                }
+            }
+            if (!empty($values) && isset($tickets__value['id'])) {
+                $this::$db->update('tickets', $values, ['id' => $tickets__value['id']]);
+                $ids[] = $tickets__value['id'];
+            }
+        }
+        $this->response([
+            'success' => true,
+            'data' => [
+                'ids' => $ids
+            ]
         ]);
     }
 

@@ -175,12 +175,12 @@ export default class App
     }
 
 
-    getTicketData( document_id )
+    getTicketData( ticket_id )
     {
         let data = null;
         this.tickets.forEach((tickets__value) =>
         {
-            if( tickets__value._id == document_id )
+            if( tickets__value.id == ticket_id )
             {
                 data = tickets__value;
             }
@@ -188,11 +188,11 @@ export default class App
         return data;
     }
 
-    setTicketData( document_id, property, value = null )
+    setTicketData( ticket_id, property, value = null )
     {
         this.tickets.forEach((tickets__value) =>
         {
-            if( tickets__value.id == document_id )
+            if( tickets__value.id == ticket_id )
             {
                 if( Helpers.isObject(property) )
                 {
@@ -326,7 +326,6 @@ export default class App
                     }
                     this.createTicket(this.getTicketData(current.attr('data-id'))).then((ticket) =>
                     {
-
                         current.after( this.createHtmlLine(ticket) );
                         current.next('.ticket_entry').find('td:nth-child(1)').find(':input').focus();
                         this.initScheduler();
@@ -343,7 +342,6 @@ export default class App
             }
         });
     }
-
 
     bindChangeTracking()
     {
@@ -410,27 +408,27 @@ export default class App
         });
     }
 
-    async startUploads( document_id, files )
+    async startUploads( ticket_id, files )
     {
         let attachments = [];
 
         for(let files__value of Array.from(files))
         {
-            this.lockTicket(document_id);            
-            let attachment = await this.startUpload( document_id, files__value );
-            this.unlockTicket(document_id, true);
+            this.lockTicket(ticket_id);            
+            let attachment = await this.startUpload( ticket_id, files__value );
+            this.unlockTicket(ticket_id, true);
             attachments.push(attachment);
         }
 
         console.log(attachments);
 
         // fetch entire doc to get newest attachment object
-        await this.updateLocalTicket(document_id);
+        await this.updateLocalTicket(ticket_id);
 
         return attachments;
     }
 
-    startUpload( document_id, file )
+    startUpload( ticket_id, file )
     {
         return new Promise((resolve,reject) =>
         {
@@ -441,7 +439,7 @@ export default class App
                     body: JSON.stringify({
                         name: file.name,
                         data: base64,
-                        ticket_id: document_id
+                        ticket_id: ticket_id
                     }),
                     cache: 'no-cache',
                     headers: { 'content-type': 'application/json' }
@@ -456,9 +454,9 @@ export default class App
         /*
         let attachment_id = Helpers.guid()+'#'+file.name;
         return this.db.putAttachment(
-            document_id,
+            ticket_id,
             attachment_id,
-            this.getTicketData(document_id)._rev,
+            this.getTicketData(ticket_id)._rev,
             file,
             file.type
         ).then((result) =>
@@ -514,8 +512,8 @@ export default class App
     {
         $('#tickets').on('click', '.ticket_entry__delete', (e) =>
         {
-            let document_id = $(e.currentTarget).closest('.ticket_entry').attr('data-id');
-            if( this.ticketIsLocked(document_id) )
+            let ticket_id = $(e.currentTarget).closest('.ticket_entry').attr('data-id');
+            if( this.ticketIsLocked(ticket_id) )
             {
                 return false;
             }
@@ -527,7 +525,7 @@ export default class App
             var result = confirm('Sind Sie sicher?');
             if( result )
             {
-                this.deleteTicket( document_id ).then((result) =>
+                this.deleteTicket( ticket_id ).then((result) =>
                 {
                     $(e.currentTarget).closest('.ticket_entry').remove();
                     this.initScheduler();
@@ -540,27 +538,26 @@ export default class App
         });
     }
 
-    deleteTicket( document_id )
+    deleteTicket( ticket_id )
     {
         return new Promise((resolve,reject) =>
         {
-            this.db.remove(
-                document_id,
-                this.getTicketData(document_id)._rev
-            ).then((result) =>
+            this.api.fetch('/_api/tickets/'+ticket_id, {
+                method: 'DELETE',
+                cache: 'no-cache',
+                headers: { 'content-type': 'application/json' }
+            }).then(res => res.json()).catch(err => {
+                console.log(err);
+            }).then(response =>
             {
                 this.tickets.forEach((tickets__value, tickets__key) =>
                 {
-                    if( tickets__value._id == document_id )
+                    if( tickets__value.id == ticket_id )
                     {
                         this.tickets.splice(tickets__key, 1);
                     }
                 });
                 resolve();
-            }).catch((error) =>
-            {
-                reject();
-                console.log(error);
             });
         });
     }
@@ -573,73 +570,53 @@ export default class App
             {
                 return false;
             }
-            this.deleteAttachment(
-                $(e.currentTarget).closest('.ticket_entry').attr('data-id'),
-                $(e.currentTarget).closest('.ticket_entry__attachment').attr('data-id')
-            ).then((result) =>
+            let attachment_id = $(e.currentTarget).closest('.ticket_entry__attachment').attr('data-id');
+            this.api.fetch('/_api/attachments/'+attachment_id, {
+                method: 'DELETE',
+                cache: 'no-cache',
+                headers: { 'content-type': 'application/json' }
+            }).then(res => res.json()).catch(err => {
+                console.log(err);
+            }).then(response =>
             {
                 $(e.currentTarget).closest('.ticket_entry__attachment').remove();
-            }).catch((error) =>
-            {                
             });
             return false;
         });
     }
 
-    lockTicket(document_id)
+    lockTicket(ticket_id)
     {
-        $('.ticket_entry[data-id="'+document_id+'"]').addClass('ticket_entry--locked');
-        $('.ticket_entry[data-id="'+document_id+'"]').find(':input').each((index,el) =>
+        $('.ticket_entry[data-id="'+ticket_id+'"]').addClass('ticket_entry--locked');
+        $('.ticket_entry[data-id="'+ticket_id+'"]').find(':input').each((index,el) =>
         {
             $(el).attr('disabled','disabled');
             $(el).attr('readonly','readonly');
         });
     }
 
-    unlockTicket(document_id, leave_changed = false)
+    unlockTicket(ticket_id, leave_changed = false)
     {
-        //console.log('unlocking ticket '+document_id);
+        //console.log('unlocking ticket '+ticket_id);
         if( leave_changed === false )
         {
-            $('.ticket_entry[data-id="'+document_id+'"]').removeClass('ticket_entry--changed');
+            $('.ticket_entry[data-id="'+ticket_id+'"]').removeClass('ticket_entry--changed');
         }
-        $('.ticket_entry[data-id="'+document_id+'"]').removeClass('ticket_entry--locked');
-        $('.ticket_entry[data-id="'+document_id+'"]').find(':input').each((index,el) =>
+        $('.ticket_entry[data-id="'+ticket_id+'"]').removeClass('ticket_entry--locked');
+        $('.ticket_entry[data-id="'+ticket_id+'"]').find(':input').each((index,el) =>
         {
             $(el).removeAttr('disabled');
             $(el).removeAttr('readonly');
         });
     }
 
-    ticketIsLocked(document_id)
+    ticketIsLocked(ticket_id)
     {
-        if( $('.ticket_entry[data-id="'+document_id+'"] .ticket_entry--locked').length > 0 )
+        if( $('.ticket_entry[data-id="'+ticket_id+'"] .ticket_entry--locked').length > 0 )
         {
             return true;
         }
         return false;
-    }
-
-    deleteAttachment( document_id, attachment_id )
-    {
-        return new Promise((resolve,reject) =>
-        {
-            this.lockTicket(document_id);
-            this.db.removeAttachment(
-                document_id,
-                attachment_id,
-                this.getTicketData(document_id)._rev
-            ).then((result) =>
-            {
-                this.unlockTicket(document_id, true);
-                this.removeAttachmentFromLocalTicket( document_id, attachment_id );
-                resolve();
-            }).catch((error) =>
-            {
-                reject();
-                console.log(error);
-            });
-        });
     }
 
     saveTickets()
@@ -663,31 +640,38 @@ export default class App
                     this.getTicketData( $(el).attr('data-id') )
                 );
             });
-            this.db.bulkDocs(changed).then((result) =>
+
+            this.api.fetch('/_api/tickets', {
+                method: 'PUT',
+                body: JSON.stringify({
+                    tickets: changed
+                }),
+                cache: 'no-cache',
+                headers: { 'content-type': 'application/json' }
+            }).then(res => res.json()).catch(err => {
+                console.log(err);
+            }).then(response =>
             {
-                console.log(result);
-                result.forEach((value) =>
+                console.log(response);
+                response.data.ids.forEach((value) =>
                 {
-                    this.unlockTicket(value.id);
+                    console.log(value);
+                    this.unlockTicket(value);
                 });
                 this.initScheduler();
                 this.updateColors();
                 this.updateSum();
                 this.updateFilter();
                 resolve();
-            }).catch((error) =>
-            {
-                console.log(error);
-                reject();
-            }); 
+            });
         });
     }
 
-    updateLocalTicket(document_id)
+    updateLocalTicket(ticket_id)
     {
         return new Promise((resolve,reject) =>
         {
-            this.api.fetch('/_api/tickets/'+document_id, {
+            this.api.fetch('/_api/tickets/'+ticket_id, {
                 method: 'GET',
                 cache: 'no-cache',
                 headers: { 'content-type': 'application/json' }
@@ -696,7 +680,7 @@ export default class App
             }).then(response =>
             {
                 this.setTicketData(
-                    document_id,
+                    ticket_id,
                     response.data
                 );
                 resolve();
@@ -704,11 +688,11 @@ export default class App
         });
     }
 
-    removeAttachmentFromLocalTicket( document_id, attachment_id )
+    removeAttachmentFromLocalTicket( ticket_id, attachment_id )
     {
         this.tickets.forEach((tickets__value) =>
         {
-            if( tickets__value._id == document_id )
+            if( tickets__value.id == ticket_id )
             {
                 delete tickets__value._attachments[attachment_id];
             }
@@ -779,15 +763,18 @@ export default class App
             {
                 ticket[cols__value] = data[cols__value]||null;
             });
-            this.db.post(ticket).then((response) =>
-            {
-                ticket._id = response.id;
-                ticket._rev = response.rev;
+            this.api.fetch('/_api/tickets', {
+                method: 'POST',
+                body: JSON.stringify(ticket),
+                cache: 'no-cache',
+                headers: { 'content-type': 'application/json' }
+            }).then(res => res.json()).catch(err => {
+                ticket.id = response.id;
                 this.tickets.push(ticket);
                 resolve(ticket);
-            }).catch((error) =>
+            }).then(response =>
             {
-                reject(error);
+                resolve(response.data);
             });
         });
     }
@@ -1025,11 +1012,11 @@ export default class App
             if( visible === false )
             {
                 tickets__value.visible = false;
-                $('#tickets .ticket_entry[data-id="'+tickets__value._id+'"]').hide();
+                $('#tickets .ticket_entry[data-id="'+tickets__value.id+'"]').hide();
             }
             else
             {
-                $('#tickets .ticket_entry[data-id="'+tickets__value._id+'"]').show();
+                $('#tickets .ticket_entry[data-id="'+tickets__value.id+'"]').show();
                 tickets__value.visible = true;
             }                    
         });
@@ -1106,7 +1093,7 @@ export default class App
     {
         this.tickets.forEach((tickets__value) =>
         {
-            $('#tickets .ticket_entry[data-id="'+tickets__value._id+'"]').css('background-color',this.getColor(tickets__value.status));
+            $('#tickets .ticket_entry[data-id="'+tickets__value.id+'"]').css('background-color',this.getColor(tickets__value.status));
         });   
     }
 

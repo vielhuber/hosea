@@ -120,7 +120,10 @@ class Attachment extends Api
             $this::$db->update('attachments', $values, ['id' => $id]);
         }
         $this->response([
-            'success' => true
+            'success' => true,
+            'data' => [
+                'id' => $id
+            ]
         ]);
     }
 
