@@ -229,41 +229,4 @@ export default class Helpers
         return !!( el.offsetWidth || el.offsetHeight || el.getClientRects().length );
     }
 
-    static textareaSetHeight(el)
-    {
-        el.style.height = '5px';
-        el.style.height = (el.scrollHeight)+'px';   
-    }
-
-    static textareaSetHeights(selector)
-    {
-        [].forEach.call(document.querySelectorAll(selector), (el) =>
-        {
-            if( this.isVisible(el) )
-            {
-                this.textareaSetHeight(el);
-            }
-        });
-    }
-
-    static textareaAutoHeight(selector)
-    {
-
-        //this.textareaSetHeights(selector);
-
-        window.addEventListener('resize', () =>
-        {
-            this.textareaSetHeights(selector);
-        });
-
-        document.addEventListener('keyup', (e) =>
-        {
-            if(e.target && e.target.tagName === 'TEXTAREA')
-            {
-                this.textareaSetHeight(e.target);
-            }
-        });
-        
-    }
-
 }

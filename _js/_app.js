@@ -48,16 +48,14 @@ export default class App
           this.initSessionVariables();
     await this.fetchTickets();
           this.buildHtml();
-          this.textareaAutoHeight();
           this.initKeyboardNavigation();
           this.initScheduler();
           this.setupBindings();
-        /*
           this.initFilter();
           this.initSort();
           this.updateColors();
           this.updateSum();
-      */
+          this.textareaAutoHeight();
     }
 
     setupBindings()
@@ -121,6 +119,7 @@ export default class App
                 this.tickets = [];
                 response.data.forEach((tickets__value) =>
                 {
+                    tickets__value.visible = false;
                     this.tickets.push(tickets__value);
                 });
                 resolve();
@@ -159,21 +158,35 @@ export default class App
         this.tickets.forEach((tickets__value) =>
         {
             $('.ticket_table tbody').append(
-                this.createHtmlLine(tickets__value)
+                this.createHtmlLine(tickets__value, false)
             );
         });
     }    
 
     textareaAutoHeight()
     {
-        //Helpers.textareaAutoHeight('#tickets textarea.autosize');
+        document.addEventListener('keyup', (e) =>
+        {
+            if(e.target && e.target.tagName === 'TEXTAREA')
+            {
+                this.textareaSetHeight(e.target);
+            }
+        });
     }
 
-    textareaSetHeights()
+    textareaSetHeight(el)
     {
-        //Helpers.textareaSetHeights('#tickets textarea.autosize');
+        el.style.height = '5px';
+        el.style.height = (el.scrollHeight)+'px';   
     }
 
+    textareaSetVisibleHeights()
+    {
+        console.log($('textarea:visible').length);
+        $('textarea:visible').each((index,el) => {
+            this.textareaSetHeight(el);
+        }); 
+    }
 
     getTicketData( ticket_id )
     {
@@ -209,11 +222,11 @@ export default class App
         });      
     }
 
-    createHtmlLine(ticket)
+    createHtmlLine(ticket, visible)
     {
         let html = '';
 
-        html += '<tr class="ticket_entry" data-id="'+ticket.id+'">';
+        html += '<tr class="ticket_entry" data-id="'+ticket.id+'"'+((visible === false)?(' style="display:none;"'):(''))+'>';
 
         this.cols.forEach((cols__value) =>
         {
@@ -319,20 +332,22 @@ export default class App
             {
                 if(String.fromCharCode(event.which).toLowerCase() === 'd')
                 {
-                    let current = $('.ticket_table tbody .ticket_entry:visible').last();
+                    let current = $('.ticket_table tbody .ticket_entry:visible').last(),
+                        currentIndex = 1;
                     if( $(':focus').closest('.ticket_entry').length > 0 )
                     {
-                        current = $(':focus').closest('.ticket_entry');
+                        current = $(':focus').closest('.ticket_entry'),
+                        currentIndex = $(':focus').closest('td').prevAll('td').length+1;
                     }
                     this.createTicket(this.getTicketData(current.attr('data-id'))).then((ticket) =>
                     {
-                        current.after( this.createHtmlLine(ticket) );
-                        current.next('.ticket_entry').find('td:nth-child(1)').find(':input').focus();
+                        current.after( this.createHtmlLine(ticket, true) );
+                        current.next('.ticket_entry').find('td:nth-child('+currentIndex+')').find(':input').first().select();
                         this.initScheduler();
                         this.updateColors();
                         this.updateSum();
                         this.updateFilter();
-                        this.textareaSetHeights();
+                        this.textareaSetVisibleHeights();
                     }).catch((error) =>
                     {
                         console.log(error);
@@ -769,12 +784,12 @@ export default class App
                 cache: 'no-cache',
                 headers: { 'content-type': 'application/json' }
             }).then(res => res.json()).catch(err => {
-                ticket.id = response.id;
-                this.tickets.push(ticket);
-                resolve(ticket);
+                reject(err);
             }).then(response =>
             {
-                resolve(response.data);
+                ticket.id = response.data.id;
+                this.tickets.push(ticket);
+                resolve(ticket);
             });
         });
     }
@@ -960,15 +975,7 @@ export default class App
                 );
             });
 
-            if( update === false )
-            {
-                this.doFilter();
-                $('#meta').on('change', '#filter select', () =>
-                {
-                    this.doFilter();
-                });
-            }
-            else
+            if( update === true )
             {
                 Object.entries(selected).forEach(([selected__key, selected__value]) =>
                 {
@@ -976,6 +983,15 @@ export default class App
                 });
             }
         });
+
+        if( update === false )
+        {
+            this.doFilter();
+            $('#meta').on('change', '#filter select', () =>
+            {
+                this.doFilter();
+            });
+        }
     }
 
     doFilter()
@@ -985,8 +1001,8 @@ export default class App
             let visible = true;
             $('#filter select').each((index,el) =>
             {
-                let val_search = $(el).val();
-                let val_target = tickets__value[$(el).attr('name')];
+                let val_search = $(el).val(),
+                    val_target = tickets__value[$(el).attr('name')];
                 if( $(el).attr('name') == 'date' && val_target !== null )
                 {
                     val_target = val_target.substring(0,10);
@@ -1009,20 +1025,20 @@ export default class App
                     visible = false;
                 }                
             });
-            if( visible === false )
+            if( visible === false && tickets__value.visible === true )
             {
                 tickets__value.visible = false;
                 $('#tickets .ticket_entry[data-id="'+tickets__value.id+'"]').hide();
             }
-            else
+            else if( visible === true && tickets__value.visible === false )
             {
-                $('#tickets .ticket_entry[data-id="'+tickets__value.id+'"]').show();
                 tickets__value.visible = true;
+                $('#tickets .ticket_entry[data-id="'+tickets__value.id+'"]').show();
             }                    
         });
         this.doSort();
         this.updateSum();
-        this.textareaSetHeights();
+        this.textareaSetVisibleHeights();
     }
 
     initSort()
@@ -1046,6 +1062,7 @@ export default class App
 
     doSort()
     {
+        return;
         let sort_1 = $('#sort select[name="sort_1"]').val(),
             sort_2 = $('#sort select[name="sort_2"]').val(),
             sorted = $('#tickets .ticket_table tbody .ticket_entry').sort((a, b) =>
