@@ -51,8 +51,8 @@ export default class App
           this.initKeyboardNavigation();
           this.initScheduler();
           this.setupBindings();
-          this.initFilter();
           this.initSort();
+          this.initFilter();
           this.updateColors();
           this.updateSum();
           this.textareaAutoHeight();
@@ -182,10 +182,9 @@ export default class App
 
     textareaSetVisibleHeights()
     {
-        console.log($('textarea:visible').length);
-        $('textarea:visible').each((index,el) => {
+        $('.ticket_entry--visible textarea').each((index,el) => {
             this.textareaSetHeight(el);
-        }); 
+        });
     }
 
     getTicketData( ticket_id )
@@ -226,7 +225,7 @@ export default class App
     {
         let html = '';
 
-        html += '<tr class="ticket_entry" data-id="'+ticket.id+'"'+((visible === false)?(' style="display:none;"'):(''))+'>';
+        html += '<tr class="ticket_entry'+((visible === true)?(' ticket_entry--visible'):(''))+'" data-id="'+ticket.id+'">';
 
         this.cols.forEach((cols__value) =>
         {
@@ -332,7 +331,7 @@ export default class App
             {
                 if(String.fromCharCode(event.which).toLowerCase() === 'd')
                 {
-                    let current = $('.ticket_table tbody .ticket_entry:visible').last(),
+                    let current = $('.ticket_table tbody .ticket_entry--visible').last(),
                         currentIndex = 1;
                     if( $(':focus').closest('.ticket_entry').length > 0 )
                     {
@@ -720,8 +719,8 @@ export default class App
         {
             let left = $(e.currentTarget).closest('td').prev('td'),
                 right = $(e.currentTarget).closest('td').next('td'),
-                top = $(e.currentTarget).closest('tr').prevAll(':visible').first(),
-                down = $(e.currentTarget).closest('tr').nextAll(':visible').first(),
+                top = $(e.currentTarget).closest('tr').prevAll('.ticket_entry--visible').first(),
+                down = $(e.currentTarget).closest('tr').nextAll('.ticket_entry--visible').first(),
                 index = ($(e.currentTarget).closest('td').prevAll('td').length+1);
 
             // arrow right (switch)
@@ -755,7 +754,7 @@ export default class App
     {
         let empty = true;
         let last = $('.ticket_entry:last-child');
-        while( !last.is(':visible') && last.prev('.ticket_entry').length > 0 )
+        while( !last.hasClass('ticket_entry--visible') && last.prev('.ticket_entry').length > 0 )
         {
             last = last.prev('.ticket_entry');
         }
@@ -1028,12 +1027,12 @@ export default class App
             if( visible === false && tickets__value.visible === true )
             {
                 tickets__value.visible = false;
-                $('#tickets .ticket_entry[data-id="'+tickets__value.id+'"]').hide();
+                $('#tickets .ticket_entry[data-id="'+tickets__value.id+'"]').removeClass('ticket_entry--visible');
             }
             else if( visible === true && tickets__value.visible === false )
             {
                 tickets__value.visible = true;
-                $('#tickets .ticket_entry[data-id="'+tickets__value.id+'"]').show();
+                $('#tickets .ticket_entry[data-id="'+tickets__value.id+'"]').addClass('ticket_entry--visible');
             }                    
         });
         this.doSort();
@@ -1052,7 +1051,6 @@ export default class App
                 $('#sort select[name="sort_'+step+'"]').append('<option value="'+columns__value+'">'+columns__value+'</option>');
             });
         });
-        this.doSort();
         $('#meta').on('change', '#sort select', () =>
         {
             this.doSort();
@@ -1062,15 +1060,14 @@ export default class App
 
     doSort()
     {
-        return;
         let sort_1 = $('#sort select[name="sort_1"]').val(),
             sort_2 = $('#sort select[name="sort_2"]').val(),
-            sorted = $('#tickets .ticket_table tbody .ticket_entry').sort((a, b) =>
+            sorted = $('#tickets .ticket_table tbody .ticket_entry--visible').sort((a, b) =>
             {
                 if( sort_1 != '' )
                 {
-                    if( $(a).find('[name="'+sort_1+'"]').val() < $(b).find('[name="'+sort_1+'"]').val() ) { return -1; }
-                    if( $(a).find('[name="'+sort_1+'"]').val() > $(b).find('[name="'+sort_1+'"]').val() ) { return 1; }
+                    if( $(a).find('[name="'+sort_1+'"]').val().toLowerCase() < $(b).find('[name="'+sort_1+'"]').val().toLowerCase() ) { return -1; }
+                    if( $(a).find('[name="'+sort_1+'"]').val().toLowerCase() > $(b).find('[name="'+sort_1+'"]').val().toLowerCase() ) { return 1; }
                 }
                 else if( $(a).find('[name="status"]').val() != $(b).find('[name="status"]').val() )
                 {
@@ -1082,8 +1079,8 @@ export default class App
                 }
                 if( sort_2 != '' )
                 {
-                    if( $(a).find('[name="'+sort_2+'"]').val() < $(b).find('[name="'+sort_2+'"]').val() ) { return -1; }
-                    if( $(a).find('[name="'+sort_2+'"]').val() > $(b).find('[name="'+sort_2+'"]').val() ) { return 1; }
+                    if( $(a).find('[name="'+sort_2+'"]').val().toLowerCase() < $(b).find('[name="'+sort_2+'"]').val().toLowerCase() ) { return -1; }
+                    if( $(a).find('[name="'+sort_2+'"]').val().toLowerCase() > $(b).find('[name="'+sort_2+'"]').val().toLowerCase() ) { return 1; }
                 }
                 if( $(a).find('[name="date"]').val() < $(b).find('[name="date"]').val() ) { return -1; }
                 if( $(a).find('[name="date"]').val() > $(b).find('[name="date"]').val() ) { return 1; }
@@ -1093,7 +1090,11 @@ export default class App
                 if( $(a).attr('data-id') > $(b).attr('data-id') ) { return 1; }
                 return 0;
             });
-        $('#tickets .ticket_table tbody').html(sorted);
+        console.log(sorted);
+        for (let i = 0; i < sorted.length; i++)
+        {
+            sorted[i].parentNode.appendChild(sorted[i]);
+        }
     }
 
     getColor(status)

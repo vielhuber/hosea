@@ -55,7 +55,12 @@
   padding: 3px;
 }
 #tickets .ticket_entry {
-  box-shadow: 0px 0px 0px 1px grey inset;
+    display:none;
+    box-shadow: 0px 0px 0px 1px grey inset;
+}
+#tickets .ticket_entry--visible
+{
+    display: table-row;
 }
 #tickets .ticket_entry--changed {
   box-shadow: 0px 0px 0px 3px yellow inset;
