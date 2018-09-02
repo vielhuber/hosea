@@ -33,7 +33,7 @@ gulp.task('js', function(){
     .on('error', function(err) { console.log(err.toString()); this.emit('end'); })
     .pipe(source('bundle.js'))
     .pipe(buffer())
-    .pipe(uglify())
+    //.pipe(uglify())
     .pipe(gulp.dest('./_public/_build'))
     .pipe(browserSync.reload({stream: true}));
 });

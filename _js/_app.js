@@ -92,7 +92,7 @@ export default class App
             }, () =>
             {
                 reject();
-                console.log(error);
+                console.error(error);
             });          
         });
     }
@@ -128,14 +128,14 @@ export default class App
     }
 
     buildHtml()
-    {        
-        $('#app').append(`
+    {
+        document.querySelector('#app').insertAdjacentHTML('beforeend',`
             <div id="meta"></div>
             <div id="tickets"></div>
             <div class="scheduler"></div>
         `);
 
-        $('#tickets').append(`
+        document.querySelector('#tickets').insertAdjacentHTML('beforeend',`
             <table class="ticket_table">
                 <thead>
                     <tr></tr>
@@ -150,14 +150,14 @@ export default class App
         `);
         this.cols.forEach((cols__value) =>
         {
-            $('.ticket_table thead tr').append('<td>'+cols__value+'</td>');
-            $('.ticket_table tfoot tr').append('<td>'+((cols__value=='time')?('<span class="sum"></span>'):(''))+'</td>');
+            document.querySelector('.ticket_table thead tr').insertAdjacentHTML('beforeend','<td>'+cols__value+'</td>');
+            document.querySelector('.ticket_table tfoot tr').insertAdjacentHTML('beforeend','<td>'+((cols__value=='time')?('<span class="sum"></span>'):(''))+'</td>');
         });
-        $('.ticket_table thead tr').append('<td>attachments</td><td>delete</td>');
-        $('.ticket_table tfoot tr').append('<td></td><td></td>');
+        document.querySelector('.ticket_table thead tr').insertAdjacentHTML('beforeend','<td>attachments</td><td>delete</td>');
+        document.querySelector('.ticket_table tfoot tr').insertAdjacentHTML('beforeend','<td></td><td></td>');
         this.tickets.forEach((tickets__value) =>
         {
-            $('.ticket_table tbody').append(
+            document.querySelector('.ticket_table tbody').insertAdjacentHTML('beforeend',
                 this.createHtmlLine(tickets__value, false)
             );
         });
@@ -182,8 +182,9 @@ export default class App
 
     textareaSetVisibleHeights()
     {
-        $('.ticket_entry--visible textarea').each((index,el) => {
-            this.textareaSetHeight(el);
+        document.querySelectorAll('.ticket_entry--visible textarea').forEach((el) =>
+        {
+            this.textareaSetHeight(el);            
         });
     }
 
@@ -280,7 +281,7 @@ export default class App
         // button click
         $('#tickets').on('click', '.button_save', () =>
         {
-            this.saveTickets().then(() => { }).catch((error) => { console.log(error); });
+            this.saveTickets().then(() => { }).catch((error) => { console.error(error); });
             return false;
         });        
 
@@ -300,7 +301,7 @@ export default class App
                         }
                     }).catch((error) =>
                     {
-                        console.log(error);
+                        console.error(error);
                     });
                     return false;
                 }
@@ -349,7 +350,7 @@ export default class App
                         this.textareaSetVisibleHeights();
                     }).catch((error) =>
                     {
-                        console.log(error);
+                        console.error(error);
                     }); 
                     return false;
                 }
@@ -373,9 +374,9 @@ export default class App
     {
         $('#tickets').on('change', '.ticket_entry [name="date"]', (e) =>
         {
-            if( $(e.currentTarget).val() != '' )
+            if( e.currentTarget.value != '' )
             {
-                let ticket_dates = $(e.currentTarget).val().split('\n'),
+                let ticket_dates = e.currentTarget.value.split('\n'),
                     begin = null,
                     end = null;
                 ticket_dates.forEach((ticket_dates__value, ticket_dates__key) =>
@@ -411,13 +412,13 @@ export default class App
                 $(e.currentTarget).val('');
                 attachments.forEach((attachments__value) =>
                 {
-                    $(e.currentTarget).closest('.ticket_entry').find('.ticket_entry__attachments').append(
+                    e.currentTarget.closest('.ticket_entry').insertAdjacentHTML('beforeend',
                         this.createHtmlDownloadLine(attachments__value)
                     );
                 });
             }).catch((error) =>
             {
-                console.log(error);
+                console.error(error);
             });
         });
     }
@@ -433,8 +434,6 @@ export default class App
             this.unlockTicket(ticket_id, true);
             attachments.push(attachment);
         }
-
-        console.log(attachments);
 
         // fetch entire doc to get newest attachment object
         await this.updateLocalTicket(ticket_id);
@@ -458,32 +457,13 @@ export default class App
                     cache: 'no-cache',
                     headers: { 'content-type': 'application/json' }
                 }).then(res => res.json()).catch(err => {
-                    console.log(err);
+                    console.error(err);
                 }).then(response =>
                 {
                     resolve(response.data);
                 });
             });
         });
-        /*
-        let attachment_id = Helpers.guid()+'#'+file.name;
-        return this.db.putAttachment(
-            ticket_id,
-            attachment_id,
-            this.getTicketData(ticket_id)._rev,
-            file,
-            file.type
-        ).then((result) =>
-        {
-            return {
-                rev: result.rev,
-                attachment_id: attachment_id
-            };
-        }).catch((error) =>
-        {
-            console.log(error);
-        });
-        */
     }
 
     bindDownload()
@@ -504,7 +484,7 @@ export default class App
             cache: 'no-cache',
             headers: { 'content-type': 'application/json' }
         }).then(res => res.json()).catch(err => {
-            console.log(err);
+            console.error(err);
         }).then(response =>
         {
             let base64 = response.data.data,
@@ -561,7 +541,7 @@ export default class App
                 cache: 'no-cache',
                 headers: { 'content-type': 'application/json' }
             }).then(res => res.json()).catch(err => {
-                console.log(err);
+                console.error(err);
             }).then(response =>
             {
                 this.tickets.forEach((tickets__value, tickets__key) =>
@@ -590,7 +570,7 @@ export default class App
                 cache: 'no-cache',
                 headers: { 'content-type': 'application/json' }
             }).then(res => res.json()).catch(err => {
-                console.log(err);
+                console.error(err);
             }).then(response =>
             {
                 $(e.currentTarget).closest('.ticket_entry__attachment').remove();
@@ -602,25 +582,23 @@ export default class App
     lockTicket(ticket_id)
     {
         $('.ticket_entry[data-id="'+ticket_id+'"]').addClass('ticket_entry--locked');
-        $('.ticket_entry[data-id="'+ticket_id+'"]').find(':input').each((index,el) =>
-        {
-            $(el).attr('disabled','disabled');
-            $(el).attr('readonly','readonly');
+        document.querySelector('.ticket_entry[data-id="'+ticket_id+'"]').querySelectorAll('input, textarea').forEach((el) => {
+            el.setAttribute('disabled','disabled');
+            el.setAttribute('readonly','readonly');
         });
     }
 
     unlockTicket(ticket_id, leave_changed = false)
     {
-        //console.log('unlocking ticket '+ticket_id);
         if( leave_changed === false )
         {
             $('.ticket_entry[data-id="'+ticket_id+'"]').removeClass('ticket_entry--changed');
         }
         $('.ticket_entry[data-id="'+ticket_id+'"]').removeClass('ticket_entry--locked');
-        $('.ticket_entry[data-id="'+ticket_id+'"]').find(':input').each((index,el) =>
+        document.querySelector('.ticket_entry[data-id="'+ticket_id+'"]').querySelectorAll('input, textarea').forEach((el) =>
         {
-            $(el).removeAttr('disabled');
-            $(el).removeAttr('readonly');
+            el.removeAttribute('disabled');
+            el.removeAttribute('readonly');
         });
     }
 
@@ -638,12 +616,12 @@ export default class App
         return new Promise((resolve, reject) =>
         {
             let changed = [];
-            $('.ticket_entry--changed').each((index,el) =>
+            document.querySelectorAll('.ticket_entry--changed').forEach((el) =>
             {
                 let data = {};
                 this.cols.forEach((cols__value) =>
                 {
-                    data[cols__value] = $(el).find('[name="'+cols__value+'"]').val();    
+                    data[cols__value] = $(el).find('[name="'+cols__value+'"]').value;    
                 });
                 this.setTicketData(
                     $(el).attr('data-id'),
@@ -663,13 +641,11 @@ export default class App
                 cache: 'no-cache',
                 headers: { 'content-type': 'application/json' }
             }).then(res => res.json()).catch(err => {
-                console.log(err);
+                console.error(err);
             }).then(response =>
             {
-                console.log(response);
                 response.data.ids.forEach((value) =>
                 {
-                    console.log(value);
                     this.unlockTicket(value);
                 });
                 this.initScheduler();
@@ -715,36 +691,40 @@ export default class App
 
     initKeyboardNavigation()
     {
-        $('#tickets').on('keydown', '.ticket_entry :input', (e) =>
+        document.querySelector('#tickets').addEventListener('keyup', (e) =>
         {
-            let left = $(e.currentTarget).closest('td').prev('td'),
-                right = $(e.currentTarget).closest('td').next('td'),
-                top = $(e.currentTarget).closest('tr').prevAll('.ticket_entry--visible').first(),
-                down = $(e.currentTarget).closest('tr').nextAll('.ticket_entry--visible').first(),
-                index = ($(e.currentTarget).closest('td').prevAll('td').length+1);
+            if( !e.target || (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') )
+            {
+                return;
+            }
+            let left = e.target.closest('td').previousElementSibling,
+                right = e.target.closest('td').nextElementSibling,
+                top = this.prevAll(e.target.closest('tr'), '.ticket_entry--visible')[0],
+                down = this.nextAll(e.target.closest('tr'), '.ticket_entry--visible')[0],
+                index = this.prevAll(e.target.closest('td')).length+1;
 
             // arrow right (switch)
-            if( e.keyCode === 39 && right.length > 0 && e.currentTarget.selectionEnd >= $(e.currentTarget).val().length )
+            if( e.keyCode === 39 && right !== null && e.target.selectionEnd >= e.target.value.length )
             {
-                right.find(':input').focus().select();
+                right.querySelector('input, textarea').select();
                 return false;
             }
             // arrow left (switch)
-            else if( e.keyCode === 37 && left.length > 0 && e.currentTarget.selectionEnd <= 0 )
+            else if( e.keyCode === 37 && left !== null && e.target.selectionEnd <= 0 )
             {
-                left.find(':input').focus().select();
+                left.querySelector('input, textarea').select();
                 return false;
             }
             // arrow top (switch)
-            else if( e.keyCode === 38 && top.length > 0 && e.currentTarget.selectionEnd <= 0 )
+            else if( e.keyCode === 38 && top !== undefined && e.target.selectionEnd <= 0 )
             {
-                top.find('td:nth-child('+index+')').find(':input').focus().select();
+                top.querySelector('td:nth-child('+index+')').querySelector('input, textarea').select();
                 return false;
             }
             // arrow down (switch)
-            else if( e.keyCode === 40 && down.length > 0 && e.currentTarget.selectionEnd >= $(e.currentTarget).val().length )
+            else if( e.keyCode === 40 && down !== undefined && e.target.selectionEnd >= e.target.value.length )
             {
-                down.find('td:nth-child('+index+')').find(':input').focus().select();
+                down.querySelector('td:nth-child('+index+')').querySelector('input, textarea').select();
                 return false;
             }
         });
@@ -760,7 +740,7 @@ export default class App
         }
         last.find(':input').each((index,el) =>
         {
-            if( $(el).val() != '' )
+            if( el.value != '' )
             {
                 empty = false;    
             }
@@ -844,7 +824,7 @@ export default class App
 
         this.generateDates().forEach((date__value) =>
         {
-            $('.scheduler__appointments').append(`
+            document.querySelector('.scheduler__appointments').insertAdjacentHTML('beforeend',`
                 <div class="scheduler__appointment" title="${date__value.title}" style="
                     left:${12.5*date__value.day}%;
                     top:${6.25*(date__value.begin-8)}%;
@@ -908,7 +888,6 @@ export default class App
                 }
             }   
         });
-        console.log(dates);
         return dates;
     }
 
@@ -927,26 +906,26 @@ export default class App
         let selected = {};
         if( update === true )
         {
-            $('#meta #filter select').each((index, el) =>
+            document.querySelectorAll('#meta #filter select').forEach((el) =>
             {
-                selected[$(el).attr('name')] = $(el).val();
+                selected[$(el).attr('name')] = el.value;
             });
             $('#meta #filter').remove();
         } 
 
-        $('#meta').append('<div id="filter"></div>');
+        document.querySelector('#meta').insertAdjacentHTML('beforeend','<div id="filter"></div>');
         ['person', 'status', 'priority', 'date', 'project'].forEach((columns__value) =>
         {
-            $('#filter').append(`
+            document.querySelector('#filter').insertAdjacentHTML('beforeend',`
                 <select name="${columns__value}">
                     <option value="*">${columns__value}</option>
                 </select>
             `);
             if( columns__value === 'date' )
             {
-                $('#filter [name="date"]').append('<option selected="selected" value="'+moment().format('YYYY-MM-DD')+'">_today</option>');
-                $('#filter [name="date"]').append('<option value="'+moment().add(1, 'days').format('YYYY-MM-DD')+'">_tomorrow</option>');
-                $('#filter [name="date"]').append('<option value="'+moment().add(-1, 'days').format('YYYY-MM-DD')+'">_yesterday</option>');
+                document.querySelector('#filter [name="date"]').insertAdjacentHTML('beforeend','<option selected="selected" value="'+moment().format('YYYY-MM-DD')+'">_today</option>');
+                document.querySelector('#filter [name="date"]').insertAdjacentHTML('beforeend','<option value="'+moment().add(1, 'days').format('YYYY-MM-DD')+'">_tomorrow</option>');
+                document.querySelector('#filter [name="date"]').insertAdjacentHTML('beforeend','<option value="'+moment().add(-1, 'days').format('YYYY-MM-DD')+'">_yesterday</option>');
             }
             let options = [];
             this.tickets.forEach((tickets__value) =>
@@ -969,7 +948,7 @@ export default class App
             options.forEach((options__value) =>
             {
                 let active = false;
-                $('#filter select[name="'+columns__value+'"]').append(
+                document.querySelector('#filter select[name="'+columns__value+'"]').insertAdjacentHTML('beforeend',
                     '<option'+((active===true)?(' selected="selected"'):(''))+' value="'+options__value+'">'+options__value+'</option>'
                 );
             });
@@ -998,9 +977,9 @@ export default class App
         this.tickets.forEach((tickets__value) =>
         {
             let visible = true;
-            $('#filter select').each((index,el) =>
+            document.querySelectorAll('#filter select').forEach((el) =>
             {
-                let val_search = $(el).val(),
+                let val_search = el.value,
                     val_target = tickets__value[$(el).attr('name')];
                 if( $(el).attr('name') == 'date' && val_target !== null )
                 {
@@ -1018,7 +997,7 @@ export default class App
                     &&
                     val_target == 'billed'
                     &&
-                    ($('#filter select[name="date"]').val() == '*' || $('#filter select[name="date"]').val() == '')
+                    ($('#filter select[name="date"]').value == '*' || $('#filter select[name="date"]').value == '')
                 )
                 {
                     visible = false;
@@ -1042,13 +1021,13 @@ export default class App
 
     initSort()
     {
-        $('#meta').append('<div id="sort"></div>');
+        document.querySelector('#meta').insertAdjacentHTML('beforeend','<div id="sort"></div>');
         [1,2].forEach((step) =>
         {
-            $('#sort').append('<select name="sort_'+step+'"><option value="">sort #'+step+'</option></select>');
+            document.querySelector('#sort').insertAdjacentHTML('beforeend','<select name="sort_'+step+'"><option value="">sort #'+step+'</option></select>');
             this.cols.forEach((columns__value) =>
             {
-                $('#sort select[name="sort_'+step+'"]').append('<option value="'+columns__value+'">'+columns__value+'</option>');
+                document.querySelector('#sort select[name="sort_'+step+'"]').insertAdjacentHTML('beforeend','<option value="'+columns__value+'">'+columns__value+'</option>');
             });
         });
         $('#meta').on('change', '#sort select', () =>
@@ -1060,37 +1039,36 @@ export default class App
 
     doSort()
     {
-        let sort_1 = $('#sort select[name="sort_1"]').val(),
-            sort_2 = $('#sort select[name="sort_2"]').val(),
+        let sort_1 = $('#sort select[name="sort_1"]').value,
+            sort_2 = $('#sort select[name="sort_2"]').value,
             sorted = $('#tickets .ticket_table tbody .ticket_entry--visible').sort((a, b) =>
             {
                 if( sort_1 != '' )
                 {
-                    if( $(a).find('[name="'+sort_1+'"]').val().toLowerCase() < $(b).find('[name="'+sort_1+'"]').val().toLowerCase() ) { return -1; }
-                    if( $(a).find('[name="'+sort_1+'"]').val().toLowerCase() > $(b).find('[name="'+sort_1+'"]').val().toLowerCase() ) { return 1; }
+                    if( $(a).find('[name="'+sort_1+'"]').value.toLowerCase() < $(b).find('[name="'+sort_1+'"]').value.toLowerCase() ) { return -1; }
+                    if( $(a).find('[name="'+sort_1+'"]').value.toLowerCase() > $(b).find('[name="'+sort_1+'"]').value.toLowerCase() ) { return 1; }
                 }
-                else if( $(a).find('[name="status"]').val() != $(b).find('[name="status"]').val() )
+                else if( $(a).find('[name="status"]').value != $(b).find('[name="status"]').value )
                 {
                     for(let status__value of ['billed','done','working','scheduled','recurring','weekend','delegated','idle','big'])
                     {
-                        if( $(a).find('[name="status"]').val() === status__value ) { return -1; }
-                        if( $(b).find('[name="status"]').val() === status__value ) { return 1; }
+                        if( $(a).find('[name="status"]').value === status__value ) { return -1; }
+                        if( $(b).find('[name="status"]').value === status__value ) { return 1; }
                     }
                 }
                 if( sort_2 != '' )
                 {
-                    if( $(a).find('[name="'+sort_2+'"]').val().toLowerCase() < $(b).find('[name="'+sort_2+'"]').val().toLowerCase() ) { return -1; }
-                    if( $(a).find('[name="'+sort_2+'"]').val().toLowerCase() > $(b).find('[name="'+sort_2+'"]').val().toLowerCase() ) { return 1; }
+                    if( $(a).find('[name="'+sort_2+'"]').value.toLowerCase() < $(b).find('[name="'+sort_2+'"]').value.toLowerCase() ) { return -1; }
+                    if( $(a).find('[name="'+sort_2+'"]').value.toLowerCase() > $(b).find('[name="'+sort_2+'"]').value.toLowerCase() ) { return 1; }
                 }
-                if( $(a).find('[name="date"]').val() < $(b).find('[name="date"]').val() ) { return -1; }
-                if( $(a).find('[name="date"]').val() > $(b).find('[name="date"]').val() ) { return 1; }
-                if( $(a).find('[name="priority"]').val() < $(b).find('[name="priority"]').val() ) { return -1; }
-                if( $(a).find('[name="priority"]').val() > $(b).find('[name="priority"]').val() ) { return 1; }
+                if( $(a).find('[name="date"]').value < $(b).find('[name="date"]').value ) { return -1; }
+                if( $(a).find('[name="date"]').value > $(b).find('[name="date"]').value ) { return 1; }
+                if( $(a).find('[name="priority"]').value < $(b).find('[name="priority"]').value ) { return -1; }
+                if( $(a).find('[name="priority"]').value > $(b).find('[name="priority"]').value ) { return 1; }
                 if( $(a).attr('data-id') < $(b).attr('data-id') ) { return -1; }
                 if( $(a).attr('data-id') > $(b).attr('data-id') ) { return 1; }
                 return 0;
             });
-        console.log(sorted);
         for (let i = 0; i < sorted.length; i++)
         {
             sorted[i].parentNode.appendChild(sorted[i]);
@@ -1198,6 +1176,42 @@ export default class App
             reader.readAsDataURL(file);
             reader.onload = () => resolve(reader.result.split(',')[1]);
             reader.onerror = error => reject(error);
+        });
+    }
+
+    prevAll(el, selector = null)
+    {
+        let prev = true;
+        return [].filter.call(el.parentNode.children, (htmlElement) =>
+        {
+            if( htmlElement === el )
+            {
+                prev = false;
+                return false;
+            }
+            if( selector !== null && !htmlElement.classList.contains(selector.replace('.','')) )
+            {
+                return false;
+            }
+            return prev;
+        }).reverse();
+    }
+
+    nextAll(el, selector = null)
+    {
+        let next = false;
+        return [].filter.call(el.parentNode.children, (htmlElement) =>
+        {
+            if( htmlElement === el )
+            {
+                next = true;
+                return false;
+            }
+            if( selector !== null && !htmlElement.classList.contains(selector.replace('.','')) )
+            {
+                return false;
+            }
+            return next;
         });
     }
 
