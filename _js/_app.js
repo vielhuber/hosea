@@ -1,8 +1,3 @@
-import Helpers from './_helpers';
-import PouchDB from 'pouchdb';
-import jQuery from 'jquery'; window.$ = window.jQuery = jQuery;
-import 'fullcalendar'; import 'fullcalendar/dist/locale/de';
-import moment from 'moment'; import de from 'moment/locale/de'; import { utc } from 'moment'; moment.locale('de');
 import jwtbutler from 'jwtbutler';
 
 export default class App
@@ -44,7 +39,6 @@ export default class App
     async init()
     {
     await this.login();
-    await this.readConfig();
           this.initSessionVariables();
     await this.fetchTickets();
           this.buildHtml();
@@ -78,23 +72,6 @@ export default class App
             auth_server: '/_auth'
         });
         return this.api.login();
-    }
-
-    readConfig()
-    {        
-        return new Promise((resolve,reject) =>
-        {
-            Helpers.get('config.json', (data) =>
-            {
-                this.url = data.url;
-                this.backup = data.backup;
-                resolve();
-            }, () =>
-            {
-                reject();
-                console.error(error);
-            });          
-        });
     }
 
     initSessionVariables()
@@ -207,7 +184,7 @@ export default class App
         {
             if( tickets__value.id == ticket_id )
             {
-                if( Helpers.isObject(property) )
+                if( this.isObject(property) )
                 {
                     Object.entries(property).forEach(([property__key, property__value]) =>
                     {
@@ -279,23 +256,26 @@ export default class App
     bindSave()
     {
         // button click
-        $('#tickets').on('click', '.button_save', () =>
+        document.querySelector('#tickets').addEventListener('click', (e) =>
         {
-            this.saveTickets().then(() => { }).catch((error) => { console.error(error); });
-            return false;
+            if( e.target.closest('.button_save') )
+            {
+                this.saveTickets().then(() => { }).catch((error) => { console.error(error); });
+                e.preventDefault();
+            }
         });        
 
         // ctrl+s
-        $(window).bind('keydown', (event) =>
+        document.addEventListener('keydown', (event) =>
         {
-            let focus = $(':focus');
+            let focus = document.activeElement;
             if(event.ctrlKey || event.metaKey)
             {
                 if(String.fromCharCode(event.which).toLowerCase() === 's')
                 {
                     this.saveTickets().then(() =>
                     {
-                        if( focus.length > 0 )
+                        if( focus !== null )
                         {
                             focus.focus();
                         }
@@ -303,7 +283,7 @@ export default class App
                     {
                         console.error(error);
                     });
-                    return false;
+                    event.preventDefault();
                 }
             }
         });
@@ -313,12 +293,12 @@ export default class App
     bindRefresh()
     {
         // f5
-        $(window).bind('keydown', (event) =>
+        document.addEventListener('keydown', (event) =>
         {
             if( event.keyCode === 116 )
             {
                 this.doFilter();
-                return false;
+                event.preventDefault();
             }
         });
     }
@@ -326,23 +306,24 @@ export default class App
     bindCreate()
     {
         // ctrl+d
-        $(window).bind('keydown', (event) =>
+        document.addEventListener('keydown', (event) =>
         {
             if(event.ctrlKey || event.metaKey)
             {
                 if(String.fromCharCode(event.which).toLowerCase() === 'd')
                 {
-                    let current = $('.ticket_table tbody .ticket_entry--visible').last(),
+                    let visibleAll = document.querySelectorAll('.ticket_table tbody .ticket_entry--visible'),
+                        current = visibleAll[visibleAll.length-1],
                         currentIndex = 1;
-                    if( $(':focus').closest('.ticket_entry').length > 0 )
+                    if( document.activeElement.closest('.ticket_entry') !== null )
                     {
-                        current = $(':focus').closest('.ticket_entry'),
-                        currentIndex = $(':focus').closest('td').prevAll('td').length+1;
+                        current = document.activeElement.closest('.ticket_entry'),
+                        currentIndex = this.prevAll(document.activeElement.closest('td')).length+1;
                     }
-                    this.createTicket(this.getTicketData(current.attr('data-id'))).then((ticket) =>
+                    this.createTicket(this.getTicketData(current.getAttribute('data-id'))).then((ticket) =>
                     {
-                        current.after( this.createHtmlLine(ticket, true) );
-                        current.next('.ticket_entry').find('td:nth-child('+currentIndex+')').find(':input').first().select();
+                        current.insertAdjacentHTML('afterend',this.createHtmlLine(ticket, true) );
+                        current.nextElementSibling.querySelector('td:nth-child('+currentIndex+')').querySelector('input, textarea').select();
                         this.initScheduler();
                         this.updateColors();
                         this.updateSum();
@@ -352,7 +333,7 @@ export default class App
                     {
                         console.error(error);
                     }); 
-                    return false;
+                    event.preventDefault();
                 }
             }
         });
@@ -360,23 +341,23 @@ export default class App
 
     bindChangeTracking()
     {
-        $('#tickets').on('input', '.ticket_entry :input', (el) =>
+        document.querySelector('#tickets').addEventListener('input', (e) => { if( e.target.closest('.ticket_entry input, .ticket_entry textarea') )
         {
-            if( $(el.currentTarget).is('[type="file"]') )
+            if( e.target.hasAttribute('type') && e.target.getAttribute('type') === 'file' )
             {
                 return;
             }
-            $(el.currentTarget).closest('.ticket_entry').addClass('ticket_entry--changed');
-        });
+            e.target.closest('.ticket_entry').classList.add('ticket_entry--changed');
+        }});
     }
 
     bindAutoTime()
     {
-        $('#tickets').on('change', '.ticket_entry [name="date"]', (e) =>
+        document.querySelector('#tickets').addEventListener('change', (e) => { if( e.target.closest('.ticket_entry [name="date"]') )
         {
-            if( e.currentTarget.value != '' )
+            if( e.target.value != '' )
             {
-                let ticket_dates = e.currentTarget.value.split('\n'),
+                let ticket_dates = e.target.value.split('\n'),
                     begin = null,
                     end = null;
                 ticket_dates.forEach((ticket_dates__value, ticket_dates__key) =>
@@ -388,31 +369,31 @@ export default class App
                     else
                     {
                         end = ticket_dates__value;
-                        if( Helpers.isDate(begin) && Helpers.isDate(end) )
+                        if( this.isDate(begin) && this.isDate(end) )
                         {
-                            $(e.currentTarget).closest('.ticket_entry').find('[name="time"]').val(
+                            e.target.closest('.ticket_entry').querySelector('[name="time"]').val(
                                 (Math.round((Math.abs(new Date(end) - new Date(begin))/(1000*60*60))*100)/100).toString().replace('.',',')
                             );
                         }
                     }
                 });
             }
-        });
+        }});
     }
 
     bindUpload()
     {
-        $('#tickets').on('change', '.ticket_entry input[type="file"]', (e) =>
+        document.querySelector('#tickets').addEventListener('change', (e) => { if( e.target.closest('.ticket_entry input[type="file"]') )
         {
             this.startUploads(
-                $(e.currentTarget).closest('.ticket_entry').attr('data-id'),
-                e.currentTarget.files
+                e.target.closest('.ticket_entry').getAttribute('data-id'),
+                e.target.files
             ).then((attachments) =>
             {
-                $(e.currentTarget).val('');
+                e.target.value = '';
                 attachments.forEach((attachments__value) =>
                 {
-                    e.currentTarget.closest('.ticket_entry').insertAdjacentHTML('beforeend',
+                    e.target.closest('.ticket_entry').insertAdjacentHTML('beforeend',
                         this.createHtmlDownloadLine(attachments__value)
                     );
                 });
@@ -420,7 +401,7 @@ export default class App
             {
                 console.error(error);
             });
-        });
+        }});
     }
 
     async startUploads( ticket_id, files )
@@ -468,12 +449,15 @@ export default class App
 
     bindDownload()
     {
-        $('#tickets').on('click', '.ticket_entry__attachment_download', (e) => 
+        document.querySelector('#tickets').addEventListener('click', (e) =>
         {
-            this.startDownload(
-                $(e.currentTarget).closest('.ticket_entry__attachment').attr('data-id')
-            );
-            return false;
+            if( e.target.closest('.ticket_entry__attachment_download') )
+            {
+                this.startDownload(
+                    e.target.closest('.ticket_entry__attachment').getAttribute('data-id')
+                );
+                e.preventDefault();
+            }
         });   
     }
 
@@ -499,37 +483,36 @@ export default class App
             a.click();
             a.remove();
         });
-        return false;
     }
 
     bindDelete()
     {
-        $('#tickets').on('click', '.ticket_entry__delete', (e) =>
+        document.querySelector('#tickets').addEventListener('click', (e) => { if( e.target.closest('.ticket_entry__delete') )
         {
-            let ticket_id = $(e.currentTarget).closest('.ticket_entry').attr('data-id');
+            let ticket_id = e.target.closest('.ticket_entry').getAttribute('data-id');
             if( this.ticketIsLocked(ticket_id) )
             {
-                return false;
+                e.preventDefault();
             }
-            if( $('#tickets .ticket_entry').length === 1 )
+            if( document.querySelectorAll('#tickets .ticket_entry').length === 1 )
             {
                 alert('don\'t delete the genesis block!');
-                return false;
+                e.preventDefault();
             }
             var result = confirm('Sind Sie sicher?');
             if( result )
             {
                 this.deleteTicket( ticket_id ).then((result) =>
                 {
-                    $(e.currentTarget).closest('.ticket_entry').remove();
+                    e.target.closest('.ticket_entry').remove();
                     this.initScheduler();
                     this.updateSum();
                     this.updateFilter();
                 }).catch((error) => { });
-                return false;
+                e.preventDefault();
             }
-            return false;
-        });
+            e.preventDefault();
+        }});
     }
 
     deleteTicket( ticket_id )
@@ -558,13 +541,13 @@ export default class App
 
     bindDeleteAttachment()
     {
-        $('#tickets').on('click', '.ticket_entry__attachment_delete', (e) =>
+        document.querySelector('#tickets').addEventListener('click', (e) => { if( e.target.closest('.ticket_entry__attachment_delete') )
         {
-            if( this.ticketIsLocked($(e.currentTarget).closest('.ticket_entry').attr('data-id')) )
+            if( this.ticketIsLocked(e.target.closest('.ticket_entry').getAttribute('data-id')) )
             {
-                return false;
+                e.preventDefault();
             }
-            let attachment_id = $(e.currentTarget).closest('.ticket_entry__attachment').attr('data-id');
+            let attachment_id = e.target.closest('.ticket_entry__attachment').getAttribute('data-id');
             this.api.fetch('/_api/attachments/'+attachment_id, {
                 method: 'DELETE',
                 cache: 'no-cache',
@@ -573,15 +556,15 @@ export default class App
                 console.error(err);
             }).then(response =>
             {
-                $(e.currentTarget).closest('.ticket_entry__attachment').remove();
+                e.target.closest('.ticket_entry__attachment').remove();
             });
-            return false;
-        });
+            e.preventDefault();
+        }});
     }
 
     lockTicket(ticket_id)
     {
-        $('.ticket_entry[data-id="'+ticket_id+'"]').addClass('ticket_entry--locked');
+        document.querySelector('.ticket_entry[data-id="'+ticket_id+'"]').classList.add('ticket_entry--locked');
         document.querySelector('.ticket_entry[data-id="'+ticket_id+'"]').querySelectorAll('input, textarea').forEach((el) => {
             el.setAttribute('disabled','disabled');
             el.setAttribute('readonly','readonly');
@@ -592,9 +575,9 @@ export default class App
     {
         if( leave_changed === false )
         {
-            $('.ticket_entry[data-id="'+ticket_id+'"]').removeClass('ticket_entry--changed');
+            document.querySelector('.ticket_entry[data-id="'+ticket_id+'"]').classList.remove('ticket_entry--changed');
         }
-        $('.ticket_entry[data-id="'+ticket_id+'"]').removeClass('ticket_entry--locked');
+        document.querySelector('.ticket_entry[data-id="'+ticket_id+'"]').classList.remove('ticket_entry--locked');
         document.querySelector('.ticket_entry[data-id="'+ticket_id+'"]').querySelectorAll('input, textarea').forEach((el) =>
         {
             el.removeAttribute('disabled');
@@ -604,7 +587,7 @@ export default class App
 
     ticketIsLocked(ticket_id)
     {
-        if( $('.ticket_entry[data-id="'+ticket_id+'"] .ticket_entry--locked').length > 0 )
+        if( document.querySelector('.ticket_entry[data-id="'+ticket_id+'"] .ticket_entry--locked') !== null )
         {
             return true;
         }
@@ -621,15 +604,15 @@ export default class App
                 let data = {};
                 this.cols.forEach((cols__value) =>
                 {
-                    data[cols__value] = $(el).find('[name="'+cols__value+'"]').value;    
+                    data[cols__value] = el.querySelector('[name="'+cols__value+'"]').value;    
                 });
                 this.setTicketData(
-                    $(el).attr('data-id'),
+                    el.getAttribute('data-id'),
                     data
                 );
-                this.lockTicket( $(el).attr('data-id') );
+                this.lockTicket( el.getAttribute('data-id') );
                 changed.push(
-                    this.getTicketData( $(el).attr('data-id') )
+                    this.getTicketData( el.getAttribute('data-id') )
                 );
             });
 
@@ -707,25 +690,25 @@ export default class App
             if( e.keyCode === 39 && right !== null && e.target.selectionEnd >= e.target.value.length )
             {
                 right.querySelector('input, textarea').select();
-                return false;
+                e.preventDefault();
             }
             // arrow left (switch)
             else if( e.keyCode === 37 && left !== null && e.target.selectionEnd <= 0 )
             {
                 left.querySelector('input, textarea').select();
-                return false;
+                e.preventDefault();
             }
             // arrow top (switch)
             else if( e.keyCode === 38 && top !== undefined && e.target.selectionEnd <= 0 )
             {
                 top.querySelector('td:nth-child('+index+')').querySelector('input, textarea').select();
-                return false;
+                e.preventDefault();
             }
             // arrow down (switch)
             else if( e.keyCode === 40 && down !== undefined && e.target.selectionEnd >= e.target.value.length )
             {
                 down.querySelector('td:nth-child('+index+')').querySelector('input, textarea').select();
-                return false;
+                e.preventDefault();
             }
         });
     }
@@ -733,12 +716,12 @@ export default class App
     lastLineIsEmpty()
     {
         let empty = true;
-        let last = $('.ticket_entry:last-child');
-        while( !last.hasClass('ticket_entry--visible') && last.prev('.ticket_entry').length > 0 )
+        let last = document.querySelector('.ticket_entry:last-child');
+        while( !last.classList.contains('ticket_entry--visible') && last.previousElementSibling !== null )
         {
             last = last.prev('.ticket_entry');
         }
-        last.find(':input').each((index,el) =>
+        last.querySelector('input, textarea').each((index,el) =>
         {
             if( el.value != '' )
             {
@@ -775,7 +758,7 @@ export default class App
 
     initScheduler()
     {
-        $('.scheduler').html(`
+        document.querySelector('.scheduler').innerHTML = `
             <div class="scheduler__navigation">
                 <span class="scheduler__navigation-week"></span>
                 <a href="#" class="scheduler__navigation-next">next</a>
@@ -820,7 +803,7 @@ export default class App
 
             <div class="scheduler__appointments">
             </div>
-        `);        
+        `;        
 
         this.generateDates().forEach((date__value) =>
         {
@@ -836,31 +819,31 @@ export default class App
             `);
         });
 
-        $('.scheduler__navigation-week').html(`
+        document.querySelector('.scheduler__navigation-week').innerHTML = `
             ${this.dateFormat( this.getDayOfActiveWeek(1), 'd. F Y' )} &ndash; ${this.dateFormat( this.getDayOfActiveWeek(7), 'd. F Y' )}
-        `);
+        `;
     }
 
     bindScheduler()
     {
-        $('.scheduler').on('click', '.scheduler__navigation-today', () =>
+        document.querySelector('.scheduler').addEventListener('click', (e) => { if( e.target.closest('.scheduler__navigation-today') )
         {
             this.session.activeDay = new Date();
             this.initScheduler();
-            return false;
-        });
-        $('.scheduler').on('click', '.scheduler__navigation-prev', () =>
+            e.preventDefault();
+        }});
+        document.querySelector('.scheduler').addEventListener('click', (e) => { if( e.target.closest('.scheduler__navigation-prev') )
         {
             this.session.activeDay.setDate(this.session.activeDay.getDate()-7);
             this.initScheduler();
-            return false;
-        });
-        $('.scheduler').on('click', '.scheduler__navigation-next', () =>
+            e.preventDefault();
+        }});
+        document.querySelector('.scheduler').addEventListener('click', (e) => { if( e.target.closest('.scheduler__navigation-next') )
         {
             this.session.activeDay.setDate(this.session.activeDay.getDate()+7);
             this.initScheduler();
-            return false;
-        });
+            e.preventDefault();
+        }});
     }
 
     generateDates()
@@ -908,9 +891,9 @@ export default class App
         {
             document.querySelectorAll('#meta #filter select').forEach((el) =>
             {
-                selected[$(el).attr('name')] = el.value;
+                selected[el.getAttribute('name')] = el.value;
             });
-            $('#meta #filter').remove();
+            document.querySelector('#meta #filter').remove();
         } 
 
         document.querySelector('#meta').insertAdjacentHTML('beforeend','<div id="filter"></div>');
@@ -923,9 +906,17 @@ export default class App
             `);
             if( columns__value === 'date' )
             {
-                document.querySelector('#filter [name="date"]').insertAdjacentHTML('beforeend','<option selected="selected" value="'+moment().format('YYYY-MM-DD')+'">_today</option>');
-                document.querySelector('#filter [name="date"]').insertAdjacentHTML('beforeend','<option value="'+moment().add(1, 'days').format('YYYY-MM-DD')+'">_tomorrow</option>');
-                document.querySelector('#filter [name="date"]').insertAdjacentHTML('beforeend','<option value="'+moment().add(-1, 'days').format('YYYY-MM-DD')+'">_yesterday</option>');
+                let d = this.getCurrentDate();
+                document.querySelector('#filter [name="date"]').insertAdjacentHTML('beforeend','<option selected="selected" value="'+this.dateFormat(d, 'Y-m-d')+'">_today</option>');
+                d.setDate(d.getDate() + 1);
+                document.querySelector('#filter [name="date"]').insertAdjacentHTML('beforeend','<option value="'+this.dateFormat(d, 'Y-m-d')+'">_tomorrow</option>');
+                d.setDate(d.getDate() + 1);
+                document.querySelector('#filter [name="date"]').insertAdjacentHTML('beforeend','<option value="'+this.dateFormat(d, 'Y-m-d')+'">_day after tomorrow</option>');
+                d.setDate(d.getDate() - 3);
+                document.querySelector('#filter [name="date"]').insertAdjacentHTML('beforeend','<option value="'+this.dateFormat(d, 'Y-m-d')+'">_yesterday</option>');
+                d.setDate(d.getDate() - 1);
+                document.querySelector('#filter [name="date"]').insertAdjacentHTML('beforeend','<option value="'+this.dateFormat(d, 'Y-m-d')+'">_day before yesterday</option>');
+
             }
             let options = [];
             this.tickets.forEach((tickets__value) =>
@@ -947,28 +938,28 @@ export default class App
             });
             options.forEach((options__value) =>
             {
-                let active = false;
                 document.querySelector('#filter select[name="'+columns__value+'"]').insertAdjacentHTML('beforeend',
-                    '<option'+((active===true)?(' selected="selected"'):(''))+' value="'+options__value+'">'+options__value+'</option>'
+                    '<option value="'+options__value+'">'+options__value+'</option>'
                 );
             });
 
-            if( update === true )
-            {
-                Object.entries(selected).forEach(([selected__key, selected__value]) =>
-                {
-                    $('#meta #filter [name="'+selected__key+'"]').val(selected__value);
-                });
-            }
         });
 
-        if( update === false )
+        if( update === true )
+        {
+            Object.entries(selected).forEach(([selected__key, selected__value]) =>
+            {
+                document.querySelector('#meta #filter [name="'+selected__key+'"]').value = selected__value;
+            });
+        }
+
+        else
         {
             this.doFilter();
-            $('#meta').on('change', '#filter select', () =>
+            document.querySelector('#meta').addEventListener('change', (e) => { if( e.target.closest('#filter select') )
             {
                 this.doFilter();
-            });
+            }});
         }
     }
 
@@ -980,8 +971,8 @@ export default class App
             document.querySelectorAll('#filter select').forEach((el) =>
             {
                 let val_search = el.value,
-                    val_target = tickets__value[$(el).attr('name')];
-                if( $(el).attr('name') == 'date' && val_target !== null )
+                    val_target = tickets__value[el.getAttribute('name')];
+                if( el.getAttribute('name') == 'date' && val_target !== null )
                 {
                     val_target = val_target.substring(0,10);
                 }
@@ -991,13 +982,13 @@ export default class App
                 }
                 /* hide billed in overview */
                 if(
-                    $(el).attr('name') == 'status'
+                    el.getAttribute('name') == 'status'
                     &&
                     val_search == '*'
                     &&
                     val_target == 'billed'
                     &&
-                    ($('#filter select[name="date"]').value == '*' || $('#filter select[name="date"]').value == '')
+                    (document.querySelector('#filter select[name="date"]').value == '*' || document.querySelector('#filter select[name="date"]').value == '')
                 )
                 {
                     visible = false;
@@ -1006,12 +997,12 @@ export default class App
             if( visible === false && tickets__value.visible === true )
             {
                 tickets__value.visible = false;
-                $('#tickets .ticket_entry[data-id="'+tickets__value.id+'"]').removeClass('ticket_entry--visible');
+                document.querySelector('#tickets .ticket_entry[data-id="'+tickets__value.id+'"]').classList.remove('ticket_entry--visible');
             }
             else if( visible === true && tickets__value.visible === false )
             {
                 tickets__value.visible = true;
-                $('#tickets .ticket_entry[data-id="'+tickets__value.id+'"]').addClass('ticket_entry--visible');
+                document.querySelector('#tickets .ticket_entry[data-id="'+tickets__value.id+'"]').classList.add('ticket_entry--visible');
             }                    
         });
         this.doSort();
@@ -1030,43 +1021,44 @@ export default class App
                 document.querySelector('#sort select[name="sort_'+step+'"]').insertAdjacentHTML('beforeend','<option value="'+columns__value+'">'+columns__value+'</option>');
             });
         });
-        $('#meta').on('change', '#sort select', () =>
+
+        document.querySelector('#meta').addEventListener('change', (e) => { if( e.target.closest('#sort select') )
         {
             this.doSort();
-        });
+        }});
     }
 
 
     doSort()
     {
-        let sort_1 = $('#sort select[name="sort_1"]').value,
-            sort_2 = $('#sort select[name="sort_2"]').value,
-            sorted = $('#tickets .ticket_table tbody .ticket_entry--visible').sort((a, b) =>
+        let sort_1 = document.querySelector('#sort select[name="sort_1"]').value,
+            sort_2 = document.querySelector('#sort select[name="sort_2"]').value,
+            sorted = [...document.querySelectorAll('#tickets .ticket_table tbody .ticket_entry--visible')].sort((a, b) =>
             {
                 if( sort_1 != '' )
                 {
-                    if( $(a).find('[name="'+sort_1+'"]').value.toLowerCase() < $(b).find('[name="'+sort_1+'"]').value.toLowerCase() ) { return -1; }
-                    if( $(a).find('[name="'+sort_1+'"]').value.toLowerCase() > $(b).find('[name="'+sort_1+'"]').value.toLowerCase() ) { return 1; }
+                    if( a.querySelector('[name="'+sort_1+'"]').value.toLowerCase() < b.querySelector('[name="'+sort_1+'"]').value.toLowerCase() ) { return -1; }
+                    if( a.querySelector('[name="'+sort_1+'"]').value.toLowerCase() > b.querySelector('[name="'+sort_1+'"]').value.toLowerCase() ) { return 1; }
                 }
-                else if( $(a).find('[name="status"]').value != $(b).find('[name="status"]').value )
+                else if( a.querySelector('[name="status"]').value != b.querySelector('[name="status"]').value )
                 {
                     for(let status__value of ['billed','done','working','scheduled','recurring','weekend','delegated','idle','big'])
                     {
-                        if( $(a).find('[name="status"]').value === status__value ) { return -1; }
-                        if( $(b).find('[name="status"]').value === status__value ) { return 1; }
+                        if( a.querySelector('[name="status"]').value === status__value ) { return -1; }
+                        if( b.querySelector('[name="status"]').value === status__value ) { return 1; }
                     }
                 }
                 if( sort_2 != '' )
                 {
-                    if( $(a).find('[name="'+sort_2+'"]').value.toLowerCase() < $(b).find('[name="'+sort_2+'"]').value.toLowerCase() ) { return -1; }
-                    if( $(a).find('[name="'+sort_2+'"]').value.toLowerCase() > $(b).find('[name="'+sort_2+'"]').value.toLowerCase() ) { return 1; }
+                    if( a.querySelector('[name="'+sort_2+'"]').value.toLowerCase() < b.querySelector('[name="'+sort_2+'"]').value.toLowerCase() ) { return -1; }
+                    if( a.querySelector('[name="'+sort_2+'"]').value.toLowerCase() > b.querySelector('[name="'+sort_2+'"]').value.toLowerCase() ) { return 1; }
                 }
-                if( $(a).find('[name="date"]').value < $(b).find('[name="date"]').value ) { return -1; }
-                if( $(a).find('[name="date"]').value > $(b).find('[name="date"]').value ) { return 1; }
-                if( $(a).find('[name="priority"]').value < $(b).find('[name="priority"]').value ) { return -1; }
-                if( $(a).find('[name="priority"]').value > $(b).find('[name="priority"]').value ) { return 1; }
-                if( $(a).attr('data-id') < $(b).attr('data-id') ) { return -1; }
-                if( $(a).attr('data-id') > $(b).attr('data-id') ) { return 1; }
+                if( a.querySelector('[name="date"]').value < b.querySelector('[name="date"]').value ) { return -1; }
+                if( a.querySelector('[name="date"]').value > b.querySelector('[name="date"]').value ) { return 1; }
+                if( a.querySelector('[name="priority"]').value < b.querySelector('[name="priority"]').value ) { return -1; }
+                if( a.querySelector('[name="priority"]').value > b.querySelector('[name="priority"]').value ) { return 1; }
+                if( a.getAttribute('data-id') < b.getAttribute('data-id') ) { return -1; }
+                if( a.getAttribute('data-id') > b.getAttribute('data-id') ) { return 1; }
                 return 0;
             });
         for (let i = 0; i < sorted.length; i++)
@@ -1089,7 +1081,7 @@ export default class App
     {
         this.tickets.forEach((tickets__value) =>
         {
-            $('#tickets .ticket_entry[data-id="'+tickets__value.id+'"]').css('background-color',this.getColor(tickets__value.status));
+            document.querySelector('#tickets .ticket_entry[data-id="'+tickets__value.id+'"]').style.backgroundColor = this.getColor(tickets__value.status);
         });   
     }
 
@@ -1111,7 +1103,7 @@ export default class App
         });
         sum = (Math.round(sum*100)/100);
         sum = sum.toString().replace('.',',');
-        $('#tickets .ticket_table tfoot .sum').text(sum);
+        document.querySelector('#tickets .ticket_table tfoot .sum').textContent  = sum;
     }
 
     getCurrentDate()
@@ -1141,6 +1133,10 @@ export default class App
         if( format === 'd. F Y' )
         {
             return ('0'+d.getDate()).slice(-2)+'. '+['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'][d.getMonth()]+' '+d.getFullYear();
+        }
+        if( format === 'Y-m-d' )
+        {
+            return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);
         }
         return ('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+'.'+d.getFullYear()+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)+':'+('0'+d.getSeconds()).slice(-2);
     }
@@ -1213,6 +1209,16 @@ export default class App
             }
             return next;
         });
+    }
+
+    isObject(obj)
+    {
+        return (obj !== null && typeof obj === 'object');
+    }
+
+    isDate(string)
+    {
+        return (new Date(string) !== 'Invalid Date') && !isNaN(new Date(string));
     }
 
 }
