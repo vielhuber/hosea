@@ -27,7 +27,7 @@ gulp.task('js', function(){
     })
     .transform(babelify.configure({
         presets : ['es2015', 'es2017'],
-        plugins : ['transform-runtime']
+        plugins : ['transform-runtime', 'transform-class-properties']
     }))
     .bundle()
     .on('error', function(err) { console.log(err.toString()); this.emit('end'); })

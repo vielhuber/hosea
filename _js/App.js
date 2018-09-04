@@ -1,45 +1,17 @@
+import Store from './Store';
+import Dates from './Dates';
 import jwtbutler from 'jwtbutler';
 
 export default class App
 {
     constructor()
-    {
-
-        this.api = null;
-        this.db = null;
-        this.tickets = null;        
-        this.url = null;
-        this.backup = null;
-        this.cols = [
-            'status',
-            'priority',
-            'date',
-            'time',
-            'project',
-            'description'
-        ];
-        this.colors = {
-            'idle': '#b3e5fc',
-            'done': '#fff59d',
-            'billed': '#81c784',
-            'recurring': '#ffeded',
-            'working': '#ef9a9a',
-            'delegated': '#ce93d8',
-            'weekend': '#bbdefb',
-            'big': '#e1bee7',
-            
-            'windows': '#42A5F5', 
-            'mac': '#8D6E63',            
-            'linux': '#9CCC65',
-        };
-        this.dates = null;
-        this.session = null;
+    {        
     }
 
     async init()
     {
+          this.initStore();
     await this.login();
-          this.initSessionVariables();
     await this.fetchTickets();
           this.buildHtml();
           this.initKeyboardNavigation();
@@ -66,26 +38,51 @@ export default class App
         this.bindScheduler();
     }
 
-    login()
+    initStore()
     {
-        this.api = new jwtbutler({
-            auth_server: '/_auth'
-        });
-        return this.api.login();
+        Store.data = {
+            api: null,
+            tickets: null,
+            cols: [
+                'status',
+                'priority',
+                'date',
+                'time',
+                'project',
+                'description'
+            ],
+            colors: {
+                'idle': '#b3e5fc',
+                'done': '#fff59d',
+                'billed': '#81c784',
+                'recurring': '#ffeded',
+                'working': '#ef9a9a',
+                'delegated': '#ce93d8',
+                'weekend': '#bbdefb',
+                'big': '#e1bee7',                
+                'windows': '#42A5F5', 
+                'mac': '#8D6E63',            
+                'linux': '#9CCC65',
+            },
+            session: {
+                activeDay: new Date()
+            }
+        };
     }
 
-    initSessionVariables()
+    login()
     {
-        this.session = {
-            activeDay: new Date()
-        };
+        Store.data.api = new jwtbutler({
+            auth_server: '/_auth'
+        });
+        return Store.data.api.login();
     }
 
     fetchTickets()
     {
         return new Promise((resolve,reject) =>
         {
-            this.api.fetch('/_api/tickets', {
+            Store.data.api.fetch('/_api/tickets', {
                 method: 'GET',
                 cache: 'no-cache',
                 headers: { 'content-type': 'application/json' }
@@ -93,11 +90,11 @@ export default class App
                 reject(err);
             }).then(response =>
             {
-                this.tickets = [];
+                Store.data.tickets = [];
                 response.data.forEach((tickets__value) =>
                 {
                     tickets__value.visible = false;
-                    this.tickets.push(tickets__value);
+                    Store.data.tickets.push(tickets__value);
                 });
                 resolve();
             });
@@ -125,14 +122,14 @@ export default class App
             </table>
             <a href="#" class="button_save">Speichern</a>
         `);
-        this.cols.forEach((cols__value) =>
+        Store.data.cols.forEach((cols__value) =>
         {
             document.querySelector('.ticket_table thead tr').insertAdjacentHTML('beforeend','<td>'+cols__value+'</td>');
             document.querySelector('.ticket_table tfoot tr').insertAdjacentHTML('beforeend','<td>'+((cols__value=='time')?('<span class="sum"></span>'):(''))+'</td>');
         });
         document.querySelector('.ticket_table thead tr').insertAdjacentHTML('beforeend','<td>attachments</td><td>delete</td>');
         document.querySelector('.ticket_table tfoot tr').insertAdjacentHTML('beforeend','<td></td><td></td>');
-        this.tickets.forEach((tickets__value) =>
+        Store.data.tickets.forEach((tickets__value) =>
         {
             document.querySelector('.ticket_table tbody').insertAdjacentHTML('beforeend',
                 this.createHtmlLine(tickets__value, false)
@@ -168,7 +165,7 @@ export default class App
     getTicketData( ticket_id )
     {
         let data = null;
-        this.tickets.forEach((tickets__value) =>
+        Store.data.tickets.forEach((tickets__value) =>
         {
             if( tickets__value.id == ticket_id )
             {
@@ -180,7 +177,7 @@ export default class App
 
     setTicketData( ticket_id, property, value = null )
     {
-        this.tickets.forEach((tickets__value) =>
+        Store.data.tickets.forEach((tickets__value) =>
         {
             if( tickets__value.id == ticket_id )
             {
@@ -205,7 +202,7 @@ export default class App
 
         html += '<tr class="ticket_entry'+((visible === true)?(' ticket_entry--visible'):(''))+'" data-id="'+ticket.id+'">';
 
-        this.cols.forEach((cols__value) =>
+        Store.data.cols.forEach((cols__value) =>
         {
             html += '<td>';
                 html += '<textarea '+((['date','description'].includes(cols__value))?(' class="autosize"'):(''))+' name="'+cols__value+'">'+(ticket[cols__value]||'')+'</textarea>';
@@ -369,7 +366,7 @@ export default class App
                     else
                     {
                         end = ticket_dates__value;
-                        if( this.isDate(begin) && this.isDate(end) )
+                        if( Dates.isDate(begin) && Dates.isDate(end) )
                         {
                             e.target.closest('.ticket_entry').querySelector('[name="time"]').val(
                                 (Math.round((Math.abs(new Date(end) - new Date(begin))/(1000*60*60))*100)/100).toString().replace('.',',')
@@ -428,7 +425,7 @@ export default class App
         {
             this.filetobase64(file).then((base64) =>
             {
-                this.api.fetch('/_api/attachments', {
+                Store.data.api.fetch('/_api/attachments', {
                     method: 'POST',
                     body: JSON.stringify({
                         name: file.name,
@@ -463,7 +460,7 @@ export default class App
 
     startDownload( attachment_id )
     { 
-        this.api.fetch('/_api/attachments/'+attachment_id, {
+        Store.data.api.fetch('/_api/attachments/'+attachment_id, {
             method: 'GET',
             cache: 'no-cache',
             headers: { 'content-type': 'application/json' }
@@ -519,7 +516,7 @@ export default class App
     {
         return new Promise((resolve,reject) =>
         {
-            this.api.fetch('/_api/tickets/'+ticket_id, {
+            Store.data.api.fetch('/_api/tickets/'+ticket_id, {
                 method: 'DELETE',
                 cache: 'no-cache',
                 headers: { 'content-type': 'application/json' }
@@ -527,11 +524,11 @@ export default class App
                 console.error(err);
             }).then(response =>
             {
-                this.tickets.forEach((tickets__value, tickets__key) =>
+                Store.data.tickets.forEach((tickets__value, tickets__key) =>
                 {
                     if( tickets__value.id == ticket_id )
                     {
-                        this.tickets.splice(tickets__key, 1);
+                        Store.data.tickets.splice(tickets__key, 1);
                     }
                 });
                 resolve();
@@ -548,7 +545,7 @@ export default class App
                 e.preventDefault();
             }
             let attachment_id = e.target.closest('.ticket_entry__attachment').getAttribute('data-id');
-            this.api.fetch('/_api/attachments/'+attachment_id, {
+            Store.data.api.fetch('/_api/attachments/'+attachment_id, {
                 method: 'DELETE',
                 cache: 'no-cache',
                 headers: { 'content-type': 'application/json' }
@@ -602,7 +599,7 @@ export default class App
             document.querySelectorAll('.ticket_entry--changed').forEach((el) =>
             {
                 let data = {};
-                this.cols.forEach((cols__value) =>
+                Store.data.cols.forEach((cols__value) =>
                 {
                     data[cols__value] = el.querySelector('[name="'+cols__value+'"]').value;    
                 });
@@ -616,7 +613,7 @@ export default class App
                 );
             });
 
-            this.api.fetch('/_api/tickets', {
+            Store.data.api.fetch('/_api/tickets', {
                 method: 'PUT',
                 body: JSON.stringify({
                     tickets: changed
@@ -644,7 +641,7 @@ export default class App
     {
         return new Promise((resolve,reject) =>
         {
-            this.api.fetch('/_api/tickets/'+ticket_id, {
+            Store.data.api.fetch('/_api/tickets/'+ticket_id, {
                 method: 'GET',
                 cache: 'no-cache',
                 headers: { 'content-type': 'application/json' }
@@ -663,7 +660,7 @@ export default class App
 
     removeAttachmentFromLocalTicket( ticket_id, attachment_id )
     {
-        this.tickets.forEach((tickets__value) =>
+        Store.data.tickets.forEach((tickets__value) =>
         {
             if( tickets__value.id == ticket_id )
             {
@@ -736,11 +733,11 @@ export default class App
         return new Promise((resolve, reject) =>
         {
             let ticket = {};
-            this.cols.forEach((cols__value) =>
+            Store.data.cols.forEach((cols__value) =>
             {
                 ticket[cols__value] = data[cols__value]||null;
             });
-            this.api.fetch('/_api/tickets', {
+            Store.data.api.fetch('/_api/tickets', {
                 method: 'POST',
                 body: JSON.stringify(ticket),
                 cache: 'no-cache',
@@ -750,7 +747,7 @@ export default class App
             }).then(response =>
             {
                 ticket.id = response.data.id;
-                this.tickets.push(ticket);
+                Store.data.tickets.push(ticket);
                 resolve(ticket);
             });
         });
@@ -771,16 +768,16 @@ export default class App
                     <tr class="scheduler__row">
                         <td class="scheduler__cell"></td>   
                         ${Array(7).join(0).split(0).map((item, i) => `
-                            <td class="scheduler__cell${(this.sameDay(this.getDayOfActiveWeek(i+1),this.getCurrentDate())?(' scheduler__cell--curday'):(''))}">
-                                ${this.dateFormat(this.getDayOfActiveWeek(i+1), 'D d.m.')}
+                            <td class="scheduler__cell${(Dates.sameDay(Dates.getDayOfActiveWeek(i+1),Dates.getCurrentDate())?(' scheduler__cell--curday'):(''))}">
+                                ${Dates.dateFormat(Dates.getDayOfActiveWeek(i+1), 'D d.m.')}
                                 <br/>
-                                KW ${this.weekNumber(this.getDayOfActiveWeek(i+1))}
+                                KW ${Dates.weekNumber(Dates.getDayOfActiveWeek(i+1))}
                             </td>
                         `).join('')}
                     </tr>
                     <tr class="scheduler__row">
                         <td class="scheduler__cell">Ganztätig</td>
-                        ${Array(7).join(0).split(0).map((item, i) => `<td class="scheduler__cell${(this.sameDay(this.getDayOfActiveWeek(i+1),this.getCurrentDate())?(' scheduler__cell--curday'):(''))}"></td>`).join('')}
+                        ${Array(7).join(0).split(0).map((item, i) => `<td class="scheduler__cell${(Dates.sameDay(Dates.getDayOfActiveWeek(i+1),Dates.getCurrentDate())?(' scheduler__cell--curday'):(''))}"></td>`).join('')}
                     </tr>
                     ${Array(15).join(0).split(0).map((item, j) => {
                         j=j+9;
@@ -790,7 +787,7 @@ export default class App
                                 ${Array(7).join(0).split(0).map((item, i) => `
                                     <td class="
                                         scheduler__cell
-                                        ${(this.sameDay(this.getDayOfActiveWeek(i+1),this.getCurrentDate())?(' scheduler__cell--curday'):(''))}
+                                        ${(Dates.sameDay(Dates.getDayOfActiveWeek(i+1),Dates.getCurrentDate())?(' scheduler__cell--curday'):(''))}
                                         ${((i<5 && ((j>=9 && j<13) || (j>=14 && j<18)))?(' scheduler__cell--main'):(''))}
                                     ">
                                     </td>
@@ -820,7 +817,7 @@ export default class App
         });
 
         document.querySelector('.scheduler__navigation-week').innerHTML = `
-            ${this.dateFormat( this.getDayOfActiveWeek(1), 'd. F Y' )} &ndash; ${this.dateFormat( this.getDayOfActiveWeek(7), 'd. F Y' )}
+            ${Dates.dateFormat( Dates.getDayOfActiveWeek(1), 'd. F Y' )} &ndash; ${Dates.dateFormat( Dates.getDayOfActiveWeek(7), 'd. F Y' )}
         `;
     }
 
@@ -828,19 +825,19 @@ export default class App
     {
         document.querySelector('.scheduler').addEventListener('click', (e) => { if( e.target.closest('.scheduler__navigation-today') )
         {
-            this.session.activeDay = new Date();
+            Store.data.session.activeDay = new Date();
             this.initScheduler();
             e.preventDefault();
         }});
         document.querySelector('.scheduler').addEventListener('click', (e) => { if( e.target.closest('.scheduler__navigation-prev') )
         {
-            this.session.activeDay.setDate(this.session.activeDay.getDate()-7);
+            Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate()-7);
             this.initScheduler();
             e.preventDefault();
         }});
         document.querySelector('.scheduler').addEventListener('click', (e) => { if( e.target.closest('.scheduler__navigation-next') )
         {
-            this.session.activeDay.setDate(this.session.activeDay.getDate()+7);
+            Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate()+7);
             this.initScheduler();
             e.preventDefault();
         }});
@@ -849,9 +846,9 @@ export default class App
     generateDates()
     {
         let dates = [];
-        this.tickets.forEach((tickets__value) =>
+        Store.data.tickets.forEach((tickets__value) =>
         {
-            if( this.dateIsInActiveWeek(tickets__value.date.split('\n')[0]) )
+            if( Dates.dateIsInActiveWeek(tickets__value.date.split('\n')[0]) )
             {
                 let title = tickets__value.project+'\n'+(tickets__value.description||'').substring(0,100),
                     ticket_dates = tickets__value.date.split('\n'),
@@ -906,20 +903,20 @@ export default class App
             `);
             if( columns__value === 'date' )
             {
-                let d = this.getCurrentDate();
-                document.querySelector('#filter [name="date"]').insertAdjacentHTML('beforeend','<option selected="selected" value="'+this.dateFormat(d, 'Y-m-d')+'">_today</option>');
+                let d = Dates.getCurrentDate();
+                document.querySelector('#filter [name="date"]').insertAdjacentHTML('beforeend','<option selected="selected" value="'+Dates.dateFormat(d, 'Y-m-d')+'">_today</option>');
                 d.setDate(d.getDate() + 1);
-                document.querySelector('#filter [name="date"]').insertAdjacentHTML('beforeend','<option value="'+this.dateFormat(d, 'Y-m-d')+'">_tomorrow</option>');
+                document.querySelector('#filter [name="date"]').insertAdjacentHTML('beforeend','<option value="'+Dates.dateFormat(d, 'Y-m-d')+'">_tomorrow</option>');
                 d.setDate(d.getDate() + 1);
-                document.querySelector('#filter [name="date"]').insertAdjacentHTML('beforeend','<option value="'+this.dateFormat(d, 'Y-m-d')+'">_day after tomorrow</option>');
+                document.querySelector('#filter [name="date"]').insertAdjacentHTML('beforeend','<option value="'+Dates.dateFormat(d, 'Y-m-d')+'">_day after tomorrow</option>');
                 d.setDate(d.getDate() - 3);
-                document.querySelector('#filter [name="date"]').insertAdjacentHTML('beforeend','<option value="'+this.dateFormat(d, 'Y-m-d')+'">_yesterday</option>');
+                document.querySelector('#filter [name="date"]').insertAdjacentHTML('beforeend','<option value="'+Dates.dateFormat(d, 'Y-m-d')+'">_yesterday</option>');
                 d.setDate(d.getDate() - 1);
-                document.querySelector('#filter [name="date"]').insertAdjacentHTML('beforeend','<option value="'+this.dateFormat(d, 'Y-m-d')+'">_day before yesterday</option>');
+                document.querySelector('#filter [name="date"]').insertAdjacentHTML('beforeend','<option value="'+Dates.dateFormat(d, 'Y-m-d')+'">_day before yesterday</option>');
 
             }
             let options = [];
-            this.tickets.forEach((tickets__value) =>
+            Store.data.tickets.forEach((tickets__value) =>
             {
                 let options_value = tickets__value[columns__value];
                 if( columns__value == 'date' && options_value != null && options_value != '' )
@@ -965,7 +962,7 @@ export default class App
 
     doFilter()
     {
-        this.tickets.forEach((tickets__value) =>
+        Store.data.tickets.forEach((tickets__value) =>
         {
             let visible = true;
             document.querySelectorAll('#filter select').forEach((el) =>
@@ -1016,7 +1013,7 @@ export default class App
         [1,2].forEach((step) =>
         {
             document.querySelector('#sort').insertAdjacentHTML('beforeend','<select name="sort_'+step+'"><option value="">sort #'+step+'</option></select>');
-            this.cols.forEach((columns__value) =>
+            Store.data.cols.forEach((columns__value) =>
             {
                 document.querySelector('#sort select[name="sort_'+step+'"]').insertAdjacentHTML('beforeend','<option value="'+columns__value+'">'+columns__value+'</option>');
             });
@@ -1070,16 +1067,16 @@ export default class App
     getColor(status)
     {
         let color = '#f2f2f2';
-        if( status !== null && status != '' && this.colors.hasOwnProperty(status) )
+        if( status !== null && status != '' && Store.data.colors.hasOwnProperty(status) )
         {
-            color = this.colors[status];
+            color = Store.data.colors[status];
         }
         return color;
     }
 
     updateColors()
     {
-        this.tickets.forEach((tickets__value) =>
+        Store.data.tickets.forEach((tickets__value) =>
         {
             document.querySelector('#tickets .ticket_entry[data-id="'+tickets__value.id+'"]').style.backgroundColor = this.getColor(tickets__value.status);
         });   
@@ -1089,7 +1086,7 @@ export default class App
     updateSum()
     {
         let sum = 0;
-        this.tickets.forEach((tickets__value) =>
+        Store.data.tickets.forEach((tickets__value) =>
         {
             if(
                 tickets__value.visible !== false &&
@@ -1104,65 +1101,6 @@ export default class App
         sum = (Math.round(sum*100)/100);
         sum = sum.toString().replace('.',',');
         document.querySelector('#tickets .ticket_table tfoot .sum').textContent  = sum;
-    }
-
-    getCurrentDate()
-    {
-        return new Date();
-    }
-
-    getDayOfActiveWeek(shift)
-    {
-        return this.getDayOfWeek(shift, this.session.activeDay);
-    }
-
-    getDayOfWeek(shift, date)
-    {
-        let d = new Date(date),
-            day = d.getDay(),
-            diff = d.getDate() - day + (day == 0 ? -6 : 1) + (shift-1);
-        return new Date(d.setDate(diff));
-    }
-
-    dateFormat(d, format)
-    {
-        if( format === 'D d.m.' )
-        {
-            return ['SO','MO','DI','MI','DO','FR','SA'][d.getDay()]+' '+('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+'.';
-        }
-        if( format === 'd. F Y' )
-        {
-            return ('0'+d.getDate()).slice(-2)+'. '+['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'][d.getMonth()]+' '+d.getFullYear();
-        }
-        if( format === 'Y-m-d' )
-        {
-            return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);
-        }
-        return ('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+'.'+d.getFullYear()+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)+':'+('0'+d.getSeconds()).slice(-2);
-    }
-
-    dateIsInActiveWeek(d)
-    {
-        if( d === null || d === '' )
-        {
-            return false;
-        }
-        d = new Date(d);
-        return this.sameDay( this.getDayOfWeek(1, d), this.getDayOfActiveWeek(1) );
-    }
-
-    sameDay(d1, d2)
-    {
-        return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate();
-    }
-
-    weekNumber(d)
-    {
-        d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-        let dayNum = d.getUTCDay() || 7;
-        d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-        let yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
-        return Math.ceil((((d - yearStart) / 86400000) + 1)/7);
     }
 
     filetobase64(file)
@@ -1214,11 +1152,6 @@ export default class App
     isObject(obj)
     {
         return (obj !== null && typeof obj === 'object');
-    }
-
-    isDate(string)
-    {
-        return (new Date(string) !== 'Invalid Date') && !isNaN(new Date(string));
     }
 
 }

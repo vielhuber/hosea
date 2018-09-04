@@ -73,5 +73,8 @@
     "description": "",
     "main": "_public/_build/bundle.js",
     "author": "",
-    "license": "ISC"
+    "license": "ISC",
+    "devDependencies": {
+        "babel-plugin-transform-class-properties": "^6.24.1"
+    }
 }
