@@ -1,7 +1,6 @@
 import App from './App';
 
-document.addEventListener('DOMContentLoaded', () =>
-{
+document.addEventListener('DOMContentLoaded', () => {
     const app = new App();
     app.init();
     window.app = app;
