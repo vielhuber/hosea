@@ -1,10 +1,10 @@
 export default class Lock {
     static lockTicket(ticket_id) {
         document
-            .querySelector('.ticket_entry[data-id="' + ticket_id + '"]')
-            .classList.add('ticket_entry--locked');
+            .querySelector('.tickets__entry[data-id="' + ticket_id + '"]')
+            .classList.add('tickets__entry--locked');
         document
-            .querySelector('.ticket_entry[data-id="' + ticket_id + '"]')
+            .querySelector('.tickets__entry[data-id="' + ticket_id + '"]')
             .querySelectorAll('input, textarea')
             .forEach(el => {
                 el.setAttribute('disabled', 'disabled');
@@ -15,14 +15,14 @@ export default class Lock {
     static unlockTicket(ticket_id, leave_changed = false) {
         if (leave_changed === false) {
             document
-                .querySelector('.ticket_entry[data-id="' + ticket_id + '"]')
-                .classList.remove('ticket_entry--changed');
+                .querySelector('.tickets__entry[data-id="' + ticket_id + '"]')
+                .classList.remove('tickets__entry--changed');
         }
         document
-            .querySelector('.ticket_entry[data-id="' + ticket_id + '"]')
-            .classList.remove('ticket_entry--locked');
+            .querySelector('.tickets__entry[data-id="' + ticket_id + '"]')
+            .classList.remove('tickets__entry--locked');
         document
-            .querySelector('.ticket_entry[data-id="' + ticket_id + '"]')
+            .querySelector('.tickets__entry[data-id="' + ticket_id + '"]')
             .querySelectorAll('input, textarea')
             .forEach(el => {
                 el.removeAttribute('disabled');
@@ -33,9 +33,9 @@ export default class Lock {
     static ticketIsLocked(ticket_id) {
         if (
             document.querySelector(
-                '.ticket_entry[data-id="' +
+                '.tickets__entry[data-id="' +
                     ticket_id +
-                    '"] .ticket_entry--locked'
+                    '"] .tickets__entry--locked'
             ) !== null
         ) {
             return true;

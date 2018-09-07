@@ -1,0 +1,104 @@
+.scheduler {
+    width: 33.33%;
+    height: 100%;
+    right: 0;
+    top: 0;
+    position: absolute;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    background-color: #eee;
+    color: #000;
+    font-size: 10px;
+    overflow: hidden;
+}
+
+.scheduler__appointments {
+    position: absolute;
+    top: 10%;
+    left: 0;
+    width: 100%;
+    height: 90%;
+}
+
+.scheduler__table {
+    position: absolute;
+    top: 10%;
+    left: 0;
+    width: 100%;
+    height: 90%;
+}
+
+.scheduler__table-body {
+    height: 100%;
+}
+
+.scheduler__row {
+    height: 6%; /* use rounded values here, because otherwise heights are shown wrong */
+}
+
+.scheduler__cell {
+    width: 12.5%;
+    padding: 0;
+    vertical-align: top;
+}
+
+.scheduler__cell--main {
+    background-color: #ffffff;
+}
+
+.scheduler__cell--curday {
+    background-color: #c7c7c7;
+}
+
+.scheduler__cell--curday.scheduler__cell--main {
+    background-color: #e8e8e8;
+}
+
+.scheduler__row:nth-child(1),
+.scheduler__row:nth-child(2) {
+    height: 3%;
+}
+
+.scheduler__appointment {
+    position: absolute;
+    width: 12.5%;
+    border: 1px solid #000;
+    overflow: hidden;
+}
+
+.scheduler__navigation {
+    position: absolute;
+    top: 0%;
+    left: 0;
+    width: 100%;
+    height: 10%;
+    background-color: #000;
+    color: #fff;
+    padding: 0 10px;
+}
+
+.scheduler__navigation-week,
+.scheduler__navigation-today,
+.scheduler__navigation-prev,
+.scheduler__navigation-next {
+    line-height: 10vh;
+    font-size: 15px;
+    display: block;
+}
+
+.scheduler__navigation-week {
+    display: block;
+    float: left;
+}
+
+.scheduler__navigation-today,
+.scheduler__navigation-prev,
+.scheduler__navigation-next {
+    float: right;
+    display: block;
+    padding-left: 20px;
+}
+
+.scheduler__navigation-today {
+    padding-left: 0;
+}

@@ -131,7 +131,7 @@ export default class Scheduler {
             ${Dates.dateFormat(
                 Dates.getDayOfActiveWeek(1),
                 'd. F Y'
-            )} &ndash; ${Dates.dateFormat(
+            )} &ndash;  ${Dates.dateFormat(
             Dates.getDayOfActiveWeek(7),
             'd. F Y'
         )}
@@ -210,7 +210,7 @@ export default class Scheduler {
     static updateColors() {
         Store.data.tickets.forEach(tickets__value => {
             document.querySelector(
-                '#tickets .ticket_entry[data-id="' + tickets__value.id + '"]'
+                '.tickets .tickets__entry[data-id="' + tickets__value.id + '"]'
             ).style.backgroundColor = Scheduler.getColor(tickets__value.status);
         });
     }

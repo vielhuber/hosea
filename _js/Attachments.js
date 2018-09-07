@@ -6,11 +6,11 @@ import Tickets from './Tickets';
 
 export default class Attachments {
     static bindDownload() {
-        document.querySelector('#tickets').addEventListener('click', e => {
-            if (e.target.closest('.ticket_entry__attachment_download')) {
+        document.querySelector('.tickets').addEventListener('click', e => {
+            if (e.target.closest('.tickets__attachment-download')) {
                 Attachments.startDownload(
                     e.target
-                        .closest('.ticket_entry__attachment')
+                        .closest('.tickets__attachment')
                         .getAttribute('data-id')
                 );
                 e.preventDefault();
@@ -45,18 +45,18 @@ export default class Attachments {
     }
 
     static bindUpload() {
-        document.querySelector('#tickets').addEventListener('change', e => {
-            if (e.target.closest('.ticket_entry input[type="file"]')) {
+        document.querySelector('.tickets').addEventListener('change', e => {
+            if (e.target.closest('.tickets__entry input[type="file"]')) {
                 Attachments.startUploads(
-                    e.target.closest('.ticket_entry').getAttribute('data-id'),
+                    e.target.closest('.tickets__entry').getAttribute('data-id'),
                     e.target.files
                 )
                     .then(attachments => {
                         e.target.value = '';
                         attachments.forEach(attachments__value => {
                             e.target
-                                .closest('.ticket_entry')
-                                .querySelector('.ticket_entry__attachments')
+                                .closest('.tickets__entry')
+                                .querySelector('.tickets__attachments')
                                 .insertAdjacentHTML(
                                     'beforeend',
                                     Html.createHtmlDownloadLine(
@@ -117,19 +117,19 @@ export default class Attachments {
     }
 
     static bindDeleteAttachment() {
-        document.querySelector('#tickets').addEventListener('click', e => {
-            if (e.target.closest('.ticket_entry__attachment_delete')) {
+        document.querySelector('.tickets').addEventListener('click', e => {
+            if (e.target.closest('.tickets__attachment-delete')) {
                 if (
                     Lock.ticketIsLocked(
                         e.target
-                            .closest('.ticket_entry')
+                            .closest('.tickets__entry')
                             .getAttribute('data-id')
                     )
                 ) {
                     e.preventDefault();
                 }
                 let attachment_id = e.target
-                    .closest('.ticket_entry__attachment')
+                    .closest('.tickets__attachment')
                     .getAttribute('data-id');
                 Store.data.api
                     .fetch('/_api/attachments/' + attachment_id, {
@@ -142,7 +142,7 @@ export default class Attachments {
                         console.error(err);
                     })
                     .then(response => {
-                        e.target.closest('.ticket_entry__attachment').remove();
+                        e.target.closest('.tickets__attachment').remove();
                     });
                 e.preventDefault();
             }

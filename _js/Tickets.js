@@ -102,17 +102,23 @@ export default class Tickets {
     static saveTickets() {
         return new Promise((resolve, reject) => {
             let changed = [];
-            document.querySelectorAll('.ticket_entry--changed').forEach(el => {
-                let data = {};
-                Store.data.cols.forEach(cols__value => {
-                    data[cols__value] = el.querySelector(
-                        '[name="' + cols__value + '"]'
-                    ).value;
+
+            document
+                .querySelector('.tickets .tickets__table-body')
+                .querySelectorAll('.tickets__entry--changed')
+                .forEach(el => {
+                    let data = {};
+                    Store.data.cols.forEach(cols__value => {
+                        data[cols__value] = el.querySelector(
+                            '[name="' + cols__value + '"]'
+                        ).value;
+                    });
+                    Tickets.setTicketData(el.getAttribute('data-id'), data);
+                    Lock.lockTicket(el.getAttribute('data-id'));
+                    changed.push(
+                        Tickets.getTicketData(el.getAttribute('data-id'))
+                    );
                 });
-                Tickets.setTicketData(el.getAttribute('data-id'), data);
-                Lock.lockTicket(el.getAttribute('data-id'));
-                changed.push(Tickets.getTicketData(el.getAttribute('data-id')));
-            });
 
             Store.data.api
                 .fetch('/_api/tickets', {
@@ -167,8 +173,8 @@ export default class Tickets {
 
     static bindSave() {
         // button click
-        document.querySelector('#tickets').addEventListener('click', e => {
-            if (e.target.closest('.button_save')) {
+        document.querySelector('.tickets').addEventListener('click', e => {
+            if (e.target.closest('.button-save')) {
                 Tickets.saveTickets()
                     .then(() => {})
                     .catch(error => {
@@ -203,16 +209,17 @@ export default class Tickets {
         document.addEventListener('keydown', event => {
             if (event.ctrlKey || event.metaKey) {
                 if (String.fromCharCode(event.which).toLowerCase() === 'd') {
-                    let visibleAll = document.querySelectorAll(
-                            '.ticket_table tbody .ticket_entry--visible'
-                        ),
+                    let visibleAll = document
+                            .querySelector('.tickets .tickets__table-body')
+                            .querySelectorAll('.tickets__entry--visible'),
                         current = visibleAll[visibleAll.length - 1],
                         currentIndex = 1;
                     if (
-                        document.activeElement.closest('.ticket_entry') !== null
+                        document.activeElement.closest('.tickets__entry') !==
+                        null
                     ) {
                         (current = document.activeElement.closest(
-                            '.ticket_entry'
+                            '.tickets__entry'
                         )),
                             (currentIndex =
                                 Helper.prevAll(
@@ -249,9 +256,11 @@ export default class Tickets {
     }
 
     static bindChangeTracking() {
-        document.querySelector('#tickets').addEventListener('input', e => {
+        document.querySelector('.tickets').addEventListener('input', e => {
             if (
-                e.target.closest('.ticket_entry input, .ticket_entry textarea')
+                e.target.closest(
+                    '.tickets__entry input, .tickets__entry textarea'
+                )
             ) {
                 if (
                     e.target.hasAttribute('type') &&
@@ -260,15 +269,15 @@ export default class Tickets {
                     return;
                 }
                 e.target
-                    .closest('.ticket_entry')
-                    .classList.add('ticket_entry--changed');
+                    .closest('.tickets__entry')
+                    .classList.add('tickets__entry--changed');
             }
         });
     }
 
     static bindAutoTime() {
-        document.querySelector('#tickets').addEventListener('change', e => {
-            if (e.target.closest('.ticket_entry [name="date"]')) {
+        document.querySelector('.tickets').addEventListener('change', e => {
+            if (e.target.closest('.tickets__entry [name="date"]')) {
                 if (e.target.value != '') {
                     let ticket_dates = e.target.value.split('\n'),
                         begin = null,
@@ -281,22 +290,20 @@ export default class Tickets {
                                 end = ticket_dates__value;
                                 if (Dates.isDate(begin) && Dates.isDate(end)) {
                                     e.target
-                                        .closest('.ticket_entry')
-                                        .querySelector('[name="time"]')
-                                        .val(
-                                            (
-                                                Math.round(
-                                                    (Math.abs(
-                                                        new Date(end) -
-                                                            new Date(begin)
-                                                    ) /
-                                                        (1000 * 60 * 60)) *
-                                                        100
-                                                ) / 100
-                                            )
-                                                .toString()
-                                                .replace('.', ',')
-                                        );
+                                        .closest('.tickets__entry')
+                                        .querySelector(
+                                            '[name="time"]'
+                                        ).value = (
+                                        Math.round(
+                                            (Math.abs(
+                                                new Date(end) - new Date(begin)
+                                            ) /
+                                                (1000 * 60 * 60)) *
+                                                100
+                                        ) / 100
+                                    )
+                                        .toString()
+                                        .replace('.', ',');
                                 }
                             }
                         }
@@ -307,17 +314,18 @@ export default class Tickets {
     }
 
     static bindDelete() {
-        document.querySelector('#tickets').addEventListener('click', e => {
-            if (e.target.closest('.ticket_entry__delete')) {
+        document.querySelector('.tickets').addEventListener('click', e => {
+            if (e.target.closest('.tickets__entry__delete')) {
                 let ticket_id = e.target
-                    .closest('.ticket_entry')
+                    .closest('.tickets__entry')
                     .getAttribute('data-id');
                 if (Lock.ticketIsLocked(ticket_id)) {
                     e.preventDefault();
                 }
                 if (
-                    document.querySelectorAll('#tickets .ticket_entry')
-                        .length === 1
+                    document
+                        .querySelector('.tickets .tickets__table-body')
+                        .querySelectorAll('.tickets__entry').length === 1
                 ) {
                     alert("don't delete the genesis block!");
                     e.preventDefault();
@@ -326,7 +334,7 @@ export default class Tickets {
                 if (result) {
                     Tickets.deleteTicket(ticket_id)
                         .then(result => {
-                            e.target.closest('.ticket_entry').remove();
+                            e.target.closest('.tickets__entry').remove();
                             Scheduler.initScheduler();
                             Tickets.updateSum();
                             Filter.updateFilter();
@@ -355,8 +363,8 @@ export default class Tickets {
         });
         sum = Math.round(sum * 100) / 100;
         sum = sum.toString().replace('.', ',');
-        document.querySelector(
-            '#tickets .ticket_table tfoot .sum'
-        ).textContent = sum;
+        document
+            .querySelector('.tickets__table-foot')
+            .querySelector('.tickets__sum').textContent = sum;
     }
 }

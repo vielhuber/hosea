@@ -14,7 +14,8 @@ export default class Textarea {
 
     static textareaSetVisibleHeights() {
         document
-            .querySelectorAll('.ticket_entry--visible textarea')
+            .querySelector('.tickets .tickets__table-body')
+            .querySelectorAll('.tickets__entry--visible textarea')
             .forEach(el => {
                 Textarea.textareaSetHeight(el);
             });

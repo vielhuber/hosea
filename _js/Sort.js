@@ -3,14 +3,17 @@ import Store from './Store';
 export default class Sort {
     static initSort() {
         document
-            .querySelector('#meta')
-            .insertAdjacentHTML('beforeend', '<div id="sort"></div>');
+            .querySelector('.metabar')
+            .insertAdjacentHTML(
+                'beforeend',
+                '<div class="metabar__sort"></div>'
+            );
         [1, 2].forEach(step => {
             document
-                .querySelector('#sort')
+                .querySelector('.metabar__sort')
                 .insertAdjacentHTML(
                     'beforeend',
-                    '<select name="sort_' +
+                    '<select class="metabar__sort-select" name="sort_' +
                         step +
                         '"><option value="">sort #' +
                         step +
@@ -18,7 +21,9 @@ export default class Sort {
                 );
             Store.data.cols.forEach(columns__value => {
                 document
-                    .querySelector('#sort select[name="sort_' + step + '"]')
+                    .querySelector(
+                        '.metabar__sort-select[name="sort_' + step + '"]'
+                    )
                     .insertAdjacentHTML(
                         'beforeend',
                         '<option value="' +
@@ -30,22 +35,24 @@ export default class Sort {
             });
         });
 
-        document.querySelector('#meta').addEventListener('change', e => {
-            if (e.target.closest('#sort select')) {
+        document.querySelector('.metabar').addEventListener('change', e => {
+            if (e.target.closest('.metabar__sort-select')) {
                 Sort.doSort();
             }
         });
     }
 
     static doSort() {
-        let sort_1 = document.querySelector('#sort select[name="sort_1"]')
-                .value,
-            sort_2 = document.querySelector('#sort select[name="sort_2"]')
-                .value,
+        let sort_1 = document.querySelector(
+                '.metabar__sort-select[name="sort_1"]'
+            ).value,
+            sort_2 = document.querySelector(
+                '.metabar__sort-select[name="sort_2"]'
+            ).value,
             sorted = [
-                ...document.querySelectorAll(
-                    '#tickets .ticket_table tbody .ticket_entry--visible'
-                )
+                ...document
+                    .querySelector('.tickets .tickets__table-body')
+                    .querySelectorAll('.tickets__entry--visible')
             ].sort((a, b) => {
                 if (sort_1 != '') {
                     if (

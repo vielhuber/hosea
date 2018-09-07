@@ -1,0 +1,19 @@
+.metabar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 66.66%;
+    height: 20px;
+    background-color: grey;
+    z-index: 400;
+    font-size: 10px;
+    line-height: 20px;
+}
+
+.metabar__filter {
+    float: left;
+}
+
+.metabar__sort {
+    float: right;
+}

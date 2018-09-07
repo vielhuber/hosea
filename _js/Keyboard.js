@@ -3,7 +3,7 @@ import Helper from './Helper';
 
 export default class Keyboard {
     static initKeyboardNavigation() {
-        document.querySelector('#tickets').addEventListener('keyup', e => {
+        document.querySelector('.tickets').addEventListener('keyup', e => {
             if (
                 !e.target ||
                 (e.target.tagName !== 'INPUT' &&
@@ -15,11 +15,11 @@ export default class Keyboard {
                 right = e.target.closest('td').nextElementSibling,
                 top = Helper.prevAll(
                     e.target.closest('tr'),
-                    '.ticket_entry--visible'
+                    '.tickets__entry--visible'
                 )[0],
                 down = Helper.nextAll(
                     e.target.closest('tr'),
-                    '.ticket_entry--visible'
+                    '.tickets__entry--visible'
                 )[0],
                 index = Helper.prevAll(e.target.closest('td')).length + 1;
 
