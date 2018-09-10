@@ -1,19 +1,31 @@
 .tickets {
-    width: 66.66%;
-    bottom: 0;
-    left: 0;
-    top: 20px;
+    width: calc(66.66% - 40rem);
+    bottom: 20rem;
+    left: 20rem;
+    top: 60rem;
+    background-color: #000;
     position: absolute;
     overflow-y: scroll;
     overflow-x: hidden;
-    background-color: #eee;
     color: #000;
-    font-size: 11px;
+    font-size: 11rem;
+    border-radius: 0 0 20rem 20rem;
+}
+
+.tickets::-webkit-scrollbar {
+    width: 5rem;
+}
+.tickets::-webkit-scrollbar-track {
+    background-color: #1d2024;
+}
+.tickets::-webkit-scrollbar-thumb {
+    background-color: #44454c;
+    border-radius: 2rem;
 }
 
 .tickets__textarea {
     width: 100%;
-    height: 65px;
+    height: 65rem;
     border: 1px solid #ddd;
     resize: none;
     overflow-x: hidden;
@@ -60,12 +72,12 @@
 .tickets__table-cell {
     vertical-align: top;
     overflow: hidden;
-    padding: 3px;
+    padding: 3rem;
 }
 
 .tickets__entry {
     display: none;
-    box-shadow: 0px 0px 0px 1px grey inset;
+    box-shadow: 0 0 0 1px grey inset;
 }
 
 .tickets__entry--visible {
@@ -73,11 +85,11 @@
 }
 
 .tickets__entry--changed {
-    box-shadow: 0px 0px 0px 3px yellow inset;
+    box-shadow: 0 0 0 3rem yellow inset;
 }
 
 .tickets__entry--locked {
-    box-shadow: 0px 0px 0px 3px red inset;
+    box-shadow: 0 0 0 3rem red inset;
 }
 
 .tickets__attachment {
@@ -90,8 +102,8 @@
     background-size: contain;
     background-position: center;
     display: inline-block;
-    width: 16px;
-    height: 16px;
+    width: 16rem;
+    height: 16rem;
 }
 
 .tickets__attachment-delete {
@@ -100,8 +112,8 @@
     background-size: contain;
     background-position: center;
     display: inline-block;
-    width: 16px;
-    height: 16px;
+    width: 16rem;
+    height: 16rem;
 }
 
 .tickets__upload {
@@ -110,8 +122,8 @@
     background-size: contain;
     background-position: center;
     display: inline-block;
-    width: 16px;
-    height: 16px;
+    width: 16rem;
+    height: 16rem;
     cursor: pointer;
 }
 

@@ -1,13 +1,14 @@
 .metabar {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 66.66%;
-    height: 20px;
-    background-color: grey;
+    top: 20rem;
+    left: 20rem;
+    width: calc(66.66% - 40rem);
+    height: 40rem;
+    background-color: #2a2b31;
     z-index: 400;
-    font-size: 10px;
-    line-height: 20px;
+    font-size: 10rem;
+    line-height: 40rem;
+    border-radius: 20rem 20rem 0 0;
 }
 
 .metabar__filter {

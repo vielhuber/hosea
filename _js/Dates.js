@@ -18,45 +18,25 @@ export default class Dates {
 
     static dateFormat(d, format) {
         if (format === 'D d.m.') {
-            return (
-                ['SO', 'MO', 'DI', 'MI', 'DO', 'FR', 'SA'][d.getDay()] +
-                ' ' +
-                ('0' + d.getDate()).slice(-2) +
-                '.' +
-                ('0' + (d.getMonth() + 1)).slice(-2) +
-                '.'
-            );
+            return ['SO', 'MO', 'DI', 'MI', 'DO', 'FR', 'SA'][d.getDay()] + ' ' + ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2) + '.';
         }
         if (format === 'd. F Y') {
             return (
                 ('0' + d.getDate()).slice(-2) +
                 '. ' +
-                [
-                    'Januar',
-                    'Februar',
-                    'März',
-                    'April',
-                    'Mai',
-                    'Juni',
-                    'Juli',
-                    'August',
-                    'September',
-                    'Oktober',
-                    'November',
-                    'Dezember'
-                ][d.getMonth()] +
+                ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'][d.getMonth()] +
                 ' ' +
                 d.getFullYear()
             );
         }
         if (format === 'Y-m-d') {
-            return (
-                d.getFullYear() +
-                '-' +
-                ('0' + (d.getMonth() + 1)).slice(-2) +
-                '-' +
-                ('0' + d.getDate()).slice(-2)
-            );
+            return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+        }
+        if (format === 'd.m.Y') {
+            return ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2) + '.' + d.getFullYear();
+        }
+        if (format === 'd.m.') {
+            return ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2) + '.';
         }
         return (
             ('0' + d.getDate()).slice(-2) +
@@ -78,18 +58,11 @@ export default class Dates {
             return false;
         }
         d = new Date(d);
-        return Dates.sameDay(
-            Dates.getDayOfWeek(1, d),
-            Dates.getDayOfActiveWeek(1)
-        );
+        return Dates.sameDay(Dates.getDayOfWeek(1, d), Dates.getDayOfActiveWeek(1));
     }
 
     static sameDay(d1, d2) {
-        return (
-            d1.getFullYear() === d2.getFullYear() &&
-            d1.getMonth() === d2.getMonth() &&
-            d1.getDate() === d2.getDate()
-        );
+        return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate();
     }
 
     static weekNumber(d) {
