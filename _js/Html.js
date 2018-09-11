@@ -5,7 +5,6 @@ export default class Html {
         document.querySelector('#app').insertAdjacentHTML(
             'beforeend',
             `
-            <div class="metabar"></div>
             <div class="tickets"></div>
             <div class="scheduler"></div>
         `
@@ -14,36 +13,27 @@ export default class Html {
         document.querySelector('.tickets').insertAdjacentHTML(
             'beforeend',
             `
-            <table class="tickets__table">
-                <thead class="tickets__table-head">
-                    <tr class="tickets__table-row"></tr>
-                </thead>
-                <tbody class="tickets__table-body">
-                </tbody>
-                <tfoot class="tickets__table-foot">
-                    <tr class="tickets__table-row"></tr>
-                </tfoot>
-            </table>
+            <div class="metabar"></div>
+            <div class="tickets__table-container">
+                <table class="tickets__table">
+                    <thead class="tickets__table-head">
+                        <tr class="tickets__table-row"></tr>
+                    </thead>
+                    <tbody class="tickets__table-body">
+                    </tbody>
+                    <tfoot class="tickets__table-foot">
+                        <tr class="tickets__table-row"></tr>
+                    </tfoot>
+                </table>
+            </div>
             <a href="#" class="button-save">Speichern</a>
         `
         );
         Store.data.cols.forEach(cols__value => {
-            document
-                .querySelector('.tickets__table-head tr')
-                .insertAdjacentHTML(
-                    'beforeend',
-                    '<td class="tickets__table-cell">' + cols__value + '</td>'
-                );
+            document.querySelector('.tickets__table-head tr').insertAdjacentHTML('beforeend', '<td class="tickets__table-cell">' + cols__value + '</td>');
             document
                 .querySelector('.tickets__table-foot tr')
-                .insertAdjacentHTML(
-                    'beforeend',
-                    '<td class="tickets__table-cell">' +
-                        (cols__value == 'time'
-                            ? '<span class="tickets__sum"></span>'
-                            : '') +
-                        '</td>'
-                );
+                .insertAdjacentHTML('beforeend', '<td class="tickets__table-cell">' + (cols__value == 'time' ? '<span class="tickets__sum"></span>' : '') + '</td>');
         });
         document.querySelector('.tickets__table-head tr').insertAdjacentHTML(
             'beforeend',
@@ -60,32 +50,20 @@ export default class Html {
             `
         );
         Store.data.tickets.forEach(tickets__value => {
-            document
-                .querySelector('.tickets__table-body')
-                .insertAdjacentHTML(
-                    'beforeend',
-                    Html.createHtmlLine(tickets__value, false)
-                );
+            document.querySelector('.tickets__table-body').insertAdjacentHTML('beforeend', Html.createHtmlLine(tickets__value, false));
         });
     }
 
     static createHtmlLine(ticket, visible) {
         let html = '';
 
-        html +=
-            '<tr class="tickets__table-row tickets__entry' +
-            (visible === true ? ' tickets__entry--visible' : '') +
-            '" data-id="' +
-            ticket.id +
-            '">';
+        html += '<tr class="tickets__table-row tickets__entry' + (visible === true ? ' tickets__entry--visible' : '') + '" data-id="' + ticket.id + '">';
 
         Store.data.cols.forEach(cols__value => {
             html += '<td class="tickets__table-cell">';
             html +=
                 '<textarea class="tickets__textarea" ' +
-                (['date', 'description'].includes(cols__value)
-                    ? ' class="autosize"'
-                    : '') +
+                (['date', 'description'].includes(cols__value) ? ' class="autosize"' : '') +
                 ' name="' +
                 cols__value +
                 '">' +
@@ -98,11 +76,9 @@ export default class Html {
             <td class="tickets__table-cell">
                 <ul class="tickets__attachments">`;
         if (ticket.attachments !== undefined && ticket.attachments.length > 0) {
-            ticket.attachments.forEach(
-                (attachments__value, attachments__key) => {
-                    html += Html.createHtmlDownloadLine(attachments__value);
-                }
-            );
+            ticket.attachments.forEach((attachments__value, attachments__key) => {
+                html += Html.createHtmlDownloadLine(attachments__value);
+            });
         }
         html += `
                 </ul>
@@ -123,9 +99,7 @@ export default class Html {
     static createHtmlDownloadLine(attachment) {
         return `
             <li class="tickets__attachment" data-id="${attachment.id}">
-                <a class="tickets__attachment-download" href="#" title="${
-                    attachment.name
-                }"></a>
+                <a class="tickets__attachment-download" href="#" title="${attachment.name}"></a>
                 <a class="tickets__attachment-delete" href="#" title="Löschen"></a>
             </li>
         `;

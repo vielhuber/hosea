@@ -1,10 +1,10 @@
 html.jwtbutler-login-form-visible .login-form {
     position: fixed;
-    top: 10%;
-    left: 10%;
-    bottom: 10%;
-    right: 10%;
-    background-color: #c0ffee;
-    border: 7rem solid #f00;
+    top: $space;
+    left: $space;
+    bottom: $space;
+    right: $space;
+    background-color: $color-greylight;
+    border: 7rem solid $color-greydark;
     z-index: 2147483638;
 }
