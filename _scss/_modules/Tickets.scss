@@ -6,7 +6,7 @@
     background-color: $color-black;
     position: absolute;
     color: $color-black;
-    font-size: 11rem;
+    font-size: $font-size-small;
     border-radius: $border-radius;
     @include shadow;
 }
@@ -33,9 +33,9 @@
 
 .tickets__table-container {
     position: absolute;
-    top: $metabar-height;
+    top: calc(#{$metabar-height} + #{$space} / 5);
     left: 0;
-    bottom: 5rem;
+    bottom: calc(#{$space} / 5);
     right: 0;
     overflow-y: scroll;
     overflow-x: hidden;

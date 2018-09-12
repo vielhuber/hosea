@@ -7,7 +7,7 @@
     line-height: $metabar-height;
     background-color: $color-greylight;
     z-index: 400;
-    font-size: 10rem;
+    font-size: $font-size-small;
     border-radius: $border-radius $border-radius 0 0;
 }
 

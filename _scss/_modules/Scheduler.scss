@@ -7,7 +7,7 @@
     background-color: $color-greylight;
     color: $color-white;
     color: $color-black;
-    font-size: 10rem;
+    font-size: $font-size-small;
     overflow: hidden;
     border-radius: $border-radius;
     @include shadow;
@@ -82,7 +82,7 @@
 .scheduler__navigation-prev,
 .scheduler__navigation-next {
     line-height: 5vh;
-    font-size: 15rem;
+    font-size: $font-size-small;
     display: block;
 }
 
