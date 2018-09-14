@@ -3,9 +3,9 @@
     bottom: $space;
     left: $space;
     top: $space;
+    color: $color-white;
     background-color: $color-black;
     position: absolute;
-    color: $color-black;
     font-size: $font-size-small;
     border-radius: $border-radius;
     @include shadow;
@@ -25,17 +25,17 @@
 .tickets__textarea {
     width: 100%;
     height: 65rem;
-    border: 1px solid #ddd;
     resize: none;
     overflow-x: hidden;
     overflow-y: hidden;
+    @include input;
 }
 
 .tickets__table-container {
     position: absolute;
-    top: calc(#{$metabar-height} + #{$space} / 5);
+    top: $metabar-height;
     left: 0;
-    bottom: calc(#{$space} / 5);
+    bottom: 0;
     right: 0;
     overflow-y: scroll;
     overflow-x: hidden;
@@ -47,7 +47,7 @@
 }
 
 .tickets__table-cell:nth-child(1) {
-    width: 5%;
+    width: 7%;
 }
 
 .tickets__table-cell:nth-child(2) {
@@ -71,22 +71,23 @@
 }
 
 .tickets__table-cell:nth-child(7) {
-    width: 10%;
+    width: 7%;
 }
 
 .tickets__table-cell:nth-child(8) {
-    width: 5%;
+    width: 7%;
 }
 
 .tickets__table-cell {
     vertical-align: top;
     overflow: hidden;
     padding: 3rem;
+    border: 2px solid #fff;
 }
 
 .tickets__entry {
     display: none;
-    box-shadow: 0 0 0 1px grey inset;
+    border-left: $space-medium solid transparent;
 }
 
 .tickets__entry--visible {

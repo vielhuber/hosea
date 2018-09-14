@@ -3,16 +3,41 @@
     top: 0;
     left: 0;
     width: 100%;
+    padding: 0 $space-small;
     height: $metabar-height;
-    line-height: $metabar-height;
     background-color: $color-greylight;
-    z-index: 400;
     font-size: $font-size-small;
     border-radius: $border-radius $border-radius 0 0;
 }
 
+.metabar__filter,
+.metabar__sort {
+    padding-top: calc(#{$metabar-height} / 4);
+    line-height: calc(#{$metabar-height} / 4);
+}
+
 .metabar__filter {
     float: left;
+}
+
+.metabar__select {
+    float: left;
+    height: calc(#{$metabar-height} / 2);
+    @include select;
+    @include input;
+}
+
+.metabar__select--filter {
+    margin-right: $space-small;
+    &:last-child {
+        margin-right: 0;
+    }
+}
+.metabar__select--sort {
+    margin-left: $space-small;
+    &:first-child {
+        margin-left: 0;
+    }
 }
 
 .metabar__sort {

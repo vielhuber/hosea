@@ -62,7 +62,7 @@ export default class Html {
         Store.data.cols.forEach(cols__value => {
             html += '<td class="tickets__table-cell">';
             html +=
-                '<textarea class="tickets__textarea" ' +
+                '<textarea class="tickets__textarea" autocorrect="off" autocapitalize="off" spellcheck="false" ' +
                 (['date', 'description'].includes(cols__value) ? ' class="autosize"' : '') +
                 ' name="' +
                 cols__value +

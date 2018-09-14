@@ -147,7 +147,7 @@ export default class Scheduler {
 
     static updateColors() {
         Store.data.tickets.forEach(tickets__value => {
-            document.querySelector('.tickets .tickets__entry[data-id="' + tickets__value.id + '"]').style.backgroundColor = Scheduler.getColor(tickets__value.status);
+            document.querySelector('.tickets .tickets__entry[data-id="' + tickets__value.id + '"]').style.borderLeftColor = Scheduler.getColor(tickets__value.status);
         });
     }
 }

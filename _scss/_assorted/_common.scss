@@ -1,3 +1,14 @@
 @mixin shadow {
     box-shadow: 0rem 30rem 80rem 0rem rgba(0, 0, 0, 0.5);
 }
+
+@mixin input {
+    background-color: #000;
+    color: #fff;
+    padding: 0 $space-small;
+}
+
+@mixin select {
+    appearance: menulist-button;
+    cursor: pointer;
+}

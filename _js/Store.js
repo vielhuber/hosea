@@ -5,23 +5,13 @@ export default class Store {
         Store.data = {
             api: null,
             tickets: null,
-            cols: [
-                'status',
-                'priority',
-                'date',
-                'time',
-                'project',
-                'description'
-            ],
+            cols: ['status', 'priority', 'date', 'time', 'project', 'description'],
             colors: {
-                idle: '#b3e5fc',
-                done: '#fff59d',
-                billed: '#81c784',
-                recurring: '#ffeded',
-                working: '#ef9a9a',
-                delegated: '#ce93d8',
-                weekend: '#bbdefb',
-                big: '#e1bee7',
+                idle: '#2196F3',
+                done: '#FFC107',
+                billed: '#4CAF50',
+                recurring: '#E91E63',
+                working: '#F44336',
                 windows: '#42A5F5',
                 mac: '#8D6E63',
                 linux: '#9CCC65'
