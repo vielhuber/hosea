@@ -3,12 +3,16 @@
 }
 
 @mixin input {
-    background-color: #000;
-    color: #fff;
+    background-color: $color-black;
+    color: $color-white;
     padding: 0 $space-small;
 }
 
 @mixin select {
     appearance: menulist-button;
     cursor: pointer;
+}
+
+@mixin border {
+    border: 2rem solid $color-white;
 }

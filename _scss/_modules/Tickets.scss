@@ -1,25 +1,24 @@
 .tickets {
-    width: calc(66.66% - 2 * #{$space});
-    bottom: $space;
-    left: $space;
-    top: $space;
+    width: calc(66.66% - 2 * #{$space-big});
+    bottom: $space-big;
+    left: $space-big;
+    top: $space-big;
     color: $color-white;
     background-color: $color-black;
     position: absolute;
     font-size: $font-size-small;
-    border-radius: $border-radius;
+    @include border;
     @include shadow;
 }
 
 .tickets__table-container::-webkit-scrollbar {
-    width: 5rem;
+    width: 2rem;
 }
 .tickets__table-container::-webkit-scrollbar-track {
-    background-color: $color-greydark;
+    background-color: $color-black;
 }
 .tickets__table-container::-webkit-scrollbar-thumb {
-    background-color: $color-greylight;
-    border-radius: 2rem;
+    background-color: $color-white;
 }
 
 .tickets__textarea {
@@ -33,11 +32,11 @@
 
 .tickets__table-container {
     position: absolute;
-    top: $metabar-height;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    overflow-y: scroll;
+    top: calc(#{$space-medium} + #{$bar-height} + #{$space-medium});
+    left: $space-medium;
+    bottom: $space-medium;
+    right: $space-medium;
+    overflow-y: auto;
     overflow-x: hidden;
 }
 
@@ -82,7 +81,7 @@
     vertical-align: top;
     overflow: hidden;
     padding: 3rem;
-    border: 2px solid #fff;
+    @include border;
 }
 
 .tickets__entry {

@@ -1,32 +1,41 @@
 .scheduler {
-    width: calc(33.33% - #{$space});
-    bottom: $space;
-    right: $space;
-    top: $space;
+    width: calc(33.33% - #{$space-big});
+    bottom: $space-big;
+    right: $space-big;
+    top: $space-big;
     position: absolute;
-    background-color: $color-greylight;
+    background-color: $color-black;
     color: $color-white;
-    color: $color-black;
     font-size: $font-size-small;
     overflow: hidden;
-    border-radius: $border-radius;
+    @include border;
     @include shadow;
 }
 
-.scheduler__appointments {
+.scheduler__navigation {
     position: absolute;
-    top: 5%;
-    left: 0;
-    width: 100%;
-    height: 95%;
+    top: $space-medium;
+    left: $space-medium;
+    right: $space-medium;
+    height: $bar-height;
+    color: $color-white;
 }
 
 .scheduler__table {
     position: absolute;
-    top: 5%;
-    left: 0;
-    width: 100%;
-    height: 95%;
+    top: calc(#{$bar-height} + #{$space-medium} * 2);
+    left: $space-medium;
+    right: $space-medium;
+    width: calc(100% - #{$space-medium} * 2); /* needed because of table */
+    height: calc(100% - #{$bar-height} - #{$space-medium} * 3);
+}
+
+.scheduler__appointments {
+    position: absolute;
+    top: calc(#{$bar-height} + #{$space-medium} * 2);
+    left: $space-medium;
+    right: $space-medium;
+    height: calc(100% - #{$bar-height} - #{$space-medium} * 3);
 }
 
 .scheduler__table-body {
@@ -39,49 +48,42 @@
 
 .scheduler__cell {
     width: 12.5%;
-    padding: 0;
     vertical-align: top;
+    padding: $space-small;
+    @include border;
+    border-color: #292929;
 }
 
 .scheduler__cell--main {
-    background-color: $color-white;
+    background-color: #272727;
 }
 
 .scheduler__cell--curday {
-    background-color: #c7c7c7;
+    background-color: #404040;
 }
 
 .scheduler__cell--curday.scheduler__cell--main {
     background-color: #e8e8e8;
 }
 
-.scheduler__row:nth-child(1),
-.scheduler__row:nth-child(2) {
-    height: 3%;
-}
-
 .scheduler__appointment {
     position: absolute;
-    width: 12.5%;
-    border: 1px solid $color-black;
+    width: calc(12.5% - 10rem);
+    padding: 4rem;
+    font-size: 7rem;
+    line-height: 8rem;
+    text-align: left;
     overflow: hidden;
-}
-
-.scheduler__navigation {
-    position: absolute;
-    top: 0%;
-    left: 0;
-    width: 100%;
-    height: 5%;
-    color: $color-white;
-    padding: 0 $space;
+    margin-top: 2rem;
+    margin-left: 6rem;
+    box-shadow: 0 0 0 1rem white inset;
 }
 
 .scheduler__navigation-week,
 .scheduler__navigation-today,
 .scheduler__navigation-prev,
 .scheduler__navigation-next {
-    line-height: 5vh;
+    line-height: $bar-height;
     font-size: $font-size-small;
     display: block;
 }
@@ -96,7 +98,7 @@
 .scheduler__navigation-next {
     float: right;
     display: block;
-    padding-left: $space;
+    padding-left: $space-medium;
 }
 
 .scheduler__navigation-today {

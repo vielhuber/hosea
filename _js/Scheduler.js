@@ -27,14 +27,6 @@ export default class Scheduler {
                             )
                             .join('')}
                     </tr>
-                    <tr class="scheduler__row">
-                        <td class="scheduler__cell">Ganztätig</td>
-                        ${Array(7)
-                            .join(0)
-                            .split(0)
-                            .map((item, i) => `<td class="scheduler__cell${Dates.sameDay(Dates.getDayOfActiveWeek(i + 1), Dates.getCurrentDate()) ? ' scheduler__cell--curday' : ''}"></td>`)
-                            .join('')}
-                    </tr>
                     ${Array(15)
                         .join(0)
                         .split(0)
@@ -76,7 +68,7 @@ export default class Scheduler {
                     left:${12.5 * date__value.day}%;
                     top:${6.25 * (date__value.begin - 8)}%;
                     bottom:${100 - 6.25 * (date__value.end - 8)}%;
-                    background-color:${date__value.backgroundColor};
+                    background-color:${date__value.backgroundColor}80;
                 ">
                     ${date__value.title}
                 </div>

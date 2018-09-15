@@ -1,19 +1,16 @@
 .metabar {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    padding: 0 $space-small;
-    height: $metabar-height;
-    background-color: $color-greylight;
+    top: $space-medium;
+    left: $space-medium;
+    right: $space-medium;
+    height: $bar-height;
     font-size: $font-size-small;
-    border-radius: $border-radius $border-radius 0 0;
 }
 
 .metabar__filter,
 .metabar__sort {
-    padding-top: calc(#{$metabar-height} / 4);
-    line-height: calc(#{$metabar-height} / 4);
+    padding-top: calc(#{$bar-height} / 4);
+    line-height: calc(#{$bar-height} / 4);
 }
 
 .metabar__filter {
@@ -22,7 +19,7 @@
 
 .metabar__select {
     float: left;
-    height: calc(#{$metabar-height} / 2);
+    height: calc(#{$bar-height} / 2);
     @include select;
     @include input;
 }
