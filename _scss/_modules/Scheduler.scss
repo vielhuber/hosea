@@ -1,6 +1,6 @@
 .scheduler {
     width: calc(33.33% - #{$space-big});
-    bottom: $space-big;
+    bottom: calc(#{$space-big} + #{$bar-height});
     right: $space-big;
     top: $space-big;
     position: absolute;

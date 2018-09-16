@@ -8,6 +8,7 @@ import Sort from './Sort';
 import Store from './Store';
 import Textarea from './Textarea';
 import Tickets from './Tickets';
+import Footer from './Footer';
 
 export default class App {
     async init() {
@@ -24,6 +25,8 @@ export default class App {
         Attachments.bindDeleteAttachment();
         Tickets.bindDelete();
         Tickets.bindSave();
+        Footer.bindSave();
+        Footer.initStatus();
         Keyboard.bindRefresh();
         Tickets.bindCreate();
         Scheduler.bindScheduler();

@@ -7,7 +7,17 @@ export default class Html {
             `
             <div class="tickets"></div>
             <div class="scheduler"></div>
+            <div class="footer"></div>
         `
+        );
+
+        document.querySelector('.footer').insertAdjacentHTML(
+            'beforeend',
+            `
+            <a href="#" class="footer__save">_save</a>
+            <span class="footer__status"></span>
+            <a href="#" class="footer__logout">_logout</a>
+            `
         );
 
         document.querySelector('.tickets').insertAdjacentHTML(
@@ -26,7 +36,6 @@ export default class Html {
                     </tfoot>
                 </table>
             </div>
-            <a href="#" class="button-save">Speichern</a>
         `
         );
         Store.data.cols.forEach(cols__value => {

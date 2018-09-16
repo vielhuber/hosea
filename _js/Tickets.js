@@ -164,18 +164,6 @@ export default class Tickets {
     }
 
     static bindSave() {
-        // button click
-        document.querySelector('.tickets').addEventListener('click', e => {
-            if (e.target.closest('.button-save')) {
-                Tickets.saveTickets()
-                    .then(() => {})
-                    .catch(error => {
-                        console.error(error);
-                    });
-                e.preventDefault();
-            }
-        });
-
         // ctrl+s
         document.addEventListener('keydown', event => {
             let focus = document.activeElement;

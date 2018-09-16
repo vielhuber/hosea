@@ -1,0 +1,23 @@
+.footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: $bar-height;
+    line-height: $bar-height;
+    background-color: $color-black;
+    color: $color-white;
+    font-size: $font-size-small;
+    padding: 0 $space-big;
+    @include shadow;
+    @include border;
+    border-left-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: 1fr;
+}
+.footer__status {
+    text-align: center;
+}

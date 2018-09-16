@@ -1,6 +1,6 @@
 .tickets {
     width: calc(66.66% - 2 * #{$space-big});
-    bottom: $space-big;
+    bottom: calc(#{$space-big} + #{$bar-height});
     left: $space-big;
     top: $space-big;
     color: $color-white;
