@@ -2,7 +2,7 @@ import Tickets from './Tickets';
 
 export default class Footer {
     static blockStatusUpdate = false;
-    static showTime = 3000;
+    static showTime = 3500;
 
     static initStatus() {
         if (Footer.blockStatusUpdate === false) {
