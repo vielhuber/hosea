@@ -101,17 +101,17 @@ a {
 }
 
 ::selection {
-    background: $color-grey;
+    background: $color-red;
     color: $color-white;
 }
 
 ::-moz-selection {
-    background: $color-grey;
+    background: $color-red;
     color: $color-white;
 }
 
 ::-webkit-selection {
-    background: $color-grey;
+    background: $color-red;
     color: $color-white;
 }
 

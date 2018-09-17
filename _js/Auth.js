@@ -8,4 +8,7 @@ export default class Auth {
         });
         return Store.data.api.login();
     }
+    static logout() {
+        return Store.data.api.logout();
+    }
 }

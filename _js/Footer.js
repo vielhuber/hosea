@@ -1,10 +1,14 @@
 import Tickets from './Tickets';
+import Auth from './Auth';
 
 export default class Footer {
     static blockStatusUpdate = false;
     static showTime = 3500;
 
     static initStatus() {
+        if (document.querySelector('.footer__status') === null) {
+            return;
+        }
         if (Footer.blockStatusUpdate === false) {
             let d =
                 new Date().getFullYear() +
@@ -31,12 +35,26 @@ export default class Footer {
     }
     static bindSave() {
         document.querySelector('.footer').addEventListener('click', e => {
-            let button = e.target.closest('.footer__save');
-            if (button) {
+            if (e.target.closest('.footer__save')) {
                 Footer.updateStatus('saving...');
                 Tickets.saveTickets()
                     .then(() => {
                         Footer.updateStatus('saved!');
+                    })
+                    .catch(error => {
+                        console.error(error);
+                    });
+                e.preventDefault();
+            }
+        });
+    }
+    static bindLogout() {
+        document.querySelector('.footer').addEventListener('click', e => {
+            if (e.target.closest('.footer__logout')) {
+                Auth.logout()
+                    .then(() => {
+                        // we simply overcome the issue of deleting event listeners on document by simply refreshing the app
+                        location.reload();
                     })
                     .catch(error => {
                         console.error(error);

@@ -11,7 +11,7 @@ import Tickets from './Tickets';
 import Footer from './Footer';
 
 export default class App {
-    async init() {
+    static async init() {
         Store.initStore();
         await Auth.login();
         await Tickets.fetchTickets();
@@ -26,6 +26,7 @@ export default class App {
         Tickets.bindDelete();
         Tickets.bindSave();
         Footer.bindSave();
+        Footer.bindLogout();
         Footer.initStatus();
         Keyboard.bindRefresh();
         Tickets.bindCreate();
