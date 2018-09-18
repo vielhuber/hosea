@@ -21,6 +21,9 @@
     color: $color-white;
 }
 
+/* tables are bad for pixel perfect adjustments */
+/* render it as blocks */
+
 .scheduler__table {
     position: absolute;
     top: calc(#{$bar-height} + #{$space-medium} * 2);
@@ -28,30 +31,28 @@
     right: $space-medium;
     width: calc(100% - #{$space-medium} * 2); /* needed because of table */
     height: calc(100% - #{$bar-height} - #{$space-medium} * 3);
-}
-
-.scheduler__appointments {
-    position: absolute;
-    top: calc(#{$bar-height} + #{$space-medium} * 2);
-    left: $space-medium;
-    right: $space-medium;
-    height: calc(100% - #{$bar-height} - #{$space-medium} * 3);
+    display: block;
+    border: 1rem solid #292929;
 }
 
 .scheduler__table-body {
+    width: 100%;
     height: 100%;
+    display: block;
 }
 
 .scheduler__row {
-    height: 6%; /* use rounded values here, because otherwise heights are shown wrong */
+    height: 6.25%;
+    display: block;
 }
 
 .scheduler__cell {
     width: 12.5%;
+    height: 100%;
     vertical-align: top;
     padding: $space-small;
-    @include border;
-    border-color: #292929;
+    float: left;
+    border: 1rem solid #292929;
 }
 
 .scheduler__cell--main {
@@ -66,17 +67,26 @@
     background-color: #e8e8e8;
 }
 
+.scheduler__appointments {
+    position: absolute;
+    top: calc(#{$bar-height} + #{$space-medium} * 2);
+    left: $space-medium;
+    right: $space-medium;
+    height: calc(100% - #{$bar-height} - #{$space-medium} * 3);
+}
+
 .scheduler__appointment {
     position: absolute;
-    width: calc(12.5% - 10rem);
+    width: calc(12.5% - 6rem);
     padding: 4rem;
     font-size: 7rem;
     line-height: 8rem;
     text-align: left;
     overflow: hidden;
-    margin-top: 2rem;
-    margin-left: 6rem;
-    box-shadow: 0 0 0 1rem white inset;
+    margin-top: 3rem;
+    margin-left: 3rem;
+    margin-bottom: 3rem;
+    border: 1px solid $color-white;
 }
 
 .scheduler__navigation-week,

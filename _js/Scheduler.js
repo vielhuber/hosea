@@ -108,13 +108,15 @@ export default class Scheduler {
     static generateDates() {
         let dates = [];
         Store.data.tickets.forEach(tickets__value => {
-            if (Dates.dateIsInActiveWeek(tickets__value.date.split('\n')[0])) {
-                let title = tickets__value.project + '\n' + (tickets__value.description || '').substring(0, 100),
-                    ticket_dates = tickets__value.date.split('\n'),
-                    cur = 0;
-                while (ticket_dates[cur] !== undefined) {
-                    let d1 = new Date(ticket_dates[cur]),
-                        d2 = new Date(ticket_dates[cur + 1]);
+            let title = tickets__value.project + '\n' + (tickets__value.description || '').substring(0, 100),
+                ticket_dates = tickets__value.date.split('\n'),
+                cur = 0;
+
+            while (ticket_dates[cur] !== undefined) {
+                let d = '20' + ticket_dates[cur].substring(6, 8) + '-' + ticket_dates[cur].substring(3, 5) + '-' + ticket_dates[cur].substring(0, 2);
+                if (Dates.dateIsInActiveWeek(d)) {
+                    let d1 = new Date(d + ' ' + ticket_dates[cur].substring(9, 14) + ':00'),
+                        d2 = new Date(d + ' ' + ticket_dates[cur].substring(15, 20) + ':00');
                     dates.push({
                         day: ((d1.getDay() + 6) % 7) + 1,
                         begin: d1.getHours() + d1.getMinutes() / 60 || 24,
@@ -122,10 +124,11 @@ export default class Scheduler {
                         title: title,
                         backgroundColor: Scheduler.getColor(tickets__value.status)
                     });
-                    cur += 2;
                 }
+                cur += 1;
             }
         });
+        console.log(dates);
         return dates;
     }
 
