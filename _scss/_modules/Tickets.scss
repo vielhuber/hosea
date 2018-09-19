@@ -23,11 +23,13 @@
 
 .tickets__textarea {
     width: 100%;
+    white-space: nowrap;
     height: 65rem;
     resize: none;
     overflow-x: hidden;
     overflow-y: hidden;
     @include input;
+    padding: 0;
 }
 
 .tickets__table-container {
@@ -80,7 +82,7 @@
 .tickets__table-cell {
     vertical-align: top;
     overflow: hidden;
-    padding: 3rem;
+    padding: 3rem 4rem;
     @include border;
 }
 

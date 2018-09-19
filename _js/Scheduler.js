@@ -113,18 +113,49 @@ export default class Scheduler {
                 cur = 0;
 
             while (ticket_dates[cur] !== undefined) {
-                let d = '20' + ticket_dates[cur].substring(6, 8) + '-' + ticket_dates[cur].substring(3, 5) + '-' + ticket_dates[cur].substring(0, 2);
-                if (Dates.dateIsInActiveWeek(d)) {
-                    let d1 = new Date(d + ' ' + ticket_dates[cur].substring(9, 14) + ':00'),
-                        d2 = new Date(d + ' ' + ticket_dates[cur].substring(15, 20) + ':00');
-                    dates.push({
-                        day: ((d1.getDay() + 6) % 7) + 1,
-                        begin: d1.getHours() + d1.getMinutes() / 60 || 24,
-                        end: d2.getHours() + d2.getMinutes() / 60 || 24,
-                        title: title,
-                        backgroundColor: Scheduler.getColor(tickets__value.status)
-                    });
+                // format: 01.01.18 10:00-11:00
+                if (ticket_dates[cur].length === 20) {
+                    let d = Dates.germanToEnglishString(ticket_dates[cur]);
+                    if (Dates.dateIsInActiveWeek(d)) {
+                        let d1 = new Date(d + ' ' + ticket_dates[cur].substring(9, 14) + ':00'),
+                            d2 = new Date(d + ' ' + ticket_dates[cur].substring(15, 20) + ':00');
+                        dates.push({
+                            day: ((d1.getDay() + 6) % 7) + 1,
+                            begin: d1.getHours() + d1.getMinutes() / 60 || 24,
+                            end: d2.getHours() + d2.getMinutes() / 60 || 24,
+                            title: title,
+                            backgroundColor: Scheduler.getColor(tickets__value.status)
+                        });
+                    }
                 }
+
+                // format: MO 10:00-11:00
+                else {
+                    let day = Dates.getDayFromString(ticket_dates[cur].substring(0, 2)),
+                        d = Dates.getDayOfActiveWeek(day),
+                        show = true;
+                    if (Dates.dateIsInPast(d)) {
+                        show = false;
+                    }
+                    // exclusions
+                    ticket_dates[cur].split(' ').forEach(value => {
+                        if (value.indexOf('-') === 0) {
+                            if (Dates.sameDay(Dates.germanToEnglishString(value.substring(1)), d)) {
+                                show = false;
+                            }
+                        }
+                    });
+                    if (show === true) {
+                        dates.push({
+                            day: day === 7 ? 0 : day,
+                            begin: parseInt(ticket_dates[cur].substring(3, 5)) + parseInt(ticket_dates[cur].substring(6, 8)) / 60 || 24,
+                            end: parseInt(ticket_dates[cur].substring(9, 11)) + parseInt(ticket_dates[cur].substring(12, 14)) / 60 || 24,
+                            title: title,
+                            backgroundColor: Scheduler.getColor(tickets__value.status)
+                        });
+                    }
+                }
+
                 cur += 1;
             }
         });

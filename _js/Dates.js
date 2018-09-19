@@ -16,6 +16,10 @@ export default class Dates {
         return new Date(d.setDate(diff));
     }
 
+    static germanToEnglishString(str) {
+        return '20' + str.substring(6, 8) + '-' + str.substring(3, 5) + '-' + str.substring(0, 2);
+    }
+
     static dateFormat(d, format) {
         if (format === 'D d.m.') {
             return ['SO', 'MO', 'DI', 'MI', 'DO', 'FR', 'SA'][d.getDay()] + ' ' + ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2) + '.';
@@ -61,7 +65,39 @@ export default class Dates {
         return Dates.sameDay(Dates.getDayOfWeek(1, d), Dates.getDayOfActiveWeek(1));
     }
 
+    static dateIsInFuture(d) {
+        if (d === null || d === '') {
+            return false;
+        }
+        let d1 = new Date(d),
+            d2 = new Date();
+        return d1 > d2;
+    }
+
+    static dateIsToday(d) {
+        if (d === null || d === '') {
+            return false;
+        }
+        let d1 = new Date(d),
+            d2 = new Date();
+        return d1.getDay() === d2.getDay() && d1.getMonth() === d2.getMonth() && d1.getFullYear() === d2.getFullYear();
+    }
+
+    static dateIsInPast(d) {
+        if (d === null || d === '') {
+            return false;
+        }
+        let d1 = new Date(d),
+            d2 = new Date();
+        return d1 < d2;
+    }
+
     static sameDay(d1, d2) {
+        if (d1 === null || d1 === '') {
+            return false;
+        }
+        d1 = new Date(d1);
+        d2 = new Date(d2);
         return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate();
     }
 
@@ -75,5 +111,13 @@ export default class Dates {
 
     static isDate(string) {
         return new Date(string) !== 'Invalid Date' && !isNaN(new Date(string));
+    }
+
+    static getDayFromString(string) {
+        return { MO: 1, DI: 2, MI: 3, DO: 4, FR: 5, SA: 6, SO: 7 }[string];
+    }
+
+    static getStringFromDay(day) {
+        return { 1: MO, 2: DI, 3: MI, 4: DO, 5: FR, 6: SA, 7: SO }[day];
     }
 }
