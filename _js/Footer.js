@@ -11,11 +11,14 @@ export default class Footer {
         }
         if (Footer.blockStatusUpdate === false) {
             let d =
-                new Date().getFullYear() +
-                '-' +
-                ('0' + (new Date().getMonth() + 1)).slice(-2) +
-                '-' +
                 ('0' + new Date().getDate()).slice(-2) +
+                '.' +
+                ('0' + (new Date().getMonth() + 1)).slice(-2) +
+                '.' +
+                new Date()
+                    .getFullYear()
+                    .toString()
+                    .substring(2, 4) +
                 ' ' +
                 ('0' + new Date().getHours()).slice(-2) +
                 ':' +
