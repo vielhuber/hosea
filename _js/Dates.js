@@ -142,10 +142,22 @@ export default class Dates {
     }
 
     static getDayFromString(string) {
-        return { MO: 1, DI: 2, MI: 3, DO: 4, FR: 5, SA: 6, SO: 7 }[string];
+        return { SO: 0, MO: 1, DI: 2, MI: 3, DO: 4, FR: 5, SA: 6 }[string];
     }
 
     static getStringFromDay(day) {
-        return { 1: MO, 2: DI, 3: MI, 4: DO, 5: FR, 6: SA, 7: SO }[day];
+        return { 0: SO, 1: MO, 2: DI, 3: MI, 4: DO, 5: FR, 6: SA }[day];
+    }
+
+    static dateIsExcluded(d, str) {
+        let ret = false;
+        str.split(' ').forEach(value => {
+            if (value.indexOf('-') === 0) {
+                if (Dates.sameDay(Dates.germanToEnglishString(value.substring(1)), d)) {
+                    ret = true;
+                }
+            }
+        });
+        return ret;
     }
 }

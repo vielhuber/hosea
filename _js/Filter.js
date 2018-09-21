@@ -104,20 +104,39 @@ export default class Filter {
                 .querySelectorAll('select')
                 .forEach(el => {
                     let val_search = el.value,
-                        val_target = tickets__value[el.getAttribute('name')];
-                    if (el.getAttribute('name') == 'date' && val_target !== null) {
-                        val_target = val_target.substring(0, 10);
+                        val_target = tickets__value[el.getAttribute('name')],
+                        visible_this = false;
+
+                    // date
+                    if (el.getAttribute('name') === 'date' && val_search !== '*') {
+                        let d = new Date(val_search);
+                        val_target.split('\n').forEach(val_target__value => {
+                            // format: 01.01.18 10:00-11:00
+                            if (val_target__value.length === 20) {
+                                if (val_target__value.substring(0, 8) === Dates.dateFormat(d, 'd.m.y')) {
+                                    visible_this = true;
+                                }
+                            }
+                            // format: MO 10:00-11:00 -05.10.18 -12.10.18
+                            else {
+                                if (d.getDay() === Dates.getDayFromString(val_target__value.substring(0, 2)) && !Dates.dateIsInPast(d) && !Dates.dateIsExcluded(d, val_target__value)) {
+                                    visible_this = true;
+                                }
+                            }
+                        });
                     }
-                    if (val_search != '*' && val_target != val_search) {
-                        visible = false;
+
+                    // all others
+                    else if (val_search === '*' || val_target === val_search) {
+                        visible_this = true;
                     }
-                    /* hide billed in overview */
-                    if (
-                        el.getAttribute('name') == 'status' &&
-                        val_search == '*' &&
-                        val_target == 'billed' &&
-                        (document.querySelector('.metabar__select--filter[name="date"]').value == '*' || document.querySelector('.metabar__select--filter[name="date"]').value == '')
-                    ) {
+
+                    /* special behaviour: hide billed in overview */
+                    if (el.getAttribute('name') == 'status' && val_search === '*' && val_target === 'billed' && document.querySelector('.metabar__select--filter[name="date"]').value === '*') {
+                        visible_this = false;
+                    }
+
+                    if (visible_this === false) {
                         visible = false;
                     }
                 });

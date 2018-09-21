@@ -131,23 +131,21 @@ export default class Scheduler {
 
                 // format: MO 10:00-11:00 -05.10.18 -12.10.18
                 else {
-                    let day = Dates.getDayFromString(ticket_dates[cur].substring(0, 2)),
-                        d = Dates.getDayOfActiveWeek(day),
+                    let day = Dates.getDayFromString(ticket_dates[cur].substring(0, 2));
+                    if (day === 0) {
+                        day = 7;
+                    }
+                    let d = Dates.getDayOfActiveWeek(day),
                         show = true;
                     if (Dates.dateIsInPast(d)) {
                         show = false;
                     }
-                    // exclusions
-                    ticket_dates[cur].split(' ').forEach(value => {
-                        if (value.indexOf('-') === 0) {
-                            if (Dates.sameDay(Dates.germanToEnglishString(value.substring(1)), d)) {
-                                show = false;
-                            }
-                        }
-                    });
+                    if (Dates.dateIsExcluded(d, ticket_dates[cur])) {
+                        show = false;
+                    }
                     if (show === true) {
                         dates.push({
-                            day: day === 7 ? 0 : day,
+                            day: day,
                             begin: parseInt(ticket_dates[cur].substring(3, 5)) + parseInt(ticket_dates[cur].substring(6, 8)) / 60 || 24,
                             end: parseInt(ticket_dates[cur].substring(9, 11)) + parseInt(ticket_dates[cur].substring(12, 14)) / 60 || 24,
                             title: title,

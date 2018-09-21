@@ -44,7 +44,6 @@ export default class Keyboard {
         // f5
         document.addEventListener('keydown', event => {
             if (event.keyCode === 116) {
-                console.log('DO');
                 Filter.doFilter();
                 event.preventDefault();
             }
