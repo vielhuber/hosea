@@ -36,41 +36,50 @@ export default class Filter {
             `
             );
             if (columns__value === 'date') {
-                let d = Dates.getCurrentDate();
-                document.querySelector('.metabar__filter [name="date"]').insertAdjacentHTML('beforeend', '<option selected="selected" value="' + Dates.dateFormat(d, 'Y-m-d') + '">_today</option>');
-                d.setDate(d.getDate() + 1);
-                document.querySelector('.metabar__filter [name="date"]').insertAdjacentHTML('beforeend', '<option value="' + Dates.dateFormat(d, 'Y-m-d') + '">_tomorrow</option>');
-                d.setDate(d.getDate() + 1);
-                document.querySelector('.metabar__filter [name="date"]').insertAdjacentHTML('beforeend', '<option value="' + Dates.dateFormat(d, 'Y-m-d') + '">_day after tomorrow</option>');
-                d.setDate(d.getDate() - 3);
-                document.querySelector('.metabar__filter [name="date"]').insertAdjacentHTML('beforeend', '<option value="' + Dates.dateFormat(d, 'Y-m-d') + '">_yesterday</option>');
-                d.setDate(d.getDate() - 1);
-                document.querySelector('.metabar__filter [name="date"]').insertAdjacentHTML('beforeend', '<option value="' + Dates.dateFormat(d, 'Y-m-d') + '">_day before yesterday</option>');
+                let firstDay = new Date('2018-01-01 00:00:00');
+                let curDay = new Date();
+                curDay.setHours(0);
+                curDay.setMinutes(0);
+                curDay.setSeconds(0);
+                let lastDay = new Date(parseInt(new Date().getFullYear()) + 1 + '-12-31 00:00:00');
+                while (firstDay < lastDay) {
+                    document
+                        .querySelector('.metabar__select--filter[name="date"]')
+                        .insertAdjacentHTML(
+                            'beforeend',
+                            '<option' +
+                                (Dates.sameDay(firstDay, curDay) ? ' selected="selected"' : '') +
+                                ' value="' +
+                                Dates.dateFormat(firstDay, 'Y-m-d') +
+                                '">' +
+                                Dates.dateFormat(firstDay, 'd.m.y') +
+                                '</option>'
+                        );
+                    firstDay.setDate(firstDay.getDate() + 1);
+                }
+            } else {
+                let options = [];
+                Store.data.tickets.forEach(tickets__value => {
+                    let options_value = tickets__value[columns__value];
+                    if (!options.includes(options_value)) {
+                        options.push(options_value);
+                    }
+                });
+                options.sort((a, b) => {
+                    if (a === null) {
+                        a = '';
+                    }
+                    if (b === null) {
+                        b = '';
+                    }
+                    return a.toLowerCase().localeCompare(b.toLowerCase());
+                });
+                options.forEach(options__value => {
+                    document
+                        .querySelector('.metabar__select--filter[name="' + columns__value + '"]')
+                        .insertAdjacentHTML('beforeend', '<option value="' + options__value + '">' + options__value + '</option>');
+                });
             }
-            let options = [];
-            Store.data.tickets.forEach(tickets__value => {
-                let options_value = tickets__value[columns__value];
-                if (columns__value == 'date' && options_value != null && options_value != '') {
-                    options_value = options_value.substring(0, 10);
-                }
-                if (!options.includes(options_value)) {
-                    options.push(options_value);
-                }
-            });
-            options.sort((a, b) => {
-                if (a === null) {
-                    a = '';
-                }
-                if (b === null) {
-                    b = '';
-                }
-                return a.toLowerCase().localeCompare(b.toLowerCase());
-            });
-            options.forEach(options__value => {
-                document
-                    .querySelector('.metabar__select--filter[name="' + columns__value + '"]')
-                    .insertAdjacentHTML('beforeend', '<option value="' + options__value + '">' + options__value + '</option>');
-            });
         });
 
         if (update === true) {

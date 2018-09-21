@@ -129,7 +129,7 @@ export default class Scheduler {
                     }
                 }
 
-                // format: MO 10:00-11:00
+                // format: MO 10:00-11:00 -05.10.18 -12.10.18
                 else {
                     let day = Dates.getDayFromString(ticket_dates[cur].substring(0, 2)),
                         d = Dates.getDayOfActiveWeek(day),
@@ -159,7 +159,6 @@ export default class Scheduler {
                 cur += 1;
             }
         });
-        console.log(dates);
         return dates;
     }
 

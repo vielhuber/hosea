@@ -39,6 +39,18 @@ export default class Dates {
         if (format === 'd.m.Y') {
             return ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2) + '.' + d.getFullYear();
         }
+        if (format === 'd.m.y') {
+            return (
+                ('0' + d.getDate()).slice(-2) +
+                '.' +
+                ('0' + (d.getMonth() + 1)).slice(-2) +
+                '.' +
+                d
+                    .getFullYear()
+                    .toString()
+                    .substring(2, 4)
+            );
+        }
         if (format === 'd.m.') {
             return ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2) + '.';
         }
@@ -71,6 +83,14 @@ export default class Dates {
         }
         let d1 = new Date(d),
             d2 = new Date();
+        d1.setHours(0);
+        d1.setMinutes(0);
+        d1.setSeconds(0);
+        d1.setMilliseconds(0);
+        d2.setHours(0);
+        d2.setMinutes(0);
+        d2.setSeconds(0);
+        d2.setMilliseconds(0);
         return d1 > d2;
     }
 
@@ -89,6 +109,14 @@ export default class Dates {
         }
         let d1 = new Date(d),
             d2 = new Date();
+        d1.setHours(0);
+        d1.setMinutes(0);
+        d1.setSeconds(0);
+        d1.setMilliseconds(0);
+        d2.setHours(0);
+        d2.setMinutes(0);
+        d2.setSeconds(0);
+        d2.setMilliseconds(0);
         return d1 < d2;
     }
 
