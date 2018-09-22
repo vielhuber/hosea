@@ -20,7 +20,11 @@ export default class Scheduler {
                             .split(0)
                             .map(
                                 (item, i) => `
-                            <td class="scheduler__cell${Dates.sameDay(Dates.getDayOfActiveWeek(i + 1), Dates.getCurrentDate()) ? ' scheduler__cell--curday' : ''}">
+                            <td class="
+                                scheduler__cell
+                                ${Dates.sameDay(Dates.getDayOfActiveWeek(i + 1), Dates.getCurrentDate()) ? ' scheduler__cell--curday' : ''}
+                                ${Dates.sameDay(Dates.getDayOfActiveWeek(i + 1), Dates.getActiveDate()) ? ' scheduler__cell--activeday' : ''}
+                            ">
                                 ${Dates.dateFormat(Dates.getDayOfActiveWeek(i + 1), 'D d.m.')}
                             </td>
                         `
@@ -43,6 +47,7 @@ export default class Scheduler {
                                     <td class="
                                         scheduler__cell
                                         ${Dates.sameDay(Dates.getDayOfActiveWeek(i + 1), Dates.getCurrentDate()) ? ' scheduler__cell--curday' : ''}
+                                        ${Dates.sameDay(Dates.getDayOfActiveWeek(i + 1), Dates.getActiveDate()) ? ' scheduler__cell--activeday' : ''}
                                         ${i < 5 && ((j >= 9 && j < 13) || (j >= 14 && j < 18)) ? ' scheduler__cell--main' : ''}
                                     ">
                                     </td>
@@ -91,14 +96,14 @@ export default class Scheduler {
         });
         document.querySelector('.scheduler').addEventListener('click', e => {
             if (e.target.closest('.scheduler__navigation-prev')) {
-                Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() - 7);
+                Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() - 1);
                 Scheduler.initScheduler();
                 e.preventDefault();
             }
         });
         document.querySelector('.scheduler').addEventListener('click', e => {
             if (e.target.closest('.scheduler__navigation-next')) {
-                Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() + 7);
+                Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() + 1);
                 Scheduler.initScheduler();
                 e.preventDefault();
             }
@@ -112,7 +117,7 @@ export default class Scheduler {
                 ticket_dates = tickets__value.date.split('\n'),
                 cur = 0;
 
-            while (ticket_dates[cur] !== undefined) {
+            while (ticket_dates[cur] !== undefined && ticket_dates[cur] != '') {
                 // format: 01.01.18 10:00-11:00
                 if (ticket_dates[cur].length === 20) {
                     let d = Dates.germanToEnglishString(ticket_dates[cur]);

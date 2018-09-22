@@ -5,6 +5,10 @@ export default class Dates {
         return new Date();
     }
 
+    static getActiveDate() {
+        return Store.data.session.activeDay;
+    }
+
     static getDayOfActiveWeek(shift) {
         return Dates.getDayOfWeek(shift, Store.data.session.activeDay);
     }

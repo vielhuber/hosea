@@ -31,6 +31,30 @@ $db->query('TRUNCATE TABLE tickets');
 foreach($backup->docs as $docs__value)
 {
     // migrate tickets
+    if( $docs__value->date != '' )
+    {
+        $date = $docs__value->date;
+        $date = explode("\n", $date);
+        $cur = 0;
+        while(isset($date[$cur]))
+        {
+            $d = date('d.m.y', strtotime($date[$cur]));
+            $t1 = date('H:i', strtotime($date[$cur]));
+            $t2 = date('H:i', strtotime($date[$cur+1]));
+            $cur += 2;
+            $docs__value->date = $d.' '.$t1.'-'.$t2;
+            migrateTicket($docs__value);
+        }
+    }
+    else
+    {
+        migrateTicket($docs__value);
+    }
+}
+
+function migrateTicket($docs__value)
+{
+    global $db;
     $ticket_id = $db->insert('tickets', [
         'status' => $docs__value->status,
         'priority' => $docs__value->priority,
@@ -40,7 +64,6 @@ foreach($backup->docs as $docs__value)
         'description' => $docs__value->description,
         'user_id' => 1
     ]);
-    // migrate attachments
     if( !empty($docs__value->_attachments) )
     {
         foreach($docs__value->_attachments as $attachments__key=>$attachments__value)
