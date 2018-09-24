@@ -2,6 +2,7 @@ import Dates from './Dates';
 import Tickets from './Tickets';
 import Sort from './Sort';
 import Store from './Store';
+import Scheduler from './Scheduler';
 import Textarea from './Textarea';
 
 export default class Filter {
@@ -90,6 +91,10 @@ export default class Filter {
             Filter.doFilter();
             document.querySelector('.metabar').addEventListener('change', e => {
                 if (e.target.closest('.metabar__select--filter')) {
+                    if (e.target.closest('.metabar__select--filter[name="date"]') && e.target.closest('.metabar__select--filter[name="date"]').value !== '*') {
+                        Store.data.session.activeDay = new Date(e.target.closest('.metabar__select--filter[name="date"]').value);
+                        Scheduler.initScheduler();
+                    }
                     Filter.doFilter();
                 }
             });
@@ -150,6 +155,6 @@ export default class Filter {
         });
         Sort.doSort();
         Tickets.updateSum();
-        Textarea.textareaSetVisibleHeights();
+        //Textarea.textareaSetVisibleHeights();
     }
 }

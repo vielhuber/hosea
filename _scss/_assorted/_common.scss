@@ -16,3 +16,7 @@
 @mixin border {
     border: 2rem solid $color-white;
 }
+
+@mixin perf {
+    transform: translateZ(0);
+}

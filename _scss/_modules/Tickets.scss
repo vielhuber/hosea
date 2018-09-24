@@ -24,7 +24,8 @@
 .tickets__textarea {
     width: 100%;
     white-space: nowrap;
-    height: 65rem;
+    height: 16rem;
+    transition: height 0.25s ease-in-out;
     resize: none;
     overflow-x: hidden;
     overflow-y: hidden;

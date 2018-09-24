@@ -1,5 +1,6 @@
 import Store from './Store';
 import Dates from './Dates';
+import Filter from './Filter';
 
 export default class Scheduler {
     static initScheduler() {
@@ -90,20 +91,26 @@ export default class Scheduler {
         document.querySelector('.scheduler').addEventListener('click', e => {
             if (e.target.closest('.scheduler__navigation-today')) {
                 Store.data.session.activeDay = new Date();
+                document.querySelector('.metabar__select--filter[name="date"]').value = Dates.dateFormat(Store.data.session.activeDay, 'Y-m-d');
                 Scheduler.initScheduler();
+                Filter.doFilter();
                 e.preventDefault();
             }
         });
         document.querySelector('.scheduler').addEventListener('click', e => {
             if (e.target.closest('.scheduler__navigation-prev')) {
                 Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() - 1);
+                document.querySelector('.metabar__select--filter[name="date"]').value = Dates.dateFormat(Store.data.session.activeDay, 'Y-m-d');
                 Scheduler.initScheduler();
+                Filter.doFilter();
                 e.preventDefault();
             }
         });
         document.querySelector('.scheduler').addEventListener('click', e => {
             if (e.target.closest('.scheduler__navigation-next')) {
                 Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() + 1);
+                document.querySelector('.metabar__select--filter[name="date"]').value = Dates.dateFormat(Store.data.session.activeDay, 'Y-m-d');
+                Filter.doFilter();
                 Scheduler.initScheduler();
                 e.preventDefault();
             }

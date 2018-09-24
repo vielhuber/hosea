@@ -206,7 +206,7 @@ export default class Tickets {
                             Scheduler.updateColors();
                             Tickets.updateSum();
                             Filter.updateFilter();
-                            Textarea.textareaSetVisibleHeights();
+                            //Textarea.textareaSetVisibleHeights();
                         })
                         .catch(error => {
                             console.error(error);
