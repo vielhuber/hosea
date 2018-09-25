@@ -155,6 +155,6 @@ export default class Filter {
         });
         Sort.doSort();
         Tickets.updateSum();
-        //Textarea.textareaSetVisibleHeights();
+        Textarea.textareaSetVisibleHeights();
     }
 }

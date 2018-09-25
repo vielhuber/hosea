@@ -7,10 +7,7 @@ export default class Helper {
                     prev = false;
                     return false;
                 }
-                if (
-                    selector !== null &&
-                    !htmlElement.classList.contains(selector.replace('.', ''))
-                ) {
+                if (selector !== null && !htmlElement.classList.contains(selector.replace('.', ''))) {
                     return false;
                 }
                 return prev;
@@ -25,10 +22,7 @@ export default class Helper {
                 next = true;
                 return false;
             }
-            if (
-                selector !== null &&
-                !htmlElement.classList.contains(selector.replace('.', ''))
-            ) {
+            if (selector !== null && !htmlElement.classList.contains(selector.replace('.', ''))) {
                 return false;
             }
             return next;
@@ -46,5 +40,23 @@ export default class Helper {
             reader.onload = () => resolve(reader.result.split(',')[1]);
             reader.onerror = error => reject(error);
         });
+    }
+
+    static debounce(func, wait, immediate) {
+        let timeout;
+        return () => {
+            let context = this,
+                args = arguments,
+                later = () => {
+                    timeout = null;
+                    if (!immediate) func.apply(context, args);
+                },
+                callNow = immediate && !timeout;
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+            if (callNow) {
+                func.apply(context, args);
+            }
+        };
     }
 }
