@@ -3,9 +3,9 @@
 }
 
 @mixin input {
-    background-color: $color-black;
+    background-color: transparent;
     color: $color-white;
-    padding: 0 $space-small;
+    padding: 0;
 }
 
 @mixin select {

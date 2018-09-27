@@ -35,7 +35,7 @@ export default class Textarea {
                 if (e.target && e.target.tagName === 'TEXTAREA') {
                     Textarea.textareaSetHeight(e.target);
                 }
-            }, 1000)
+            }, 100)
         );
 
         /*
