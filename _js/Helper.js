@@ -43,20 +43,18 @@ export default class Helper {
     }
 
     static debounce(func, wait, immediate) {
-        let timeout;
-        return () => {
-            let context = this,
-                args = arguments,
-                later = () => {
-                    timeout = null;
-                    if (!immediate) func.apply(context, args);
-                },
-                callNow = immediate && !timeout;
+        var timeout;
+        return function() {
+            var context = this,
+                args = arguments;
+            var later = function() {
+                timeout = null;
+                if (!immediate) func.apply(context, args);
+            };
+            var callNow = immediate && !timeout;
             clearTimeout(timeout);
             timeout = setTimeout(later, wait);
-            if (callNow) {
-                func.apply(context, args);
-            }
+            if (callNow) func.apply(context, args);
         };
     }
 }

@@ -16,17 +16,28 @@ export default class Textarea {
                 );
             });
         */
+
         /*
-        document.addEventListener(
+        document.querySelector('.tickets .tickets__table-body').addEventListener(
             'input',
             Helper.debounce(e => {
-                console.log(e.target);
+                console.log(e);
                 if (e.target && e.target.tagName === 'TEXTAREA') {
                     Textarea.textareaSetHeight(e.target);
                 }
             }, 1000)
         );
         */
+
+        document.querySelector('.tickets .tickets__table-body').addEventListener(
+            'input',
+            Helper.debounce(e => {
+                if (e.target && e.target.tagName === 'TEXTAREA') {
+                    Textarea.textareaSetHeight(e.target);
+                }
+            }, 1000)
+        );
+
         /*
         document
             .querySelector('.tickets .tickets__table-body')
