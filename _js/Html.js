@@ -40,6 +40,26 @@ export default class Html {
         );
         Store.data.cols.forEach(cols__value => {
             document.querySelector('.tickets__table-head tr').insertAdjacentHTML('beforeend', '<td class="tickets__table-cell">' + cols__value + '</td>');
+            if (cols__value === 'date') {
+                document.querySelector('.tickets__table-head tr td:last-child').insertAdjacentHTML(
+                    'beforeend',
+                    `
+                    <span title="supported formats (examples):
+                    
+single
+01.01.18
+01.01.18 09:00-10:00
+
+recurring
+MO
+MO 10:00-11:00
+MO 10:00-11:00 -05.10.18 -12.10.18
+MO#1 10:00-11:00
+01.01.
+01.01. 09:00-10:00">(?)</span>
+                `
+                );
+            }
             document
                 .querySelector('.tickets__table-foot tr')
                 .insertAdjacentHTML('beforeend', '<td class="tickets__table-cell">' + (cols__value == 'time' ? '<span class="tickets__sum"></span>' : '') + '</td>');

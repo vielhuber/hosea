@@ -24,12 +24,13 @@
 .tickets__textarea {
     width: 100%;
     white-space: nowrap;
-    transition: height 0.1s ease-in-out;
+    /*transition: height 1s ease-out;*/
     resize: none;
     overflow-x: hidden;
     overflow-y: hidden;
     height: $space-medium;
     line-height: $space-medium;
+    vertical-align: top; // fixes annoying unknown padding bug
     @include input;
 }
 
@@ -53,13 +54,6 @@
     overflow: hidden;
     padding: 0rem 4rem;
     @include border;
-}
-
-.tickets__table-cell {
-    font-size: 0; /* set font size to 0 to remote unknown padding */
-}
-.tickets__table-cell > * {
-    font-size: $font-size-small; /* reset font size */
 }
 
 .tickets__table-cell:nth-child(1) {
