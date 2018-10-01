@@ -20,6 +20,77 @@ export default class Dates {
         return new Date(d.setDate(diff));
     }
 
+    static parseDateString(string, view) {
+        let d;
+
+        if (view !== 'tickets' && view !== 'scheduler') {
+            return null;
+        }
+
+        // 01.01.18
+        if (string.length === '01.01.18'.length) {
+            d = new Date(string.substring(6, 10) + '-' + str.substring(3, 5) + '-' + str.substring(0, 2));
+            if ((view === 'tickets' && Dates.dateIsActiveDay(d)) || (view === 'scheduler' && Dates.dateIsInActiveWeek(d))) {
+                return {
+                    day: d,
+                    begin: null,
+                    end: null
+                };
+            }
+        }
+
+        // 01.01.18 09:00-10:00
+        if (string.length === '01.01.18 09:00-10:00'.length) {
+            d = new Date(string.substring(6, 10) + '-' + str.substring(3, 5) + '-' + str.substring(0, 2));
+            if ((view === 'tickets' && Dates.dateIsActiveDay(d)) || (view === 'scheduler' && Dates.dateIsInActiveWeek(d))) {
+                return {
+                    day: new Date(string.substring(6, 10) + '-' + str.substring(3, 5) + '-' + str.substring(0, 2)),
+                    begin: parseInt(string.substring(11, 13)) + parseInt(string.substring(14, 16)) / 60,
+                    end: parseInt(string.substring(17, 19)) + parseInt(string.substring(20, 22)) / 60
+                };
+            }
+        }
+
+        // MO
+        if (string.length === 'MO'.length) {
+            d = Dates.getDayFromString(string.substring(0, 2));
+            if (d === 0) {
+                d = 7;
+            }
+            d = Dates.getDayOfActiveWeek(d);
+            if ((view === 'tickets' && Dates.dateIsActiveDay(d) && !Dates.dateIsInPast(d)) || (view === 'scheduler' && Dates.dateIsInActiveWeek(d) && !Dates.dateIsInPast(d))) {
+                return {
+                    day: d,
+                    begin: null,
+                    end: null
+                };
+            }
+        }
+
+        // MO 10:00-11:00
+        if (string.length === 'MO 10:00-11:00'.length) {
+            d = Dates.getDayFromString(string.substring(0, 2));
+            if (d === 0) {
+                d = 7;
+            }
+            d = Dates.getDayOfActiveWeek(d);
+            if ((view === 'tickets' && Dates.dateIsActiveDay(d) && !Dates.dateIsInPast(d)) || (view === 'scheduler' && Dates.dateIsInActiveWeek(d) && !Dates.dateIsInPast(d))) {
+                return {
+                    day: d,
+                    begin: parseInt(string.substring(3, 5)) + parseInt(string.substring(6, 8)) / 60,
+                    end: parseInt(string.substring(9, 11)) + parseInt(string.substring(12, 14)) / 60
+                };
+            }
+        }
+
+        /*
+        MO 10:00-11:00 -05.10.18 -12.10.18
+        MO#1 10:00-11:00
+        01.01.
+        01.01. 09:00-10:00
+        */
+    }
+
     static germanToEnglishString(str) {
         return '20' + str.substring(6, 8) + '-' + str.substring(3, 5) + '-' + str.substring(0, 2);
     }
