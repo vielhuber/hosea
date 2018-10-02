@@ -21,74 +21,95 @@ export default class Dates {
     }
 
     static parseDateString(string, view) {
-        let d;
-
         if (view !== 'tickets' && view !== 'scheduler') {
-            return null;
+            return false;
         }
 
-        // 01.01.18
-        if (string.length === '01.01.18'.length) {
-            d = new Date(string.substring(6, 10) + '-' + str.substring(3, 5) + '-' + str.substring(0, 2));
-            if ((view === 'tickets' && Dates.dateIsActiveDay(d)) || (view === 'scheduler' && Dates.dateIsInActiveWeek(d))) {
-                return {
-                    day: d,
-                    begin: null,
-                    end: null
-                };
+        let ret = [],
+            error = false,
+            d;
+
+        string.split('\n').forEach(string__value => {
+            error = false;
+
+            // 01.01.18
+            if (string__value.length === '01.01.18'.length) {
+                d = new Date('20' + string__value.substring(6, 8) + '-' + string__value.substring(3, 5) + '-' + string__value.substring(0, 2));
+                if ((view === 'tickets' && Dates.dateIsActiveDay(d)) || (view === 'scheduler' && Dates.dateIsInActiveWeek(d))) {
+                    ret.push({
+                        day: d,
+                        begin: null,
+                        end: null
+                    });
+                }
             }
+
+            // 01.01.18 09:00-10:00
+            else if (string__value.length === '01.01.18 09:00-10:00'.length) {
+                d = new Date('20' + string__value.substring(6, 8) + '-' + string__value.substring(3, 5) + '-' + string__value.substring(0, 2));
+                if ((view === 'tickets' && Dates.dateIsActiveDay(d)) || (view === 'scheduler' && Dates.dateIsInActiveWeek(d))) {
+                    ret.push({
+                        day: d,
+                        begin: parseInt(string__value.substring(9, 11)) + parseInt(string__value.substring(12, 14)) / 60,
+                        end: parseInt(string__value.substring(15, 17)) + parseInt(string__value.substring(18, 20)) / 60
+                    });
+                }
+            }
+
+            // MO
+            else if (string__value.length === 'MO'.length) {
+                d = Dates.getDayOfActiveWeek(Dates.getDayFromString(string__value.substring(0, 2)));
+                if ((view === 'tickets' && Dates.dateIsActiveDay(d) && !Dates.dateIsInPast(d)) || (view === 'scheduler' && Dates.dateIsInActiveWeek(d) && !Dates.dateIsInPast(d))) {
+                    ret.push({
+                        day: d,
+                        begin: null,
+                        end: null
+                    });
+                }
+            }
+
+            // MO 10:00-11:00
+            else if (string__value.length === 'MO 10:00-11:00'.length) {
+                d = Dates.getDayOfActiveWeek(Dates.getDayFromString(string__value.substring(0, 2)));
+                if ((view === 'tickets' && Dates.dateIsActiveDay(d) && !Dates.dateIsInPast(d)) || (view === 'scheduler' && Dates.dateIsInActiveWeek(d) && !Dates.dateIsInPast(d))) {
+                    ret.push({
+                        day: d,
+                        begin: parseInt(string__value.substring(3, 5)) + parseInt(string__value.substring(6, 8)) / 60,
+                        end: parseInt(string__value.substring(9, 11)) + parseInt(string__value.substring(12, 14)) / 60
+                    });
+                }
+            }
+
+            // MO 10:00-11:00 -05.10.18 -12.10.18
+            else if (string__value.length > 'MO 10:00-11:00'.length && string__value.split(' -').length > 0) {
+                d = Dates.getDayOfActiveWeek(Dates.getDayFromString(string__value.substring(0, 2)));
+                if (
+                    (view === 'tickets' && Dates.dateIsActiveDay(d) && !Dates.dateIsInPast(d) && !Dates.dateIsExcluded(d, string__value)) ||
+                    (view === 'scheduler' && Dates.dateIsInActiveWeek(d) && !Dates.dateIsInPast(d) && !Dates.dateIsExcluded(d, string__value))
+                ) {
+                    ret.push({
+                        day: d,
+                        begin: parseInt(string__value.substring(3, 5)) + parseInt(string__value.substring(6, 8)) / 60,
+                        end: parseInt(string__value.substring(9, 11)) + parseInt(string__value.substring(12, 14)) / 60
+                    });
+                }
+            } else {
+                error = true;
+                return;
+            }
+
+            /*       
+            MO#1 10:00-11:00
+            01.01.
+            01.01. 09:00-10:00
+            */
+        });
+
+        if (error === true) {
+            return false;
         }
 
-        // 01.01.18 09:00-10:00
-        if (string.length === '01.01.18 09:00-10:00'.length) {
-            d = new Date(string.substring(6, 10) + '-' + str.substring(3, 5) + '-' + str.substring(0, 2));
-            if ((view === 'tickets' && Dates.dateIsActiveDay(d)) || (view === 'scheduler' && Dates.dateIsInActiveWeek(d))) {
-                return {
-                    day: new Date(string.substring(6, 10) + '-' + str.substring(3, 5) + '-' + str.substring(0, 2)),
-                    begin: parseInt(string.substring(11, 13)) + parseInt(string.substring(14, 16)) / 60,
-                    end: parseInt(string.substring(17, 19)) + parseInt(string.substring(20, 22)) / 60
-                };
-            }
-        }
-
-        // MO
-        if (string.length === 'MO'.length) {
-            d = Dates.getDayFromString(string.substring(0, 2));
-            if (d === 0) {
-                d = 7;
-            }
-            d = Dates.getDayOfActiveWeek(d);
-            if ((view === 'tickets' && Dates.dateIsActiveDay(d) && !Dates.dateIsInPast(d)) || (view === 'scheduler' && Dates.dateIsInActiveWeek(d) && !Dates.dateIsInPast(d))) {
-                return {
-                    day: d,
-                    begin: null,
-                    end: null
-                };
-            }
-        }
-
-        // MO 10:00-11:00
-        if (string.length === 'MO 10:00-11:00'.length) {
-            d = Dates.getDayFromString(string.substring(0, 2));
-            if (d === 0) {
-                d = 7;
-            }
-            d = Dates.getDayOfActiveWeek(d);
-            if ((view === 'tickets' && Dates.dateIsActiveDay(d) && !Dates.dateIsInPast(d)) || (view === 'scheduler' && Dates.dateIsInActiveWeek(d) && !Dates.dateIsInPast(d))) {
-                return {
-                    day: d,
-                    begin: parseInt(string.substring(3, 5)) + parseInt(string.substring(6, 8)) / 60,
-                    end: parseInt(string.substring(9, 11)) + parseInt(string.substring(12, 14)) / 60
-                };
-            }
-        }
-
-        /*
-        MO 10:00-11:00 -05.10.18 -12.10.18
-        MO#1 10:00-11:00
-        01.01.
-        01.01. 09:00-10:00
-        */
+        return ret;
     }
 
     static germanToEnglishString(str) {
@@ -150,6 +171,14 @@ export default class Dates {
         }
         d = new Date(d);
         return Dates.sameDay(Dates.getDayOfWeek(1, d), Dates.getDayOfActiveWeek(1));
+    }
+
+    static dateIsActiveDay(d) {
+        if (d === null || d === '') {
+            return false;
+        }
+        d = new Date(d);
+        return Dates.sameDay(d, Dates.getActiveDate());
     }
 
     static dateIsInFuture(d) {
@@ -236,3 +265,6 @@ export default class Dates {
         return ret;
     }
 }
+
+/* debug */
+window.Dates = Dates;

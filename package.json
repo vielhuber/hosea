@@ -11,9 +11,9 @@
         "js": "npm-run-all --sequential js:browserify js:uglify",
         "html": "html-minifier --collapse-whitespace --output ./_public/index.html ./_html/index.html",
         "browsersync": "cross-var browser-sync start --reload-debounce 3000 --proxy \"$npm_package_config_domain\" --files \"./_public/_build/*.css, ./_public/_build/*.js\"",
-        "watch:css": "onchange ./_scss/**/*.scss --initial --wait --delay 1000 --await-write-finish -- onerror \"npm run css --silent\" --title \"watch:scss\" --message \"build failed\" --sound mute",
-        "watch:js": "onchange ./_js/**/*.js --initial --wait --delay 1000 --await-write-finish -- onerror \"npm run js --silent\" --title \"watch:js\" --message \"build failed\" --sound mute",
-        "watch:html": "onchange ./_html/**/*.html --initial --wait --delay 1000 --await-write-finish -- onerror \"npm run html --silent\" --title \"watch:html\" --message \"build failed\" --sound mute",
+        "watch:css": "onchange ./_scss/**/*.scss --initial --wait --delay 200 --await-write-finish -- onerror \"npm run css --silent\" --title \"watch:scss\" --message \"build failed\" --sound mute",
+        "watch:js": "onchange ./_js/**/*.js --initial --wait --delay 200 --await-write-finish -- onerror \"npm run js --silent\" --title \"watch:js\" --message \"build failed\" --sound mute",
+        "watch:html": "onchange ./_html/**/*.html --initial --wait --delay 200 --await-write-finish -- onerror \"npm run html --silent\" --title \"watch:html\" --message \"build failed\" --sound mute",
         "build": "npm-run-all --parallel watch:*",
         "serve": "npm-run-all --parallel watch:* browsersync"
     },
