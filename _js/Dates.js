@@ -33,64 +33,41 @@ export default class Dates {
             error = false;
 
             // 01.01.18
-            if (string__value.length === '01.01.18'.length) {
-                d = new Date('20' + string__value.substring(6, 8) + '-' + string__value.substring(3, 5) + '-' + string__value.substring(0, 2));
-                if ((view === 'tickets' && Dates.dateIsActiveDay(d)) || (view === 'scheduler' && Dates.dateIsInActiveWeek(d))) {
-                    ret.push({
-                        day: d,
-                        begin: null,
-                        end: null
-                    });
-                }
-            }
-
             // 01.01.18 09:00-10:00
-            else if (string__value.length === '01.01.18 09:00-10:00'.length) {
+            if (string__value.substring(2, 3) === '.' && string__value.substring(5, 6) === '.' && string__value.substring(6, 7).trim() != '') {
                 d = new Date('20' + string__value.substring(6, 8) + '-' + string__value.substring(3, 5) + '-' + string__value.substring(0, 2));
                 if ((view === 'tickets' && Dates.dateIsActiveDay(d)) || (view === 'scheduler' && Dates.dateIsInActiveWeek(d))) {
                     ret.push({
                         day: d,
-                        begin: parseInt(string__value.substring(9, 11)) + parseInt(string__value.substring(12, 14)) / 60,
-                        end: parseInt(string__value.substring(15, 17)) + parseInt(string__value.substring(18, 20)) / 60
+                        begin: string__value.length > 8 ? parseInt(string__value.substring(9, 11)) + parseInt(string__value.substring(12, 14)) / 60 : null,
+                        end: string__value.length > 8 ? parseInt(string__value.substring(15, 17)) + parseInt(string__value.substring(18, 20)) / 60 : null
                     });
                 }
             }
 
-            // MO
-            else if (string__value.length === 'MO'.length) {
+            // MO [-05.10.18 -12.10.18]
+            // MO 10:00-11:00 [-05.10.18 -12.10.18]
+            // MO#1 10:00-11:00 [-05.10.18 -12.10.18]
+            else if (['MO', 'DI', 'MI', 'DO', 'FR', 'SA', 'SO'].includes(string__value.substring(0, 2))) {
                 d = Dates.getDayOfActiveWeek(Dates.getDayFromString(string__value.substring(0, 2)));
+                if (Dates.dateIsExcluded(d, string__value)) {
+                    return;
+                }
+                if (string__value.substring(2, 3) === '#' && Math.floor((d.getDay() - 1) / 7) + 1 != string__value.substring(3, 4)) {
+                    return;
+                }
                 if ((view === 'tickets' && Dates.dateIsActiveDay(d) && !Dates.dateIsInPast(d)) || (view === 'scheduler' && Dates.dateIsInActiveWeek(d) && !Dates.dateIsInPast(d))) {
+                    let begin = null,
+                        end = null;
+                    if (string__value.split(':').length === 3) {
+                        let shift = string__value.indexOf(':') - 2;
+                        begin = parseInt(string__value.substring(shift, shift + 2)) + parseInt(string__value.substring(shift + 3, shift + 5)) / 60;
+                        end = parseInt(string__value.substring(shift + 6, shift + 8)) + parseInt(string__value.substring(shift + 9, shift + 11)) / 60;
+                    }
                     ret.push({
                         day: d,
-                        begin: null,
-                        end: null
-                    });
-                }
-            }
-
-            // MO 10:00-11:00
-            else if (string__value.length === 'MO 10:00-11:00'.length) {
-                d = Dates.getDayOfActiveWeek(Dates.getDayFromString(string__value.substring(0, 2)));
-                if ((view === 'tickets' && Dates.dateIsActiveDay(d) && !Dates.dateIsInPast(d)) || (view === 'scheduler' && Dates.dateIsInActiveWeek(d) && !Dates.dateIsInPast(d))) {
-                    ret.push({
-                        day: d,
-                        begin: parseInt(string__value.substring(3, 5)) + parseInt(string__value.substring(6, 8)) / 60,
-                        end: parseInt(string__value.substring(9, 11)) + parseInt(string__value.substring(12, 14)) / 60
-                    });
-                }
-            }
-
-            // MO 10:00-11:00 -05.10.18 -12.10.18
-            else if (string__value.length > 'MO 10:00-11:00'.length && string__value.split(' -').length > 0) {
-                d = Dates.getDayOfActiveWeek(Dates.getDayFromString(string__value.substring(0, 2)));
-                if (
-                    (view === 'tickets' && Dates.dateIsActiveDay(d) && !Dates.dateIsInPast(d) && !Dates.dateIsExcluded(d, string__value)) ||
-                    (view === 'scheduler' && Dates.dateIsInActiveWeek(d) && !Dates.dateIsInPast(d) && !Dates.dateIsExcluded(d, string__value))
-                ) {
-                    ret.push({
-                        day: d,
-                        begin: parseInt(string__value.substring(3, 5)) + parseInt(string__value.substring(6, 8)) / 60,
-                        end: parseInt(string__value.substring(9, 11)) + parseInt(string__value.substring(12, 14)) / 60
+                        begin: begin,
+                        end: end
                     });
                 }
             } else {
@@ -98,10 +75,9 @@ export default class Dates {
                 return;
             }
 
-            /*       
-            MO#1 10:00-11:00
-            01.01.
-            01.01. 09:00-10:00
+            /*           
+            01.01. [-05.10.18 -12.10.18]
+            01.01. 09:00-10:00 [-05.10.18 -12.10.18]
             */
         });
 
