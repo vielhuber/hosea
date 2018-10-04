@@ -124,7 +124,11 @@ export default class Filter {
                             }
                             // format: MO 10:00-11:00 -05.10.18 -12.10.18
                             else {
-                                if (d.getDay() === Dates.getDayFromString(val_target__value.substring(0, 2)) && !Dates.dateIsInPast(d) && !Dates.dateIsExcluded(d, val_target__value)) {
+                                let tmp = Dates.getDayFromString(val_target__value.substring(0, 2));
+                                if (tmp == 7) {
+                                    tmp = 0;
+                                }
+                                if (d.getDay() === tmp && !Dates.dateIsInPast(d) && !Dates.dateIsExcluded(d, val_target__value)) {
                                     visible_this = true;
                                 }
                             }

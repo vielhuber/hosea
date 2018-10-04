@@ -144,9 +144,6 @@ export default class Scheduler {
                 // format: MO 10:00-11:00 -05.10.18 -12.10.18
                 else {
                     let day = Dates.getDayFromString(ticket_dates[cur].substring(0, 2));
-                    if (day === 0) {
-                        day = 7;
-                    }
                     let d = Dates.getDayOfActiveWeek(day),
                         show = true;
                     if (Dates.dateIsInPast(d)) {

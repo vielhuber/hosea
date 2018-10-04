@@ -53,7 +53,7 @@ export default class Dates {
                 if (Dates.dateIsExcluded(d, string__value)) {
                     return;
                 }
-                if (string__value.substring(2, 3) === '#' && Math.floor((d.getDay() - 1) / 7) + 1 != string__value.substring(3, 4)) {
+                if (string__value.substring(2, 3) === '#' && Math.floor((d.getDate() - 1) / 7) + 1 != string__value.substring(3, 4)) {
                     return;
                 }
                 if ((view === 'tickets' && Dates.dateIsActiveDay(d) && !Dates.dateIsInPast(d)) || (view === 'scheduler' && Dates.dateIsInActiveWeek(d) && !Dates.dateIsInPast(d))) {
@@ -70,15 +70,31 @@ export default class Dates {
                         end: end
                     });
                 }
+            }
+
+            // 01.01. [-05.10.18 -12.10.18]
+            // 01.01. 09:00-10:00 [-05.10.18 -12.10.18]
+            else if (string__value.substring(2, 3) === '.' && string__value.substring(5, 6) === '.' && string__value.substring(6, 7).trim() == '') {
+                d = new Date(Dates.getActiveDate().getFullYear() + '-' + string__value.substring(3, 5) + '-' + string__value.substring(0, 2));
+                if (Dates.dateIsExcluded(d, string__value)) {
+                    return;
+                }
+                if ((view === 'tickets' && Dates.dateIsActiveDay(d)) || (view === 'scheduler' && Dates.dateIsInActiveWeek(d))) {
+                    if (string__value.split(':').length === 3) {
+                        let shift = string__value.indexOf(':') - 2;
+                        begin = parseInt(string__value.substring(shift, shift + 2)) + parseInt(string__value.substring(shift + 3, shift + 5)) / 60;
+                        end = parseInt(string__value.substring(shift + 6, shift + 8)) + parseInt(string__value.substring(shift + 9, shift + 11)) / 60;
+                    }
+                    ret.push({
+                        day: d,
+                        begin: begin,
+                        end: end
+                    });
+                }
             } else {
                 error = true;
                 return;
             }
-
-            /*           
-            01.01. [-05.10.18 -12.10.18]
-            01.01. 09:00-10:00 [-05.10.18 -12.10.18]
-            */
         });
 
         if (error === true) {
@@ -222,11 +238,11 @@ export default class Dates {
     }
 
     static getDayFromString(string) {
-        return { SO: 0, MO: 1, DI: 2, MI: 3, DO: 4, FR: 5, SA: 6 }[string];
+        return { MO: 1, DI: 2, MI: 3, DO: 4, FR: 5, SA: 6, SO: 7 }[string];
     }
 
     static getStringFromDay(day) {
-        return { 0: SO, 1: MO, 2: DI, 3: MI, 4: DO, 5: FR, 6: SA }[day];
+        return { 1: MO, 2: DI, 3: MI, 4: DO, 5: FR, 6: SA, 7: SO }[day];
     }
 
     static dateIsExcluded(d, str) {
