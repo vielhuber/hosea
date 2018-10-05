@@ -24,6 +24,9 @@ export default class Dates {
         if (view !== 'tickets' && view !== 'scheduler') {
             return false;
         }
+        if (string == '') {
+            return [];
+        }
 
         let ret = [],
             error = false,
@@ -38,7 +41,8 @@ export default class Dates {
                 d = new Date('20' + string__value.substring(6, 8) + '-' + string__value.substring(3, 5) + '-' + string__value.substring(0, 2));
                 if ((view === 'tickets' && Dates.dateIsActiveDay(d)) || (view === 'scheduler' && Dates.dateIsInActiveWeek(d))) {
                     ret.push({
-                        day: d,
+                        date: d,
+                        day: ((d.getDay() + 6) % 7) + 1,
                         begin: string__value.length > 8 ? parseInt(string__value.substring(9, 11)) + parseInt(string__value.substring(12, 14)) / 60 : null,
                         end: string__value.length > 8 ? parseInt(string__value.substring(15, 17)) + parseInt(string__value.substring(18, 20)) / 60 : null
                     });
@@ -65,7 +69,8 @@ export default class Dates {
                         end = parseInt(string__value.substring(shift + 6, shift + 8)) + parseInt(string__value.substring(shift + 9, shift + 11)) / 60;
                     }
                     ret.push({
-                        day: d,
+                        date: d,
+                        day: ((d.getDay() + 6) % 7) + 1,
                         begin: begin,
                         end: end
                     });
@@ -86,7 +91,8 @@ export default class Dates {
                         end = parseInt(string__value.substring(shift + 6, shift + 8)) + parseInt(string__value.substring(shift + 9, shift + 11)) / 60;
                     }
                     ret.push({
-                        day: d,
+                        date: d,
+                        day: ((d.getDay() + 6) % 7) + 1,
                         begin: begin,
                         end: end
                     });

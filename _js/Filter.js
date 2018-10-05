@@ -37,6 +37,7 @@ export default class Filter {
             `
             );
             if (columns__value === 'date') {
+                document.querySelector('.metabar__select--filter[name="date"]').insertAdjacentHTML('beforeend', '<option value=""></option>');
                 let firstDay = new Date('2018-01-01 00:00:00');
                 let curDay = new Date();
                 curDay.setHours(0);
@@ -113,26 +114,11 @@ export default class Filter {
                         visible_this = false;
 
                     // date
-                    if (el.getAttribute('name') === 'date' && val_search !== '*') {
-                        let d = new Date(val_search);
-                        val_target.split('\n').forEach(val_target__value => {
-                            // format: 01.01.18 10:00-11:00
-                            if (val_target__value.length === 20) {
-                                if (val_target__value.substring(0, 8) === Dates.dateFormat(d, 'd.m.y')) {
-                                    visible_this = true;
-                                }
-                            }
-                            // format: MO 10:00-11:00 -05.10.18 -12.10.18
-                            else {
-                                let tmp = Dates.getDayFromString(val_target__value.substring(0, 2));
-                                if (tmp == 7) {
-                                    tmp = 0;
-                                }
-                                if (d.getDay() === tmp && !Dates.dateIsInPast(d) && !Dates.dateIsExcluded(d, val_target__value)) {
-                                    visible_this = true;
-                                }
-                            }
-                        });
+                    if (el.getAttribute('name') === 'date' && val_search !== '*' && val_search !== '') {
+                        let parsed_values = Dates.parseDateString(val_target, 'tickets');
+                        if (parsed_values !== false && parsed_values.length > 0) {
+                            visible_this = true;
+                        }
                     }
 
                     // all others
