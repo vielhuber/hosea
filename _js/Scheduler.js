@@ -84,13 +84,22 @@ export default class Scheduler {
             </div>
         `;
 
-        Scheduler.generateDates().forEach(date__value => {
+        let generatedDates = Scheduler.generateDates(),
+            generatedDatesUndefinedMax = 0,
+            generatedDatesUndefinedCur = 0;
+        generatedDates.forEach(generatedDates__value => {
+            if (generatedDates__value.begin === null) {
+                generatedDatesUndefinedMax++;
+            }
+        });
+        generatedDates.forEach(date__value => {
             let posLeft = 12.5 * date__value.day,
                 posTop,
                 posBottom;
             if (date__value.begin === null) {
-                posTop = 0;
-                posBottom = 100 - 6.25;
+                posTop = (generatedDatesUndefinedCur / generatedDatesUndefinedMax) * 6.25;
+                posBottom = 100 - ((generatedDatesUndefinedCur + 1) / generatedDatesUndefinedMax) * 6.25;
+                generatedDatesUndefinedCur++;
             } else {
                 posTop = 6.25 * (date__value.begin - 8);
                 posBottom = 100 - 6.25 * (date__value.end - 8);
@@ -163,7 +172,6 @@ export default class Scheduler {
                 });
             }
         });
-        console.log(dates);
         return dates;
     }
 
