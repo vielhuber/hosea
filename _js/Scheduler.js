@@ -13,7 +13,7 @@ export default class Scheduler {
             </div>
 
             <table class="scheduler__table">
-                <tbody class="scheduler__table-body">
+                <thead class="scheduler__table-head">
                     <tr class="scheduler__row">
                         <td class="scheduler__cell"></td>   
                         ${Array(7)
@@ -28,6 +28,24 @@ export default class Scheduler {
                             ">
                                 ${Dates.dateFormat(Dates.getDayOfActiveWeek(i + 1), 'D d.m.')}
                             </td>
+                        `
+                            )
+                            .join('')}
+                    </tr>
+                </thead>
+                <tbody class="scheduler__table-body">
+                    <tr class="scheduler__row">
+                        <td class="scheduler__cell"></td>   
+                        ${Array(7)
+                            .join(0)
+                            .split(0)
+                            .map(
+                                (item, i) => `
+                            <td class="
+                                scheduler__cell
+                                ${Dates.sameDay(Dates.getDayOfActiveWeek(i + 1), Dates.getCurrentDate()) ? ' scheduler__cell--curday' : ''}
+                                ${Dates.sameDay(Dates.getDayOfActiveWeek(i + 1), Dates.getActiveDate()) ? ' scheduler__cell--activeday' : ''}
+                            "></td>
                         `
                             )
                             .join('')}
@@ -67,13 +85,23 @@ export default class Scheduler {
         `;
 
         Scheduler.generateDates().forEach(date__value => {
+            let posLeft = 12.5 * date__value.day,
+                posTop,
+                posBottom;
+            if (date__value.begin === null) {
+                posTop = 0;
+                posBottom = 100 - 6.25;
+            } else {
+                posTop = 6.25 * (date__value.begin - 8);
+                posBottom = 100 - 6.25 * (date__value.end - 8);
+            }
             document.querySelector('.scheduler__appointments').insertAdjacentHTML(
                 'beforeend',
                 `
                 <div class="scheduler__appointment" title="${date__value.title}" style="
-                    left:${12.5 * date__value.day}%;
-                    top:${6.25 * (date__value.begin - 8)}%;
-                    bottom:${100 - 6.25 * (date__value.end - 8)}%;
+                    left:${posLeft}%;
+                    top:${posTop}%;
+                    bottom:${posBottom}%;
                     background-color:${date__value.backgroundColor}80;
                 ">
                     ${date__value.title}
@@ -135,6 +163,7 @@ export default class Scheduler {
                 });
             }
         });
+        console.log(dates);
         return dates;
     }
 
