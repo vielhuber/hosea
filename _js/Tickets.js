@@ -142,7 +142,7 @@ export default class Tickets {
         return new Promise((resolve, reject) => {
             let ticket = {};
             Store.data.cols.forEach(cols__value => {
-                ticket[cols__value] = data[cols__value] || null;
+                ticket[cols__value] = cols__value in data ? data[cols__value] : '';
             });
             Store.data.api
                 .fetch('/_api/tickets', {
@@ -190,16 +190,30 @@ export default class Tickets {
             if (event.ctrlKey || event.metaKey) {
                 if (String.fromCharCode(event.which).toLowerCase() === 'd') {
                     let visibleAll = document.querySelector('.tickets .tickets__table-body').querySelectorAll('.tickets__entry--visible'),
-                        current = visibleAll[visibleAll.length - 1],
-                        currentIndex = 1;
-                    if (document.activeElement.closest('.tickets__entry') !== null) {
-                        (current = document.activeElement.closest('.tickets__entry')), (currentIndex = Helper.prevAll(document.activeElement.closest('td')).length + 1);
+                        current = null,
+                        currentIndex = 1,
+                        duplicateData = {};
+                    if (visibleAll.length > 0) {
+                        if (document.activeElement.closest('.tickets__entry') !== null) {
+                            current = document.activeElement.closest('.tickets__entry');
+                            currentIndex = Helper.prevAll(document.activeElement.closest('td')).length + 1;
+                        } else {
+                            current = visibleAll[visibleAll.length - 1];
+                            currentIndex = 1;
+                        }
+                        duplicateData = Tickets.getTicketData(current.getAttribute('data-id'));
                     }
-                    Tickets.createTicket(Tickets.getTicketData(current.getAttribute('data-id')))
+                    Tickets.createTicket(duplicateData)
                         .then(ticket => {
-                            current.insertAdjacentHTML('afterend', Html.createHtmlLine(ticket, true));
-                            current.nextElementSibling
-                                .querySelector('td:nth-child(' + currentIndex + ')')
+                            let next;
+                            if (current !== null) {
+                                current.insertAdjacentHTML('afterend', Html.createHtmlLine(ticket, true));
+                                next = current.nextElementSibling;
+                            } else {
+                                document.querySelector('.tickets .tickets__table-body').insertAdjacentHTML('beforeend', Html.createHtmlLine(ticket, true));
+                                next = document.querySelector('.tickets .tickets__table-body').querySelector('.tickets__entry--visible');
+                            }
+                            next.querySelector('td:nth-child(' + currentIndex + ')')
                                 .querySelector('input, textarea')
                                 .select();
                             Scheduler.initScheduler();

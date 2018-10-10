@@ -22,3 +22,5 @@ export default class Store {
         };
     }
 }
+
+window.Store = Store;

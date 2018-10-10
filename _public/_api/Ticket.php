@@ -137,7 +137,7 @@ class Ticket extends Api
         {
             $values = [];
             foreach ( $this->colsWithout('id','user_id') as $columns__value ) {
-                if (isset($tickets__value[$columns__value]) && $tickets__value[$columns__value] != '') {
+                if (isset($tickets__value[$columns__value])) {
                     $values[$columns__value] = $tickets__value[$columns__value];
                 }
             }

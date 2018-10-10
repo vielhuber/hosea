@@ -3,19 +3,23 @@
         "domain": "http://hosea-new.local"
     },
     "scripts": {
-        "css:sass": "node-sass --source-map true --output-style compressed ./_scss/style.scss ./_public/_build/bundle.css",
+        "css:sass": "node-sass --output-style compressed ./_scss/style.scss ./_public/_build/bundle.css",
+        "css:sass:dev": "node-sass --source-map true ./_scss/style.scss ./_public/_build/bundle.css",
         "css:autoprefix": "postcss --use autoprefixer --output ./_public/_build/bundle.css ./_public/_build/bundle.css",
         "css": "npm-run-all --sequential css:sass css:autoprefix",
+        "css:dev": "npm-run-all --sequential css:sass:dev",
         "js:browserify": "browserify ./_js/script.js --outfile ./_public/_build/bundle.js --debug --transform babelify --transform vueify",
         "js:uglify": "uglifyjs --compress --mangle --output ./_public/_build/bundle.js ./_public/_build/bundle.js",
         "js": "npm-run-all --sequential js:browserify js:uglify",
+        "js:dev": "npm-run-all --sequential js:browserify",
         "html": "html-minifier --collapse-whitespace --output ./_public/index.html ./_html/index.html",
+        "html:dev": "html-minifier --output ./_public/index.html ./_html/index.html",
         "browsersync": "cross-var browser-sync start --reload-debounce 3000 --proxy \"$npm_package_config_domain\" --files \"./_public/_build/*.css, ./_public/_build/*.js\"",
-        "watch:css": "onchange ./_scss/**/*.scss --initial --wait --delay 200 --await-write-finish -- onerror \"npm run css --silent\" --title \"watch:scss\" --message \"build failed\" --sound mute",
-        "watch:js": "onchange ./_js/**/*.js --initial --wait --delay 200 --await-write-finish -- onerror \"npm run js --silent\" --title \"watch:js\" --message \"build failed\" --sound mute",
-        "watch:html": "onchange ./_html/**/*.html --initial --wait --delay 200 --await-write-finish -- onerror \"npm run html --silent\" --title \"watch:html\" --message \"build failed\" --sound mute",
-        "build": "npm-run-all --parallel watch:*",
-        "serve": "npm-run-all --parallel watch:* browsersync"
+        "watch:css": "onchange ./_scss/**/*.scss --initial --wait --delay 200 --await-write-finish -- onerror \"npm run css:dev --silent\" --title \"watch:css\" --message \"build failed\" --sound mute",
+        "watch:js": "onchange ./_js/**/*.js --initial --wait --delay 200 --await-write-finish -- onerror \"npm run js:dev --silent\" --title \"watch:js\" --message \"build failed\" --sound mute",
+        "watch:html": "onchange ./_html/**/*.html --initial --wait --delay 200 --await-write-finish -- onerror \"npm run html:dev --silent\" --title \"watch:html\" --message \"build failed\" --sound mute",
+        "build": "npm-run-all --parallel html js css",
+        "dev": "npm-run-all --parallel watch:* browsersync"
     },
     "dependencies": {
         "@babel/cli": "^7.0.0",
