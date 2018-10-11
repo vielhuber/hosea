@@ -85,6 +85,8 @@ export default class Dates {
                     return;
                 }
                 if ((view === 'tickets' && Dates.dateIsActiveDay(d)) || (view === 'scheduler' && Dates.dateIsInActiveWeek(d))) {
+                    let begin = null,
+                        end = null;
                     if (string__value.split(':').length === 3) {
                         let shift = string__value.indexOf(':') - 2;
                         begin = parseInt(string__value.substring(shift, shift + 2)) + parseInt(string__value.substring(shift + 3, shift + 5)) / 60;

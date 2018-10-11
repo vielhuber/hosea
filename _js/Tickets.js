@@ -157,6 +157,7 @@ export default class Tickets {
                 })
                 .then(response => {
                     ticket.id = response.data.id;
+                    ticket.visible = true;
                     Store.data.tickets.push(ticket);
                     resolve(ticket);
                 });

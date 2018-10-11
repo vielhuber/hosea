@@ -85,11 +85,17 @@ export default class Scheduler {
         `;
 
         let generatedDates = Scheduler.generateDates(),
-            generatedDatesUndefinedMax = 0,
-            generatedDatesUndefinedCur = 0;
+            generatedDatesUndefinedMax = [],
+            generatedDatesUndefinedCur = [];
         generatedDates.forEach(generatedDates__value => {
             if (generatedDates__value.begin === null) {
-                generatedDatesUndefinedMax++;
+                if (!(generatedDates__value.day in generatedDatesUndefinedMax)) {
+                    generatedDatesUndefinedMax[generatedDates__value.day] = 0;
+                }
+                if (!(generatedDates__value.day in generatedDatesUndefinedCur)) {
+                    generatedDatesUndefinedCur[generatedDates__value.day] = 0;
+                }
+                generatedDatesUndefinedMax[generatedDates__value.day]++;
             }
         });
         generatedDates.forEach(date__value => {
@@ -97,9 +103,9 @@ export default class Scheduler {
                 posTop,
                 posBottom;
             if (date__value.begin === null) {
-                posTop = (generatedDatesUndefinedCur / generatedDatesUndefinedMax) * 6.25;
-                posBottom = 100 - ((generatedDatesUndefinedCur + 1) / generatedDatesUndefinedMax) * 6.25;
-                generatedDatesUndefinedCur++;
+                posTop = (generatedDatesUndefinedCur[date__value.day] / generatedDatesUndefinedMax[date__value.day]) * 6.25;
+                posBottom = 100 - ((generatedDatesUndefinedCur[date__value.day] + 1) / generatedDatesUndefinedMax[date__value.day]) * 6.25;
+                generatedDatesUndefinedCur[date__value.day]++;
             } else {
                 posTop = 6.25 * (date__value.begin - 8);
                 posBottom = 100 - 6.25 * (date__value.end - 8);
