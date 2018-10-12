@@ -49,9 +49,9 @@ export default class Dates {
                 }
             }
 
-            // MO [-05.10.18 -12.10.18]
-            // MO 10:00-11:00 [-05.10.18 -12.10.18]
-            // MO#1 10:00-11:00 [-05.10.18 -12.10.18]
+            // MO [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
+            // MO 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
+            // MO#1 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
             else if (['MO', 'DI', 'MI', 'DO', 'FR', 'SA', 'SO'].includes(string__value.substring(0, 2))) {
                 d = Dates.getDayOfActiveWeek(Dates.getDayFromString(string__value.substring(0, 2)));
                 if (Dates.dateIsExcluded(d, string__value)) {
@@ -60,7 +60,7 @@ export default class Dates {
                 if (string__value.substring(2, 3) === '#' && Math.floor((d.getDate() - 1) / 7) + 1 != string__value.substring(3, 4)) {
                     return;
                 }
-                if ((view === 'tickets' && Dates.dateIsActiveDay(d) && !Dates.dateIsInPast(d)) || (view === 'scheduler' && Dates.dateIsInActiveWeek(d) && !Dates.dateIsInPast(d))) {
+                if ((view === 'tickets' && Dates.dateIsActiveDay(d)) || (view === 'scheduler' && Dates.dateIsInActiveWeek(d))) {
                     let begin = null,
                         end = null;
                     if (string__value.split(':').length === 3) {
@@ -77,8 +77,8 @@ export default class Dates {
                 }
             }
 
-            // 01.01. [-05.10.18 -12.10.18]
-            // 01.01. 09:00-10:00 [-05.10.18 -12.10.18]
+            // 01.01. [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
+            // 01.01. 09:00-10:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
             else if (string__value.substring(2, 3) === '.' && string__value.substring(5, 6) === '.' && string__value.substring(6, 7).trim() == '') {
                 d = new Date(Dates.getActiveDate().getFullYear() + '-' + string__value.substring(3, 5) + '-' + string__value.substring(0, 2));
                 if (Dates.dateIsExcluded(d, string__value)) {
@@ -233,6 +233,28 @@ export default class Dates {
         return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate();
     }
 
+    static compareDates(d1, d2) {
+        if (d1.getFullYear() < d2.getFullYear()) {
+            return -1;
+        }
+        if (d1.getFullYear() > d2.getFullYear()) {
+            return 1;
+        }
+        if (d1.getMonth() < d2.getMonth()) {
+            return -1;
+        }
+        if (d1.getMonth() > d2.getMonth()) {
+            return 1;
+        }
+        if (d1.getDate() < d2.getDate()) {
+            return -1;
+        }
+        if (d1.getDate() > d2.getDate()) {
+            return 1;
+        }
+        return 0;
+    }
+
     static weekNumber(d) {
         d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
         let dayNum = d.getUTCDay() || 7;
@@ -256,8 +278,19 @@ export default class Dates {
     static dateIsExcluded(d, str) {
         let ret = false;
         str.split(' ').forEach(value => {
+            let excludedDate = new Date(Dates.germanToEnglishString(value.substring(1)));
             if (value.indexOf('-') === 0) {
-                if (Dates.sameDay(Dates.germanToEnglishString(value.substring(1)), d)) {
+                if (Dates.sameDay(excludedDate, d)) {
+                    ret = true;
+                }
+            }
+            if (value.indexOf('>') === 0) {
+                if (Dates.compareDates(excludedDate, d) !== -1) {
+                    ret = true;
+                }
+            }
+            if (value.indexOf('<') === 0) {
+                if (Dates.compareDates(excludedDate, d) !== 1) {
                     ret = true;
                 }
             }

@@ -34,6 +34,10 @@
     @include input;
 }
 
+.tickets__textarea:invalid {
+    background-color: red;
+}
+
 .tickets__table-container {
     position: absolute;
     top: calc(#{$space-medium} + #{$bar-height} + #{$space-medium});

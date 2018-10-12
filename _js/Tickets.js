@@ -243,6 +243,19 @@ export default class Tickets {
         });
     }
 
+    static bindValidation() {
+        document.querySelector('.tickets').addEventListener('input', e => {
+            if (e.target.closest('.tickets__textarea--date')) {
+                console.log(Dates.parseDateString(e.target.value, 'tickets'));
+                if (Dates.parseDateString(e.target.value, 'tickets') === false) {
+                    e.target.setCustomValidity('wrong format');
+                } else {
+                    e.target.setCustomValidity('');
+                }
+            }
+        });
+    }
+
     static bindAutoTime() {
         document.querySelector('.tickets').addEventListener('change', e => {
             if (e.target.closest('.tickets__entry [name="date"]')) {

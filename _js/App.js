@@ -20,6 +20,7 @@ export default class App {
         Scheduler.initScheduler();
         Tickets.bindAutoTime();
         Tickets.bindChangeTracking();
+        Tickets.bindValidation();
         Attachments.bindUpload();
         Attachments.bindDownload();
         Attachments.bindDeleteAttachment();

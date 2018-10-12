@@ -51,11 +51,11 @@ single
  01.01.18 09:00-10:00
 
 recurring
- MO [-05.10.18 -12.10.18]
- MO 10:00-11:00 [-05.10.18 -12.10.18]
- MO#1 10:00-11:00 [-05.10.18 -12.10.18]
- 01.01. [-05.10.18 -12.10.18]
- 01.01. 09:00-10:00 [-05.10.18 -12.10.18]">(?)</span>
+ MO [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
+ MO 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
+ MO#1 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
+ 01.01. [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
+ 01.01. 09:00-10:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]">(?)</span>
                 `
                 );
             }
@@ -90,7 +90,9 @@ recurring
         Store.data.cols.forEach(cols__value => {
             html += '<td class="tickets__table-cell">';
             html +=
-                '<textarea class="tickets__textarea" autocorrect="off" autocapitalize="off" spellcheck="false" ' +
+                '<textarea class="tickets__textarea tickets__textarea--' +
+                cols__value +
+                '" autocorrect="off" autocapitalize="off" spellcheck="false" ' +
                 (['date', 'description'].includes(cols__value) ? ' class="autosize"' : '') +
                 ' name="' +
                 cols__value +
