@@ -2,7 +2,6 @@
 /_public/config.json
 /node_modules/
 /_backup/
-/.vscode/
 /.env
 /composer.lock
 /vendor/

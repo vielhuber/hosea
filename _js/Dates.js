@@ -33,12 +33,14 @@ export default class Dates {
             d;
 
         string.split('\n').forEach(string__value => {
-            error = false;
-
             // 01.01.18
             // 01.01.18 09:00-10:00
-            if (string__value.substring(2, 3) === '.' && string__value.substring(5, 6) === '.' && string__value.substring(6, 7).trim() != '') {
+            if (string__value.match(new RegExp('^[0-9][0-9].[0-9][0-9].[1-2][0-9]( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?$'))) {
                 d = new Date('20' + string__value.substring(6, 8) + '-' + string__value.substring(3, 5) + '-' + string__value.substring(0, 2));
+                if (isNaN(d)) {
+                    error = true;
+                    return;
+                }
                 if ((view === 'tickets' && Dates.dateIsActiveDay(d)) || (view === 'scheduler' && Dates.dateIsInActiveWeek(d))) {
                     ret.push({
                         date: d,
@@ -52,8 +54,12 @@ export default class Dates {
             // MO [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
             // MO 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
             // MO#1 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
-            else if (['MO', 'DI', 'MI', 'DO', 'FR', 'SA', 'SO'].includes(string__value.substring(0, 2))) {
+            else if (string__value.match(new RegExp('^(MO|DI|MI|DO|FR|SA|SO)(#[1-5])?( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?( (-|>|<)[0-9][0-9].[0-9][0-9].[1-2][0-9])*$'))) {
                 d = Dates.getDayOfActiveWeek(Dates.getDayFromString(string__value.substring(0, 2)));
+                if (isNaN(d)) {
+                    error = true;
+                    return;
+                }
                 if (Dates.dateIsExcluded(d, string__value)) {
                     return;
                 }
@@ -79,8 +85,12 @@ export default class Dates {
 
             // 01.01. [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
             // 01.01. 09:00-10:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
-            else if (string__value.substring(2, 3) === '.' && string__value.substring(5, 6) === '.' && string__value.substring(6, 7).trim() == '') {
+            else if (string__value.match(new RegExp('^[0-9][0-9].[0-9][0-9].( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?( (-|>|<)[0-9][0-9].[0-9][0-9].[1-2][0-9])*$'))) {
                 d = new Date(Dates.getActiveDate().getFullYear() + '-' + string__value.substring(3, 5) + '-' + string__value.substring(0, 2));
+                if (isNaN(d)) {
+                    error = true;
+                    return;
+                }
                 if (Dates.dateIsExcluded(d, string__value)) {
                     return;
                 }
