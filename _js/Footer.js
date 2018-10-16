@@ -45,7 +45,7 @@ export default class Footer {
                         Footer.updateStatus('saved!');
                     })
                     .catch(error => {
-                        console.error(error);
+                        Footer.updateStatus(error);
                     });
                 e.preventDefault();
             }

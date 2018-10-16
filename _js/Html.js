@@ -40,22 +40,46 @@ export default class Html {
         );
         Store.data.cols.forEach(cols__value => {
             document.querySelector('.tickets__table-head tr').insertAdjacentHTML('beforeend', '<td class="tickets__table-cell">' + cols__value + '</td>');
+            if (cols__value === 'status') {
+                document.querySelector('.tickets__table-head tr td:last-child').insertAdjacentHTML(
+                    'beforeend',
+                    `
+                    <span title="scheduled
+idle
+done
+billed
+recurring
+working">(?)</span>
+                `
+                );
+            }
+            if (cols__value === 'priority') {
+                document.querySelector('.tickets__table-head tr td:last-child').insertAdjacentHTML(
+                    'beforeend',
+                    `
+                    <span title="[A-D]">(?)</span>
+                `
+                );
+            }
+            if (cols__value === 'time') {
+                document.querySelector('.tickets__table-head tr td:last-child').insertAdjacentHTML(
+                    'beforeend',
+                    `
+                    <span title="[0-24]">(?)</span>
+                `
+                );
+            }
             if (cols__value === 'date') {
                 document.querySelector('.tickets__table-head tr td:last-child').insertAdjacentHTML(
                     'beforeend',
                     `
-                    <span title="supported formats (examples):
-                    
-single
- 01.01.18
- 01.01.18 09:00-10:00
-
-recurring
- MO [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
- MO 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
- MO#1 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
- 01.01. [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
- 01.01. 09:00-10:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]">(?)</span>
+                    <span title="01.01.18
+01.01.18 09:00-10:00
+MO [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
+MO 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
+MO#1 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
+01.01. [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
+01.01. 09:00-10:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]">(?)</span>
                 `
                 );
             }

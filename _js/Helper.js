@@ -33,6 +33,10 @@ export default class Helper {
         return obj !== null && typeof obj === 'object';
     }
 
+    static isInteger(value) {
+        return !isNaN(value) && parseInt(Number(value)) == value && !isNaN(parseInt(value, 10));
+    }
+
     static fileToBase64(file) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();

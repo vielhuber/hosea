@@ -11,10 +11,7 @@ export default class Store {
                 done: '#FFC107',
                 billed: '#4CAF50',
                 recurring: '#E91E63',
-                working: '#F44336',
-                windows: '#42A5F5',
-                mac: '#8D6E63',
-                linux: '#9CCC65'
+                working: '#F44336'
             },
             session: {
                 activeDay: new Date()

@@ -6,6 +6,8 @@ import Lock from './Lock';
 import Scheduler from './Scheduler';
 import Store from './Store';
 import Textarea from './Textarea';
+import Footer from './Footer';
+import { isBuffer } from 'util';
 
 export default class Tickets {
     static updateLocalTicket(ticket_id) {
@@ -97,6 +99,11 @@ export default class Tickets {
 
     static saveTickets() {
         return new Promise((resolve, reject) => {
+            if (document.querySelector('.tickets .tickets__table-body').querySelector('.tickets__textarea:invalid') !== null) {
+                reject('not saved - invalid fields!');
+                return;
+            }
+
             let changed = [];
 
             document
@@ -170,14 +177,16 @@ export default class Tickets {
             let focus = document.activeElement;
             if (event.ctrlKey || event.metaKey) {
                 if (String.fromCharCode(event.which).toLowerCase() === 's') {
+                    Footer.updateStatus('saving...');
                     Tickets.saveTickets()
                         .then(() => {
+                            Footer.updateStatus('saved!');
                             if (focus !== null) {
                                 focus.focus();
                             }
                         })
                         .catch(error => {
-                            console.error(error);
+                            Footer.updateStatus(error);
                         });
                     event.preventDefault();
                 }
@@ -245,13 +254,38 @@ export default class Tickets {
 
     static bindValidation() {
         document.querySelector('.tickets').addEventListener('input', e => {
-            if (e.target.closest('.tickets__textarea--date')) {
-                console.log(Dates.parseDateString(e.target.value, 'tickets'));
-                if (Dates.parseDateString(e.target.value, 'tickets') === false) {
-                    e.target.setCustomValidity('wrong format');
-                } else {
-                    e.target.setCustomValidity('');
+            if (e.target.value !== '') {
+                if (e.target.closest('.tickets__textarea--date')) {
+                    if (Dates.parseDateString(e.target.value, 'tickets') === false) {
+                        e.target.setCustomValidity('wrong format');
+                    } else {
+                        e.target.setCustomValidity('');
+                    }
                 }
+                if (e.target.closest('.tickets__textarea--time')) {
+                    // also don't allow "9." despite it is considered as an integer
+                    if (Helper.isInteger(e.target.value) === false || e.target.value.indexOf('.') > -1 || e.target.value < 0 || e.target.value > 24) {
+                        e.target.setCustomValidity('wrong format');
+                    } else {
+                        e.target.setCustomValidity('');
+                    }
+                }
+                if (e.target.closest('.tickets__textarea--priority')) {
+                    if (!['A', 'B', 'C', 'D'].includes(e.target.value)) {
+                        e.target.setCustomValidity('wrong format');
+                    } else {
+                        e.target.setCustomValidity('');
+                    }
+                }
+                if (e.target.closest('.tickets__textarea--status')) {
+                    if (!['scheduled', 'idle', 'done', 'billed', 'recurring', 'working'].includes(e.target.value)) {
+                        e.target.setCustomValidity('wrong format');
+                    } else {
+                        e.target.setCustomValidity('');
+                    }
+                }
+            } else {
+                e.target.setCustomValidity('');
             }
         });
     }
