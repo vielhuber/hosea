@@ -137,7 +137,7 @@ MO#1 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
         html += `
                 </ul>
 
-                <label class="tickets__upload">
+                <label class="tickets__upload" title="_upload">
                     <input class="tickets__upload-input" type="file" name="attachments" multiple="multiple" />
                 </label>
    
@@ -154,7 +154,7 @@ MO#1 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
         return `
             <li class="tickets__attachment" data-id="${attachment.id}">
                 <a class="tickets__attachment-download" href="#" title="${attachment.name}"></a>
-                <a class="tickets__attachment-delete" href="#" title="Löschen"></a>
+                <a class="tickets__attachment-delete" href="#" title="_delete"></a>
             </li>
         `;
     }

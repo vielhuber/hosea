@@ -35,9 +35,9 @@
 }
 
 .tickets__textarea:invalid {
-    background-image: url(../_assets/icon_warning.svg);
+    background-image: url('../_assets/icon_warning.svg');
     background-position: center right;
-    background-size: 10rem;
+    background-size: 13rem;
     background-repeat: no-repeat;
 }
 
@@ -117,37 +117,35 @@
 }
 
 .tickets__attachment-download {
-    background-image: url('../_assets/icon_email.png');
+    background-image: url('../_assets/icon_email.svg');
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
-    background-color: #fff;
     display: inline-block;
-    width: 15rem;
+    width: 14rem;
     height: 15rem;
+    margin-right: 5rem;
     vertical-align: top;
 }
 
 .tickets__attachment-delete {
-    background-image: url('../_assets/icon_delete.png');
+    background-image: url('../_assets/icon_delete.svg');
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
-    background-color: #fff;
     display: inline-block;
-    width: 15rem;
+    width: 13rem;
     height: 15rem;
     vertical-align: top;
 }
 
 .tickets__upload {
-    background-image: url('../_assets/icon_upload.png');
+    background-image: url('../_assets/icon_upload.svg');
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
-    background-color: #fff;
     display: inline-block;
-    width: 15rem;
+    width: 13rem;
     height: 15rem;
     cursor: pointer;
     vertical-align: top;
