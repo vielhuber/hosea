@@ -11,14 +11,8 @@
     @include shadow;
 }
 
-.tickets__table-container::-webkit-scrollbar {
-    width: 2rem;
-}
-.tickets__table-container::-webkit-scrollbar-track {
-    background-color: $color-black;
-}
-.tickets__table-container::-webkit-scrollbar-thumb {
-    background-color: $color-white;
+.tickets__table-container {
+    @include scrollbar;
 }
 
 .tickets__textarea {
@@ -54,6 +48,10 @@
 .tickets__table {
     width: 100%;
     table-layout: fixed;
+}
+
+.tickets__table-tooltip {
+    cursor: help;
 }
 
 .tickets__table-cell {

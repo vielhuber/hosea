@@ -20,8 +20,8 @@
 .metabar__select {
     float: left;
     height: calc(#{$bar-height} / 2);
-    @include select;
     @include input;
+    @include select;
 }
 
 .metabar__select--filter {

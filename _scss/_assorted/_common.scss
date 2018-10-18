@@ -9,7 +9,9 @@
 }
 
 @mixin select {
+    background-color: $color-black;
     appearance: menulist-button;
+    padding: 0 20rem 0 4rem;
     cursor: pointer;
 }
 
@@ -19,6 +21,18 @@
 
 @mixin perf {
     transform: translateZ(0);
+}
+
+@mixin scrollbar {
+    &::-webkit-scrollbar {
+        width: 2rem;
+    }
+    &::-webkit-scrollbar-track {
+        background-color: $color-black;
+    }
+    &::-webkit-scrollbar-thumb {
+        background-color: $color-white;
+    }
 }
 
 @mixin animated-background {

@@ -92,8 +92,9 @@ export default class Filter {
             Filter.doFilter();
             document.querySelector('.metabar').addEventListener('change', e => {
                 if (e.target.closest('.metabar__select--filter')) {
-                    if (e.target.closest('.metabar__select--filter[name="date"]') && e.target.closest('.metabar__select--filter[name="date"]').value !== '*') {
-                        Store.data.session.activeDay = new Date(e.target.closest('.metabar__select--filter[name="date"]').value);
+                    let date = e.target.closest('.metabar__select--filter[name="date"]');
+                    if (date && date.value !== '*' && date.value !== '') {
+                        Store.data.session.activeDay = new Date(date.value);
                         Scheduler.initScheduler();
                     }
                     Filter.doFilter();

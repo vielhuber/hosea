@@ -115,9 +115,7 @@
 }
 
 .scheduler__navigation-week,
-.scheduler__navigation-today,
-.scheduler__navigation-prev,
-.scheduler__navigation-next {
+.scheduler__navigation-button {
     line-height: $bar-height;
     font-size: $font-size-small;
     display: block;
@@ -128,12 +126,19 @@
     float: left;
 }
 
-.scheduler__navigation-today,
-.scheduler__navigation-prev,
-.scheduler__navigation-next {
+.scheduler__navigation-button {
     float: right;
     display: block;
-    padding-left: $space-medium;
+    margin-left: 2rem;
+    padding: 0px 6rem;
+}
+
+.scheduler__navigation-button--next-month {
+    padding-right: 0;
+}
+.scheduler__navigation-button--prev-month {
+    margin-left: 0;
+    padding-left: 0;
 }
 
 .scheduler__navigation-today {

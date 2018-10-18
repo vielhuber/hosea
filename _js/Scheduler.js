@@ -7,9 +7,13 @@ export default class Scheduler {
         document.querySelector('.scheduler').innerHTML = `
             <div class="scheduler__navigation">
                 <span class="scheduler__navigation-week"></span>
-                <a href="#" class="scheduler__navigation-next">_next</a>
-                <a href="#" class="scheduler__navigation-prev">_prev</a>
-                <a href="#" class="scheduler__navigation-today">_today</a>
+                <a href="#" class="scheduler__navigation-button scheduler__navigation-button--next-month" title="_next_month">&gt;&gt;&gt;</a>
+                <a href="#" class="scheduler__navigation-button scheduler__navigation-button--next-week" title="_next_week">&gt;&gt;</a>
+                <a href="#" class="scheduler__navigation-button scheduler__navigation-button--next-day" title="_next_day">&gt;</a>
+                <a href="#" class="scheduler__navigation-button scheduler__navigation-button--today" title="_next_today">_</a>
+                <a href="#" class="scheduler__navigation-button scheduler__navigation-button--prev-day" title="_prev_day">&lt;</a>
+                <a href="#" class="scheduler__navigation-button scheduler__navigation-button--prev-week" title="_prev_week">&lt;&lt;</a>
+                <a href="#" class="scheduler__navigation-button scheduler__navigation-button--prev-month" title="_prev_month">&lt;&lt;&lt;</a>
             </div>
 
             <table class="scheduler__table">
@@ -132,29 +136,31 @@ export default class Scheduler {
 
     static bindScheduler() {
         document.querySelector('.scheduler').addEventListener('click', e => {
-            if (e.target.closest('.scheduler__navigation-today')) {
-                Store.data.session.activeDay = new Date();
+            if (e.target.closest('.scheduler__navigation-button')) {
+                if (e.target.closest('.scheduler__navigation-button--today')) {
+                    Store.data.session.activeDay = new Date();
+                }
+                if (e.target.closest('.scheduler__navigation-button--prev-day')) {
+                    Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() - 1);
+                }
+                if (e.target.closest('.scheduler__navigation-button--next-day')) {
+                    Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() + 1);
+                }
+                if (e.target.closest('.scheduler__navigation-button--prev-week')) {
+                    Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() - 7);
+                }
+                if (e.target.closest('.scheduler__navigation-button--next-week')) {
+                    Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() + 7);
+                }
+                if (e.target.closest('.scheduler__navigation-button--prev-month')) {
+                    Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() - 28);
+                }
+                if (e.target.closest('.scheduler__navigation-button--next-month')) {
+                    Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() + 28);
+                }
                 document.querySelector('.metabar__select--filter[name="date"]').value = Dates.dateFormat(Store.data.session.activeDay, 'Y-m-d');
                 Scheduler.initScheduler();
                 Filter.doFilter();
-                e.preventDefault();
-            }
-        });
-        document.querySelector('.scheduler').addEventListener('click', e => {
-            if (e.target.closest('.scheduler__navigation-prev')) {
-                Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() - 1);
-                document.querySelector('.metabar__select--filter[name="date"]').value = Dates.dateFormat(Store.data.session.activeDay, 'Y-m-d');
-                Scheduler.initScheduler();
-                Filter.doFilter();
-                e.preventDefault();
-            }
-        });
-        document.querySelector('.scheduler').addEventListener('click', e => {
-            if (e.target.closest('.scheduler__navigation-next')) {
-                Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() + 1);
-                document.querySelector('.metabar__select--filter[name="date"]').value = Dates.dateFormat(Store.data.session.activeDay, 'Y-m-d');
-                Filter.doFilter();
-                Scheduler.initScheduler();
                 e.preventDefault();
             }
         });

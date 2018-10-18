@@ -49,7 +49,7 @@ idle
 done
 billed
 recurring
-working">(?)</span>
+working" class="tickets__table-tooltip">(?)</span>
                 `
                 );
             }
@@ -57,7 +57,7 @@ working">(?)</span>
                 document.querySelector('.tickets__table-head tr td:last-child').insertAdjacentHTML(
                     'beforeend',
                     `
-                    <span title="[A-D]">(?)</span>
+                    <span title="[A-D]" class="tickets__table-tooltip">(?)</span>
                 `
                 );
             }
@@ -65,7 +65,7 @@ working">(?)</span>
                 document.querySelector('.tickets__table-head tr td:last-child').insertAdjacentHTML(
                     'beforeend',
                     `
-                    <span title="[0-24]">(?)</span>
+                    <span title="[0-24]" class="tickets__table-tooltip">(?)</span>
                 `
                 );
             }
@@ -79,7 +79,7 @@ MO [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
 MO 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
 MO#1 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
 01.01. [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
-01.01. 09:00-10:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]">(?)</span>
+01.01. 09:00-10:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]" class="tickets__table-tooltip">(?)</span>
                 `
                 );
             }
