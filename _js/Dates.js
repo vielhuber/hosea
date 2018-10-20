@@ -35,7 +35,7 @@ export default class Dates {
         string.split('\n').forEach(string__value => {
             // 01.01.18
             // 01.01.18 09:00-10:00
-            if (string__value.match(new RegExp('^[0-9][0-9].[0-9][0-9].[1-2][0-9]( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?$'))) {
+            if (new RegExp('^[0-9][0-9].[0-9][0-9].[1-2][0-9]( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?$').test(string__value)) {
                 d = new Date('20' + string__value.substring(6, 8) + '-' + string__value.substring(3, 5) + '-' + string__value.substring(0, 2));
                 if (isNaN(d)) {
                     error = true;
@@ -54,7 +54,7 @@ export default class Dates {
             // MO [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
             // MO 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
             // MO#1 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
-            else if (string__value.match(new RegExp('^(MO|DI|MI|DO|FR|SA|SO)(#[1-5])?( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?( (-|>|<)[0-9][0-9].[0-9][0-9].[1-2][0-9])*$'))) {
+            else if (new RegExp('^(MO|DI|MI|DO|FR|SA|SO)(#[1-5])?( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?( (-|>|<)[0-9][0-9].[0-9][0-9].[1-2][0-9])*$').test(string__value)) {
                 d = Dates.getDayOfActiveWeek(Dates.getDayFromString(string__value.substring(0, 2)));
                 if (isNaN(d)) {
                     error = true;
@@ -85,7 +85,7 @@ export default class Dates {
 
             // 01.01. [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
             // 01.01. 09:00-10:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
-            else if (string__value.match(new RegExp('^[0-9][0-9].[0-9][0-9].( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?( (-|>|<)[0-9][0-9].[0-9][0-9].[1-2][0-9])*$'))) {
+            else if (new RegExp('^[0-9][0-9].[0-9][0-9].( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?( (-|>|<)[0-9][0-9].[0-9][0-9].[1-2][0-9])*$').test(string__value)) {
                 d = new Date(Dates.getActiveDate().getFullYear() + '-' + string__value.substring(3, 5) + '-' + string__value.substring(0, 2));
                 if (isNaN(d)) {
                     error = true;
@@ -306,6 +306,14 @@ export default class Dates {
             }
         });
         return ret;
+    }
+
+    static extractTimeFromDate(d) {
+        return '';
+    }
+
+    static includeNewLowerBoundInDate(d, lowerBound) {
+        return d + ' > FICKEN';
     }
 }
 

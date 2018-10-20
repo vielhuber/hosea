@@ -213,6 +213,18 @@ export default class Tickets {
                         }
                         duplicateData = Tickets.getTicketData(current.getAttribute('data-id'));
                     }
+                    /* if source is a recurring ticket, do some magic */
+                    if (current !== null && duplicateData.status === 'recurring') {
+                        let newDate = Dates.dateFormat(Dates.getActiveDate(), 'd.m.y'),
+                            extractedTime = Dates.extractTimeFromDate(duplicateData.date);
+                        if (extractedTime) {
+                            newDate += ' ' + extractedTime;
+                        }
+                        current.querySelector('.tickets__textarea--date').value = Dates.includeNewLowerBoundInDate(duplicateData.date, Dates.getActiveDate());
+                        current.querySelector('.tickets__textarea--date').dispatchEvent(new Event('input', { bubbles: true }));
+                        duplicateData.date = newDate;
+                        duplicateData.status = 'scheduled';
+                    }
                     Tickets.createTicket(duplicateData)
                         .then(ticket => {
                             let next;
@@ -223,9 +235,9 @@ export default class Tickets {
                                 document.querySelector('.tickets .tickets__table-body').insertAdjacentHTML('beforeend', Html.createHtmlLine(ticket, true));
                                 next = document.querySelector('.tickets .tickets__table-body').querySelector('.tickets__entry--visible');
                             }
-                            next.querySelector('td:nth-child(' + currentIndex + ')')
-                                .querySelector('input, textarea')
-                                .select();
+                            let input = next.querySelector('td:nth-child(' + currentIndex + ')').querySelector('input, textarea');
+                            input.select();
+                            input.dispatchEvent(new Event('input', { bubbles: true }));
                             Scheduler.initScheduler();
                             Scheduler.updateColors();
                             Tickets.updateSum();
