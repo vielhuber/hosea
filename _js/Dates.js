@@ -309,11 +309,32 @@ export default class Dates {
     }
 
     static extractTimeFromDate(d) {
+        let match = d.match(new RegExp('[0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9]'));
+        if (match !== null) {
+            return match[0];
+        }
         return '';
     }
 
     static includeNewLowerBoundInDate(d, lowerBound) {
-        return d + ' > FICKEN';
+        let match = d.match(new RegExp('>[0-9][0-9].[0-9][0-9].[1-2][0-9]', 'g')),
+            isObsolete = false;
+        if (match !== null) {
+            match.forEach(match__value => {
+                let curBound = new Date(Dates.germanToEnglishString(match__value.substring(1)));
+                if (Dates.compareDates(lowerBound, curBound) === 1) {
+                    d = d.split(match__value).join('');
+                } else {
+                    isObsolete = true;
+                }
+            });
+        }
+        d = d.replace(/ +(?= )/g, ''); // remove double whitespaces
+        d = d.trim();
+        if (isObsolete === false) {
+            d = d + ' >' + Dates.dateFormat(Dates.getActiveDate(), 'd.m.y');
+        }
+        return d;
     }
 }
 
