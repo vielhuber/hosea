@@ -6,7 +6,6 @@
     color: $color-white;
     background-color: $color-black;
     position: absolute;
-    font-size: $font-size-small;
     @include border;
     @include shadow;
 }
@@ -151,4 +150,16 @@
 
 .tickets__upload-input {
     display: none;
+}
+
+@media screen and (max-width: $breakpoint-medium) {
+    .tickets {
+        width: 100%;
+        bottom: auto;
+        right: auto;
+        top: 0;
+        left: 0;
+        position: relative;
+        height: calc((100vh - #{$bar-height}) / 2);
+    }
 }

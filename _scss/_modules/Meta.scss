@@ -4,7 +4,6 @@
     left: $space-medium;
     right: $space-medium;
     height: $bar-height;
-    font-size: $font-size-small;
 }
 
 .metabar__filter,
@@ -39,4 +38,20 @@
 
 .metabar__sort {
     float: right;
+}
+
+@media screen and (max-width: $breakpoint-medium) {
+    .metabar__filter {
+        width: 100%;
+    }
+    .metabar__sort {
+        display: none;
+    }
+    .metabar__select {
+        width: 21.25%;
+        margin-right: 5%;
+    }
+    .metabar__select:last-child {
+        margin-right: 0;
+    }
 }

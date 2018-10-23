@@ -8,6 +8,7 @@ html,
 body {
     width: 100%;
     background-color: $color-white;
+    overflow: hidden;
 }
 
 html {
@@ -22,8 +23,6 @@ html {
 
 body {
     height: 100%;
-    overflow-y: hidden;
-    overflow-x: hidden;
 }
 
 /* iphone/ipad prevent overflow-x */

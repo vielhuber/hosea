@@ -51,3 +51,15 @@
         }
     }
 }
+
+@mixin responsive-big {
+    @media screen and (max-width: $breakpoint-big) {
+        @content;
+    }
+}
+
+@mixin responsive-small {
+    @media screen and (max-width: $breakpoint-small) {
+        @content;
+    }
+}

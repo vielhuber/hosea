@@ -6,7 +6,6 @@
     position: absolute;
     background-color: $color-black;
     color: $color-white;
-    font-size: $font-size-small;
     overflow: hidden;
     @include border;
     @include shadow;
@@ -103,7 +102,7 @@
     position: absolute;
     width: calc(12.5% - 4rem);
     padding: 1rem 3rem;
-    font-size: 7rem;
+    font-size: $font-size-small;
     line-height: 8rem;
     text-align: left;
     overflow: hidden;
@@ -117,7 +116,6 @@
 .scheduler__navigation-week,
 .scheduler__navigation-button {
     line-height: $bar-height;
-    font-size: $font-size-small;
     display: block;
 }
 
@@ -143,4 +141,16 @@
 
 .scheduler__navigation-today {
     padding-left: 0;
+}
+
+@media screen and (max-width: $breakpoint-medium) {
+    .scheduler {
+        width: 100%;
+        bottom: auto;
+        right: auto;
+        top: 0;
+        left: 0;
+        position: relative;
+        height: calc((100vh - #{$bar-height}) / 2);
+    }
 }
