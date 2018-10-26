@@ -1,10 +1,32 @@
-html.jwtbutler-login-form-visible .login-form {
-    position: fixed;
-    top: $space-big;
-    left: $space-big;
-    bottom: $space-big;
-    right: $space-big;
-    background-color: $color-greylight;
-    border: 7rem solid $color-greydark;
-    z-index: 2147483638;
+html.jwtbutler-login-form-visible {
+    .login-form {
+        font-size: $font-size-big;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        width: auto;
+        height: auto;
+        padding: $space-medium;
+        transform: translateY(-50%) translateX(-50%);
+        background-color: $color-greylight;
+        z-index: 2147483638;
+        @include border;
+        @include shadow;
+    }
+
+    .login-form__label {
+        display: none;
+    }
+
+    .login-form__input {
+        width: 200rem;
+        margin-bottom: $space-small;
+    }
+
+    .login-form__submit {
+        width: 100%;
+        background-color: $color-black;
+        color: $color-white;
+        cursor: pointer;
+    }
 }
