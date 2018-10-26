@@ -13,7 +13,7 @@ export default class Tickets {
     static updateLocalTicket(ticket_id) {
         return new Promise((resolve, reject) => {
             Store.data.api
-                .fetch('/_api/tickets/' + ticket_id, {
+                .fetch('_api/tickets/' + ticket_id, {
                     method: 'GET',
                     cache: 'no-cache',
                     headers: { 'content-type': 'application/json' }
@@ -44,7 +44,7 @@ export default class Tickets {
     static fetchTickets() {
         return new Promise((resolve, reject) => {
             Store.data.api
-                .fetch('/_api/tickets', {
+                .fetch('_api/tickets', {
                     method: 'GET',
                     cache: 'no-cache',
                     headers: { 'content-type': 'application/json' }
@@ -77,7 +77,7 @@ export default class Tickets {
     static deleteTicket(ticket_id) {
         return new Promise((resolve, reject) => {
             Store.data.api
-                .fetch('/_api/tickets/' + ticket_id, {
+                .fetch('_api/tickets/' + ticket_id, {
                     method: 'DELETE',
                     cache: 'no-cache',
                     headers: { 'content-type': 'application/json' }
@@ -120,7 +120,7 @@ export default class Tickets {
                 });
 
             Store.data.api
-                .fetch('/_api/tickets', {
+                .fetch('_api/tickets', {
                     method: 'PUT',
                     body: JSON.stringify({
                         tickets: changed
@@ -152,7 +152,7 @@ export default class Tickets {
                 ticket[cols__value] = cols__value in data ? data[cols__value] : '';
             });
             Store.data.api
-                .fetch('/_api/tickets', {
+                .fetch('_api/tickets', {
                     method: 'POST',
                     body: JSON.stringify(ticket),
                     cache: 'no-cache',

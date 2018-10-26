@@ -8,11 +8,7 @@ export default class Attachments {
     static bindDownload() {
         document.querySelector('.tickets').addEventListener('click', e => {
             if (e.target.closest('.tickets__attachment-download')) {
-                Attachments.startDownload(
-                    e.target
-                        .closest('.tickets__attachment')
-                        .getAttribute('data-id')
-                );
+                Attachments.startDownload(e.target.closest('.tickets__attachment').getAttribute('data-id'));
                 e.preventDefault();
             }
         });
@@ -20,7 +16,7 @@ export default class Attachments {
 
     static startDownload(attachment_id) {
         Store.data.api
-            .fetch('/_api/attachments/' + attachment_id, {
+            .fetch('_api/attachments/' + attachment_id, {
                 method: 'GET',
                 cache: 'no-cache',
                 headers: { 'content-type': 'application/json' }
@@ -47,22 +43,14 @@ export default class Attachments {
     static bindUpload() {
         document.querySelector('.tickets').addEventListener('change', e => {
             if (e.target.closest('.tickets__entry input[type="file"]')) {
-                Attachments.startUploads(
-                    e.target.closest('.tickets__entry').getAttribute('data-id'),
-                    e.target.files
-                )
+                Attachments.startUploads(e.target.closest('.tickets__entry').getAttribute('data-id'), e.target.files)
                     .then(attachments => {
                         e.target.value = '';
                         attachments.forEach(attachments__value => {
                             e.target
                                 .closest('.tickets__entry')
                                 .querySelector('.tickets__attachments')
-                                .insertAdjacentHTML(
-                                    'beforeend',
-                                    Html.createHtmlDownloadLine(
-                                        attachments__value
-                                    )
-                                );
+                                .insertAdjacentHTML('beforeend', Html.createHtmlDownloadLine(attachments__value));
                         });
                     })
                     .catch(error => {
@@ -77,10 +65,7 @@ export default class Attachments {
 
         for (let files__value of Array.from(files)) {
             Lock.lockTicket(ticket_id);
-            let attachment = await Attachments.startUpload(
-                ticket_id,
-                files__value
-            );
+            let attachment = await Attachments.startUpload(ticket_id, files__value);
             Lock.unlockTicket(ticket_id, true);
             attachments.push(attachment);
         }
@@ -95,7 +80,7 @@ export default class Attachments {
         return new Promise((resolve, reject) => {
             Helper.fileToBase64(file).then(base64 => {
                 Store.data.api
-                    .fetch('/_api/attachments', {
+                    .fetch('_api/attachments', {
                         method: 'POST',
                         body: JSON.stringify({
                             name: file.name,
@@ -119,20 +104,12 @@ export default class Attachments {
     static bindDeleteAttachment() {
         document.querySelector('.tickets').addEventListener('click', e => {
             if (e.target.closest('.tickets__attachment-delete')) {
-                if (
-                    Lock.ticketIsLocked(
-                        e.target
-                            .closest('.tickets__entry')
-                            .getAttribute('data-id')
-                    )
-                ) {
+                if (Lock.ticketIsLocked(e.target.closest('.tickets__entry').getAttribute('data-id'))) {
                     e.preventDefault();
                 }
-                let attachment_id = e.target
-                    .closest('.tickets__attachment')
-                    .getAttribute('data-id');
+                let attachment_id = e.target.closest('.tickets__attachment').getAttribute('data-id');
                 Store.data.api
-                    .fetch('/_api/attachments/' + attachment_id, {
+                    .fetch('_api/attachments/' + attachment_id, {
                         method: 'DELETE',
                         cache: 'no-cache',
                         headers: { 'content-type': 'application/json' }

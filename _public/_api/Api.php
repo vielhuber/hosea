@@ -72,7 +72,7 @@ class Api
     protected function getRequestPath()
     {
         $path = $_SERVER['REQUEST_URI'];
-        $path = str_replace('_api', '', $path);
+        $path = substr($path, strpos($path,'_api')+strlen('_api'));
         $path = trim($path, '/');
         return $path;
     }
