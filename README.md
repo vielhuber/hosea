@@ -23,6 +23,6 @@ hosea is a personal assistant.
 -   if you want some test data, also run `php seed`
 -   point a vhost to the `_public` folder
 -   if you want to have the application run inside a subfolder of an existing domain
-   -   deploy the app outside of the root folder (e.g. `/var/hosea`)
-   -   create a symlink (`ln -s /var/hosea /var/www/hosea`)
+    -   deploy the app outside of the root folder (e.g. `/var/hosea`)
+    -   create a symlink (`ln -s /var/hosea /var/www/hosea`)
 -   open up the url and have fun
