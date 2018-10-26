@@ -161,5 +161,25 @@
         left: 0;
         position: relative;
         height: calc((100vh - #{$bar-height}) / 2);
+        border-bottom: 0;
+    }
+    .tickets__table-tooltip {
+        display: none;
+    }
+    .tickets__table-cell:nth-child(1) {
+        width: 80rem;
+    }
+    .tickets__table-cell:nth-child(3) {
+        width: 120rem;
+    }
+    .tickets__table-cell:nth-child(5) {
+        width: 90rem;
+    }
+
+    .tickets__table-cell:nth-child(2),
+    .tickets__table-cell:nth-child(4),
+    .tickets__table-cell:nth-child(7),
+    .tickets__table-cell:nth-child(8) {
+        display: none;
     }
 }

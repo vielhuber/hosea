@@ -14,9 +14,24 @@
     border-right-width: 0;
     border-bottom-width: 0;
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: 0.1fr 0.1fr 1fr 0.2fr;
     grid-template-rows: 1fr;
 }
 .footer__status {
     text-align: center;
+}
+.footer__logout {
+    text-align: right;
+}
+
+@media screen and (max-width: $breakpoint-medium) {
+    .footer {
+        padding: 0 $space-small;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
+    .footer__save,
+    .footer__create,
+    .footer__logout {
+        text-align: center;
+    }
 }

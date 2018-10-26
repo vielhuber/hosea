@@ -51,6 +51,14 @@ export default class Footer {
             }
         });
     }
+    static bindCreate() {
+        document.querySelector('.footer').addEventListener('click', e => {
+            if (e.target.closest('.footer__create')) {
+                Tickets.prepareCreation();
+                e.preventDefault();
+            }
+        });
+    }
     static bindLogout() {
         document.querySelector('.footer').addEventListener('click', e => {
             if (e.target.closest('.footer__logout')) {

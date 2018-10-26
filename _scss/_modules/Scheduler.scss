@@ -152,5 +152,6 @@
         left: 0;
         position: relative;
         height: calc((100vh - #{$bar-height}) / 2);
+        border-bottom: 0;
     }
 }

@@ -199,58 +199,62 @@ export default class Tickets {
         document.addEventListener('keydown', event => {
             if (event.ctrlKey || event.metaKey) {
                 if (String.fromCharCode(event.which).toLowerCase() === 'd') {
-                    let visibleAll = document.querySelector('.tickets .tickets__table-body').querySelectorAll('.tickets__entry--visible'),
-                        current = null,
-                        currentIndex = 1,
-                        duplicateData = {};
-                    if (visibleAll.length > 0) {
-                        if (document.activeElement.closest('.tickets__entry') !== null) {
-                            current = document.activeElement.closest('.tickets__entry');
-                            currentIndex = Helper.prevAll(document.activeElement.closest('td')).length + 1;
-                        } else {
-                            current = visibleAll[visibleAll.length - 1];
-                            currentIndex = 1;
-                        }
-                        duplicateData = Tickets.getTicketData(current.getAttribute('data-id'));
-                    }
-                    /* if source is a recurring ticket, do some magic */
-                    if (current !== null && duplicateData.status === 'recurring') {
-                        let newDate = Dates.dateFormat(Dates.getActiveDate(), 'd.m.y'),
-                            extractedTime = Dates.extractTimeFromDate(duplicateData.date);
-                        if (extractedTime) {
-                            newDate += ' ' + extractedTime;
-                        }
-                        current.querySelector('.tickets__textarea--date').value = Dates.includeNewLowerBoundInDate(duplicateData.date, Dates.getActiveDate());
-                        current.querySelector('.tickets__textarea--date').dispatchEvent(new Event('input', { bubbles: true }));
-                        duplicateData.date = newDate;
-                        duplicateData.status = 'scheduled';
-                    }
-                    Tickets.createTicket(duplicateData)
-                        .then(ticket => {
-                            let next;
-                            if (current !== null) {
-                                current.insertAdjacentHTML('afterend', Html.createHtmlLine(ticket, true));
-                                next = current.nextElementSibling;
-                            } else {
-                                document.querySelector('.tickets .tickets__table-body').insertAdjacentHTML('beforeend', Html.createHtmlLine(ticket, true));
-                                next = document.querySelector('.tickets .tickets__table-body').querySelector('.tickets__entry--visible');
-                            }
-                            let input = next.querySelector('td:nth-child(' + currentIndex + ')').querySelector('input, textarea');
-                            input.select();
-                            input.dispatchEvent(new Event('input', { bubbles: true }));
-                            Scheduler.initScheduler();
-                            Scheduler.updateColors();
-                            Tickets.updateSum();
-                            Filter.updateFilter();
-                            Textarea.textareaSetVisibleHeights();
-                        })
-                        .catch(error => {
-                            console.error(error);
-                        });
+                    Tickets.prepareCreation();
                     event.preventDefault();
                 }
             }
         });
+    }
+
+    static prepareCreation() {
+        let visibleAll = document.querySelector('.tickets .tickets__table-body').querySelectorAll('.tickets__entry--visible'),
+            current = null,
+            currentIndex = 1,
+            duplicateData = {};
+        if (visibleAll.length > 0) {
+            if (document.activeElement.closest('.tickets__entry') !== null) {
+                current = document.activeElement.closest('.tickets__entry');
+                currentIndex = Helper.prevAll(document.activeElement.closest('td')).length + 1;
+            } else {
+                current = visibleAll[visibleAll.length - 1];
+                currentIndex = 1;
+            }
+            duplicateData = Tickets.getTicketData(current.getAttribute('data-id'));
+        }
+        /* if source is a recurring ticket, do some magic */
+        if (current !== null && duplicateData.status === 'recurring') {
+            let newDate = Dates.dateFormat(Dates.getActiveDate(), 'd.m.y'),
+                extractedTime = Dates.extractTimeFromDate(duplicateData.date);
+            if (extractedTime) {
+                newDate += ' ' + extractedTime;
+            }
+            current.querySelector('.tickets__textarea--date').value = Dates.includeNewLowerBoundInDate(duplicateData.date, Dates.getActiveDate());
+            current.querySelector('.tickets__textarea--date').dispatchEvent(new Event('input', { bubbles: true }));
+            duplicateData.date = newDate;
+            duplicateData.status = 'scheduled';
+        }
+        Tickets.createTicket(duplicateData)
+            .then(ticket => {
+                let next;
+                if (current !== null) {
+                    current.insertAdjacentHTML('afterend', Html.createHtmlLine(ticket, true));
+                    next = current.nextElementSibling;
+                } else {
+                    document.querySelector('.tickets .tickets__table-body').insertAdjacentHTML('beforeend', Html.createHtmlLine(ticket, true));
+                    next = document.querySelector('.tickets .tickets__table-body').querySelector('.tickets__entry--visible');
+                }
+                let input = next.querySelector('td:nth-child(' + currentIndex + ')').querySelector('input, textarea');
+                input.select();
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+                Scheduler.initScheduler();
+                Scheduler.updateColors();
+                Tickets.updateSum();
+                Filter.updateFilter();
+                Textarea.textareaSetVisibleHeights();
+            })
+            .catch(error => {
+                console.error(error);
+            });
     }
 
     static bindChangeTracking() {
@@ -275,8 +279,7 @@ export default class Tickets {
                     }
                 }
                 if (e.target.closest('.tickets__textarea--time')) {
-                    // also don't allow "9." despite it is considered as an integer
-                    if (Helper.isInteger(e.target.value) === false || e.target.value.indexOf('.') > -1 || e.target.value < 0 || e.target.value > 24) {
+                    if (!new RegExp('^[0-9]+,[0-9]+$').test(e.target.value) || e.target.value < 0 || e.target.value > 24) {
                         e.target.setCustomValidity('wrong format');
                     } else {
                         e.target.setCustomValidity('');

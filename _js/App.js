@@ -27,6 +27,7 @@ export default class App {
         Tickets.bindDelete();
         Tickets.bindSave();
         Footer.bindSave();
+        Footer.bindCreate();
         Footer.bindLogout();
         Footer.initStatus();
         Keyboard.bindRefresh();
