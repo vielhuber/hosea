@@ -8,8 +8,8 @@
 
 .metabar__filter,
 .metabar__sort {
-    padding-top: calc(#{$bar-height} / 4);
-    line-height: calc(#{$bar-height} / 4);
+    /*padding-top: calc(#{$bar-height} / 4);*/
+    line-height: $bar-height;
 }
 
 .metabar__filter {
@@ -18,7 +18,7 @@
 
 .metabar__select {
     float: left;
-    height: calc(#{$bar-height} / 2);
+    height: $bar-height;
     @include input;
     @include select;
 }
@@ -40,7 +40,7 @@
     float: right;
 }
 
-@media screen and (max-width: $breakpoint-medium) {
+@include responsive-medium {
     .metabar__filter {
         width: 100%;
     }

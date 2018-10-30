@@ -58,7 +58,7 @@
 .scheduler__cell {
     width: 12.5%;
     height: 100%;
-    padding: $space-small;
+    padding: 0 $space-small;
     float: left;
     /*border: 1rem solid #292929;*/
     box-shadow: 0px 0px 0px 1px #292929;
@@ -143,15 +143,17 @@
     padding-left: 0;
 }
 
-@media screen and (max-width: $breakpoint-medium) {
+@include responsive-medium {
     .scheduler {
         width: 100%;
         bottom: auto;
         right: auto;
         top: 0;
         left: 0;
-        position: relative;
         height: calc((100vh - #{$bar-height}) / 2);
         border-bottom: 0;
+    }
+    .scheduler__navigation-button {
+        padding: 0px 10rem;
     }
 }

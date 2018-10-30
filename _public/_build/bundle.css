@@ -64,12 +64,12 @@ inspired by https://zellwk.com/blog/viewport-based-typography/
 */
 /* 0px-320px: 1rem = 0.4px */
 html {
-  font-size: 0.8px; }
+  font-size: 0.95px; }
 
 /* 320px-1920px: 0.4px < 1rem < 1px */
 @media (min-width: 600px) {
   html {
-    font-size: calc(0.8px + 0.2 * (100vw - 600px) / 1320); } }
+    font-size: calc(0.95px + 0.05 * (100vw - 600px) / 1320); } }
 
 /* 1920px-above: 1rem = 1px */
 @media (min-width: 1920px) {
@@ -211,6 +211,11 @@ textarea {
     background-position: 100% 50%; }
   100% {
     background-position: 0% 50%; } }
+  @media screen and (max-width: 700px) {
+    #app {
+      animation: none;
+      background: none;
+      background-color: #e91e63; } }
 
 .tickets {
   width: calc(66.66% - 2 * 40rem);
@@ -222,6 +227,9 @@ textarea {
   position: absolute;
   border: 2rem solid #ffffff;
   box-shadow: 0rem 30rem 80rem 0rem rgba(0, 0, 0, 0.5); }
+  @media screen and (max-width: 700px) {
+    .tickets {
+      border-width: 1rem; } }
 
 .tickets__table-container::-webkit-scrollbar {
   width: 2rem; }
@@ -273,6 +281,9 @@ textarea {
   overflow: hidden;
   padding: 0rem 4rem;
   border: 2rem solid #ffffff; }
+  @media screen and (max-width: 700px) {
+    .tickets__table-cell {
+      border-width: 1rem; } }
 
 .tickets__table-cell:nth-child(1) {
   width: 7%; }
@@ -354,9 +365,8 @@ textarea {
     width: 100%;
     bottom: auto;
     right: auto;
-    top: 0;
+    top: calc((100vh - 25rem) / 2);
     left: 0;
-    position: relative;
     height: calc((100vh - 25rem) / 2);
     border-bottom: 0; }
   .tickets__table-tooltip {
@@ -382,15 +392,15 @@ textarea {
 
 .metabar__filter,
 .metabar__sort {
-  padding-top: calc(25rem / 4);
-  line-height: calc(25rem / 4); }
+  /*padding-top: calc(25rem / 4);*/
+  line-height: 25rem; }
 
 .metabar__filter {
   float: left; }
 
 .metabar__select {
   float: left;
-  height: calc(25rem / 2);
+  height: 25rem;
   background-color: transparent;
   color: #ffffff;
   padding: 0;
@@ -398,6 +408,10 @@ textarea {
   appearance: menulist-button;
   padding: 0 20rem 0 4rem;
   cursor: pointer; }
+  @media screen and (max-width: 700px) {
+    .metabar__select {
+      padding-left: 10rem;
+      padding-right: 10rem; } }
 
 .metabar__select--filter {
   margin-right: 5rem; }
@@ -436,6 +450,9 @@ html.jwtbutler-login-form-visible .login-form {
   z-index: 2147483638;
   border: 2rem solid #ffffff;
   box-shadow: 0rem 30rem 80rem 0rem rgba(0, 0, 0, 0.5); }
+  @media screen and (max-width: 700px) {
+    html.jwtbutler-login-form-visible .login-form {
+      border-width: 1rem; } }
 
 html.jwtbutler-login-form-visible .login-form__label {
   display: none; }
@@ -461,6 +478,9 @@ html.jwtbutler-login-form-visible .login-form__submit {
   overflow: hidden;
   border: 2rem solid #ffffff;
   box-shadow: 0rem 30rem 80rem 0rem rgba(0, 0, 0, 0.5); }
+  @media screen and (max-width: 700px) {
+    .scheduler {
+      border-width: 1rem; } }
 
 .scheduler__navigation {
   position: absolute;
@@ -503,7 +523,7 @@ html.jwtbutler-login-form-visible .login-form__submit {
 .scheduler__cell {
   width: 12.5%;
   height: 100%;
-  padding: 5rem;
+  padding: 0 5rem;
   float: left;
   /*border: 1rem solid #292929;*/
   box-shadow: 0px 0px 0px 1px #292929; }
@@ -534,6 +554,11 @@ html.jwtbutler-login-form-visible .login-form__submit {
     background-position: 100% 50%; }
   100% {
     background-position: 0% 50%; } }
+  @media screen and (max-width: 700px) {
+    .scheduler__cell--activeday {
+      animation: none;
+      background: none;
+      background-color: #e91e63; } }
 
 .scheduler__cell--activeday.scheduler__cell--main {
   background-color: #e8e8e8; }
@@ -591,9 +616,10 @@ html.jwtbutler-login-form-visible .login-form__submit {
     right: auto;
     top: 0;
     left: 0;
-    position: relative;
     height: calc((100vh - 25rem) / 2);
-    border-bottom: 0; } }
+    border-bottom: 0; }
+  .scheduler__navigation-button {
+    padding: 0px 10rem; } }
 
 .footer {
   position: absolute;
@@ -613,6 +639,9 @@ html.jwtbutler-login-form-visible .login-form__submit {
   display: grid;
   grid-template-columns: 0.1fr 0.1fr 1fr 0.2fr;
   grid-template-rows: 1fr; }
+  @media screen and (max-width: 700px) {
+    .footer {
+      border-width: 1rem; } }
 
 .footer__status {
   text-align: center; }
@@ -623,7 +652,10 @@ html.jwtbutler-login-form-visible .login-form__submit {
 @media screen and (max-width: 700px) {
   .footer {
     padding: 0 5rem;
-    grid-template-columns: 1fr 1fr 1fr 1fr; }
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    border-left-width: 1rem;
+    border-bottom-width: 1rem;
+    border-right-width: 1rem; }
   .footer__save,
   .footer__create,
   .footer__logout {

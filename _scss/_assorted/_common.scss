@@ -13,10 +13,17 @@
     appearance: menulist-button;
     padding: 0 20rem 0 4rem;
     cursor: pointer;
+    @include responsive-medium {
+        padding-left: 10rem;
+        padding-right: 10rem;
+    }
 }
 
 @mixin border {
     border: 2rem solid $color-white;
+    @include responsive-medium {
+        border-width: 1rem;
+    }
 }
 
 @mixin perf {
@@ -50,10 +57,21 @@
             background-position: 0% 50%;
         }
     }
+    @include responsive-medium {
+        animation: none;
+        background: none;
+        background-color: $color-red;
+    }
 }
 
 @mixin responsive-big {
     @media screen and (max-width: $breakpoint-big) {
+        @content;
+    }
+}
+
+@mixin responsive-medium {
+    @media screen and (max-width: $breakpoint-medium) {
         @content;
     }
 }

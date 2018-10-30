@@ -17,10 +17,17 @@ hosea is a personal assistant.
 
 ## installation
 
+### app
+-   clone the repository
+-   ```composer install```
+
+### database
 -   create a new empty database
 -   copy .env.example to .env and fill out your database credentials
 -   run `php migrate` to create the schema
 -   if you want some test data, also run `php seed`
+
+### host
 -   point a vhost to the `_public` folder
 -   if you want to have the application run inside a subfolder of an existing domain
     -   deploy the app outside of the root folder (e.g. `/var/hosea`)

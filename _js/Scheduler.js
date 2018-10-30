@@ -130,7 +130,7 @@ export default class Scheduler {
         });
 
         document.querySelector('.scheduler__navigation-week').innerHTML = `
-            ${Dates.dateFormat(Dates.getDayOfActiveWeek(1), 'd.m.')}&ndash;${Dates.dateFormat(Dates.getDayOfActiveWeek(7), 'd.m.Y')} /// _kw ${Dates.weekNumber(Dates.getDayOfActiveWeek(1))}
+            ${Dates.dateFormat(Dates.getDayOfActiveWeek(1), 'd.m.')} &ndash; ${Dates.dateFormat(Dates.getDayOfActiveWeek(7), 'd.m.Y')} /// _kw ${Dates.weekNumber(Dates.getDayOfActiveWeek(1))}
         `;
     }
 
