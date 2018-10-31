@@ -230,6 +230,9 @@ textarea {
   @media screen and (max-width: 700px) {
     .tickets {
       border-width: 1rem; } }
+  @media screen and (max-width: 700px) {
+    .tickets {
+      box-shadow: none; } }
 
 .tickets__table-container::-webkit-scrollbar {
   width: 2rem; }
@@ -453,6 +456,9 @@ html.jwtbutler-login-form-visible .login-form {
   @media screen and (max-width: 700px) {
     html.jwtbutler-login-form-visible .login-form {
       border-width: 1rem; } }
+  @media screen and (max-width: 700px) {
+    html.jwtbutler-login-form-visible .login-form {
+      box-shadow: none; } }
 
 html.jwtbutler-login-form-visible .login-form__label {
   display: none; }
@@ -481,6 +487,9 @@ html.jwtbutler-login-form-visible .login-form__submit {
   @media screen and (max-width: 700px) {
     .scheduler {
       border-width: 1rem; } }
+  @media screen and (max-width: 700px) {
+    .scheduler {
+      box-shadow: none; } }
 
 .scheduler__navigation {
   position: absolute;
@@ -641,6 +650,9 @@ html.jwtbutler-login-form-visible .login-form__submit {
   grid-template-rows: 1fr; }
   @media screen and (max-width: 700px) {
     .footer {
+      box-shadow: none; } }
+  @media screen and (max-width: 700px) {
+    .footer {
       border-width: 1rem; } }
 
 .footer__status {
@@ -653,7 +665,7 @@ html.jwtbutler-login-form-visible .login-form__submit {
   .footer {
     padding: 0 5rem;
     grid-template-columns: 1fr 1fr 1fr 1fr;
-    border-left-width: 10rem;
+    border-left-width: 1rem;
     border-bottom-width: 2rem;
     border-right-width: 1rem; }
   .footer__save,
