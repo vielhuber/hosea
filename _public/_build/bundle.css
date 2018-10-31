@@ -653,7 +653,7 @@ html.jwtbutler-login-form-visible .login-form__submit {
   .footer {
     padding: 0 5rem;
     grid-template-columns: 1fr 1fr 1fr 1fr;
-    border-left-width: 1rem;
+    border-left-width: 10rem;
     border-bottom-width: 2rem;
     border-right-width: 1rem; }
   .footer__save,
