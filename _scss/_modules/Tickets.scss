@@ -1,6 +1,6 @@
 .tickets {
     width: calc(66.66% - 2 * #{$space-big});
-    bottom: calc(#{$space-big} + #{$bar-height});
+    bottom: calc(#{$space-big} + #{$footer-height});
     left: $space-big;
     top: $space-big;
     color: $color-white;
@@ -157,9 +157,9 @@
         width: 100%;
         bottom: auto;
         right: auto;
-        top: calc((100vh - #{$bar-height}) / 2);
+        top: calc((100vh - #{$footer-height}) / 2);
         left: 0;
-        height: calc((100vh - #{$bar-height}) / 2);
+        height: calc((100vh - #{$footer-height}) / 2);
         border-bottom: 0;
     }
     .tickets__table-tooltip {

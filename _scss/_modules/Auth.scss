@@ -20,6 +20,7 @@ html.jwtbutler-login-form-visible {
 
     .login-form__input {
         width: 200rem;
+        padding: $space-small;
         margin-bottom: $space-small;
     }
 
@@ -27,6 +28,15 @@ html.jwtbutler-login-form-visible {
         width: 100%;
         background-color: $color-black;
         color: $color-white;
+        padding: $space-small;
         cursor: pointer;
+    }
+
+    .login-form__error {
+        background-color: $color-red;
+        color: $color-white;
+        margin-bottom: $space-small;
+        padding: $space-small;
+        text-align: center;
     }
 }

@@ -1,6 +1,6 @@
 .scheduler {
     width: calc(33.33% - #{$space-big});
-    bottom: calc(#{$space-big} + #{$bar-height});
+    bottom: calc(#{$space-big} + #{$footer-height});
     right: $space-big;
     top: $space-big;
     position: absolute;
@@ -150,7 +150,7 @@
         right: auto;
         top: 0;
         left: 0;
-        height: calc((100vh - #{$bar-height}) / 2);
+        height: calc((100vh - #{$footer-height}) / 2);
         border-bottom: 0;
     }
     .scheduler__navigation-button {

@@ -219,7 +219,7 @@ textarea {
 
 .tickets {
   width: calc(66.66% - 2 * 40rem);
-  bottom: calc(40rem + 25rem);
+  bottom: calc(40rem + 35rem);
   left: 40rem;
   top: 40rem;
   color: #ffffff;
@@ -368,9 +368,9 @@ textarea {
     width: 100%;
     bottom: auto;
     right: auto;
-    top: calc((100vh - 25rem) / 2);
+    top: calc((100vh - 35rem) / 2);
     left: 0;
-    height: calc((100vh - 25rem) / 2);
+    height: calc((100vh - 35rem) / 2);
     border-bottom: 0; }
   .tickets__table-tooltip {
     display: none; }
@@ -395,7 +395,6 @@ textarea {
 
 .metabar__filter,
 .metabar__sort {
-  /*padding-top: calc(25rem / 4);*/
   line-height: 25rem; }
 
 .metabar__filter {
@@ -465,17 +464,26 @@ html.jwtbutler-login-form-visible .login-form__label {
 
 html.jwtbutler-login-form-visible .login-form__input {
   width: 200rem;
+  padding: 5rem;
   margin-bottom: 5rem; }
 
 html.jwtbutler-login-form-visible .login-form__submit {
   width: 100%;
   background-color: #000000;
   color: #ffffff;
+  padding: 5rem;
   cursor: pointer; }
+
+html.jwtbutler-login-form-visible .login-form__error {
+  background-color: #e91e63;
+  color: #ffffff;
+  margin-bottom: 5rem;
+  padding: 5rem;
+  text-align: center; }
 
 .scheduler {
   width: calc(33.33% - 40rem);
-  bottom: calc(40rem + 25rem);
+  bottom: calc(40rem + 35rem);
   right: 40rem;
   top: 40rem;
   position: absolute;
@@ -625,7 +633,7 @@ html.jwtbutler-login-form-visible .login-form__submit {
     right: auto;
     top: 0;
     left: 0;
-    height: calc((100vh - 25rem) / 2);
+    height: calc((100vh - 35rem) / 2);
     border-bottom: 0; }
   .scheduler__navigation-button {
     padding: 0px 10rem; } }
@@ -635,8 +643,8 @@ html.jwtbutler-login-form-visible .login-form__submit {
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 25rem;
-  line-height: 25rem;
+  height: 35rem;
+  line-height: 35rem;
   background-color: #000000;
   color: #ffffff;
   padding: 0 40rem;
