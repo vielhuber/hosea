@@ -2,7 +2,9 @@
 
 hosea is a personal assistant.
 
-![](https://github.com/vielhuber/hosea/raw/master/screenshot.png)
+<p align="center">
+  <img src="https://github.com/vielhuber/hosea/raw/master/screenshot.png" alt="hosea" />
+</p>
 
 ## features
 
@@ -10,12 +12,14 @@ hosea is a personal assistant.
 -   scheduler view
 -   recurring events
 -   convert recurring events to scheduled events
--   attach emails from outlook to tickets
+-   attach emails or documents to tickets
 -   can be controlled keyboard-only
 -   optimized for mobile
+-   advanced sorting and filtering of tickets
 -   frontend/backend validation
 -   all data (including attachments) are inside the db
 -   supports mysql/postgres databases
+-   save login system using jwt
 
 ## installation
 
