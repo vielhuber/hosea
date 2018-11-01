@@ -2,6 +2,8 @@
 
 hosea is a personal assistant.
 
+![](https://github.com/vielhuber/hosea/raw/master/screenshot.png)
+
 ## features
 
 -   ticket table view
