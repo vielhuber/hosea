@@ -121,7 +121,7 @@ export default class Scheduler {
                     left:${posLeft}%;
                     top:${posTop}%;
                     bottom:${posBottom}%;
-                    background-color:${date__value.backgroundColor}80;
+                    background-color:${date__value.backgroundColor}98;
                 ">
                     ${date__value.title}
                 </div>

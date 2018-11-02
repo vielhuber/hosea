@@ -42,11 +42,16 @@ export default class Dates {
                     return;
                 }
                 if ((view === 'tickets' && Dates.dateIsActiveDay(d)) || (view === 'scheduler' && Dates.dateIsInActiveWeek(d))) {
+                    let begin = string__value.length > 8 ? parseInt(string__value.substring(9, 11)) + parseInt(string__value.substring(12, 14)) / 60 : null,
+                        end = string__value.length > 8 ? parseInt(string__value.substring(15, 17)) + parseInt(string__value.substring(18, 20)) / 60 : null;
+                    if (end === 0) {
+                        end = 24;
+                    }
                     ret.push({
                         date: d,
                         day: ((d.getDay() + 6) % 7) + 1,
-                        begin: string__value.length > 8 ? parseInt(string__value.substring(9, 11)) + parseInt(string__value.substring(12, 14)) / 60 : null,
-                        end: string__value.length > 8 ? parseInt(string__value.substring(15, 17)) + parseInt(string__value.substring(18, 20)) / 60 : null
+                        begin: begin,
+                        end: end
                     });
                 }
             }
@@ -73,6 +78,9 @@ export default class Dates {
                         let shift = string__value.indexOf(':') - 2;
                         begin = parseInt(string__value.substring(shift, shift + 2)) + parseInt(string__value.substring(shift + 3, shift + 5)) / 60;
                         end = parseInt(string__value.substring(shift + 6, shift + 8)) + parseInt(string__value.substring(shift + 9, shift + 11)) / 60;
+                    }
+                    if (end === 0) {
+                        end = 24;
                     }
                     ret.push({
                         date: d,
@@ -102,6 +110,9 @@ export default class Dates {
                         begin = parseInt(string__value.substring(shift, shift + 2)) + parseInt(string__value.substring(shift + 3, shift + 5)) / 60;
                         end = parseInt(string__value.substring(shift + 6, shift + 8)) + parseInt(string__value.substring(shift + 9, shift + 11)) / 60;
                     }
+                    if (end === 0) {
+                        end = 24;
+                    }
                     ret.push({
                         date: d,
                         day: ((d.getDay() + 6) % 7) + 1,
@@ -124,6 +135,10 @@ export default class Dates {
 
     static germanToEnglishString(str) {
         return '20' + str.substring(6, 8) + '-' + str.substring(3, 5) + '-' + str.substring(0, 2);
+    }
+
+    static germanDateTimeToEnglishString(str) {
+        return '20' + str.substring(6, 8) + '-' + str.substring(3, 5) + '-' + str.substring(0, 2) + str.substring(9);
     }
 
     static dateFormat(d, format) {

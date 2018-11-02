@@ -114,7 +114,7 @@ button,
 input,
 select,
 textarea {
-  color: grey;
+  color: #ffffff;
   font-weight: normal;
   line-height: 1.4; }
 
@@ -139,7 +139,7 @@ input:-webkit-autofill:hover,
 input:-webkit-autofill:active,
 input:-webkit-autofill:focus {
   -webkit-box-shadow: 0 0 0 100px #ffffff inset !important;
-  -webkit-text-fill-color: grey !important; }
+  -webkit-text-fill-color: #000000 !important; }
 
 input[type='submit'],
 input[type='text'],
@@ -200,7 +200,7 @@ textarea {
 #app {
   width: 100%;
   height: 100%;
-  background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+  background: linear-gradient(-45deg, #ee7752, #e91e63, #1b7593, #6ccbb8);
   background-size: 400% 400%;
   animation: animated-background 3s ease infinite; }
 
@@ -241,7 +241,8 @@ textarea {
   background-color: #000000; }
 
 .tickets__table-container::-webkit-scrollbar-thumb {
-  background-color: #ffffff; }
+  background-color: #ffffff;
+  box-shadow: -1rem 0 0 0 #ffffff; }
 
 .tickets__textarea {
   width: 100%;
@@ -249,17 +250,24 @@ textarea {
   /*transition: height 1s ease-out;*/
   resize: none;
   overflow-x: hidden;
-  overflow-y: hidden;
+  overflow-y: auto;
   height: 15rem;
   line-height: 15rem;
   vertical-align: top;
   background-color: transparent;
   color: #ffffff;
   padding: 0; }
+  .tickets__textarea::-webkit-scrollbar {
+    width: 2rem; }
+  .tickets__textarea::-webkit-scrollbar-track {
+    background-color: #000000; }
+  .tickets__textarea::-webkit-scrollbar-thumb {
+    background-color: #ffffff;
+    box-shadow: -1rem 0 0 0 #ffffff; }
 
 .tickets__textarea:invalid {
   background-image: url("../_assets/icon_warning.svg");
-  background-position: center right;
+  background-position: right 2rem top 1rem;
   background-size: 13rem;
   background-repeat: no-repeat; }
 
@@ -282,7 +290,7 @@ textarea {
 .tickets__table-cell {
   vertical-align: top;
   overflow: hidden;
-  padding: 0rem 4rem;
+  padding: 0 0 0 4rem;
   border: 2rem solid #ffffff; }
   @media screen and (max-width: 700px) {
     .tickets__table-cell {
@@ -320,10 +328,10 @@ textarea {
   display: table-row; }
 
 .tickets__entry--changed {
-  box-shadow: 0 0 0 3rem yellow inset; }
+  box-shadow: 0 0 0 3rem #ee7752 inset, 7rem 0 0 3rem #ee7752 inset; }
 
 .tickets__entry--locked {
-  box-shadow: 0 0 0 3rem red inset; }
+  box-shadow: 0 0 0 3rem #e91e63 inset, 7rem 0 0 3rem #e91e63 inset; }
 
 .tickets__attachment {
   font-size: 0; }
@@ -518,7 +526,6 @@ html.jwtbutler-login-form-visible .login-form__error {
   /* needed because of table */
   height: calc(100% - 25rem - 15rem * 3);
   display: block;
-  /*border: 1rem solid #292929;*/
   box-shadow: 0px 0px 0px 2px #292929; }
 
 .scheduler__table-head {
@@ -542,7 +549,6 @@ html.jwtbutler-login-form-visible .login-form__error {
   height: 100%;
   padding: 0 5rem;
   float: left;
-  /*border: 1rem solid #292929;*/
   box-shadow: 0px 0px 0px 1px #292929; }
   .scheduler__table-head .scheduler__cell {
     text-align: center;
@@ -550,17 +556,16 @@ html.jwtbutler-login-form-visible .login-form__error {
     padding: 0; }
 
 .scheduler__cell--main {
-  background-color: #272727; }
+  background-color: rgba(255, 255, 255, 0.1); }
 
 .scheduler__cell--curday {
-  background-color: #404040; }
+  background-color: rgba(255, 255, 255, 0.2); }
 
 .scheduler__cell--curday.scheduler__cell--main {
-  background-color: #c3c3c3; }
+  background-color: rgba(255, 255, 255, 0.3); }
 
 .scheduler__cell--activeday {
-  /*background-color: #f5f5f5;*/
-  background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+  background: linear-gradient(-45deg, #ee7752, #e91e63, #1b7593, #6ccbb8);
   background-size: 400% 400%;
   animation: animated-background 3s ease infinite; }
 
@@ -578,7 +583,7 @@ html.jwtbutler-login-form-visible .login-form__error {
       background-color: #e91e63; } }
 
 .scheduler__cell--activeday.scheduler__cell--main {
-  background-color: #e8e8e8; }
+  background-color: rgba(255, 255, 255, 0.4); }
 
 .scheduler__appointments {
   position: absolute;

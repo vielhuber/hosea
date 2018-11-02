@@ -18,10 +18,6 @@ export default class Textarea {
         });
     }
 
-    static textareaSetHeight(el) {
-        el.style.height = 15 * ((el.value.match(/\n/g) || []).length + 1) + 'rem';
-    }
-
     static textareaSetVisibleHeights() {
         document
             .querySelector('.tickets .tickets__table-body')
@@ -29,5 +25,17 @@ export default class Textarea {
             .forEach((el, index) => {
                 Textarea.textareaSetHeight(el);
             });
+    }
+
+    static textareaSetHeight(el) {
+        let min = 3,
+            max = 10,
+            cur = (el.value.match(/\n/g) || []).length + 1;
+        if (cur < min) {
+            cur = min;
+        } else if (cur > max) {
+            cur = max;
+        }
+        el.style.height = 15 * cur + 'rem';
     }
 }

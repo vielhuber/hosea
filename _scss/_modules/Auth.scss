@@ -8,7 +8,7 @@ html.jwtbutler-login-form-visible {
         height: auto;
         padding: $space-medium;
         transform: translateY(-50%) translateX(-50%);
-        background-color: $color-greylight;
+        background-color: $color-green;
         z-index: 2147483638;
         @include border;
         @include shadow;
@@ -33,7 +33,7 @@ html.jwtbutler-login-form-visible {
     }
 
     .login-form__error {
-        background-color: $color-red;
+        background-color: $color-pink;
         color: $color-white;
         margin-bottom: $space-small;
         padding: $space-small;

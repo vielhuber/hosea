@@ -42,11 +42,12 @@
     }
     &::-webkit-scrollbar-thumb {
         background-color: $color-white;
+        box-shadow: -1rem 0 0 0 $color-white;
     }
 }
 
 @mixin animated-background {
-    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    background: linear-gradient(-45deg, $color-orange, $color-pink, $color-blue, $color-green);
     background-size: 400% 400%;
     animation: animated-background 3s ease infinite;
     @keyframes animated-background {
@@ -63,7 +64,7 @@
     @include responsive-medium {
         animation: none;
         background: none;
-        background-color: $color-red;
+        background-color: $color-pink;
     }
 }
 

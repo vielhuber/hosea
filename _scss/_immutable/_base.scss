@@ -38,7 +38,7 @@ button,
 input,
 select,
 textarea {
-    color: $color-grey;
+    color: $color-white;
     font-weight: normal;
     line-height: 1.4;
 }
@@ -68,7 +68,7 @@ input:-webkit-autofill:hover,
 input:-webkit-autofill:active,
 input:-webkit-autofill:focus {
     -webkit-box-shadow: 0 0 0 100px $color-white inset !important;
-    -webkit-text-fill-color: $color-grey !important;
+    -webkit-text-fill-color: $color-black !important;
 }
 
 input[type='submit'],
@@ -100,17 +100,17 @@ a {
 }
 
 ::selection {
-    background: $color-red;
+    background: $color-pink;
     color: $color-white;
 }
 
 ::-moz-selection {
-    background: $color-red;
+    background: $color-pink;
     color: $color-white;
 }
 
 ::-webkit-selection {
-    background: $color-red;
+    background: $color-pink;
     color: $color-white;
 }
 
