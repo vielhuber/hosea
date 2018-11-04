@@ -336,11 +336,7 @@ export default class Tickets {
                 if (Lock.ticketIsLocked(ticket_id)) {
                     e.preventDefault();
                 }
-                if (document.querySelector('.tickets .tickets__table-body').querySelectorAll('.tickets__entry').length === 1) {
-                    alert("don't delete the genesis block!");
-                    e.preventDefault();
-                }
-                var result = confirm('Sind Sie sicher?');
+                let result = confirm('Sind Sie sicher?');
                 if (result) {
                     Tickets.deleteTicket(ticket_id)
                         .then(result => {
