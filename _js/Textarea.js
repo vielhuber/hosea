@@ -29,7 +29,7 @@ export default class Textarea {
 
     static textareaSetHeight(el) {
         let min = 3,
-            max = 10,
+            max = 7,
             cur = (el.value.match(/\n/g) || []).length + 1;
         if (cur < min) {
             cur = min;

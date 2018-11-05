@@ -121,9 +121,9 @@ export default class Scheduler {
                     left:${posLeft}%;
                     top:${posTop}%;
                     bottom:${posBottom}%;
-                    background-color:${date__value.backgroundColor}98;
+                    background-color:${date__value.backgroundColor};
                 ">
-                    ${date__value.title}
+                    ${date__value.name}
                 </div>
             `
             );
@@ -169,7 +169,8 @@ export default class Scheduler {
     static generateDates() {
         let dates = [];
         Store.data.tickets.forEach(tickets__value => {
-            let title = tickets__value.project + '\n' + (tickets__value.description || '').substring(0, 100),
+            let name = tickets__value.project,
+                title = tickets__value.project + '\n' + (tickets__value.description || '').substring(0, 100),
                 backgroundColor = Scheduler.getColor(tickets__value.status),
                 parsed_values = Dates.parseDateString(tickets__value.date, 'scheduler');
             if (parsed_values !== false && parsed_values.length > 0) {
@@ -178,6 +179,7 @@ export default class Scheduler {
                         day: parsed_values__value.day,
                         begin: parsed_values__value.begin,
                         end: parsed_values__value.end,
+                        name: name,
                         title: title,
                         backgroundColor: backgroundColor
                     });
@@ -188,7 +190,7 @@ export default class Scheduler {
     }
 
     static getColor(status) {
-        let color = '#f2f2f2';
+        let color = '#9E9E9E';
         if (status !== null && status != '' && Store.data.colors.hasOwnProperty(status)) {
             color = Store.data.colors[status];
         }

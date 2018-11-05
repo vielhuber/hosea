@@ -49,7 +49,7 @@
 @mixin animated-background {
     background: linear-gradient(-45deg, $color-orange, $color-pink, $color-blue, $color-green);
     background-size: 400% 400%;
-    animation: animated-background 3s ease infinite;
+    animation: animated-background 20s ease infinite;
     @keyframes animated-background {
         0% {
             background-position: 0% 50%;

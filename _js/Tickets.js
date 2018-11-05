@@ -306,24 +306,15 @@ export default class Tickets {
     }
 
     static bindAutoTime() {
-        document.querySelector('.tickets').addEventListener('change', e => {
+        document.querySelector('.tickets').addEventListener('input', e => {
             if (e.target.closest('.tickets__entry [name="date"]')) {
                 if (e.target.value != '') {
-                    let ticket_dates = e.target.value.split('\n'),
-                        begin = null,
-                        end = null;
-                    ticket_dates.forEach((ticket_dates__value, ticket_dates__key) => {
-                        if (ticket_dates__key % 2 === 0) {
-                            begin = ticket_dates__value;
-                        } else {
-                            end = ticket_dates__value;
-                            if (Dates.isDate(begin) && Dates.isDate(end)) {
-                                e.target.closest('.tickets__entry').querySelector('[name="time"]').value = (Math.round((Math.abs(new Date(end) - new Date(begin)) / (1000 * 60 * 60)) * 100) / 100)
-                                    .toString()
-                                    .replace('.', ',');
-                            }
-                        }
-                    });
+                    let parsed_values = Dates.parseDateString(e.target.value, 'tickets');
+                    if (parsed_values !== false && parsed_values[0].begin !== undefined && parsed_values[0].end !== undefined) {
+                        e.target.closest('.tickets__entry').querySelector('[name="time"]').value = Math.abs(parsed_values[0].end - parsed_values[0].begin)
+                            .toString()
+                            .replace('.', ',');
+                    }
                 }
             }
         });
