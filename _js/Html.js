@@ -47,6 +47,8 @@ export default class Html {
                     `
                     <span title="scheduled
 idle
+allday
+roaming
 done
 billed
 recurring

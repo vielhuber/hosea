@@ -200,6 +200,9 @@ export default class Scheduler {
     static updateColors() {
         Store.data.tickets.forEach(tickets__value => {
             document.querySelector('.tickets .tickets__entry[data-id="' + tickets__value.id + '"]').style.borderLeftColor = Scheduler.getColor(tickets__value.status);
+            if (tickets__value.status === 'allday') {
+                document.querySelector('.tickets .tickets__entry[data-id="' + tickets__value.id + '"]').style.opacity = 0.5;
+            }
         });
     }
 }

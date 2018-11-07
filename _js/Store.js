@@ -8,6 +8,8 @@ export default class Store {
             cols: ['status', 'priority', 'date', 'time', 'project', 'description'],
             colors: {
                 idle: '#2196F3',
+                allday: '#868686',
+                roaming: '#ba68c8',
                 done: '#FFB300',
                 billed: '#4CAF50',
                 recurring: '#E91E63',

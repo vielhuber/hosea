@@ -44,7 +44,7 @@ export default class Sort {
                     val_a = a.querySelector('[name="status"]').value;
                     val_b = b.querySelector('[name="status"]').value;
                     if (val_a != val_b) {
-                        for (let status__value of ['billed', 'done', 'working', 'scheduled', 'recurring', 'idle']) {
+                        for (let status__value of ['allday', 'billed', 'done', 'working', 'scheduled', 'roaming', 'recurring', 'idle']) {
                             if (val_a === status__value) {
                                 return -1;
                             }

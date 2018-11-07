@@ -293,7 +293,7 @@ export default class Tickets {
                     }
                 }
                 if (e.target.closest('.tickets__textarea--status')) {
-                    if (!['scheduled', 'idle', 'done', 'billed', 'recurring', 'working'].includes(e.target.value)) {
+                    if (!['scheduled', 'idle', 'allday', 'roaming', 'done', 'billed', 'recurring', 'working'].includes(e.target.value)) {
                         e.target.setCustomValidity('wrong format');
                     } else {
                         e.target.setCustomValidity('');
@@ -347,7 +347,7 @@ export default class Tickets {
     static updateSum() {
         let sum = 0;
         Store.data.tickets.forEach(tickets__value => {
-            if (tickets__value.visible !== false && tickets__value.time !== null && tickets__value.time != '' && !['idle', 'done', 'billed'].includes(tickets__value.status)) {
+            if (tickets__value.visible !== false && tickets__value.time !== null && tickets__value.time != '' && !['idle', 'allday', 'done', 'billed'].includes(tickets__value.status)) {
                 sum += parseFloat(tickets__value.time.replace(',', '.'));
             }
         });
