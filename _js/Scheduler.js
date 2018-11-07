@@ -122,6 +122,7 @@ export default class Scheduler {
                     top:${posTop}%;
                     bottom:${posBottom}%;
                     background-color:${date__value.backgroundColor};
+                    opacity:${date__value.opacity};
                 ">
                     ${date__value.name}
                 </div>
@@ -181,7 +182,8 @@ export default class Scheduler {
                         end: parsed_values__value.end,
                         name: name,
                         title: title,
-                        backgroundColor: backgroundColor
+                        backgroundColor: backgroundColor,
+                        opacity: tickets__value.status === 'allday' ? 0.75 : 1
                     });
                 });
             }
@@ -200,9 +202,7 @@ export default class Scheduler {
     static updateColors() {
         Store.data.tickets.forEach(tickets__value => {
             document.querySelector('.tickets .tickets__entry[data-id="' + tickets__value.id + '"]').style.borderLeftColor = Scheduler.getColor(tickets__value.status);
-            if (tickets__value.status === 'allday') {
-                document.querySelector('.tickets .tickets__entry[data-id="' + tickets__value.id + '"]').style.opacity = 0.5;
-            }
+            document.querySelector('.tickets .tickets__entry[data-id="' + tickets__value.id + '"]').style.opacity = tickets__value.status === 'allday' ? 0.65 : 1;
         });
     }
 }
