@@ -279,7 +279,7 @@ export default class Tickets {
                     }
                 }
                 if (e.target.closest('.tickets__textarea--time')) {
-                    if (!new RegExp('^[0-9]+,[0-9]+$').test(e.target.value) || e.target.value < 0 || e.target.value > 24) {
+                    if (!new RegExp('^[0-9]$|^[0-9],[0-9]$').test(e.target.value) || e.target.value < 0 || e.target.value > 24) {
                         e.target.setCustomValidity('wrong format');
                     } else {
                         e.target.setCustomValidity('');
