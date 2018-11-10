@@ -30,9 +30,10 @@
 
 .tickets__textarea:invalid {
     background-image: url('../_assets/icon_warning.svg');
-    background-position: right 2rem top 1rem;
+    background-position: right -18rem top 1rem;
     background-size: 13rem;
     background-repeat: no-repeat;
+    border-right: 20rem solid transparent;
 }
 
 .tickets__table-container {

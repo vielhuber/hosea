@@ -7,7 +7,7 @@ import Scheduler from './Scheduler';
 import Store from './Store';
 import Textarea from './Textarea';
 import Footer from './Footer';
-import { isBuffer } from 'util';
+import hlp from 'hlp';
 
 export default class Tickets {
     static updateLocalTicket(ticket_id) {
@@ -71,7 +71,7 @@ export default class Tickets {
                 data = tickets__value;
             }
         });
-        return data;
+        return hlp.deepCopy(data);
     }
 
     static deleteTicket(ticket_id) {
@@ -223,14 +223,18 @@ export default class Tickets {
         }
         /* if source is a recurring ticket, do some magic */
         if (current !== null && duplicateData.status === 'recurring') {
-            let newDate = Dates.dateFormat(Dates.getActiveDate(), 'd.m.y'),
-                extractedTime = Dates.extractTimeFromDate(duplicateData.date);
-            if (extractedTime) {
-                newDate += ' ' + extractedTime;
-            }
+            let newDates = [];
+            duplicateData.date.split('\n').forEach(duplicateData__value => {
+                let newDate = Dates.dateFormat(Dates.getActiveDate(), 'd.m.y'),
+                    extractedTime = Dates.extractTimeFromDate(duplicateData__value);
+                if (extractedTime) {
+                    newDate += ' ' + extractedTime;
+                }
+                newDates.push(newDate);
+            });
             current.querySelector('.tickets__textarea--date').value = Dates.includeNewLowerBoundInDate(duplicateData.date, Dates.getActiveDate());
             current.querySelector('.tickets__textarea--date').dispatchEvent(new Event('input', { bubbles: true }));
-            duplicateData.date = newDate;
+            duplicateData.date = newDates.join('\n');
             duplicateData.status = 'scheduled';
         }
         Tickets.createTicket(duplicateData)
@@ -285,6 +289,13 @@ export default class Tickets {
                         e.target.setCustomValidity('');
                     }
                 }
+                if (e.target.closest('.tickets__textarea--project')) {
+                    if (new RegExp('[^a-zA-Z0-9 ]').test(e.target.value)) {
+                        e.target.setCustomValidity('wrong format');
+                    } else {
+                        e.target.setCustomValidity('');
+                    }
+                }
                 if (e.target.closest('.tickets__textarea--priority')) {
                     if (!['A', 'B', 'C', 'D'].includes(e.target.value)) {
                         e.target.setCustomValidity('wrong format');
@@ -310,10 +321,15 @@ export default class Tickets {
             if (e.target.closest('.tickets__entry [name="date"]')) {
                 if (e.target.value != '') {
                     let parsed_values = Dates.parseDateString(e.target.value, 'tickets');
-                    if (parsed_values !== false && parsed_values[0].begin !== undefined && parsed_values[0].end !== undefined) {
-                        e.target.closest('.tickets__entry').querySelector('[name="time"]').value = Math.abs(parsed_values[0].end - parsed_values[0].begin)
-                            .toString()
-                            .replace('.', ',');
+                    console.log(parsed_values);
+                    if (parsed_values !== false) {
+                        let time = 0;
+                        parsed_values.forEach(parses_values__value => {
+                            if (parses_values__value.begin !== undefined && parses_values__value.end !== undefined) {
+                                time += Math.abs(parses_values__value.end - parses_values__value.begin);
+                            }
+                        });
+                        e.target.closest('.tickets__entry').querySelector('[name="time"]').value = time.toString().replace('.', ',');
                     }
                 }
             }

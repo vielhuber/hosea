@@ -331,25 +331,30 @@ export default class Dates {
         return '';
     }
 
-    static includeNewLowerBoundInDate(d, lowerBound) {
-        let match = d.match(new RegExp('>[0-9][0-9].[0-9][0-9].[1-2][0-9]', 'g')),
-            isObsolete = false;
-        if (match !== null) {
-            match.forEach(match__value => {
-                let curBound = new Date(Dates.germanToEnglishString(match__value.substring(1)));
-                if (Dates.compareDates(lowerBound, curBound) === 1) {
-                    d = d.split(match__value).join('');
-                } else {
-                    isObsolete = true;
-                }
-            });
-        }
-        d = d.replace(/ +(?= )/g, ''); // remove double whitespaces
-        d = d.trim();
-        if (isObsolete === false) {
-            d = d + ' >' + Dates.dateFormat(Dates.getActiveDate(), 'd.m.y');
-        }
-        return d;
+    static includeNewLowerBoundInDate(date, lowerBound) {
+        date = date.split('\n');
+        date.forEach((date__value, date__key) => {
+            let match = date__value.match(new RegExp('>[0-9][0-9].[0-9][0-9].[1-2][0-9]', 'g')),
+                isObsolete = false;
+            if (match !== null) {
+                match.forEach(match__value => {
+                    let curBound = new Date(Dates.germanToEnglishString(match__value.substring(1)));
+                    if (Dates.compareDates(lowerBound, curBound) === 1) {
+                        date__value = date__value.split(match__value).join('');
+                    } else {
+                        isObsolete = true;
+                    }
+                });
+            }
+            date__value = date__value.replace(/ +(?= )/g, ''); // remove double whitespaces
+            date__value = date__value.trim();
+            if (isObsolete === false) {
+                date__value = date__value + ' >' + Dates.dateFormat(Dates.getActiveDate(), 'd.m.y');
+            }
+            date[date__key] = date__value;
+        });
+        date = date.join('\n');
+        return date;
     }
 }
 
