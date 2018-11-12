@@ -1,6 +1,6 @@
 {
     "config": {
-        "domain": "http://hosea.local"
+        "domain": "http://hosea.local.vielhuber.de"
     },
     "scripts": {
         "css:sass": "node-sass --output-style compressed ./_scss/style.scss ./_public/_build/bundle.css",

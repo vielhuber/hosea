@@ -270,8 +270,7 @@ textarea {
   background-position: right -18rem top 1rem;
   background-size: 13rem;
   background-repeat: no-repeat;
-  border-right: 19rem solid transparent;
-  }
+  border-right: 20rem solid transparent; }
 
 .tickets__table-container {
   position: absolute;
