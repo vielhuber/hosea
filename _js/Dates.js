@@ -21,9 +21,10 @@ export default class Dates {
     }
 
     static parseDateString(string, view) {
-        if (view !== 'tickets' && view !== 'scheduler') {
+        if (!['tickets', 'scheduler', 'all'].includes(view)) {
             return false;
         }
+
         if (string == '') {
             return [];
         }
@@ -41,7 +42,7 @@ export default class Dates {
                     error = true;
                     return;
                 }
-                if ((view === 'tickets' && Dates.dateIsActiveDay(d)) || (view === 'scheduler' && Dates.dateIsInActiveWeek(d))) {
+                if ((view === 'tickets' && Dates.dateIsActiveDay(d)) || (view === 'scheduler' && Dates.dateIsInActiveWeek(d)) || view === 'all') {
                     let begin = string__value.length > 8 ? parseInt(string__value.substring(9, 11)) + parseInt(string__value.substring(12, 14)) / 60 : null,
                         end = string__value.length > 8 ? parseInt(string__value.substring(15, 17)) + parseInt(string__value.substring(18, 20)) / 60 : null;
                     if (end === 0) {
@@ -65,13 +66,13 @@ export default class Dates {
                     error = true;
                     return;
                 }
-                if (Dates.dateIsExcluded(d, string__value)) {
+                if (view !== 'all' && Dates.dateIsExcluded(d, string__value)) {
                     return;
                 }
-                if (string__value.substring(2, 3) === '#' && Math.floor((d.getDate() - 1) / 7) + 1 != string__value.substring(3, 4)) {
+                if (view !== 'all' && string__value.substring(2, 3) === '#' && Math.floor((d.getDate() - 1) / 7) + 1 != string__value.substring(3, 4)) {
                     return;
                 }
-                if ((view === 'tickets' && Dates.dateIsActiveDay(d)) || (view === 'scheduler' && Dates.dateIsInActiveWeek(d))) {
+                if ((view === 'tickets' && Dates.dateIsActiveDay(d)) || (view === 'scheduler' && Dates.dateIsInActiveWeek(d)) || view === 'all') {
                     let begin = null,
                         end = null;
                     if (string__value.split(':').length === 3) {
@@ -99,10 +100,10 @@ export default class Dates {
                     error = true;
                     return;
                 }
-                if (Dates.dateIsExcluded(d, string__value)) {
+                if (view !== 'all' && Dates.dateIsExcluded(d, string__value)) {
                     return;
                 }
-                if ((view === 'tickets' && Dates.dateIsActiveDay(d)) || (view === 'scheduler' && Dates.dateIsInActiveWeek(d))) {
+                if ((view === 'tickets' && Dates.dateIsActiveDay(d)) || (view === 'scheduler' && Dates.dateIsInActiveWeek(d)) || view === 'all') {
                     let begin = null,
                         end = null;
                     if (string__value.split(':').length === 3) {

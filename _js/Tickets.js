@@ -320,8 +320,7 @@ export default class Tickets {
         document.querySelector('.tickets').addEventListener('input', e => {
             if (e.target.closest('.tickets__entry [name="date"]')) {
                 if (e.target.value != '') {
-                    let parsed_values = Dates.parseDateString(e.target.value, 'tickets');
-                    console.log(parsed_values);
+                    let parsed_values = Dates.parseDateString(e.target.value, 'all');
                     if (parsed_values !== false) {
                         let time = 0;
                         parsed_values.forEach(parses_values__value => {
@@ -329,7 +328,11 @@ export default class Tickets {
                                 time += Math.abs(parses_values__value.end - parses_values__value.begin);
                             }
                         });
-                        e.target.closest('.tickets__entry').querySelector('[name="time"]').value = time.toString().replace('.', ',');
+                        if (!Number.isInteger(time)) {
+                            time = time.toFixed(2);
+                        }
+                        time = time.toString().replace('.', ',');
+                        e.target.closest('.tickets__entry').querySelector('[name="time"]').value = time;
                     }
                 }
             }
