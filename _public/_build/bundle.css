@@ -118,6 +118,11 @@ textarea {
   font-weight: normal;
   line-height: 1.4; }
 
+input,
+select,
+textarea {
+  color: #000000; }
+
 textarea {
   overflow: auto; }
 

@@ -60,7 +60,8 @@ export default class Dates {
             // MO [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
             // MO 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
             // MO#1 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
-            else if (new RegExp('^(MO|DI|MI|DO|FR|SA|SO)(#[1-5])?( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?( (-|>|<)[0-9][0-9].[0-9][0-9].[1-2][0-9])*$').test(string__value)) {
+            // MO#12 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
+            else if (new RegExp('^(MO|DI|MI|DO|FR|SA|SO)(#[1-54])?( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?( (-|>|<)[0-9][0-9].[0-9][0-9].[1-2][0-9])*$').test(string__value)) {
                 d = Dates.getDayOfActiveWeek(Dates.getDayFromString(string__value.substring(0, 2)));
                 if (isNaN(d)) {
                     error = true;
@@ -69,8 +70,17 @@ export default class Dates {
                 if (view !== 'all' && Dates.dateIsExcluded(d, string__value)) {
                     return;
                 }
-                if (view !== 'all' && string__value.substring(2, 3) === '#' && Math.floor((d.getDate() - 1) / 7) + 1 != string__value.substring(3, 4)) {
-                    return;
+
+                if (view !== 'all' && string__value.substring(2, 3) === '#') {
+                    let num = string__value.substring(3, 5).trim();
+                    // [1-4] is interpreted as the nth e.g. monday in a month
+                    if (num <= 4 && Math.floor((d.getDate() - 1) / 7) + 1 != num) {
+                        return;
+                    }
+                    // >4 is interpreted as the nth e.g. monday in a year (and the first!)
+                    if (num > 4 && (Math.floor((Dates.dayOfYear(d) - 1) / 7) + 1) % num != 0 && Math.floor((Dates.dayOfYear(d) - 1) / 7) + 1 != 1) {
+                        return;
+                    }
                 }
                 if ((view === 'tickets' && Dates.dateIsActiveDay(d)) || (view === 'scheduler' && Dates.dateIsInActiveWeek(d)) || view === 'all') {
                     let begin = null,
@@ -330,6 +340,10 @@ export default class Dates {
             return match[0];
         }
         return '';
+    }
+
+    static dayOfYear(date) {
+        return (Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) - Date.UTC(date.getFullYear(), 0, 0)) / 24 / 60 / 60 / 1000;
     }
 
     static includeNewLowerBoundInDate(date, lowerBound) {

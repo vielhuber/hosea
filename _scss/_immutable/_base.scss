@@ -43,6 +43,12 @@ textarea {
     line-height: 1.4;
 }
 
+input,
+select,
+textarea {
+    color: $color-black;
+}
+
 textarea {
     overflow: auto;
 }
