@@ -99,7 +99,11 @@ export default class Tickets {
 
     static saveTickets() {
         return new Promise((resolve, reject) => {
-            if (document.querySelector('.tickets .tickets__table-body').querySelector('.tickets__textarea:invalid') !== null) {
+            if (
+                document
+                    .querySelector('.tickets .tickets__table-body')
+                    .querySelector('.tickets__textarea:invalid') !== null
+            ) {
                 reject('not saved - invalid fields!');
                 return;
             }
@@ -207,7 +211,9 @@ export default class Tickets {
     }
 
     static prepareCreation() {
-        let visibleAll = document.querySelector('.tickets .tickets__table-body').querySelectorAll('.tickets__entry--visible'),
+        let visibleAll = document
+                .querySelector('.tickets .tickets__table-body')
+                .querySelectorAll('.tickets__entry--visible'),
             current = null,
             currentIndex = 1,
             duplicateData = {};
@@ -232,8 +238,12 @@ export default class Tickets {
                 }
                 newDates.push(newDate);
             });
-            current.querySelector('.tickets__textarea--date').value = Dates.includeNewLowerBoundInDate(duplicateData.date, Dates.getActiveDate());
-            current.querySelector('.tickets__textarea--date').dispatchEvent(new Event('input', { bubbles: true }));
+            current.querySelector(
+                '.tickets__textarea--date'
+            ).value = Dates.includeNewLowerBoundInDate(duplicateData.date, Dates.getActiveDate());
+            current
+                .querySelector('.tickets__textarea--date')
+                .dispatchEvent(new Event('input', { bubbles: true }));
             duplicateData.date = newDates.join('\n');
             duplicateData.status = 'scheduled';
         }
@@ -244,10 +254,16 @@ export default class Tickets {
                     current.insertAdjacentHTML('afterend', Html.createHtmlLine(ticket, true));
                     next = current.nextElementSibling;
                 } else {
-                    document.querySelector('.tickets .tickets__table-body').insertAdjacentHTML('beforeend', Html.createHtmlLine(ticket, true));
-                    next = document.querySelector('.tickets .tickets__table-body').querySelector('.tickets__entry--visible');
+                    document
+                        .querySelector('.tickets .tickets__table-body')
+                        .insertAdjacentHTML('beforeend', Html.createHtmlLine(ticket, true));
+                    next = document
+                        .querySelector('.tickets .tickets__table-body')
+                        .querySelector('.tickets__entry--visible');
                 }
-                let input = next.querySelector('td:nth-child(' + currentIndex + ')').querySelector('input, textarea');
+                let input = next
+                    .querySelector('td:nth-child(' + currentIndex + ')')
+                    .querySelector('input, textarea');
                 input.select();
                 input.dispatchEvent(new Event('input', { bubbles: true }));
                 Scheduler.initScheduler();
@@ -283,7 +299,13 @@ export default class Tickets {
                     }
                 }
                 if (e.target.closest('.tickets__textarea--time')) {
-                    if (!new RegExp('^[0-9]$|^[0-9],[0-9]$|^[0-9],[0-9][0-9]$').test(e.target.value) || e.target.value < 0 || e.target.value > 24) {
+                    if (
+                        !new RegExp('^[0-9]$|^[0-9],[0-9]$|^[0-9],[0-9][0-9]$').test(
+                            e.target.value
+                        ) ||
+                        e.target.value < 0 ||
+                        e.target.value > 24
+                    ) {
                         e.target.setCustomValidity('wrong format');
                     } else {
                         e.target.setCustomValidity('');
@@ -304,7 +326,18 @@ export default class Tickets {
                     }
                 }
                 if (e.target.closest('.tickets__textarea--status')) {
-                    if (!['scheduled', 'idle', 'allday', 'roaming', 'done', 'billed', 'recurring', 'working'].includes(e.target.value)) {
+                    if (
+                        ![
+                            'scheduled',
+                            'idle',
+                            'allday',
+                            'roaming',
+                            'done',
+                            'billed',
+                            'recurring',
+                            'working'
+                        ].includes(e.target.value)
+                    ) {
                         e.target.setCustomValidity('wrong format');
                     } else {
                         e.target.setCustomValidity('');
@@ -324,15 +357,22 @@ export default class Tickets {
                     if (parsed_values !== false) {
                         let time = 0;
                         parsed_values.forEach(parses_values__value => {
-                            if (parses_values__value.begin !== undefined && parses_values__value.end !== undefined) {
-                                time += Math.abs(parses_values__value.end - parses_values__value.begin);
+                            if (
+                                parses_values__value.begin !== undefined &&
+                                parses_values__value.end !== undefined
+                            ) {
+                                time += Math.abs(
+                                    parses_values__value.end - parses_values__value.begin
+                                );
                             }
                         });
                         if (!Number.isInteger(time)) {
                             time = time.toFixed(2);
                         }
                         time = time.toString().replace('.', ',');
-                        e.target.closest('.tickets__entry').querySelector('[name="time"]').value = time;
+                        e.target
+                            .closest('.tickets__entry')
+                            .querySelector('[name="time"]').value = time;
                     }
                 }
             }
@@ -366,12 +406,19 @@ export default class Tickets {
     static updateSum() {
         let sum = 0;
         Store.data.tickets.forEach(tickets__value => {
-            if (tickets__value.visible !== false && tickets__value.time !== null && tickets__value.time != '' && !['idle', 'allday', 'done', 'billed'].includes(tickets__value.status)) {
+            if (
+                tickets__value.visible !== false &&
+                tickets__value.time !== null &&
+                tickets__value.time != '' &&
+                !['idle', 'allday', 'done', 'billed'].includes(tickets__value.status)
+            ) {
                 sum += parseFloat(tickets__value.time.replace(',', '.'));
             }
         });
         sum = Math.round(sum * 100) / 100;
         sum = sum.toString().replace('.', ',');
-        document.querySelector('.tickets__table-foot').querySelector('.tickets__sum').textContent = sum;
+        document
+            .querySelector('.tickets__table-foot')
+            .querySelector('.tickets__sum').textContent = sum;
     }
 }

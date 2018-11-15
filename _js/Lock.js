@@ -1,6 +1,8 @@
 export default class Lock {
     static lockTicket(ticket_id) {
-        document.querySelector('.tickets__entry[data-id="' + ticket_id + '"]').classList.add('tickets__entry--locked');
+        document
+            .querySelector('.tickets__entry[data-id="' + ticket_id + '"]')
+            .classList.add('tickets__entry--locked');
         document
             .querySelector('.tickets__entry[data-id="' + ticket_id + '"]')
             .querySelectorAll('input, textarea')
@@ -13,9 +15,13 @@ export default class Lock {
 
     static unlockTicket(ticket_id, leave_changed = false) {
         if (leave_changed === false) {
-            document.querySelector('.tickets__entry[data-id="' + ticket_id + '"]').classList.remove('tickets__entry--changed');
+            document
+                .querySelector('.tickets__entry[data-id="' + ticket_id + '"]')
+                .classList.remove('tickets__entry--changed');
         }
-        document.querySelector('.tickets__entry[data-id="' + ticket_id + '"]').classList.remove('tickets__entry--locked');
+        document
+            .querySelector('.tickets__entry[data-id="' + ticket_id + '"]')
+            .classList.remove('tickets__entry--locked');
         document
             .querySelector('.tickets__entry[data-id="' + ticket_id + '"]')
             .querySelectorAll('input, textarea')
@@ -26,7 +32,11 @@ export default class Lock {
     }
 
     static ticketIsLocked(ticket_id) {
-        if (document.querySelector('.tickets__entry[data-id="' + ticket_id + '"] .tickets__entry--locked') !== null) {
+        if (
+            document.querySelector(
+                '.tickets__entry[data-id="' + ticket_id + '"] .tickets__entry--locked'
+            ) !== null
+        ) {
             return true;
         }
         return false;

@@ -26,7 +26,9 @@ export default class Filter {
             document.querySelector('.metabar__filter').remove();
         }
 
-        document.querySelector('.metabar').insertAdjacentHTML('beforeend', '<div class="metabar__filter"></div>');
+        document
+            .querySelector('.metabar')
+            .insertAdjacentHTML('beforeend', '<div class="metabar__filter"></div>');
         ['status', 'priority', 'date', 'project'].forEach(columns__value => {
             document.querySelector('.metabar__filter').insertAdjacentHTML(
                 'beforeend',
@@ -37,7 +39,9 @@ export default class Filter {
             `
             );
             if (columns__value === 'date') {
-                document.querySelector('.metabar__select--filter[name="date"]').insertAdjacentHTML('beforeend', '<option value=""></option>');
+                document
+                    .querySelector('.metabar__select--filter[name="date"]')
+                    .insertAdjacentHTML('beforeend', '<option value=""></option>');
                 let firstDay = new Date('2018-01-01 00:00:00');
                 let curDay = new Date();
                 curDay.setHours(0);
@@ -79,14 +83,19 @@ export default class Filter {
                 options.forEach(options__value => {
                     document
                         .querySelector('.metabar__select--filter[name="' + columns__value + '"]')
-                        .insertAdjacentHTML('beforeend', '<option value="' + options__value + '">' + options__value + '</option>');
+                        .insertAdjacentHTML(
+                            'beforeend',
+                            '<option value="' + options__value + '">' + options__value + '</option>'
+                        );
                 });
             }
         });
 
         if (update === true) {
             Object.entries(selected).forEach(([selected__key, selected__value]) => {
-                document.querySelector('.metabar__filter [name="' + selected__key + '"]').value = selected__value;
+                document.querySelector(
+                    '.metabar__filter [name="' + selected__key + '"]'
+                ).value = selected__value;
             });
         } else {
             Filter.doFilter();
@@ -115,7 +124,11 @@ export default class Filter {
                         visible_this = false;
 
                     // date
-                    if (el.getAttribute('name') === 'date' && val_search !== '*' && val_search !== '') {
+                    if (
+                        el.getAttribute('name') === 'date' &&
+                        val_search !== '*' &&
+                        val_search !== ''
+                    ) {
                         let parsed_values = Dates.parseDateString(val_target, 'tickets');
                         if (parsed_values !== false && parsed_values.length > 0) {
                             visible_this = true;
@@ -128,7 +141,13 @@ export default class Filter {
                     }
 
                     /* special behaviour: hide billed in overview */
-                    if (el.getAttribute('name') == 'status' && val_search === '*' && val_target === 'billed' && document.querySelector('.metabar__select--filter[name="date"]').value === '*') {
+                    if (
+                        el.getAttribute('name') == 'status' &&
+                        val_search === '*' &&
+                        val_target === 'billed' &&
+                        document.querySelector('.metabar__select--filter[name="date"]').value ===
+                            '*'
+                    ) {
                         visible_this = false;
                     }
 
@@ -138,10 +157,14 @@ export default class Filter {
                 });
             if (visible === false && tickets__value.visible === true) {
                 tickets__value.visible = false;
-                document.querySelector('.tickets .tickets__entry[data-id="' + tickets__value.id + '"]').classList.remove('tickets__entry--visible');
+                document
+                    .querySelector('.tickets .tickets__entry[data-id="' + tickets__value.id + '"]')
+                    .classList.remove('tickets__entry--visible');
             } else if (visible === true && tickets__value.visible === false) {
                 tickets__value.visible = true;
-                document.querySelector('.tickets .tickets__entry[data-id="' + tickets__value.id + '"]').classList.add('tickets__entry--visible');
+                document
+                    .querySelector('.tickets .tickets__entry[data-id="' + tickets__value.id + '"]')
+                    .classList.add('tickets__entry--visible');
             }
         });
         Sort.doSort();

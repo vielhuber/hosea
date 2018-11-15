@@ -7,7 +7,10 @@ export default class Helper {
                     prev = false;
                     return false;
                 }
-                if (selector !== null && !htmlElement.classList.contains(selector.replace('.', ''))) {
+                if (
+                    selector !== null &&
+                    !htmlElement.classList.contains(selector.replace('.', ''))
+                ) {
                     return false;
                 }
                 return prev;

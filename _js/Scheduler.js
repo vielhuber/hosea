@@ -27,8 +27,22 @@ export default class Scheduler {
                                 (item, i) => `
                             <td class="
                                 scheduler__cell
-                                ${Dates.sameDay(Dates.getDayOfActiveWeek(i + 1), Dates.getCurrentDate()) ? ' scheduler__cell--curday' : ''}
-                                ${Dates.sameDay(Dates.getDayOfActiveWeek(i + 1), Dates.getActiveDate()) ? ' scheduler__cell--activeday' : ''}
+                                ${
+                                    Dates.sameDay(
+                                        Dates.getDayOfActiveWeek(i + 1),
+                                        Dates.getCurrentDate()
+                                    )
+                                        ? ' scheduler__cell--curday'
+                                        : ''
+                                }
+                                ${
+                                    Dates.sameDay(
+                                        Dates.getDayOfActiveWeek(i + 1),
+                                        Dates.getActiveDate()
+                                    )
+                                        ? ' scheduler__cell--activeday'
+                                        : ''
+                                }
                             ">
                                 ${Dates.dateFormat(Dates.getDayOfActiveWeek(i + 1), 'D d.m.')}
                             </td>
@@ -47,8 +61,22 @@ export default class Scheduler {
                                 (item, i) => `
                             <td class="
                                 scheduler__cell
-                                ${Dates.sameDay(Dates.getDayOfActiveWeek(i + 1), Dates.getCurrentDate()) ? ' scheduler__cell--curday' : ''}
-                                ${Dates.sameDay(Dates.getDayOfActiveWeek(i + 1), Dates.getActiveDate()) ? ' scheduler__cell--activeday' : ''}
+                                ${
+                                    Dates.sameDay(
+                                        Dates.getDayOfActiveWeek(i + 1),
+                                        Dates.getCurrentDate()
+                                    )
+                                        ? ' scheduler__cell--curday'
+                                        : ''
+                                }
+                                ${
+                                    Dates.sameDay(
+                                        Dates.getDayOfActiveWeek(i + 1),
+                                        Dates.getActiveDate()
+                                    )
+                                        ? ' scheduler__cell--activeday'
+                                        : ''
+                                }
                             "></td>
                         `
                             )
@@ -61,7 +89,10 @@ export default class Scheduler {
                             j = j + 9;
                             return `
                             <tr class="scheduler__row">
-                                <td class="scheduler__cell">${('0' + j).slice(-2)}&ndash;${('0' + (j + 1)).slice(-2)}</td>
+                                <td class="scheduler__cell">${('0' + j).slice(-2)}&ndash;${(
+                                '0' +
+                                (j + 1)
+                            ).slice(-2)}</td>
                                 ${Array(7)
                                     .join(0)
                                     .split(0)
@@ -69,9 +100,27 @@ export default class Scheduler {
                                         (item, i) => `
                                     <td class="
                                         scheduler__cell
-                                        ${Dates.sameDay(Dates.getDayOfActiveWeek(i + 1), Dates.getCurrentDate()) ? ' scheduler__cell--curday' : ''}
-                                        ${Dates.sameDay(Dates.getDayOfActiveWeek(i + 1), Dates.getActiveDate()) ? ' scheduler__cell--activeday' : ''}
-                                        ${i < 5 && ((j >= 9 && j < 13) || (j >= 14 && j < 18)) ? ' scheduler__cell--main' : ''}
+                                        ${
+                                            Dates.sameDay(
+                                                Dates.getDayOfActiveWeek(i + 1),
+                                                Dates.getCurrentDate()
+                                            )
+                                                ? ' scheduler__cell--curday'
+                                                : ''
+                                        }
+                                        ${
+                                            Dates.sameDay(
+                                                Dates.getDayOfActiveWeek(i + 1),
+                                                Dates.getActiveDate()
+                                            )
+                                                ? ' scheduler__cell--activeday'
+                                                : ''
+                                        }
+                                        ${
+                                            i < 5 && ((j >= 9 && j < 13) || (j >= 14 && j < 18))
+                                                ? ' scheduler__cell--main'
+                                                : ''
+                                        }
                                     ">
                                     </td>
                                 `
@@ -107,8 +156,15 @@ export default class Scheduler {
                 posTop,
                 posBottom;
             if (date__value.begin === null) {
-                posTop = (generatedDatesUndefinedCur[date__value.day] / generatedDatesUndefinedMax[date__value.day]) * 6.25;
-                posBottom = 100 - ((generatedDatesUndefinedCur[date__value.day] + 1) / generatedDatesUndefinedMax[date__value.day]) * 6.25;
+                posTop =
+                    (generatedDatesUndefinedCur[date__value.day] /
+                        generatedDatesUndefinedMax[date__value.day]) *
+                    6.25;
+                posBottom =
+                    100 -
+                    ((generatedDatesUndefinedCur[date__value.day] + 1) /
+                        generatedDatesUndefinedMax[date__value.day]) *
+                        6.25;
                 generatedDatesUndefinedCur[date__value.day]++;
             } else {
                 posTop = 6.25 * (date__value.begin - 8);
@@ -131,7 +187,10 @@ export default class Scheduler {
         });
 
         document.querySelector('.scheduler__navigation-week').innerHTML = `
-            ${Dates.dateFormat(Dates.getDayOfActiveWeek(1), 'd.m.')} &ndash; ${Dates.dateFormat(Dates.getDayOfActiveWeek(7), 'd.m.Y')} /// _kw ${Dates.weekNumber(Dates.getDayOfActiveWeek(1))}
+            ${Dates.dateFormat(Dates.getDayOfActiveWeek(1), 'd.m.')} &ndash; ${Dates.dateFormat(
+            Dates.getDayOfActiveWeek(7),
+            'd.m.Y'
+        )} /// _kw ${Dates.weekNumber(Dates.getDayOfActiveWeek(1))}
         `;
     }
 
@@ -142,24 +201,38 @@ export default class Scheduler {
                     Store.data.session.activeDay = new Date();
                 }
                 if (e.target.closest('.scheduler__navigation-button--prev-day')) {
-                    Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() - 1);
+                    Store.data.session.activeDay.setDate(
+                        Store.data.session.activeDay.getDate() - 1
+                    );
                 }
                 if (e.target.closest('.scheduler__navigation-button--next-day')) {
-                    Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() + 1);
+                    Store.data.session.activeDay.setDate(
+                        Store.data.session.activeDay.getDate() + 1
+                    );
                 }
                 if (e.target.closest('.scheduler__navigation-button--prev-week')) {
-                    Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() - 7);
+                    Store.data.session.activeDay.setDate(
+                        Store.data.session.activeDay.getDate() - 7
+                    );
                 }
                 if (e.target.closest('.scheduler__navigation-button--next-week')) {
-                    Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() + 7);
+                    Store.data.session.activeDay.setDate(
+                        Store.data.session.activeDay.getDate() + 7
+                    );
                 }
                 if (e.target.closest('.scheduler__navigation-button--prev-month')) {
-                    Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() - 28);
+                    Store.data.session.activeDay.setDate(
+                        Store.data.session.activeDay.getDate() - 28
+                    );
                 }
                 if (e.target.closest('.scheduler__navigation-button--next-month')) {
-                    Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() + 28);
+                    Store.data.session.activeDay.setDate(
+                        Store.data.session.activeDay.getDate() + 28
+                    );
                 }
-                document.querySelector('.metabar__select--filter[name="date"]').value = Dates.dateFormat(Store.data.session.activeDay, 'Y-m-d');
+                document.querySelector(
+                    '.metabar__select--filter[name="date"]'
+                ).value = Dates.dateFormat(Store.data.session.activeDay, 'Y-m-d');
                 Scheduler.initScheduler();
                 Filter.doFilter();
                 e.preventDefault();
@@ -171,7 +244,10 @@ export default class Scheduler {
         let dates = [];
         Store.data.tickets.forEach(tickets__value => {
             let name = tickets__value.project,
-                title = tickets__value.project + '\n' + (tickets__value.description || '').substring(0, 100),
+                title =
+                    tickets__value.project +
+                    '\n' +
+                    (tickets__value.description || '').substring(0, 100),
                 backgroundColor = Scheduler.getColor(tickets__value.status),
                 parsed_values = Dates.parseDateString(tickets__value.date, 'scheduler');
             if (parsed_values !== false && parsed_values.length > 0) {
@@ -201,8 +277,12 @@ export default class Scheduler {
 
     static updateColors() {
         Store.data.tickets.forEach(tickets__value => {
-            document.querySelector('.tickets .tickets__entry[data-id="' + tickets__value.id + '"]').style.borderLeftColor = Scheduler.getColor(tickets__value.status);
-            document.querySelector('.tickets .tickets__entry[data-id="' + tickets__value.id + '"]').style.opacity = tickets__value.status === 'allday' ? 0.65 : 1;
+            document.querySelector(
+                '.tickets .tickets__entry[data-id="' + tickets__value.id + '"]'
+            ).style.borderLeftColor = Scheduler.getColor(tickets__value.status);
+            document.querySelector(
+                '.tickets .tickets__entry[data-id="' + tickets__value.id + '"]'
+            ).style.opacity = tickets__value.status === 'allday' ? 0.65 : 1;
         });
     }
 }

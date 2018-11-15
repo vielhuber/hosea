@@ -36,15 +36,38 @@ export default class Dates {
         string.split('\n').forEach(string__value => {
             // 01.01.18
             // 01.01.18 09:00-10:00
-            if (new RegExp('^[0-9][0-9].[0-9][0-9].[1-2][0-9]( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?$').test(string__value)) {
-                d = new Date('20' + string__value.substring(6, 8) + '-' + string__value.substring(3, 5) + '-' + string__value.substring(0, 2));
+            if (
+                new RegExp(
+                    '^[0-9][0-9].[0-9][0-9].[1-2][0-9]( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?$'
+                ).test(string__value)
+            ) {
+                d = new Date(
+                    '20' +
+                        string__value.substring(6, 8) +
+                        '-' +
+                        string__value.substring(3, 5) +
+                        '-' +
+                        string__value.substring(0, 2)
+                );
                 if (isNaN(d)) {
                     error = true;
                     return;
                 }
-                if ((view === 'tickets' && Dates.dateIsActiveDay(d)) || (view === 'scheduler' && Dates.dateIsInActiveWeek(d)) || view === 'all') {
-                    let begin = string__value.length > 8 ? parseInt(string__value.substring(9, 11)) + parseInt(string__value.substring(12, 14)) / 60 : null,
-                        end = string__value.length > 8 ? parseInt(string__value.substring(15, 17)) + parseInt(string__value.substring(18, 20)) / 60 : null;
+                if (
+                    (view === 'tickets' && Dates.dateIsActiveDay(d)) ||
+                    (view === 'scheduler' && Dates.dateIsInActiveWeek(d)) ||
+                    view === 'all'
+                ) {
+                    let begin =
+                            string__value.length > 8
+                                ? parseInt(string__value.substring(9, 11)) +
+                                  parseInt(string__value.substring(12, 14)) / 60
+                                : null,
+                        end =
+                            string__value.length > 8
+                                ? parseInt(string__value.substring(15, 17)) +
+                                  parseInt(string__value.substring(18, 20)) / 60
+                                : null;
                     if (end === 0) {
                         end = 24;
                     }
@@ -61,7 +84,11 @@ export default class Dates {
             // MO 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
             // MO#1 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
             // MO#12 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
-            else if (new RegExp('^(MO|DI|MI|DO|FR|SA|SO)(#[1-54])?( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?( (-|>|<)[0-9][0-9].[0-9][0-9].[1-2][0-9])*$').test(string__value)) {
+            else if (
+                new RegExp(
+                    '^(MO|DI|MI|DO|FR|SA|SO)(#[1-54])?( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?( (-|>|<)[0-9][0-9].[0-9][0-9].[1-2][0-9])*$'
+                ).test(string__value)
+            ) {
                 d = Dates.getDayOfActiveWeek(Dates.getDayFromString(string__value.substring(0, 2)));
                 if (isNaN(d)) {
                     error = true;
@@ -72,23 +99,28 @@ export default class Dates {
                 }
 
                 if (view !== 'all' && string__value.substring(2, 3) === '#') {
-                    let num = string__value.substring(3, 5).trim();
-                    // [1-4] is interpreted as the nth e.g. monday in a month
-                    if (num <= 4 && Math.floor((d.getDate() - 1) / 7) + 1 != num) {
-                        return;
-                    }
-                    // >4 is interpreted as the nth e.g. monday in a year (and the first!)
-                    if (num > 4 && (Math.floor((Dates.dayOfYear(d) - 1) / 7) + 1) % num != 0 && Math.floor((Dates.dayOfYear(d) - 1) / 7) + 1 != 1) {
+                    let num = parseInt(string__value.substring(3, 5).trim()),
+                        num_2 = Math.ceil(num / 4) * 4,
+                        nthDay = Math.floor((Dates.dayOfYear(d) - 1) / 7) + 1;
+                    if ((nthDay - num) % num_2 != 0) {
                         return;
                     }
                 }
-                if ((view === 'tickets' && Dates.dateIsActiveDay(d)) || (view === 'scheduler' && Dates.dateIsInActiveWeek(d)) || view === 'all') {
+                if (
+                    (view === 'tickets' && Dates.dateIsActiveDay(d)) ||
+                    (view === 'scheduler' && Dates.dateIsInActiveWeek(d)) ||
+                    view === 'all'
+                ) {
                     let begin = null,
                         end = null;
                     if (string__value.split(':').length === 3) {
                         let shift = string__value.indexOf(':') - 2;
-                        begin = parseInt(string__value.substring(shift, shift + 2)) + parseInt(string__value.substring(shift + 3, shift + 5)) / 60;
-                        end = parseInt(string__value.substring(shift + 6, shift + 8)) + parseInt(string__value.substring(shift + 9, shift + 11)) / 60;
+                        begin =
+                            parseInt(string__value.substring(shift, shift + 2)) +
+                            parseInt(string__value.substring(shift + 3, shift + 5)) / 60;
+                        end =
+                            parseInt(string__value.substring(shift + 6, shift + 8)) +
+                            parseInt(string__value.substring(shift + 9, shift + 11)) / 60;
                     }
                     if (end === 0) {
                         end = 24;
@@ -104,8 +136,18 @@ export default class Dates {
 
             // 01.01. [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
             // 01.01. 09:00-10:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
-            else if (new RegExp('^[0-9][0-9].[0-9][0-9].( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?( (-|>|<)[0-9][0-9].[0-9][0-9].[1-2][0-9])*$').test(string__value)) {
-                d = new Date(Dates.getActiveDate().getFullYear() + '-' + string__value.substring(3, 5) + '-' + string__value.substring(0, 2));
+            else if (
+                new RegExp(
+                    '^[0-9][0-9].[0-9][0-9].( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?( (-|>|<)[0-9][0-9].[0-9][0-9].[1-2][0-9])*$'
+                ).test(string__value)
+            ) {
+                d = new Date(
+                    Dates.getActiveDate().getFullYear() +
+                        '-' +
+                        string__value.substring(3, 5) +
+                        '-' +
+                        string__value.substring(0, 2)
+                );
                 if (isNaN(d)) {
                     error = true;
                     return;
@@ -113,13 +155,21 @@ export default class Dates {
                 if (view !== 'all' && Dates.dateIsExcluded(d, string__value)) {
                     return;
                 }
-                if ((view === 'tickets' && Dates.dateIsActiveDay(d)) || (view === 'scheduler' && Dates.dateIsInActiveWeek(d)) || view === 'all') {
+                if (
+                    (view === 'tickets' && Dates.dateIsActiveDay(d)) ||
+                    (view === 'scheduler' && Dates.dateIsInActiveWeek(d)) ||
+                    view === 'all'
+                ) {
                     let begin = null,
                         end = null;
                     if (string__value.split(':').length === 3) {
                         let shift = string__value.indexOf(':') - 2;
-                        begin = parseInt(string__value.substring(shift, shift + 2)) + parseInt(string__value.substring(shift + 3, shift + 5)) / 60;
-                        end = parseInt(string__value.substring(shift + 6, shift + 8)) + parseInt(string__value.substring(shift + 9, shift + 11)) / 60;
+                        begin =
+                            parseInt(string__value.substring(shift, shift + 2)) +
+                            parseInt(string__value.substring(shift + 3, shift + 5)) / 60;
+                        end =
+                            parseInt(string__value.substring(shift + 6, shift + 8)) +
+                            parseInt(string__value.substring(shift + 9, shift + 11)) / 60;
                     }
                     if (end === 0) {
                         end = 24;
@@ -149,27 +199,67 @@ export default class Dates {
     }
 
     static germanDateTimeToEnglishString(str) {
-        return '20' + str.substring(6, 8) + '-' + str.substring(3, 5) + '-' + str.substring(0, 2) + str.substring(9);
+        return (
+            '20' +
+            str.substring(6, 8) +
+            '-' +
+            str.substring(3, 5) +
+            '-' +
+            str.substring(0, 2) +
+            str.substring(9)
+        );
     }
 
     static dateFormat(d, format) {
         if (format === 'D d.m.') {
-            return ['SO', 'MO', 'DI', 'MI', 'DO', 'FR', 'SA'][d.getDay()] + ' ' + ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2) + '.';
+            return (
+                ['SO', 'MO', 'DI', 'MI', 'DO', 'FR', 'SA'][d.getDay()] +
+                ' ' +
+                ('0' + d.getDate()).slice(-2) +
+                '.' +
+                ('0' + (d.getMonth() + 1)).slice(-2) +
+                '.'
+            );
         }
         if (format === 'd. F Y') {
             return (
                 ('0' + d.getDate()).slice(-2) +
                 '. ' +
-                ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'][d.getMonth()] +
+                [
+                    'Januar',
+                    'Februar',
+                    'März',
+                    'April',
+                    'Mai',
+                    'Juni',
+                    'Juli',
+                    'August',
+                    'September',
+                    'Oktober',
+                    'November',
+                    'Dezember'
+                ][d.getMonth()] +
                 ' ' +
                 d.getFullYear()
             );
         }
         if (format === 'Y-m-d') {
-            return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+            return (
+                d.getFullYear() +
+                '-' +
+                ('0' + (d.getMonth() + 1)).slice(-2) +
+                '-' +
+                ('0' + d.getDate()).slice(-2)
+            );
         }
         if (format === 'd.m.Y') {
-            return ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2) + '.' + d.getFullYear();
+            return (
+                ('0' + d.getDate()).slice(-2) +
+                '.' +
+                ('0' + (d.getMonth() + 1)).slice(-2) +
+                '.' +
+                d.getFullYear()
+            );
         }
         if (format === 'd.m.y') {
             return (
@@ -240,7 +330,11 @@ export default class Dates {
         }
         let d1 = new Date(d),
             d2 = new Date();
-        return d1.getDay() === d2.getDay() && d1.getMonth() === d2.getMonth() && d1.getFullYear() === d2.getFullYear();
+        return (
+            d1.getDay() === d2.getDay() &&
+            d1.getMonth() === d2.getMonth() &&
+            d1.getFullYear() === d2.getFullYear()
+        );
     }
 
     static dateIsInPast(d) {
@@ -266,7 +360,11 @@ export default class Dates {
         }
         d1 = new Date(d1);
         d2 = new Date(d2);
-        return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate();
+        return (
+            d1.getFullYear() === d2.getFullYear() &&
+            d1.getMonth() === d2.getMonth() &&
+            d1.getDate() === d2.getDate()
+        );
     }
 
     static compareDates(d1, d2) {
@@ -343,7 +441,14 @@ export default class Dates {
     }
 
     static dayOfYear(date) {
-        return (Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) - Date.UTC(date.getFullYear(), 0, 0)) / 24 / 60 / 60 / 1000;
+        return (
+            (Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) -
+                Date.UTC(date.getFullYear(), 0, 0)) /
+            24 /
+            60 /
+            60 /
+            1000
+        );
     }
 
     static includeNewLowerBoundInDate(date, lowerBound) {

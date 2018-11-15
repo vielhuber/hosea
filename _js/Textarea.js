@@ -6,7 +6,11 @@ export default class Textarea {
             Textarea.textareaSetHeight(e.target);
         }, 100);
         document.querySelector('.tickets .tickets__table-body').addEventListener('input', e => {
-            if (e.target && e.target.tagName === 'TEXTAREA' && e.target.classList.contains('tickets__textarea--description')) {
+            if (
+                e.target &&
+                e.target.tagName === 'TEXTAREA' &&
+                e.target.classList.contains('tickets__textarea--description')
+            ) {
                 /* immediately change height if enter is pressed */
                 if (e.inputType === 'insertLineBreak') {
                     Textarea.textareaSetHeight(e.target);
@@ -40,10 +44,12 @@ export default class Textarea {
         el.style.height = height;
         /* also set other textarea heights */
         let parent = el.parentNode;
-        [...parent.parentNode.children].filter(child => child !== parent).forEach(i => {
-            if (i.querySelector('textarea') !== null) {
-                i.querySelector('textarea').style.height = height;
-            }
-        });
+        [...parent.parentNode.children]
+            .filter(child => child !== parent)
+            .forEach(i => {
+                if (i.querySelector('textarea') !== null) {
+                    i.querySelector('textarea').style.height = height;
+                }
+            });
     }
 }

@@ -40,7 +40,12 @@ export default class Html {
         `
         );
         Store.data.cols.forEach(cols__value => {
-            document.querySelector('.tickets__table-head tr').insertAdjacentHTML('beforeend', '<td class="tickets__table-cell">' + cols__value + '</td>');
+            document
+                .querySelector('.tickets__table-head tr')
+                .insertAdjacentHTML(
+                    'beforeend',
+                    '<td class="tickets__table-cell">' + cols__value + '</td>'
+                );
             if (cols__value === 'status') {
                 document.querySelector('.tickets__table-head tr td:last-child').insertAdjacentHTML(
                     'beforeend',
@@ -89,7 +94,12 @@ MO#12 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
             }
             document
                 .querySelector('.tickets__table-foot tr')
-                .insertAdjacentHTML('beforeend', '<td class="tickets__table-cell">' + (cols__value == 'time' ? '<span class="tickets__sum"></span>' : '') + '</td>');
+                .insertAdjacentHTML(
+                    'beforeend',
+                    '<td class="tickets__table-cell">' +
+                        (cols__value == 'time' ? '<span class="tickets__sum"></span>' : '') +
+                        '</td>'
+                );
         });
         document.querySelector('.tickets__table-head tr').insertAdjacentHTML(
             'beforeend',
@@ -106,14 +116,21 @@ MO#12 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
             `
         );
         Store.data.tickets.forEach(tickets__value => {
-            document.querySelector('.tickets__table-body').insertAdjacentHTML('beforeend', Html.createHtmlLine(tickets__value, false));
+            document
+                .querySelector('.tickets__table-body')
+                .insertAdjacentHTML('beforeend', Html.createHtmlLine(tickets__value, false));
         });
     }
 
     static createHtmlLine(ticket, visible) {
         let html = '';
 
-        html += '<tr class="tickets__table-row tickets__entry' + (visible === true ? ' tickets__entry--visible' : '') + '" data-id="' + ticket.id + '">';
+        html +=
+            '<tr class="tickets__table-row tickets__entry' +
+            (visible === true ? ' tickets__entry--visible' : '') +
+            '" data-id="' +
+            ticket.id +
+            '">';
 
         Store.data.cols.forEach(cols__value => {
             html += '<td class="tickets__table-cell">';
