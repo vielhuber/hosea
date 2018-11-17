@@ -69,8 +69,8 @@ export default class Sort {
                             'working',
                             'scheduled',
                             'idle',
-                            'roaming',
-                            'recurring'
+                            'recurring',
+                            'roaming'
                         ]) {
                             if (val_a === status__value) {
                                 return -1;
