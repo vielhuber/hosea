@@ -141,12 +141,16 @@ export default class Dates {
                     '^[0-9][0-9].[0-9][0-9].( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?( (-|>|<)[0-9][0-9].[0-9][0-9].[1-2][0-9])*$'
                 ).test(string__value)
             ) {
+                let year = Dates.getActiveDate().getFullYear();
+                // exception on year change
+                if (
+                    Dates.weekNumber(Dates.getActiveDate()) === 1 &&
+                    Dates.getActiveDate().getMonth() + 1 != string__value.substring(3, 5)
+                ) {
+                    year--;
+                }
                 d = new Date(
-                    Dates.getActiveDate().getFullYear() +
-                        '-' +
-                        string__value.substring(3, 5) +
-                        '-' +
-                        string__value.substring(0, 2)
+                    year + '-' + string__value.substring(3, 5) + '-' + string__value.substring(0, 2)
                 );
                 if (isNaN(d)) {
                     error = true;
@@ -155,6 +159,7 @@ export default class Dates {
                 if (view !== 'all' && Dates.dateIsExcluded(d, string__value)) {
                     return;
                 }
+                console.log(d);
                 if (
                     (view === 'tickets' && Dates.dateIsActiveDay(d)) ||
                     (view === 'scheduler' && Dates.dateIsInActiveWeek(d)) ||
