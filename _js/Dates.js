@@ -159,7 +159,6 @@ export default class Dates {
                 if (view !== 'all' && Dates.dateIsExcluded(d, string__value)) {
                     return;
                 }
-                console.log(d);
                 if (
                     (view === 'tickets' && Dates.dateIsActiveDay(d)) ||
                     (view === 'scheduler' && Dates.dateIsInActiveWeek(d)) ||

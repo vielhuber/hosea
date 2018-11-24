@@ -1,6 +1,7 @@
 import Store from './Store';
 import Dates from './Dates';
 import Filter from './Filter';
+import hlp from 'hlp';
 
 export default class Scheduler {
     static initScheduler() {
@@ -151,6 +152,42 @@ export default class Scheduler {
                 generatedDatesUndefinedMax[generatedDates__value.day]++;
             }
         });
+
+        let conflict = {};
+        generatedDates.forEach((generatedDates__value, generatedDates__key) => {
+            if (generatedDates__value.begin === null || generatedDates__value.end === null) {
+                return;
+            }
+            generatedDates.forEach((generatedDates2__value, generatedDates2__key) => {
+                if (generatedDates__key === generatedDates2__key) {
+                    return;
+                }
+                if (generatedDates2__value.begin === null || generatedDates2__value.end === null) {
+                    return;
+                }
+                if (generatedDates2__value.begin < generatedDates__value.end) {
+                    console.log([generatedDates2__value, generatedDates__value]);
+                    let conflictId;
+                    if ('conflict' in generatedDates__value) {
+                        conflictId = generatedDates__value.conflict;
+                    } else if ('conflict' in generatedDates2__value) {
+                        conflictId = generatedDates2__value.conflict;
+                    } else {
+                        conflictId = hlp.pushId();
+                    }
+                    generatedDates__value.conflict = conflictId;
+                    generatedDates2__value.conflict = conflictId;
+                    if (conflictId in conflict) {
+                        conflict[conflictId] = 0;
+                    }
+                    conflict[conflictId] += 2;
+                }
+            });
+        });
+        if (Object.keys(conflict).length > 0) {
+            console.log([conflict, generatedDates]);
+        }
+
         generatedDates.forEach(date__value => {
             let posLeft = 12.5 * date__value.day,
                 posTop,
