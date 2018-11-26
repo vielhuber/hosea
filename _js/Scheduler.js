@@ -138,8 +138,10 @@ export default class Scheduler {
             </div>
         `;
 
-        let generatedDates = Scheduler.generateDates(),
-            generatedDatesUndefinedMax = [],
+        let generatedDates = Scheduler.generateDates();
+
+        /* visual compression of all day events */
+        let generatedDatesUndefinedMax = [],
             generatedDatesUndefinedCur = [];
         generatedDates.forEach(generatedDates__value => {
             if (generatedDates__value.begin === null) {
@@ -153,45 +155,58 @@ export default class Scheduler {
             }
         });
 
-        let conflict = {};
-        generatedDates.forEach((generatedDates__value, generatedDates__key) => {
-            if (generatedDates__value.begin === null || generatedDates__value.end === null) {
+        /* visual compression of conflicting events */
+        let conflicts = {};
+        generatedDates.forEach((gv1, gk1) => {
+            if (gv1.begin === null || gv1.end === null) {
                 return;
             }
-            generatedDates.forEach((generatedDates2__value, generatedDates2__key) => {
-                if (generatedDates__key === generatedDates2__key) {
+            generatedDates.forEach((gv2, gk2) => {
+                if (gk1 === gk2) {
                     return;
                 }
-                if (generatedDates2__value.begin === null || generatedDates2__value.end === null) {
+                if (gv2.day !== gv1.day) {
                     return;
                 }
-                if (generatedDates2__value.begin < generatedDates__value.end) {
-                    console.log([generatedDates2__value, generatedDates__value]);
-                    let conflictId;
-                    if ('conflict' in generatedDates__value) {
-                        conflictId = generatedDates__value.conflict;
-                    } else if ('conflict' in generatedDates2__value) {
-                        conflictId = generatedDates2__value.conflict;
+                if (gv2.begin === null || gv2.end === null) {
+                    return;
+                }
+                if (gv2.begin < gv1.begin) {
+                    return;
+                }
+                if ('conflict' in gv2 && 'conflict' in gv1 && gv2.conflict === gv1.conflict) {
+                    return;
+                }
+                if (gv2.begin < gv1.end) {
+                    if ('conflict' in gv1) {
+                        let conflictId = gv1.conflict;
+                        gv2.conflict = conflictId;
+                        if (!(conflictId in conflicts)) {
+                            conflicts[conflictId] = { count: 0, painted: 0 };
+                        }
+                        conflicts[conflictId].count += 1;
+                    } else if ('conflict' in gv2) {
+                        let conflictId = gv2.conflict;
+                        gv1.conflict = conflictId;
+                        if (!(conflictId in conflicts)) {
+                            conflicts[conflictId] = { count: 0, painted: 0 };
+                        }
+                        conflicts[conflictId].count += 1;
                     } else {
-                        conflictId = hlp.pushId();
+                        let conflictId = hlp.pushId();
+                        gv1.conflict = conflictId;
+                        gv2.conflict = conflictId;
+                        if (!(conflictId in conflicts)) {
+                            conflicts[conflictId] = { count: 0, painted: 0 };
+                        }
+                        conflicts[conflictId].count += 2;
                     }
-                    generatedDates__value.conflict = conflictId;
-                    generatedDates2__value.conflict = conflictId;
-                    if (conflictId in conflict) {
-                        conflict[conflictId] = 0;
-                    }
-                    conflict[conflictId] += 2;
                 }
             });
         });
-        if (Object.keys(conflict).length > 0) {
-            console.log([conflict, generatedDates]);
-        }
 
         generatedDates.forEach(date__value => {
-            let posLeft = 12.5 * date__value.day,
-                posTop,
-                posBottom;
+            let posTop, posBottom;
             if (date__value.begin === null) {
                 posTop =
                     (generatedDatesUndefinedCur[date__value.day] /
@@ -207,6 +222,20 @@ export default class Scheduler {
                 posTop = 6.25 * (date__value.begin - 8);
                 posBottom = 100 - 6.25 * (date__value.end - 8);
             }
+
+            let width, posLeft;
+            if (!('conflict' in date__value)) {
+                width = 'calc(12.5% - 4rem)';
+                posLeft = 12.5 * date__value.day;
+            } else {
+                width = 'calc(' + 12.5 / conflicts[date__value.conflict].count + '% - 4rem)';
+                posLeft =
+                    12.5 * date__value.day +
+                    (12.5 / conflicts[date__value.conflict].count) *
+                        conflicts[date__value.conflict].painted;
+                conflicts[date__value.conflict].painted++;
+            }
+
             document.querySelector('.scheduler__appointments').insertAdjacentHTML(
                 'beforeend',
                 `
@@ -216,6 +245,7 @@ export default class Scheduler {
                     bottom:${posBottom}%;
                     background-color:${date__value.backgroundColor};
                     opacity:${date__value.opacity};
+                    width:${width};
                 ">
                     ${date__value.name}
                 </div>
