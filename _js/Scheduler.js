@@ -140,6 +140,103 @@ export default class Scheduler {
 
         let generatedDates = Scheduler.generateDates();
 
+        generatedDates.forEach(date__value => {
+            document.querySelector('.scheduler__appointments').insertAdjacentHTML(
+                'beforeend',
+                `
+                <div class="scheduler__appointment" title="${date__value.title}" style="
+                    left:${date__value.posLeft}%;
+                    top:${date__value.posTop}%;
+                    bottom:${date__value.posBottom}%;
+                    background-color:${date__value.backgroundColor};
+                    opacity:${date__value.opacity};
+                    width:${date__value.width};
+                ">
+                    ${date__value.name}
+                </div>
+            `
+            );
+        });
+
+        document.querySelector('.scheduler__navigation-week').innerHTML = `
+            ${Dates.dateFormat(Dates.getDayOfActiveWeek(1), 'd.m.')} &ndash; ${Dates.dateFormat(
+            Dates.getDayOfActiveWeek(7),
+            'd.m.Y'
+        )} /// _kw ${Dates.weekNumber(Dates.getDayOfActiveWeek(1))}
+        `;
+    }
+
+    static bindScheduler() {
+        document.querySelector('.scheduler').addEventListener('click', e => {
+            if (e.target.closest('.scheduler__navigation-button')) {
+                if (e.target.closest('.scheduler__navigation-button--today')) {
+                    Store.data.session.activeDay = new Date();
+                }
+                if (e.target.closest('.scheduler__navigation-button--prev-day')) {
+                    Store.data.session.activeDay.setDate(
+                        Store.data.session.activeDay.getDate() - 1
+                    );
+                }
+                if (e.target.closest('.scheduler__navigation-button--next-day')) {
+                    Store.data.session.activeDay.setDate(
+                        Store.data.session.activeDay.getDate() + 1
+                    );
+                }
+                if (e.target.closest('.scheduler__navigation-button--prev-week')) {
+                    Store.data.session.activeDay.setDate(
+                        Store.data.session.activeDay.getDate() - 7
+                    );
+                }
+                if (e.target.closest('.scheduler__navigation-button--next-week')) {
+                    Store.data.session.activeDay.setDate(
+                        Store.data.session.activeDay.getDate() + 7
+                    );
+                }
+                if (e.target.closest('.scheduler__navigation-button--prev-month')) {
+                    Store.data.session.activeDay.setDate(
+                        Store.data.session.activeDay.getDate() - 28
+                    );
+                }
+                if (e.target.closest('.scheduler__navigation-button--next-month')) {
+                    Store.data.session.activeDay.setDate(
+                        Store.data.session.activeDay.getDate() + 28
+                    );
+                }
+                document.querySelector(
+                    '.metabar__select--filter[name="date"]'
+                ).value = Dates.dateFormat(Store.data.session.activeDay, 'Y-m-d');
+                Scheduler.initScheduler();
+                Filter.doFilter();
+                e.preventDefault();
+            }
+        });
+    }
+
+    static generateDates() {
+        let generatedDates = [];
+        Store.data.tickets.forEach(tickets__value => {
+            let name = tickets__value.project,
+                title =
+                    tickets__value.project +
+                    '\n' +
+                    (tickets__value.description || '').substring(0, 100),
+                backgroundColor = Scheduler.getColor(tickets__value.status),
+                parsed_values = Dates.parseDateString(tickets__value.date, 'scheduler');
+            if (parsed_values !== false && parsed_values.length > 0) {
+                parsed_values.forEach(parsed_values__value => {
+                    generatedDates.push({
+                        day: parsed_values__value.day,
+                        begin: parsed_values__value.begin,
+                        end: parsed_values__value.end,
+                        name: name,
+                        title: title,
+                        backgroundColor: backgroundColor,
+                        opacity: tickets__value.status === 'allday' ? 0.75 : 1
+                    });
+                });
+            }
+        });
+
         /* visual compression of all day events */
         let generatedDatesUndefinedMax = [],
             generatedDatesUndefinedCur = [];
@@ -205,6 +302,7 @@ export default class Scheduler {
             });
         });
 
+        /* finalize */
         generatedDates.forEach(date__value => {
             let posTop, posBottom;
             if (date__value.begin === null) {
@@ -236,102 +334,13 @@ export default class Scheduler {
                 conflicts[date__value.conflict].painted++;
             }
 
-            document.querySelector('.scheduler__appointments').insertAdjacentHTML(
-                'beforeend',
-                `
-                <div class="scheduler__appointment" title="${date__value.title}" style="
-                    left:${posLeft}%;
-                    top:${posTop}%;
-                    bottom:${posBottom}%;
-                    background-color:${date__value.backgroundColor};
-                    opacity:${date__value.opacity};
-                    width:${width};
-                ">
-                    ${date__value.name}
-                </div>
-            `
-            );
+            date__value.posLeft = posLeft;
+            date__value.posTop = posTop;
+            date__value.posBottom = posBottom;
+            date__value.width = width;
         });
 
-        document.querySelector('.scheduler__navigation-week').innerHTML = `
-            ${Dates.dateFormat(Dates.getDayOfActiveWeek(1), 'd.m.')} &ndash; ${Dates.dateFormat(
-            Dates.getDayOfActiveWeek(7),
-            'd.m.Y'
-        )} /// _kw ${Dates.weekNumber(Dates.getDayOfActiveWeek(1))}
-        `;
-    }
-
-    static bindScheduler() {
-        document.querySelector('.scheduler').addEventListener('click', e => {
-            if (e.target.closest('.scheduler__navigation-button')) {
-                if (e.target.closest('.scheduler__navigation-button--today')) {
-                    Store.data.session.activeDay = new Date();
-                }
-                if (e.target.closest('.scheduler__navigation-button--prev-day')) {
-                    Store.data.session.activeDay.setDate(
-                        Store.data.session.activeDay.getDate() - 1
-                    );
-                }
-                if (e.target.closest('.scheduler__navigation-button--next-day')) {
-                    Store.data.session.activeDay.setDate(
-                        Store.data.session.activeDay.getDate() + 1
-                    );
-                }
-                if (e.target.closest('.scheduler__navigation-button--prev-week')) {
-                    Store.data.session.activeDay.setDate(
-                        Store.data.session.activeDay.getDate() - 7
-                    );
-                }
-                if (e.target.closest('.scheduler__navigation-button--next-week')) {
-                    Store.data.session.activeDay.setDate(
-                        Store.data.session.activeDay.getDate() + 7
-                    );
-                }
-                if (e.target.closest('.scheduler__navigation-button--prev-month')) {
-                    Store.data.session.activeDay.setDate(
-                        Store.data.session.activeDay.getDate() - 28
-                    );
-                }
-                if (e.target.closest('.scheduler__navigation-button--next-month')) {
-                    Store.data.session.activeDay.setDate(
-                        Store.data.session.activeDay.getDate() + 28
-                    );
-                }
-                document.querySelector(
-                    '.metabar__select--filter[name="date"]'
-                ).value = Dates.dateFormat(Store.data.session.activeDay, 'Y-m-d');
-                Scheduler.initScheduler();
-                Filter.doFilter();
-                e.preventDefault();
-            }
-        });
-    }
-
-    static generateDates() {
-        let dates = [];
-        Store.data.tickets.forEach(tickets__value => {
-            let name = tickets__value.project,
-                title =
-                    tickets__value.project +
-                    '\n' +
-                    (tickets__value.description || '').substring(0, 100),
-                backgroundColor = Scheduler.getColor(tickets__value.status),
-                parsed_values = Dates.parseDateString(tickets__value.date, 'scheduler');
-            if (parsed_values !== false && parsed_values.length > 0) {
-                parsed_values.forEach(parsed_values__value => {
-                    dates.push({
-                        day: parsed_values__value.day,
-                        begin: parsed_values__value.begin,
-                        end: parsed_values__value.end,
-                        name: name,
-                        title: title,
-                        backgroundColor: backgroundColor,
-                        opacity: tickets__value.status === 'allday' ? 0.75 : 1
-                    });
-                });
-            }
-        });
-        return dates;
+        return generatedDates;
     }
 
     static getColor(status) {
