@@ -19,7 +19,39 @@
 }
 .footer__status {
     text-align: center;
+    z-index: 1;
 }
+.footer__status:after {
+    content: '';
+    position: absolute;
+    width: 15%;
+    height: 1px;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    z-index: -1;
+    transition: all 0.75s ease-in-out;
+    border-radius: 50%;
+    box-shadow: 0 0 10rem 10rem $color-white;
+    background-color: $color-white;
+    opacity: 0.15;
+}
+.footer__status--success:after {
+    box-shadow: 0 0 30rem 30rem $color-green;
+    background-color: $color-green;
+    opacity: 0.5;
+}
+.footer__status--warning:after {
+    box-shadow: 0 0 30rem 30rem $color-orange;
+    background-color: $color-orange;
+    opacity: 0.5;
+}
+.footer__status--error:after {
+    box-shadow: 0 0 30rem 30rem $color-pink;
+    background-color: $color-pink;
+    opacity: 0.75;
+}
+
 .footer__logout {
     text-align: right;
 }

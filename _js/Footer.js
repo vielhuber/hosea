@@ -29,23 +29,30 @@ export default class Footer {
         }
         setTimeout(Footer.initStatus, 1000);
     }
-    static updateStatus(status) {
+    static updateStatus(status, type) {
         document.querySelector('.footer__status').textContent = status;
+        document.querySelector('.footer__status').classList.remove('footer__status--success');
+        document.querySelector('.footer__status').classList.remove('footer__status--warning');
+        document.querySelector('.footer__status').classList.remove('footer__status--error');
+        document.querySelector('.footer__status').classList.add('footer__status--' + type);
         Footer.blockStatusUpdate = true;
         setTimeout(() => {
             Footer.blockStatusUpdate = false;
+        }, Footer.showTime - 1000);
+        setTimeout(() => {
+            document.querySelector('.footer__status').classList.remove('footer__status--' + type);
         }, Footer.showTime);
     }
     static bindSave() {
         document.querySelector('.footer').addEventListener('click', e => {
             if (e.target.closest('.footer__save')) {
-                Footer.updateStatus('saving...');
+                Footer.updateStatus('saving...', 'warning');
                 Tickets.saveTickets()
                     .then(() => {
-                        Footer.updateStatus('saved!');
+                        Footer.updateStatus('saved!', 'success');
                     })
                     .catch(error => {
-                        Footer.updateStatus(error);
+                        Footer.updateStatus(error, 'error');
                     });
                 e.preventDefault();
             }

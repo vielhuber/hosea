@@ -661,7 +661,38 @@ html.jwtbutler-login-form-visible .login-form__error {
       border-width: 1rem; } }
 
 .footer__status {
-  text-align: center; }
+  text-align: center;
+  z-index: 1; }
+
+.footer__status:after {
+  content: '';
+  position: absolute;
+  width: 15%;
+  height: 1px;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  z-index: -1;
+  transition: all 0.75s ease-in-out;
+  border-radius: 50%;
+  box-shadow: 0 0 10rem 10rem #ffffff;
+  background-color: #ffffff;
+  opacity: 0.15; }
+
+.footer__status--success:after {
+  box-shadow: 0 0 30rem 30rem #6ccbb8;
+  background-color: #6ccbb8;
+  opacity: 0.5; }
+
+.footer__status--warning:after {
+  box-shadow: 0 0 30rem 30rem #ee7752;
+  background-color: #ee7752;
+  opacity: 0.5; }
+
+.footer__status--error:after {
+  box-shadow: 0 0 30rem 30rem #e91e63;
+  background-color: #e91e63;
+  opacity: 0.75; }
 
 .footer__logout {
   text-align: right; }

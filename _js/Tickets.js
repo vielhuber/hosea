@@ -181,16 +181,16 @@ export default class Tickets {
             let focus = document.activeElement;
             if (event.ctrlKey || event.metaKey) {
                 if (String.fromCharCode(event.which).toLowerCase() === 's') {
-                    Footer.updateStatus('saving...');
+                    Footer.updateStatus('saving...', 'warning');
                     Tickets.saveTickets()
                         .then(() => {
-                            Footer.updateStatus('saved!');
+                            Footer.updateStatus('saved!', 'success');
                             if (focus !== null) {
                                 focus.focus();
                             }
                         })
                         .catch(error => {
-                            Footer.updateStatus(error);
+                            Footer.updateStatus(error, 'error');
                         });
                     event.preventDefault();
                 }
