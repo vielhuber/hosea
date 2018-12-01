@@ -26,6 +26,10 @@ class Api
 
     protected function checkAuth()
     {
+        if( $this->getRequestPathFirst() === 'ical' )
+        {
+            return;
+        }
         $this::$auth = new simpleauth(__DIR__ . '/../../.env');
         if (!$this::$auth->isLoggedIn()) {
             $this->response(
@@ -59,6 +63,7 @@ class Api
     {
         $this->Ticket->getRequest();
         $this->Attachment->getRequest();
+        $this->iCal->getRequest();
         $this->response(
             [
                 'success' => false,

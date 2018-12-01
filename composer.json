@@ -4,7 +4,8 @@
         "vlucas/phpdotenv": "^2.5",
         "vielhuber/simpleauth": "^1.2",
         "guzzlehttp/guzzle": "^6.3",
-        "vielhuber/comparehelper": "^1.0"
+        "vielhuber/comparehelper": "^1.0",
+        "eluceo/ical": "^0.14.0"
     },
     "autoload": {
         "psr-4": {

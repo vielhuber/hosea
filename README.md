@@ -18,6 +18,7 @@ hosea is a personal assistant.
 -   all data (including attachments) are inside the db
 -   supports mysql/postgres databases
 -   save login system using jwt
+-   live ical export for outlook integration
 
 ## installation
 
