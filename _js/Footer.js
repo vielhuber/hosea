@@ -81,4 +81,9 @@ export default class Footer {
             }
         });
     }
+    static linkiCal() {
+        document
+            .querySelector('.footer__ical')
+            .setAttribute('href', '_api/ical/' + Store.data.user.ical_key);
+    }
 }

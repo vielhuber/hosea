@@ -651,7 +651,7 @@ html.jwtbutler-login-form-visible .login-form__error {
   border-right-width: 0;
   border-bottom-width: 0;
   display: grid;
-  grid-template-columns: 0.1fr 0.1fr 1fr 0.2fr;
+  grid-template-columns: 0.1fr 0.1fr 1fr 0.1fr 0.1fr;
   grid-template-rows: 1fr; }
   @media screen and (max-width: 700px) {
     .footer {
@@ -694,18 +694,20 @@ html.jwtbutler-login-form-visible .login-form__error {
   background-color: #e91e63;
   opacity: 0.75; }
 
+.footer__ical,
 .footer__logout {
   text-align: right; }
 
 @media screen and (max-width: 700px) {
   .footer {
     padding: 0 5rem;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
     border-left-width: 1rem;
     border-bottom-width: 2rem;
     border-right-width: 1rem; }
   .footer__save,
   .footer__create,
+  .footer__ical,
   .footer__logout {
     text-align: center; } }
 

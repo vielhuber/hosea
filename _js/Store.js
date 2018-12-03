@@ -4,6 +4,7 @@ export default class Store {
     static initStore() {
         Store.data = {
             api: null,
+            user: null,
             tickets: null,
             cols: ['status', 'priority', 'date', 'time', 'project', 'description'],
             colors: {

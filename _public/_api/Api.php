@@ -63,6 +63,7 @@ class Api
     {
         $this->Ticket->getRequest();
         $this->Attachment->getRequest();
+        $this->User->getRequest();
         $this->iCal->getRequest();
         $this->response(
             [

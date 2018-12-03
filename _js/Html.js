@@ -17,6 +17,7 @@ export default class Html {
             <a href="#" class="footer__save">_save</a>
             <a href="#" class="footer__create">_create</a>
             <span class="footer__status"></span>
+            <a href="#" class="footer__ical" target="_blank">_ical</a>
             <a href="#" class="footer__logout">_logout</a>
             `
         );

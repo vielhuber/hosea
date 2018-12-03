@@ -1,5 +1,6 @@
 import Auth from './Auth';
 import Attachments from './Attachments';
+import Footer from './Footer';
 import Filter from './Filter';
 import Html from './Html';
 import Keyboard from './Keyboard';
@@ -8,12 +9,13 @@ import Sort from './Sort';
 import Store from './Store';
 import Textarea from './Textarea';
 import Tickets from './Tickets';
-import Footer from './Footer';
+import User from './User';
 
 export default class App {
     static async init() {
         Store.initStore();
         await Auth.login();
+        await User.fetchUser();
         await Tickets.fetchTickets();
         Html.buildHtml();
         Keyboard.initKeyboardNavigation();
@@ -29,6 +31,7 @@ export default class App {
         Footer.bindSave();
         Footer.bindCreate();
         Footer.bindLogout();
+        Footer.linkiCal();
         Footer.initStatus();
         Keyboard.bindRefresh();
         Tickets.bindCreate();
