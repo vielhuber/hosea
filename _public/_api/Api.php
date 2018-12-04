@@ -13,8 +13,8 @@ class Api
 
     public function __construct()
     {
-        $this->checkAuth();
         $this->initDb();
+        $this->checkAuth();
         $this->getRequest();
     }
 
@@ -26,12 +26,18 @@ class Api
 
     protected function checkAuth()
     {
-        if( $this->getRequestPathFirst() === 'ical' )
-        {
-            return;
+        $success = true;
+        if ($this->getRequestPathFirst() === 'ical') {
+            if ($this->getRequestPathSecond() == '' || $this::$db->fetch_var('SELECT COUNT(*) FROM users WHERE ical_key = ?', $this->getRequestPathSecond()) == 0) {
+                $success = false;
+            }
+        } else {
+            $this::$auth = new simpleauth(__DIR__ . '/../../.env');
+            if (!$this::$auth->isLoggedIn()) {
+                $success = false;
+            }
         }
-        $this::$auth = new simpleauth(__DIR__ . '/../../.env');
-        if (!$this::$auth->isLoggedIn()) {
+        if ($success === false) {
             $this->response(
                 [
                     'success' => false,
@@ -48,15 +54,7 @@ class Api
         $dotenv = new Dotenv(__DIR__ . '/../../');
         $dotenv->load();
         $this::$db = new dbhelper();
-        $this::$db->connect(
-            'pdo',
-            getenv('DB_CONNECTION'),
-            getenv('DB_HOST'),
-            getenv('DB_USERNAME'),
-            getenv('DB_PASSWORD'),
-            getenv('DB_DATABASE'),
-            getenv('DB_PORT')
-        );
+        $this::$db->connect('pdo', getenv('DB_CONNECTION'), getenv('DB_HOST'), getenv('DB_USERNAME'), getenv('DB_PASSWORD'), getenv('DB_DATABASE'), getenv('DB_PORT'));
     }
 
     protected function getRequest()
@@ -78,7 +76,7 @@ class Api
     protected function getRequestPath()
     {
         $path = $_SERVER['REQUEST_URI'];
-        $path = substr($path, strpos($path,'_api')+strlen('_api'));
+        $path = substr($path, strpos($path, '_api') + strlen('_api'));
         $path = trim($path, '/');
         return $path;
     }
@@ -137,20 +135,16 @@ class Api
         die();
     }
 
-
     public function colsWithout(...$array)
     {
         $ret = [];
-        foreach( $this->cols as $cols__value)
-        {
-            if( !in_array($cols__value, $array) )
-            {
+        foreach ($this->cols as $cols__value) {
+            if (!in_array($cols__value, $array)) {
                 $ret[] = $cols__value;
             }
         }
         return $ret;
     }
-    
 }
 
 $api = new Api();
