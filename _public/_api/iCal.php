@@ -30,9 +30,10 @@ class iCal extends Api
                     $vEvent->setDtEnd(new \DateTime($dates__value['date']));
                     $vEvent->setNoTime(true);
                 }
-                $vEvent->setSummary('Christmas');
-                $vEvent->setDescription('Happy Christmas!');
-                $vEvent->setDescriptionHTML('<b>Happy Christmas!</b>');
+                $vEvent->setCategories(['_' . $tickets__value['status']]);
+                $vEvent->setSummary($tickets__value['project']);
+                $vEvent->setDescription($tickets__value['description']);
+                $vEvent->setDescriptionHTML(nl2br($tickets__value['description']));
                 $vCalendar->addComponent($vEvent);
             }
         }
@@ -56,7 +57,7 @@ class iCal extends Api
                 $date = '20' . substr($dates__value, 6, 2) . '-' . substr($dates__value, 3, 2) . '-' . substr($dates__value, 0, 2);
                 $begin = strlen($dates__value) > 8 ? substr($dates__value, 9, 5) : null;
                 $end = strlen($dates__value) > 8 ? substr($dates__value, 15, 5) : null;
-                if ($end === 0) {
+                if ($end == 0) {
                     $end = 24;
                 }
                 $return[] = [
@@ -65,7 +66,34 @@ class iCal extends Api
                     'end' => $end
                 ];
             }
+            if (preg_match('/^(MO|DI|MI|DO|FR|SA|SO)((#|~)[1-9][0-9]?)?( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?( (-|>|<)[0-9][0-9].[0-9][0-9].[1-2][0-9])*$/', $dates__value)) {
+                $curday = strtotime('2018-01-01');
+                $endday = strtotime('now + 1 year');
+                while ($curday < $endday) {
+                    $day = substr($dates__value, 0, 2);
+                    if ($this->getDayFromTime($curday) === $day && !$this->dateIsExcluded($curday, $dates__value)) {
+                    }
+                    $curday = strtotime('+ 1 day', $curday);
+                }
+            }
         }
         return $return;
+    }
+
+    protected function getDayFromTime($curday)
+    {
+        return [
+            1 => 'MO',
+            2 => 'DI',
+            3 => 'MI',
+            4 => 'DO',
+            5 => 'FR',
+            6 => 'SA',
+            7 => 'SO'
+        ][date('N', $curday)];
+    }
+
+    protected function dateIsExcluded($curday, $dates__value)
+    {
     }
 }
