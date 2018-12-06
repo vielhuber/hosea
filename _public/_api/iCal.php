@@ -30,6 +30,19 @@ class iCal extends Api
                     $vEvent->setDtEnd(new \DateTime($dates__value['date']));
                     $vEvent->setNoTime(true);
                 }
+                if ($dates__value['recurrence'] !== null) {
+                    $recurrenceRule = new \Eluceo\iCal\Property\Event\RecurrenceRule();
+                    $recurrenceRule->setFreq('YEARLY');
+                    $recurrenceRule->setInterval(1);
+                    $recurrenceRule->setCount(1);
+                    $recurrenceRule->setUntil(new \DateTime('1997-12-24'));
+                    $recurrenceRule->setByDay('MO,WE,FR');
+                    $recurrenceRule->setByMonth(1);
+                    $recurrenceRule->setByWeekNo(1);
+                    $recurrenceRule->setByYearDay(1);
+                    $recurrenceRule->setByMonthDay(1);
+                    $vEvent->setRecurrenceRule($recurrenceRule);
+                }
                 $vEvent->setCategories(['_' . $tickets__value['status']]);
                 $vEvent->setSummary($tickets__value['project']);
                 $vEvent->setDescription($tickets__value['description']);
@@ -63,21 +76,50 @@ class iCal extends Api
                 $return[] = [
                     'date' => $date,
                     'begin' => $begin,
-                    'end' => $end
+                    'end' => $end,
+                    'recurrence' => null
                 ];
             }
             if (preg_match('/^(MO|DI|MI|DO|FR|SA|SO)((#|~)[1-9][0-9]?)?( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?( (-|>|<)[0-9][0-9].[0-9][0-9].[1-2][0-9])*$/', $dates__value)) {
-                $curday = strtotime('2018-01-01');
-                $endday = strtotime('now + 1 year');
-                while ($curday < $endday) {
-                    $day = substr($dates__value, 0, 2);
-                    if ($this->getDayFromTime($curday) === $day && !$this->dateIsExcluded($curday, $dates__value)) {
-                    }
-                    $curday = strtotime('+ 1 day', $curday);
+                $day = substr($dates__value, 0, 2);
+                $date = $this->getFirstWeekdayOfYear($day, date('Y') - 2);
+                $begin = null;
+                $end = null;
+                if (count(explode(':', $dates__value)) === 3) {
+                    $shift = strpos($dates__value, ':') - 2;
+                    $begin = intval(substr($dates__value, $shift, 2)) + intval(substr($dates__value, $shift + 3, 2)) / 60;
+                    $end = intval(substr($dates__value, $shift + 6, 2)) + intval(substr($dates__value, $shift + 9, 2)) / 60;
                 }
+                if ($end === 0) {
+                    $end = 24;
+                }
+                /*
+                print_r([
+                    $dates__value,
+                    [
+                        'date' => $date,
+                        'begin' => $begin,
+                        'end' => $end,
+                        'recurrence' => 'test'
+                    ]
+                ]);
+                die();
+                */
+                $return[] = [
+                    'date' => $date,
+                    'begin' => $begin,
+                    'end' => $end,
+                    'recurrence' => 'test'
+                ];
             }
         }
         return $return;
+    }
+
+    function getFirstWeekdayOfYear($day, $year)
+    {
+        $day = ['MO' => 'monday', 'DI' => 'tuesday', 'MI' => 'wednesday', 'DO' => 'thursday', 'FR' => 'friday', 'SA' => 'saturday', 'SO' => 'sunday'][$day];
+        return date('Y-m-d', strtotime('first ' . $day . ' of january ' . $year));
     }
 
     protected function getDayFromTime($curday)
