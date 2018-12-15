@@ -68,6 +68,7 @@ export default class Sort {
                             'done',
                             'working',
                             'scheduled',
+                            'fixed',
                             'idle',
                             'recurring',
                             'roaming'

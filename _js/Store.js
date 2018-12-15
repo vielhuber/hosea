@@ -8,9 +8,10 @@ export default class Store {
             tickets: null,
             cols: ['status', 'priority', 'date', 'time', 'project', 'description'],
             colors: {
-                idle: '#2196F3',
+                idle: '#4527a0',
                 allday: '#868686',
                 roaming: '#ba68c8',
+                fixed: '#2196F3',
                 done: '#FFB300',
                 billed: '#4CAF50',
                 recurring: '#E91E63',

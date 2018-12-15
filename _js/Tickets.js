@@ -332,6 +332,7 @@ export default class Tickets {
                             'idle',
                             'allday',
                             'roaming',
+                            'fixed',
                             'done',
                             'billed',
                             'recurring',

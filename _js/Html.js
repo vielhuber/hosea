@@ -55,6 +55,7 @@ export default class Html {
 idle
 allday
 roaming
+fixed
 done
 billed
 recurring
