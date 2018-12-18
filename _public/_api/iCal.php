@@ -80,9 +80,14 @@ class iCal extends Api
                     'recurrence' => null
                 ];
             }
+
+            // MO [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
+            // MO 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
+            // MO#1 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
+            // MO#12 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
+            // MO~1 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
+            // MO~12 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
             if (preg_match('/^(MO|DI|MI|DO|FR|SA|SO)((#|~)[1-9][0-9]?)?( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?( (-|>|<)[0-9][0-9].[0-9][0-9].[1-2][0-9])*$/', $dates__value)) {
-                $day = substr($dates__value, 0, 2);
-                $date = $this->getFirstWeekdayOfYear($day, date('Y') - 2);
                 $begin = null;
                 $end = null;
                 if (count(explode(':', $dates__value)) === 3) {
@@ -93,6 +98,64 @@ class iCal extends Api
                 if ($end === 0) {
                     $end = 24;
                 }
+
+                $date_min = null;
+                if (strpos($dates__value, '>') !== false) {
+                    foreach (explode(' ', $dates__value) as $dates__value__value) {
+                        if (strpos($dates__value__value, '>') === 0) {
+                            if ($date_min === null || strtotime(substr($dates__value__value, 1)) > strtotime($date_min)) {
+                                $date_min = substr($dates__value__value, 1);
+                            }
+                        }
+                    }
+                }
+                $date_max = null;
+                if (strpos($dates__value, '<') !== false) {
+                    foreach (explode(' ', $dates__value) as $dates__value__value) {
+                        if (strpos($dates__value__value, '<') === 0) {
+                            if ($date_max === null || strtotime(substr($dates__value__value, 1)) < strtotime($date_max)) {
+                                $date_max = substr($dates__value__value, 1);
+                            }
+                        }
+                    }
+                }
+
+                $byday = ['MO' => 'MO', 'DI' => 'TU', 'MI' => 'WE', 'DO' => 'TH', 'FR' => 'FR', 'SA' => 'SA', 'SO' => 'SU'][substr($dates__value, 0, 2)];
+
+                $byweekno = null;
+                if (substr($dates__value, 2, 1) === '#') {
+                    $byweekno = [];
+                    $rule_original = trim(substr($dates__value, 2, 2));
+                    $rule = $rule_original;
+                    while ($rule < 53) {
+                        $byweekno[] = $rule;
+                        if ($rule_original < 4) {
+                            $rule += 4;
+                        } else {
+                            $rule += $rule_original;
+                        }
+                    }
+                    $byweekno = implode(',', $byweekno);
+                }
+                if (substr($dates__value, 2, 1) === '~') {
+                    $byweekno = trim(substr($dates__value, 2, 2));
+                }
+
+                /*
+                $return[] = [
+                    'date' => $date,
+                    'begin' => $begin,
+                    'end' => $end,
+                    'recurrence' => [
+                        'dtstart' => $date_min,
+                        'until' => $date_max,
+                        'freq' => 'weekly',
+                        'byday' => $byday,
+                        'byweekno' => $byweekno
+                    ]
+                ];
+                */
+
                 /*
                 print_r([
                     $dates__value,

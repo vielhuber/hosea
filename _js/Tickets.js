@@ -228,7 +228,13 @@ export default class Tickets {
             duplicateData = Tickets.getTicketData(current.getAttribute('data-id'));
         }
         /* if source is a recurring ticket, do some magic */
-        if (current !== null && duplicateData.status === 'recurring') {
+        if (
+            current !== null &&
+            duplicateData.status === 'recurring' &&
+            confirm(
+                'should the copy be a scheduled ticket and the recurring ticket automatically be postponed?'
+            )
+        ) {
             let newDates = [];
             duplicateData.date.split('\n').forEach(duplicateData__value => {
                 let newDate = Dates.dateFormat(Dates.getActiveDate(), 'd.m.y'),
