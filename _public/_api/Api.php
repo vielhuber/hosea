@@ -78,6 +78,9 @@ class Api
         $path = $_SERVER['REQUEST_URI'];
         $path = substr($path, strpos($path, '_api') + strlen('_api'));
         $path = trim($path, '/');
+        if (strpos($path, '?')) {
+            $path = substr($path, 0, strpos($path, '?'));
+        }
         return $path;
     }
 

@@ -62,10 +62,12 @@ class iCal extends Api
                 $vCalendar->addComponent($vEvent);
             }
         }
-
-        //echo '<pre>';
-        //print_r($vCalendar);
-        //die();
+        if (@$_GET['test'] == 1) {
+            echo '<pre>';
+            print_r($vCalendar);
+            echo $vCalendar->render();
+            die();
+        }
 
         header('Content-Type: text/calendar; charset=utf-8');
         header('Content-Disposition: attachment; filename="cal.ics"');
@@ -114,7 +116,7 @@ class iCal extends Api
                     foreach (explode(' ', $dates__value) as $dates__value__value) {
                         if (strpos($dates__value__value, '>') === 0) {
                             if ($date === null || strtotime(substr($dates__value__value, 1)) > strtotime($date)) {
-                                $date = substr($dates__value__value, 1);
+                                $date = date('Y-m-d', strtotime(substr($dates__value__value, 1, 6) . '20' . substr($dates__value__value, 7, 8)));
                             }
                         }
                     }
@@ -125,7 +127,7 @@ class iCal extends Api
                     foreach (explode(' ', $dates__value) as $dates__value__value) {
                         if (strpos($dates__value__value, '<') === 0) {
                             if ($recurrence['until'] === null || strtotime(substr($dates__value__value, 1)) < strtotime($recurrence['until'])) {
-                                $recurrence['until'] = substr($dates__value__value, 1);
+                                $recurrence['until'] = date('Y-m-d', strtotime(substr($dates__value__value, 1, 6) . '20' . substr($dates__value__value, 7, 8)));
                             }
                         }
                     }
@@ -160,9 +162,11 @@ class iCal extends Api
                 ];
             }
         }
-        //echo '<pre>';
-        //print_r($return);
-        //die();
+        if (@$_GET['test'] == 2) {
+            echo '<pre>';
+            print_r($return);
+            die();
+        }
         return $return;
     }
 
