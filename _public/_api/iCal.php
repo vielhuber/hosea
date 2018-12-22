@@ -44,7 +44,8 @@ class iCal extends Api
                         $recurrenceRule->setByDay($dates__value['recurrence']['byday']);
                     }
                     if (@$dates__value['recurrence']['byweekno'] != '') {
-                        $recurrenceRule->setByWeekNo($dates__value['recurrence']['byweekno']);
+                        //$recurrenceRule->setByWeekNo($dates__value['recurrence']['byweekno']);
+                        $recurrenceRule->setByWeekNo('1');
                     }
                     /*
                     $recurrenceRule->setInterval(1);
@@ -93,9 +94,31 @@ class iCal extends Api
                     'end' => $end,
                     'recurrence' => null
                 ];
-            }
-
-            if (preg_match('/^(MO|DI|MI|DO|FR|SA|SO)((#|~)[1-9][0-9]?)?( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?( (-|>|<)[0-9][0-9].[0-9][0-9].[1-2][0-9])*$/', $dates__value)) {
+            } elseif (preg_match('/^[0-9][0-9].[0-9][0-9].( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?( (-|>|<)[0-9][0-9].[0-9][0-9].[1-2][0-9])*$/', $dates__value)) {
+                $begin = null;
+                $end = null;
+                if (count(explode(':', $dates__value)) === 3) {
+                    $shift = strpos($dates__value, ':') - 2;
+                    $begin = intval(substr($dates__value, $shift, 2)) + intval(substr($dates__value, $shift + 3, 2)) / 60;
+                    $end = intval(substr($dates__value, $shift + 6, 2)) + intval(substr($dates__value, $shift + 9, 2)) / 60;
+                }
+                if ($end === 0) {
+                    $end = 24;
+                }
+                $date = '2016-' . substr($dates__value, 3, 2) . '-' . substr($dates__value, 0, 2);
+                for ($i = 0; $i < 10; $i++) {
+                    $date = date('Y-m-d', strtotime($date . ' + 1 year'));
+                    if ($this->dateIsExcluded($date, $dates__value)) {
+                        continue;
+                    }
+                    $return[] = [
+                        'date' => $date,
+                        'begin' => $begin,
+                        'end' => $end,
+                        'recurrence' => null
+                    ];
+                }
+            } elseif (preg_match('/^(MO|DI|MI|DO|FR|SA|SO)((#|~)[1-9][0-9]?)?( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?( (-|>|<)[0-9][0-9].[0-9][0-9].[1-2][0-9])*$/', $dates__value)) {
                 $begin = null;
                 $end = null;
                 if (count(explode(':', $dates__value)) === 3) {
@@ -136,9 +159,11 @@ class iCal extends Api
                 $recurrence['byday'] = ['MO' => 'MO', 'DI' => 'TU', 'MI' => 'WE', 'DO' => 'TH', 'FR' => 'FR', 'SA' => 'SA', 'SO' => 'SU'][substr($dates__value, 0, 2)];
 
                 $recurrence['byweekno'] = null;
+
+                /*
                 if (substr($dates__value, 2, 1) === '#') {
                     $recurrence['byweekno'] = [];
-                    $rule_original = trim(substr($dates__value, 2, 2));
+                    $rule_original = trim(substr($dates__value, 3, 2));
                     $rule = $rule_original;
                     while ($rule < 53) {
                         $recurrence['byweekno'][] = $rule;
@@ -152,6 +177,10 @@ class iCal extends Api
                 }
                 if (substr($dates__value, 2, 1) === '~') {
                     $recurrence['byweekno'] = trim(substr($dates__value, 2, 2));
+                }
+                */
+
+                if (substr($dates__value, 2, 1) === '~') {
                 }
 
                 $return[] = [
@@ -170,26 +199,27 @@ class iCal extends Api
         return $return;
     }
 
-    function getFirstWeekdayOfYear($day, $year)
+    protected function dateIsExcluded($date, $dates)
     {
-        $day = ['MO' => 'monday', 'DI' => 'tuesday', 'MI' => 'wednesday', 'DO' => 'thursday', 'FR' => 'friday', 'SA' => 'saturday', 'SO' => 'sunday'][$day];
-        return date('Y-m-d', strtotime('first ' . $day . ' of january ' . $year));
-    }
-
-    protected function getDayFromTime($curday)
-    {
-        return [
-            1 => 'MO',
-            2 => 'DI',
-            3 => 'MI',
-            4 => 'DO',
-            5 => 'FR',
-            6 => 'SA',
-            7 => 'SO'
-        ][date('N', $curday)];
-    }
-
-    protected function dateIsExcluded($curday, $dates__value)
-    {
+        $ret = false;
+        foreach (explode(' ', $dates) as $dates__value) {
+            $excluded = '20' . substr($dates__value, 7, 2) . '-' . substr($dates__value, 4, 2) . '-' . substr($dates__value, 1, 2);
+            if (substr($dates__value, 0, 1) === '-') {
+                if ($date === $excluded) {
+                    $ret = true;
+                }
+            }
+            if (substr($dates__value, 0, 1) === '>') {
+                if (strtotime($date) < strtotime($excluded)) {
+                    $ret = true;
+                }
+            }
+            if (substr($dates__value, 0, 1) === '<') {
+                if (strtotime($date) > strtotime($excluded)) {
+                    $ret = true;
+                }
+            }
+        }
+        return $ret;
     }
 }
