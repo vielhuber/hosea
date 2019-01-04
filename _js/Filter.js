@@ -65,7 +65,26 @@ export default class Filter {
                 }
             } else {
                 let options = [];
+
+                let skip_old_dates = [],
+                    skip_year_end =
+                        parseInt(
+                            new Date()
+                                .getFullYear()
+                                .toString()
+                                .slice(-2)
+                        ) - 1;
+                for (let skip_year = 17; skip_year <= skip_year_end; skip_year++) {
+                    skip_old_dates.push('.' + skip_year);
+                }
+
                 Store.data.tickets.forEach(tickets__value => {
+                    // skip old projects
+                    if (columns__value === 'project') {
+                        if (skip_old_dates.includes(tickets__value.date.substring(5, 8))) {
+                            return;
+                        }
+                    }
                     let options_value = tickets__value[columns__value];
                     if (!options.includes(options_value)) {
                         options.push(options_value);
