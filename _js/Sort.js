@@ -67,8 +67,8 @@ export default class Sort {
                             'billed',
                             'done',
                             'working',
-                            'scheduled',
                             'fixed',
+                            'scheduled',
                             'idle',
                             'recurring',
                             'roaming'
