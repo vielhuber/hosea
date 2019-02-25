@@ -148,7 +148,7 @@ export default class Scheduler {
                     left:${date__value.posLeft}%;
                     top:${date__value.posTop}%;
                     bottom:${date__value.posBottom}%;
-                    background-color:${date__value.backgroundColor};
+                    background:${date__value.background};
                     opacity:${date__value.opacity};
                     width:${date__value.width};
                 ">
@@ -220,8 +220,10 @@ export default class Scheduler {
                     tickets__value.project +
                     '\n' +
                     (tickets__value.description || '').substring(0, 100),
-                backgroundColor = Scheduler.getColor(tickets__value.status),
                 parsed_values = Dates.parseDateString(tickets__value.date, 'scheduler');
+            let background =
+                Scheduler.getBackgroundColor(tickets__value.status, tickets__value.project) ||
+                Scheduler.getBorderColor(tickets__value.status, tickets__value.project);
             if (parsed_values !== false && parsed_values.length > 0) {
                 parsed_values.forEach(parsed_values__value => {
                     generatedDates.push({
@@ -230,7 +232,7 @@ export default class Scheduler {
                         end: parsed_values__value.end,
                         name: name,
                         title: title,
-                        backgroundColor: backgroundColor,
+                        background: background,
                         opacity: tickets__value.status === 'allday' ? 0.75 : 1
                     });
                 });
@@ -343,22 +345,62 @@ export default class Scheduler {
         return generatedDates;
     }
 
-    static getColor(status) {
-        let color = '#9E9E9E';
-        if (status !== null && status != '' && Store.data.colors.hasOwnProperty(status)) {
-            color = Store.data.colors[status];
+    static getColor(status, project = null) {
+        if (
+            project !== null &&
+            project !== '' &&
+            Store.data.colors.project.hasOwnProperty(project)
+        ) {
+            return Store.data.colors.project[project];
+        }
+        if (status !== null && status !== '' && Store.data.colors.status.hasOwnProperty(status)) {
+            return Store.data.colors.status[status];
+        }
+        return {
+            border: '#9E9E9E'
+        };
+    }
+
+    static getBackgroundColor(status, project = null) {
+        let color = Scheduler.getColor(status, project);
+        if (typeof color === 'object' && 'background' in color) {
+            return color.background;
+        }
+        return null;
+    }
+
+    static getBorderColor(status, project = null) {
+        let color = Scheduler.getColor(status, project);
+        if (typeof color === 'object' && 'border' in color) {
+            return color.border;
         }
         return color;
     }
 
     static updateColors() {
         Store.data.tickets.forEach(tickets__value => {
-            document.querySelector(
-                '.tickets .tickets__entry[data-id="' + tickets__value.id + '"]'
-            ).style.borderLeftColor = Scheduler.getColor(tickets__value.status);
-            document.querySelector(
-                '.tickets .tickets__entry[data-id="' + tickets__value.id + '"]'
-            ).style.opacity = tickets__value.status === 'allday' ? 0.65 : 1;
+            let borderColor = Scheduler.getBorderColor(
+                    tickets__value.status,
+                    tickets__value.project
+                ),
+                backgroundColor = Scheduler.getBackgroundColor(
+                    tickets__value.status,
+                    tickets__value.project
+                ),
+                el = document.querySelector(
+                    '.tickets .tickets__entry[data-id="' + tickets__value.id + '"]'
+                );
+            if (borderColor) {
+                el.style.borderLeftColor = borderColor;
+            } else {
+                el.style.borderLeftColor = 'transparent';
+            }
+            if (backgroundColor) {
+                el.style.background = backgroundColor;
+            } else {
+                el.style.background = 'none';
+            }
+            el.style.opacity = tickets__value.status === 'allday' ? 0.65 : 1;
         });
     }
 }
