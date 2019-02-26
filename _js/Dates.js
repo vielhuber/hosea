@@ -102,16 +102,19 @@ export default class Dates {
 
                 if (view !== 'all' && string__value.substring(2, 3) === '#') {
                     let num = parseInt(string__value.substring(3, 5).trim()),
-                        num_2 = Math.ceil(num / 4) * 4,
-                        nthDay = Math.floor((Dates.dayOfYear(d) - 1) / 7) + 1;
-                    if ((nthDay - num) % num_2 != 0) {
+                        nthWeekdayOfMonth = this.nthWeekdayOfMonth(d);
+                    if (num % 4 !== nthWeekdayOfMonth) {
+                        return;
+                    }
+                    if (num / 4 > 1 && (d.getMonth() + 1) % (Math.floor(num / 4) + 1) !== 0) {
                         return;
                     }
                 }
+
                 if (view !== 'all' && string__value.substring(2, 3) === '~') {
                     let num = parseInt(string__value.substring(3, 5).trim()),
-                        nthDay = Math.floor((Dates.dayOfYear(d) - 1) / 7) + 1;
-                    if (num != nthDay) {
+                        weekNumber = this.weekNumber(d);
+                    if (num != weekNumber) {
                         return;
                     }
                 }
@@ -463,6 +466,11 @@ export default class Dates {
             60 /
             1000
         );
+    }
+
+    static nthWeekdayOfMonth(date) {
+        let c = date.getDate();
+        return Math.floor((c - 1) / 7) + 1;
     }
 
     static includeNewLowerBoundInDate(date, lowerBound) {

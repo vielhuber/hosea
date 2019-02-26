@@ -129,16 +129,18 @@ class iCal extends Api
     {
         if (strpos($dates, '#') === 2) {
             $num = trim(substr($dates, 3, 2));
-            $num_2 = ceil($num / 4) * 4;
-            $nthDay = floor(date('z', strtotime($date)) / 7) + 1;
-            if (($nthDay - $num) % $num_2 != 0) {
-                return true;
+            $nthWeekdayOfMonth = $this->nthWeekdayOfMonth($date);
+            if ($num % 4 !== $nthWeekdayOfMonth) {
+                return;
+            }
+            if ($num / 4 > 1 && date('m', strtotime($date)) % (floor($num / 4) + 1) !== 0) {
+                return;
             }
         }
         if (strpos($dates, '~') === 2) {
             $num = trim(substr($dates, 3, 2));
-            $nthDay = floor(date('z', strtotime($date)) / 7) + 1;
-            if ($num != $nthDay) {
+            $weekNumber = intval(date('W', strtotime($date)));
+            if ($num != $weekNumber) {
                 return true;
             }
         }
@@ -161,5 +163,11 @@ class iCal extends Api
             }
         }
         return false;
+    }
+
+    protected function nthWeekdayOfMonth($date)
+    {
+        $c = date('d', strtotime($date));
+        return floor(($c - 1) / 7) + 1;
     }
 }
