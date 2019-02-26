@@ -131,10 +131,10 @@ class iCal extends Api
             $num = trim(substr($dates, 3, 2));
             $nthWeekdayOfMonth = $this->nthWeekdayOfMonth($date);
             if ($num % 4 !== $nthWeekdayOfMonth) {
-                return;
+                return true;
             }
             if ($num / 4 > 1 && date('m', strtotime($date)) % (floor($num / 4) + 1) !== 0) {
-                return;
+                return true;
             }
         }
         if (strpos($dates, '~') === 2) {
