@@ -379,28 +379,30 @@ export default class Scheduler {
 
     static updateColors() {
         Store.data.tickets.forEach(tickets__value => {
-            let borderColor = Scheduler.getBorderColor(
-                    tickets__value.status,
-                    tickets__value.project
-                ),
-                backgroundColor = Scheduler.getBackgroundColor(
-                    tickets__value.status,
-                    tickets__value.project
-                ),
-                el = document.querySelector(
-                    '.tickets .tickets__entry[data-id="' + tickets__value.id + '"]'
-                );
-            if (borderColor) {
-                el.style.borderLeftColor = borderColor;
-            } else {
-                el.style.borderLeftColor = 'transparent';
+            if (tickets__value.visible === true) {
+                let borderColor = Scheduler.getBorderColor(
+                        tickets__value.status,
+                        tickets__value.project
+                    ),
+                    backgroundColor = Scheduler.getBackgroundColor(
+                        tickets__value.status,
+                        tickets__value.project
+                    ),
+                    el = document.querySelector(
+                        '.tickets .tickets__entry[data-id="' + tickets__value.id + '"]'
+                    );
+                if (borderColor) {
+                    el.style.borderLeftColor = borderColor;
+                } else {
+                    el.style.borderLeftColor = 'transparent';
+                }
+                if (backgroundColor) {
+                    el.style.background = backgroundColor;
+                } else {
+                    el.style.background = 'none';
+                }
+                el.style.opacity = tickets__value.status === 'allday' ? 0.65 : 1;
             }
-            if (backgroundColor) {
-                el.style.background = backgroundColor;
-            } else {
-                el.style.background = 'none';
-            }
-            el.style.opacity = tickets__value.status === 'allday' ? 0.65 : 1;
         });
     }
 }

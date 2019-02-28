@@ -187,6 +187,7 @@ export default class Filter {
             }
         });
         Sort.doSort();
+        Scheduler.updateColors();
         Tickets.updateSum();
         Textarea.textareaSetVisibleHeights();
     }
