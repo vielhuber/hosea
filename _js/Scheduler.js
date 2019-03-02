@@ -222,8 +222,18 @@ export default class Scheduler {
                     (tickets__value.description || '').substring(0, 100),
                 parsed_values = Dates.parseDateString(tickets__value.date, 'scheduler');
             let background =
-                Scheduler.getBackgroundColor(tickets__value.status, tickets__value.project) ||
-                Scheduler.getBorderColor(tickets__value.status, tickets__value.project);
+                Scheduler.getStoreProperty(
+                    'background',
+                    tickets__value.status,
+                    tickets__value.project,
+                    null
+                ) ||
+                Scheduler.getStoreProperty(
+                    'border',
+                    tickets__value.status,
+                    tickets__value.project,
+                    '#9E9E9E'
+                );
             if (parsed_values !== false && parsed_values.length > 0) {
                 parsed_values.forEach(parsed_values__value => {
                     generatedDates.push({
@@ -233,7 +243,12 @@ export default class Scheduler {
                         name: name,
                         title: title,
                         background: background,
-                        opacity: tickets__value.status === 'allday' ? 0.75 : 1
+                        opacity: Scheduler.getStoreProperty(
+                            'opacity',
+                            tickets__value.status,
+                            tickets__value.project,
+                            1
+                        )
                     });
                 });
             }
@@ -345,48 +360,48 @@ export default class Scheduler {
         return generatedDates;
     }
 
-    static getColor(status, project = null) {
+    static getStoreProperty(property, status, project = null, defValue = null) {
         if (
             project !== null &&
             project !== '' &&
-            Store.data.colors.project.hasOwnProperty(project)
+            Store.data.colors.project.hasOwnProperty(project) &&
+            typeof Store.data.colors.project[project] === 'object' &&
+            property in Store.data.colors.project[project]
         ) {
-            return Store.data.colors.project[project];
+            return Store.data.colors.project[project][property];
         }
-        if (status !== null && status !== '' && Store.data.colors.status.hasOwnProperty(status)) {
-            return Store.data.colors.status[status];
+        if (
+            status !== null &&
+            status !== '' &&
+            Store.data.colors.status.hasOwnProperty(status) &&
+            typeof Store.data.colors.status[status] === 'object' &&
+            property in Store.data.colors.status[status]
+        ) {
+            return Store.data.colors.status[status][property];
         }
-        return {
-            border: '#9E9E9E'
-        };
-    }
-
-    static getBackgroundColor(status, project = null) {
-        let color = Scheduler.getColor(status, project);
-        if (typeof color === 'object' && 'background' in color) {
-            return color.background;
-        }
-        return null;
-    }
-
-    static getBorderColor(status, project = null) {
-        let color = Scheduler.getColor(status, project);
-        if (typeof color === 'object' && 'border' in color) {
-            return color.border;
-        }
-        return color;
+        return defValue;
     }
 
     static updateColors() {
         Store.data.tickets.forEach(tickets__value => {
             if (tickets__value.visible === true) {
-                let borderColor = Scheduler.getBorderColor(
+                let borderColor = Scheduler.getStoreProperty(
+                        'border',
                         tickets__value.status,
-                        tickets__value.project
+                        tickets__value.project,
+                        '#9E9E9E'
                     ),
-                    backgroundColor = Scheduler.getBackgroundColor(
+                    backgroundColor = Scheduler.getStoreProperty(
+                        'background',
                         tickets__value.status,
-                        tickets__value.project
+                        tickets__value.project,
+                        null
+                    ),
+                    opacity = Scheduler.getStoreProperty(
+                        'opacity',
+                        tickets__value.status,
+                        tickets__value.project,
+                        1
                     ),
                     el = document.querySelector(
                         '.tickets .tickets__entry[data-id="' + tickets__value.id + '"]'
@@ -401,7 +416,11 @@ export default class Scheduler {
                 } else {
                     el.style.background = 'none';
                 }
-                el.style.opacity = tickets__value.status === 'allday' ? 0.65 : 1;
+                if (opacity) {
+                    el.style.opacity = opacity;
+                } else {
+                    el.style.opacity = 1;
+                }
             }
         });
     }

@@ -9,20 +9,40 @@ export default class Store {
             cols: ['status', 'priority', 'date', 'time', 'project', 'description'],
             colors: {
                 status: {
-                    idle: '#4527a0',
-                    allday: '#868686',
-                    roaming: '#ba68c8',
-                    fixed: '#2196F3',
-                    done: '#FFB300',
-                    billed: '#4CAF50',
-                    recurring: '#E91E63',
-                    working: '#F44336'
+                    idle: {
+                        border: '#4527a0'
+                    },
+                    allday: {
+                        border: '#868686',
+                        opacity: 0.75
+                    },
+                    roaming: {
+                        border: '#ba68c8'
+                    },
+                    fixed: {
+                        border: '#2196F3'
+                    },
+                    done: {
+                        border: '#FFB300'
+                    },
+                    billed: {
+                        border: '#4CAF50'
+                    },
+                    recurring: {
+                        border: '#E91E63'
+                    },
+                    working: {
+                        border: '#F44336'
+                    }
                 },
                 project: {
                     Geburtstag: {
                         border: '#ba68c8',
                         background:
                             'linear-gradient(178deg, #cb60b3 0%, #c146a1 50%, #a80077 51%, #db36a4 100%)'
+                    },
+                    Olga: {
+                        opacity: 0.75
                     }
                 }
             },
