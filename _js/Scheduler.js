@@ -140,29 +140,37 @@ export default class Scheduler {
 
         let generatedDates = Scheduler.generateDates();
 
+        let weeklySum = 0;
+
         generatedDates.forEach(date__value => {
             document.querySelector('.scheduler__appointments').insertAdjacentHTML(
                 'beforeend',
                 `
-                <div class="scheduler__appointment" title="${date__value.title}" style="
-                    left:${date__value.posLeft}%;
-                    top:${date__value.posTop}%;
-                    bottom:${date__value.posBottom}%;
-                    background:${date__value.background};
-                    opacity:${date__value.opacity};
-                    width:${date__value.width};
-                ">
-                    ${date__value.name}
-                </div>
-            `
+                    <div class="scheduler__appointment" title="${hlp.htmlEncode(
+                        date__value.title
+                    )}" style="
+                        left:${date__value.posLeft}%;
+                        top:${date__value.posTop}%;
+                        bottom:${date__value.posBottom}%;
+                        background:${date__value.background};
+                        opacity:${date__value.opacity};
+                        width:${date__value.width};
+                    ">
+                        ${date__value.name}
+                    </div>
+                `
             );
+            if (date__value.time != '' && date__value.project !== 'Olga') {
+                weeklySum += parseFloat(date__value.time.replace(',', '.'));
+            }
         });
+        weeklySum = (Math.round(weeklySum * 100) / 100).toString().replace('.', ',');
 
         document.querySelector('.scheduler__navigation-week').innerHTML = `
             ${Dates.dateFormat(Dates.getDayOfActiveWeek(1), 'd.m.')} &ndash; ${Dates.dateFormat(
             Dates.getDayOfActiveWeek(7),
             'd.m.Y'
-        )} /// _kw ${Dates.weekNumber(Dates.getDayOfActiveWeek(1))}
+        )} /// _kw ${Dates.weekNumber(Dates.getDayOfActiveWeek(1))} /// ${weeklySum} hours
         `;
     }
 
@@ -220,6 +228,8 @@ export default class Scheduler {
                     tickets__value.project +
                     '\n' +
                     (tickets__value.description || '').substring(0, 100),
+                time = tickets__value.time,
+                project = tickets__value.project,
                 parsed_values = Dates.parseDateString(tickets__value.date, 'scheduler');
             let background =
                 Scheduler.getStoreProperty(
@@ -242,6 +252,8 @@ export default class Scheduler {
                         end: parsed_values__value.end,
                         name: name,
                         title: title,
+                        project: project,
+                        time: time,
                         background: background,
                         opacity: Scheduler.getStoreProperty(
                             'opacity',
