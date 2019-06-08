@@ -75,7 +75,8 @@ export default class Dates {
                         date: d,
                         day: ((d.getDay() + 6) % 7) + 1,
                         begin: begin,
-                        end: end
+                        end: end,
+                        time: end - begin
                     });
                 }
             }
@@ -142,7 +143,8 @@ export default class Dates {
                         date: d,
                         day: ((d.getDay() + 6) % 7) + 1,
                         begin: begin,
-                        end: end
+                        end: end,
+                        time: end - begin
                     });
                 }
             }
@@ -195,7 +197,8 @@ export default class Dates {
                         date: d,
                         day: ((d.getDay() + 6) % 7) + 1,
                         begin: begin,
-                        end: end
+                        end: end,
+                        time: end - begin
                     });
                 }
             } else {

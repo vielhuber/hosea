@@ -161,7 +161,7 @@ export default class Scheduler {
                 `
             );
             if (date__value.time != '' && date__value.project !== 'Olga') {
-                weeklySum += parseFloat(date__value.time.replace(',', '.'));
+                weeklySum += date__value.time;
             }
         });
         weeklySum = (Math.round(weeklySum * 100) / 100).toString().replace('.', ',');
@@ -228,7 +228,6 @@ export default class Scheduler {
                     tickets__value.project +
                     '\n' +
                     (tickets__value.description || '').substring(0, 100),
-                time = tickets__value.time,
                 project = tickets__value.project,
                 parsed_values = Dates.parseDateString(tickets__value.date, 'scheduler');
             let background =
@@ -253,7 +252,7 @@ export default class Scheduler {
                         name: name,
                         title: title,
                         project: project,
-                        time: time,
+                        time: parsed_values__value.time,
                         background: background,
                         opacity: Scheduler.getStoreProperty(
                             'opacity',
