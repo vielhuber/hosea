@@ -6,3 +6,4 @@
 /vendor/
 /package-lock.json
 /backup.sql
+/public/_build/*tmp*
