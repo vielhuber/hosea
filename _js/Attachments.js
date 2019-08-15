@@ -30,7 +30,7 @@ export default class Attachments {
             .then(response => {
                 let base64 = response.data.data,
                     filename = response.data.name,
-                    url = 'data:application/octet-stream;base64,' + base64;
+                    url = hlp.base64tourl(base64);
 
                 let a = document.createElement('a');
                 a.setAttribute('style', 'display:none');
@@ -38,6 +38,7 @@ export default class Attachments {
                 a.setAttribute('href', url);
                 document.body.appendChild(a);
                 a.click();
+                window.URL.revokeObjectURL(url);
                 a.remove();
             });
     }
