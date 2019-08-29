@@ -3,6 +3,7 @@ import Html from './Html';
 import Lock from './Lock';
 import Store from './Store';
 import Tickets from './Tickets';
+import Footer from './Footer';
 
 export default class Attachments {
     static bindDownload() {
@@ -76,7 +77,9 @@ export default class Attachments {
             Lock.lockTicket(ticket_id);
             let attachment = await Attachments.startUpload(ticket_id, files__value);
             Lock.unlockTicket(ticket_id, true);
-            attachments.push(attachment);
+            if (attachment !== null) {
+                attachments.push(attachment);
+            }
         }
 
         // fetch entire doc to get newest attachment object
@@ -87,6 +90,11 @@ export default class Attachments {
 
     static startUpload(ticket_id, file) {
         return new Promise((resolve, reject) => {
+            if (file.size / 1024 / 1024 > 5) {
+                Footer.updateStatus('size gt 5 mb!', 'error');
+                resolve(null);
+                return;
+            }
             Helper.fileToBase64(file).then(base64 => {
                 Store.data.api
                     .fetch('_api/attachments', {
