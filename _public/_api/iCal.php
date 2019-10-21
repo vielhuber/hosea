@@ -1,11 +1,11 @@
 <?php
+
 namespace HoseaApi;
 
 class iCal extends Api
 {
     public function __construct()
-    {
-    }
+    { }
 
     protected function getRequest()
     {
@@ -70,8 +70,7 @@ class iCal extends Api
                     strtotime(
                         'first ' .
                             ['MO' => 'monday', 'DI' => 'tuesday', 'MI' => 'wednesday', 'DO' => 'thursday', 'FR' => 'friday', 'SA' => 'saturday', 'SO' => 'sunday'][substr($dates__value, 0, 2)] .
-                            ' of january ' .
-                            (date('Y') - 1)
+                            ' of january ' . (date('Y') - 1)
                     )
                 );
                 [$begin, $end] = $this->extractTimeFromDate($dates__value);
@@ -133,7 +132,7 @@ class iCal extends Api
             if ($num % 4 != $nthWeekdayOfMonth) {
                 return true;
             }
-            if ($num / 4 > 1 && date('m', strtotime($date)) % (floor($num / 4) + 1) != 0) {
+            if (date('m', strtotime($date)) % (floor(($num - 1) / 4) + 1) != 0) {
                 return true;
             }
         }

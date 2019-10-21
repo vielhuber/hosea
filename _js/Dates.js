@@ -107,7 +107,7 @@ export default class Dates {
                     if (num % 4 !== nthWeekdayOfMonth) {
                         return;
                     }
-                    if (num / 4 > 1 && (d.getMonth() + 1) % (Math.floor(num / 4) + 1) !== 0) {
+                    if ((d.getMonth() + 1) % (Math.floor((num - 1) / 4) + 1) !== 0) {
                         return;
                     }
                 }
