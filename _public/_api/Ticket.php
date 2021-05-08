@@ -3,7 +3,6 @@ namespace HoseaApi;
 
 class Ticket extends Api
 {
-
     public $cols = ['id', 'status', 'priority', 'date', 'time', 'project', 'description', 'user_id'];
 
     public function __construct()
@@ -59,15 +58,32 @@ class Ticket extends Api
     protected function index()
     {
         $tickets = $this::$db->fetch_all(
-            'SELECT '.implode(',',$this->colsWithout('user_id')).' FROM tickets WHERE user_id = ?',
+            '
+            SELECT
+                tickets.id,
+                tickets.status,
+                tickets.priority,
+                tickets.date,
+                tickets.time,
+                tickets.project,
+                tickets.description,
+                GROUP_CONCAT(CONCAT(attachments.id, \'SEP_COL\', attachments.name) SEPARATOR \'SEP_OBJ\') as attachments
+            FROM tickets
+            LEFT JOIN attachments ON attachments.ticket_id = tickets.id
+            WHERE user_id = ?
+            GROUP BY tickets.id
+        ',
             $this::$auth->getCurrentUserId()
         );
-        foreach($tickets as $tickets__key=>$tickets__value)
-        {
-            $tickets[$tickets__key]['attachments'] = $this::$db->fetch_all(
-                'SELECT '.implode(',',$this->Attachment->colsWithout('data','ticket_id')).' FROM attachments WHERE ticket_id = ?',
-                $tickets[$tickets__key]['id']
-            );
+        foreach ($tickets as $tickets__key => $tickets__value) {
+            if ($tickets__value['attachments'] == '') {
+                $tickets[$tickets__key]['attachments'] = [];
+            } else {
+                $tickets[$tickets__key]['attachments'] = array_map(function ($a) {
+                    $splitted = explode('SEP_COL', $a);
+                    return ['id' => $splitted[0], 'name' => $splitted[1]];
+                }, explode('SEP_OBJ', $tickets__value['attachments']));
+            }
         }
         $this->response([
             'success' => true,
@@ -79,12 +95,14 @@ class Ticket extends Api
     {
         $this->checkId($id);
         $ticket = $this::$db->fetch_row(
-            'SELECT '.implode(',',$this->colsWithout('user_id')).' FROM tickets WHERE id = ? AND user_id = ?',
+            'SELECT ' . implode(',', $this->colsWithout('user_id')) . ' FROM tickets WHERE id = ? AND user_id = ?',
             $id,
             $this::$auth->getCurrentUserId()
         );
         $ticket['attachments'] = $this::$db->fetch_all(
-            'SELECT '.implode(',',$this->Attachment->colsWithout('data','ticket_id')).' FROM attachments WHERE ticket_id = ?',
+            'SELECT ' .
+                implode(',', $this->Attachment->colsWithout('data', 'ticket_id')) .
+                ' FROM attachments WHERE ticket_id = ?',
             $ticket['id']
         );
         $this->response([
@@ -96,7 +114,7 @@ class Ticket extends Api
     protected function create()
     {
         $values = [];
-        foreach ( $this->colsWithout('id','user_id') as $columns__value ) {
+        foreach ($this->colsWithout('id', 'user_id') as $columns__value) {
             $values[$columns__value] = $this->getInput($columns__value);
         }
         $values['user_id'] = $this::$auth->getCurrentUserId();
@@ -113,7 +131,7 @@ class Ticket extends Api
     {
         $this->checkId($id);
         $values = [];
-        foreach ( $this->colsWithout('id','user_id') as $columns__value ) {
+        foreach ($this->colsWithout('id', 'user_id') as $columns__value) {
             if ($this->getInput($columns__value) !== null) {
                 $values[$columns__value] = $this->getInput($columns__value);
             }
@@ -133,10 +151,9 @@ class Ticket extends Api
     {
         $tickets = $this->getInput('tickets');
         $ids = [];
-        foreach($tickets as $tickets__value)
-        {
+        foreach ($tickets as $tickets__value) {
             $values = [];
-            foreach ( $this->colsWithout('id','user_id') as $columns__value ) {
+            foreach ($this->colsWithout('id', 'user_id') as $columns__value) {
                 if (isset($tickets__value[$columns__value])) {
                     $values[$columns__value] = $tickets__value[$columns__value];
                 }
@@ -182,5 +199,4 @@ class Ticket extends Api
             );
         }
     }
-
 }
