@@ -57,6 +57,9 @@ class Ticket extends Api
 
     protected function index()
     {
+        // load tickets with attachments:
+        // - regular tickets that reach back 3 months in the past
+        // - all irregular tickets
         $tickets = $this::$db->fetch_all(
             '
             SELECT
@@ -70,10 +73,19 @@ class Ticket extends Api
                 GROUP_CONCAT(CONCAT(attachments.id, \'SEP_COL\', attachments.name) SEPARATOR \'SEP_OBJ\') as attachments
             FROM tickets
             LEFT JOIN attachments ON attachments.ticket_id = tickets.id
-            WHERE user_id = ?
+            WHERE
+                user_id = ?
+                AND
+                (
+                    date NOT REGEXP ?
+                    OR
+                    STR_TO_DATE(date,?) > DATE_SUB(NOW(), INTERVAL 90 DAY)
+                )
             GROUP BY tickets.id
         ',
-            $this::$auth->getCurrentUserId()
+            $this::$auth->getCurrentUserId(),
+            '^[0-9][0-9]\.[0-9][0-9]\.[0-9][0-9]( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?$',
+            '%d.%m.%y'
         );
         foreach ($tickets as $tickets__key => $tickets__value) {
             if ($tickets__value['attachments'] == '') {
