@@ -1,0 +1,17 @@
+{
+    "dir": "ltr",
+    "lang": "de",
+    "name": "hosea",
+    "short_name": "hosea",
+    "scope": "/hosea/",
+    "display": "browser",
+    "start_url": "https://vielhuber.de/hosea/",
+    "background_color": "#000000",
+    "theme_color": "transparent",
+    "description": "",
+    "orientation": "any",
+    "related_applications": [],
+    "prefer_related_applications": false,
+    "icons": [],
+    "url": "https://vielhuber.de/hosea/"
+}
