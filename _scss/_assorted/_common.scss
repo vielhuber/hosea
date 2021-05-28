@@ -35,7 +35,7 @@
 
 @mixin scrollbar {
     &::-webkit-scrollbar {
-        width: 2rem;
+        width: 8rem;
     }
     &::-webkit-scrollbar-track {
         background-color: $color-black;

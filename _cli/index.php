@@ -9,17 +9,17 @@ class Cli
 
     function __construct()
     {
-        $dotenv = new Dotenv\Dotenv(__DIR__ . '/../');
+        $dotenv = \Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
         $dotenv->load();
         $this->db = new dbhelper();
         $this->db->connect(
             'pdo',
-            getenv('DB_CONNECTION'),
-            getenv('DB_HOST'),
-            getenv('DB_USERNAME'),
-            getenv('DB_PASSWORD'),
-            getenv('DB_DATABASE'),
-            getenv('DB_PORT')
+            $_SERVER['DB_CONNECTION'],
+            $_SERVER['DB_HOST'],
+            $_SERVER['DB_USERNAME'],
+            $_SERVER['DB_PASSWORD'],
+            $_SERVER['DB_DATABASE'],
+            $_SERVER['DB_PORT']
         );
     }
 
@@ -69,9 +69,7 @@ class Cli
                 id SERIAL PRIMARY KEY,
                 name TEXT DEFAULT NULL,
                 data ' .
-                (($this->db->engine === 'postgres')
-                    ? ('BYTEA')
-                    : ('MEDIUMBLOB')) .
+                ($this->db->engine === 'postgres' ? 'BYTEA' : 'MEDIUMBLOB') .
                 ' DEFAULT NULL,
                 ticket_id INT DEFAULT NULL
             )

@@ -1,10 +1,10 @@
 <?php
 namespace HoseaApi;
 
-use Dotenv\Dotenv;
+require_once __DIR__ . '/../../vendor/autoload.php';
+
 use vielhuber\simpleauth\simpleauth;
 use vielhuber\dbhelper\dbhelper;
-require_once __DIR__ . '/../../vendor/autoload.php';
 
 class Api
 {
@@ -28,7 +28,11 @@ class Api
     {
         $success = true;
         if ($this->getRequestPathFirst() === 'ical') {
-            if ($this->getRequestPathSecond() == '' || $this::$db->fetch_var('SELECT COUNT(*) FROM users WHERE ical_key = ?', $this->getRequestPathSecond()) == 0) {
+            if (
+                $this->getRequestPathSecond() == '' ||
+                $this::$db->fetch_var('SELECT COUNT(*) FROM users WHERE ical_key = ?', $this->getRequestPathSecond()) ==
+                    0
+            ) {
                 $success = false;
             }
         } else {
@@ -42,7 +46,7 @@ class Api
                 [
                     'success' => false,
                     'message' => 'auth not successful',
-                    'public_message' => 'Authentifizierung fehlgeschlagen'
+                    'public_message' => 'Authentifizierung fehlgeschlagen',
                 ],
                 401
             );
@@ -51,10 +55,18 @@ class Api
 
     protected function initDb()
     {
-        $dotenv = new Dotenv(__DIR__ . '/../../');
+        $dotenv = \Dotenv\Dotenv::createImmutable(__DIR__ . '/../../');
         $dotenv->load();
         $this::$db = new dbhelper();
-        $this::$db->connect('pdo', getenv('DB_CONNECTION'), getenv('DB_HOST'), getenv('DB_USERNAME'), getenv('DB_PASSWORD'), getenv('DB_DATABASE'), getenv('DB_PORT'));
+        $this::$db->connect(
+            'pdo',
+            $_SERVER['DB_CONNECTION'],
+            $_SERVER['DB_HOST'],
+            $_SERVER['DB_USERNAME'],
+            $_SERVER['DB_PASSWORD'],
+            $_SERVER['DB_DATABASE'],
+            $_SERVER['DB_PORT']
+        );
     }
 
     protected function getRequest()
@@ -62,12 +74,13 @@ class Api
         $this->Ticket->getRequest();
         $this->Attachment->getRequest();
         $this->User->getRequest();
+        $this->Mail->getRequest();
         $this->iCal->getRequest();
         $this->response(
             [
                 'success' => false,
                 'message' => 'unknown route',
-                'public_message' => 'Unbekannte Route!'
+                'public_message' => 'Unbekannte Route!',
             ],
             404
         );

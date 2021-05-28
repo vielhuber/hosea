@@ -1,0 +1,416 @@
+.quickbox {
+    width: calc(33.33% - #{$space-big});
+    bottom: calc(#{$footer-height} + #{$space-big});
+    right: $space-big;
+    top: calc(#{$space-big} + ((100% - (2 * #{$space-big}) - #{$footer-height}) / 2) + (0.5 * #{$space-big}));
+    position: absolute;
+    background-color: $color-black;
+    color: $color-white;
+    overflow: hidden;
+    @include border;
+    @include shadow;
+}
+
+.quickbox__content {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: calc(#{$space-big} + 2 * #{$space-small});
+}
+
+.quickbox__new {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: $color-black;
+}
+
+.quickbox__new-form {
+    padding: $space-small;
+    height: 100%;
+}
+
+.quickbox__new-inputrows {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    align-content: flex-start;
+    height: 100%;
+}
+
+.quickbox__new-inputrow {
+    width: 100%;
+    flex: 0 0 auto;
+    background-color: $color-grey;
+    height: $space-big;
+    line-height: $space-big;
+}
+
+.quickbox__new-inputrow--rheight {
+    height: calc(100% - (3 * #{$space-big} + 3 * #{$space-small}));
+}
+
+.quickbox__new-submit {
+    width: 100%;
+    height: 100%;
+    line-height: calc(#{$space-big} - 2 * #{$space-small});
+    display: block;
+    padding: $space-small;
+    cursor: pointer;
+    background-color: $color-black;
+    color: $color-white;
+    @include border;
+    border-left: 0;
+    border-right: 0;
+    border-bottom: 0;
+}
+
+.quickbox__new-label {
+    width: 100%;
+    height: 100%;
+    display: block;
+    cursor: pointer;
+    padding: $space-small;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.quickbox__new-label-text {
+    height: 100%;
+    line-height: calc(#{$space-big} - 2 * #{$space-small});
+    display: inline-block;
+    margin-left: $space-small;
+    vertical-align: top;
+}
+
+.quickbox__new-input--radio {
+    vertical-align: top;
+    height: 100%;
+    margin-top: -1rem;
+}
+
+.quickbox__new-inputrow--1\/4 {
+    width: calc(25% - #{$space-small} * 3 / 4);
+}
+.quickbox__new-inputrow--1\/4:not(:nth-child(4)) {
+    margin-right: $space-small;
+}
+
+.quickbox__new-inputrow:not(:last-child) {
+    margin-bottom: $space-small;
+}
+
+.quickbox__new-input--text {
+    width: 100%;
+    height: 100%;
+    line-height: calc(#{$space-big} - 2 * #{$space-small});
+    background-color: $color-grey;
+    color: $color-white;
+    display: block;
+    padding: $space-small;
+}
+
+.quickbox__new-input--textarea {
+    width: 100%;
+    height: 100%;
+    background-color: $color-grey;
+    color: $color-white;
+    display: block;
+    padding: $space-small;
+    resize: none;
+    @include scrollbar;
+}
+
+.quickbox__today {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    @include scrollbar;
+}
+
+.quickbox__today-tickets {
+    padding: $space-small;
+}
+.quickbox__today-ticket {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    align-content: flex-start;
+    @include border;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    margin-bottom: $space-small;
+}
+.quickbox__today-ticket:last-child {
+    margin-bottom: 0;
+    border-bottom: none;
+}
+.quickbox__today-ticket-project,
+.quickbox__today-ticket-date,
+.quickbox__today-ticket-description {
+    flex: 0 1 auto;
+    padding: $space-small;
+}
+.quickbox__today-ticket-project {
+    width: 50%;
+}
+.quickbox__today-ticket-date {
+    text-align: right;
+    width: 50%;
+}
+.quickbox__today-ticket-description {
+    width: 100%;
+}
+
+.quickbox__mails {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: url('../_assets/finished.gif');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    transition: background-image 0.25s ease-in-out;
+}
+
+.quickbox__mails--loading {
+    background-image: url('../_assets/loading.gif');
+}
+
+.quickbox__mails,
+.quickbox__new,
+.quickbox__today {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease-in-out;
+}
+
+.quickbox__content[data-view='mails'] .quickbox__mails,
+.quickbox__content[data-view='new'] .quickbox__new,
+.quickbox__content[data-view='today'] .quickbox__today {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.quickbox__mail {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: $color-black;
+    padding: $space-small;
+    cursor: grab;
+    transition: transform 0.5s ease-in-out;
+}
+
+.quickbox__mail-from,
+.quickbox__mail-subject {
+    text-align: center;
+    line-height: $space-medium;
+    height: $space-medium;
+    margin-bottom: $space-small;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.quickbox__mail--move-left {
+    transform: translateX(-100%);
+}
+
+.quickbox__mail--move-right {
+    transform: translateX(100%);
+}
+
+.quickbox__mail-content {
+    @include border;
+    background-color: $color-black;
+    padding: $space-big;
+    filter: grayscale(100%);
+    width: 100%;
+    height: calc(100% - (4 * #{$space-small} + 2 * #{$space-medium} + 2 * #{$space-big}));
+}
+
+.quickbox__mail-inputrows {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    align-content: flex-start;
+}
+
+.quickbox__mail-inputrow {
+    margin-right: $space-small;
+    flex: 0 0 auto;
+    margin-bottom: $space-small;
+    background-color: $color-grey;
+    height: $space-big;
+    line-height: $space-big;
+}
+
+.quickbox__mail-inputrow--1\/1 {
+    width: calc(100% / 1 - #{$space-small} / 1 * 0);
+}
+.quickbox__mail-inputrow--1\/1 {
+    margin-right: 0;
+}
+.quickbox__mail-inputrow--1\/1:nth-last-child(-n + 1) {
+    margin-bottom: 0;
+}
+
+.quickbox__mail-inputrow--1\/2 {
+    width: calc(100% / 2 - #{$space-small} / 2 * 1);
+}
+.quickbox__mail-inputrow--1\/2 + .quickbox__mail-inputrow--1\/2 {
+    margin-right: 0;
+}
+.quickbox__mail-inputrow--1\/2:nth-last-child(-n + 2) {
+    margin-bottom: 0;
+}
+
+.quickbox__mail-inputrow--1\/3 {
+    width: calc(100% / 3 - #{$space-small} / 3 * 2);
+}
+.quickbox__mail-inputrow--1\/3 + .quickbox__mail-inputrow--1\/3 + .quickbox__mail-inputrow--1\/3 {
+    margin-right: 0;
+}
+.quickbox__mail-inputrow--1\/3:nth-last-child(-n + 3) {
+    margin-bottom: 0;
+}
+
+.quickbox__mail-inputrow--1\/4 {
+    width: calc(100% / 4 - #{$space-small} / 4 * 3);
+}
+.quickbox__mail-inputrow--1\/4
+    + .quickbox__mail-inputrow--1\/4
+    + .quickbox__mail-inputrow--1\/4
+    + .quickbox__mail-inputrow--1\/4 {
+    margin-right: 0;
+}
+.quickbox__mail-inputrow--1\/4:nth-last-child(-n + 4) {
+    margin-bottom: 0;
+}
+
+.quickbox__mail-inputrow--1\/5 {
+    width: calc(100% / 5 - #{$space-small} / 5 * 4);
+}
+.quickbox__mail-inputrow--1\/5
+    + .quickbox__mail-inputrow--1\/5
+    + .quickbox__mail-inputrow--1\/5
+    + .quickbox__mail-inputrow--1\/5
+    + .quickbox__mail-inputrow--1\/5 {
+    margin-right: 0;
+}
+.quickbox__mail-inputrow--1\/5:nth-last-child(-n + 5) {
+    margin-bottom: 0;
+}
+
+.quickbox__mail-inputrow--1\/6 {
+    width: calc(100% / 3 - #{$space-small} / 6 * 5);
+}
+.quickbox__mail-inputrow--1\/6
+    + .quickbox__mail-inputrow--1\/6
+    + .quickbox__mail-inputrow--1\/6
+    + .quickbox__mail-inputrow--1\/6
+    + .quickbox__mail-inputrow--1\/6
+    + .quickbox__mail-inputrow--1\/6 {
+    margin-right: 0;
+}
+.quickbox__mail-inputrow--1\/6:nth-last-child(-n + 6) {
+    margin-bottom: 0;
+}
+
+.quickbox__mail-input--text {
+    width: 100%;
+    height: 100%;
+    line-height: calc(#{$space-big} - 2 * #{$space-small});
+    background-color: $color-grey;
+    color: $color-white;
+    display: block;
+    padding: $space-small;
+}
+
+.quickbox__mail-label {
+    width: 100%;
+    height: 100%;
+    display: block;
+    cursor: pointer;
+    padding: $space-small;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.quickbox__mail-label-text {
+    height: 100%;
+    line-height: calc(#{$space-big} - 2 * #{$space-small});
+    display: inline-block;
+    margin-left: $space-small;
+    vertical-align: top;
+}
+
+.quickbox__mail-input--radio,
+.quickbox__mail-input--checkbox {
+    vertical-align: top;
+    height: 100%;
+    margin-top: -1rem;
+}
+
+.quickbox__nav {
+    background-color: $color-black;
+    @include border;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: calc(#{$space-big} + 2 * #{$space-small});
+    display: flex;
+    align-items: flex-start;
+    align-content: flex-start;
+}
+
+.quickbox__navitem {
+    width: 33.33%;
+    height: 100%;
+    line-height: calc(#{$space-big} + 2 * #{$space-small});
+    display: block;
+    text-align: center;
+    flex: 0 1 auto;
+}
+
+.quickbox__navitem-count {
+    border-radius: 50%;
+    background-color: $color-pink;
+    color: $color-white;
+    width: $space-medium;
+    height: $space-medium;
+    line-height: $space-medium;
+    margin-left: $space-small;
+    display: inline-block;
+    vertical-align: middle;
+    transition: opacity 0.25s ease-in-out;
+}
+.quickbox__navitem-count:empty {
+    opacity: 0;
+}
+
+.quickbox__navitem--active {
+    background-color: $color-white;
+    color: $color-black;
+}
+
+@include responsive-medium {
+    .quickbox {
+        width: 100%;
+        bottom: 0;
+        right: 0;
+        top: 0;
+    }
+}

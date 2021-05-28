@@ -1,11 +1,13 @@
 {
     "require": {
-        "vielhuber/dbhelper": "^1.8",
-        "vlucas/phpdotenv": "^2.5",
-        "vielhuber/simpleauth": "^1.2",
-        "guzzlehttp/guzzle": "^6.3",
-        "vielhuber/comparehelper": "^1.0",
-        "eluceo/ical": "^0.14.0"
+        "vielhuber/dbhelper": "*",
+        "vielhuber/simpleauth": "*",
+        "guzzlehttp/guzzle": "*",
+        "vielhuber/comparehelper": "*",
+        "eluceo/ical": "*",
+        "php-imap/php-imap": "*",
+        "phpmailer/phpmailer": "*",
+        "vlucas/phpdotenv": "*"
     },
     "autoload": {
         "psr-4": {

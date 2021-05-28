@@ -29,18 +29,12 @@ export default class Scheduler {
                             <td class="
                                 scheduler__cell
                                 ${
-                                    Dates.sameDay(
-                                        Dates.getDayOfActiveWeek(i + 1),
-                                        Dates.getCurrentDate()
-                                    )
+                                    Dates.sameDay(Dates.getDayOfActiveWeek(i + 1), Dates.getCurrentDate())
                                         ? ' scheduler__cell--curday'
                                         : ''
                                 }
                                 ${
-                                    Dates.sameDay(
-                                        Dates.getDayOfActiveWeek(i + 1),
-                                        Dates.getActiveDate()
-                                    )
+                                    Dates.sameDay(Dates.getDayOfActiveWeek(i + 1), Dates.getActiveDate())
                                         ? ' scheduler__cell--activeday'
                                         : ''
                                 }
@@ -63,18 +57,12 @@ export default class Scheduler {
                             <td class="
                                 scheduler__cell
                                 ${
-                                    Dates.sameDay(
-                                        Dates.getDayOfActiveWeek(i + 1),
-                                        Dates.getCurrentDate()
-                                    )
+                                    Dates.sameDay(Dates.getDayOfActiveWeek(i + 1), Dates.getCurrentDate())
                                         ? ' scheduler__cell--curday'
                                         : ''
                                 }
                                 ${
-                                    Dates.sameDay(
-                                        Dates.getDayOfActiveWeek(i + 1),
-                                        Dates.getActiveDate()
-                                    )
+                                    Dates.sameDay(Dates.getDayOfActiveWeek(i + 1), Dates.getActiveDate())
                                         ? ' scheduler__cell--activeday'
                                         : ''
                                 }
@@ -90,10 +78,9 @@ export default class Scheduler {
                             j = j + 9;
                             return `
                             <tr class="scheduler__row">
-                                <td class="scheduler__cell">${('0' + j).slice(-2)}&ndash;${(
-                                '0' +
-                                (j + 1)
-                            ).slice(-2)}</td>
+                                <td class="scheduler__cell">${('0' + j).slice(-2)}&ndash;${('0' + (j + 1)).slice(
+                                -2
+                            )}</td>
                                 ${Array(7)
                                     .join(0)
                                     .split(0)
@@ -102,18 +89,12 @@ export default class Scheduler {
                                     <td class="
                                         scheduler__cell
                                         ${
-                                            Dates.sameDay(
-                                                Dates.getDayOfActiveWeek(i + 1),
-                                                Dates.getCurrentDate()
-                                            )
+                                            Dates.sameDay(Dates.getDayOfActiveWeek(i + 1), Dates.getCurrentDate())
                                                 ? ' scheduler__cell--curday'
                                                 : ''
                                         }
                                         ${
-                                            Dates.sameDay(
-                                                Dates.getDayOfActiveWeek(i + 1),
-                                                Dates.getActiveDate()
-                                            )
+                                            Dates.sameDay(Dates.getDayOfActiveWeek(i + 1), Dates.getActiveDate())
                                                 ? ' scheduler__cell--activeday'
                                                 : ''
                                         }
@@ -142,13 +123,11 @@ export default class Scheduler {
 
         let weeklySum = 0;
 
-        generatedDates.forEach(date__value => {
+        generatedDates.forEach((date__value) => {
             document.querySelector('.scheduler__appointments').insertAdjacentHTML(
                 'beforeend',
                 `
-                    <div class="scheduler__appointment" title="${hlp.htmlEncode(
-                        date__value.title
-                    )}" style="
+                    <div class="scheduler__appointment" title="${hlp.htmlEncode(date__value.title)}" style="
                         left:${date__value.posLeft}%;
                         top:${date__value.posTop}%;
                         bottom:${date__value.posBottom}%;
@@ -175,44 +154,33 @@ export default class Scheduler {
     }
 
     static bindScheduler() {
-        document.querySelector('.scheduler').addEventListener('click', e => {
+        document.querySelector('.scheduler').addEventListener('click', (e) => {
             if (e.target.closest('.scheduler__navigation-button')) {
                 if (e.target.closest('.scheduler__navigation-button--today')) {
                     Store.data.session.activeDay = new Date();
                 }
                 if (e.target.closest('.scheduler__navigation-button--prev-day')) {
-                    Store.data.session.activeDay.setDate(
-                        Store.data.session.activeDay.getDate() - 1
-                    );
+                    Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() - 1);
                 }
                 if (e.target.closest('.scheduler__navigation-button--next-day')) {
-                    Store.data.session.activeDay.setDate(
-                        Store.data.session.activeDay.getDate() + 1
-                    );
+                    Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() + 1);
                 }
                 if (e.target.closest('.scheduler__navigation-button--prev-week')) {
-                    Store.data.session.activeDay.setDate(
-                        Store.data.session.activeDay.getDate() - 7
-                    );
+                    Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() - 7);
                 }
                 if (e.target.closest('.scheduler__navigation-button--next-week')) {
-                    Store.data.session.activeDay.setDate(
-                        Store.data.session.activeDay.getDate() + 7
-                    );
+                    Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() + 7);
                 }
                 if (e.target.closest('.scheduler__navigation-button--prev-month')) {
-                    Store.data.session.activeDay.setDate(
-                        Store.data.session.activeDay.getDate() - 28
-                    );
+                    Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() - 28);
                 }
                 if (e.target.closest('.scheduler__navigation-button--next-month')) {
-                    Store.data.session.activeDay.setDate(
-                        Store.data.session.activeDay.getDate() + 28
-                    );
+                    Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() + 28);
                 }
-                document.querySelector(
-                    '.metabar__select--filter[name="date"]'
-                ).value = Dates.dateFormat(Store.data.session.activeDay, 'Y-m-d');
+                document.querySelector('.metabar__select--filter[name="date"]').value = Dates.dateFormat(
+                    Store.data.session.activeDay,
+                    'Y-m-d'
+                );
                 Scheduler.initScheduler();
                 Filter.doFilter();
                 e.preventDefault();
@@ -222,29 +190,16 @@ export default class Scheduler {
 
     static generateDates() {
         let generatedDates = [];
-        Store.data.tickets.forEach(tickets__value => {
+        Store.data.tickets.forEach((tickets__value) => {
             let name = tickets__value.project,
-                title =
-                    tickets__value.project +
-                    '\n' +
-                    (tickets__value.description || '').substring(0, 100),
+                title = tickets__value.project + '\n' + (tickets__value.description || '').substring(0, 100),
                 project = tickets__value.project,
                 parsed_values = Dates.parseDateString(tickets__value.date, 'scheduler');
             let background =
-                Scheduler.getStoreProperty(
-                    'background',
-                    tickets__value.status,
-                    tickets__value.project,
-                    null
-                ) ||
-                Scheduler.getStoreProperty(
-                    'border',
-                    tickets__value.status,
-                    tickets__value.project,
-                    '#9E9E9E'
-                );
+                Scheduler.getStoreProperty('background', tickets__value.status, tickets__value.project, null) ||
+                Scheduler.getStoreProperty('border', tickets__value.status, tickets__value.project, '#9E9E9E');
             if (parsed_values !== false && parsed_values.length > 0) {
-                parsed_values.forEach(parsed_values__value => {
+                parsed_values.forEach((parsed_values__value) => {
                     generatedDates.push({
                         day: parsed_values__value.day,
                         begin: parsed_values__value.begin,
@@ -259,7 +214,7 @@ export default class Scheduler {
                             tickets__value.status,
                             tickets__value.project,
                             1
-                        )
+                        ),
                     });
                 });
             }
@@ -268,7 +223,7 @@ export default class Scheduler {
         /* visual compression of all day events */
         let generatedDatesUndefinedMax = [],
             generatedDatesUndefinedCur = [];
-        generatedDates.forEach(generatedDates__value => {
+        generatedDates.forEach((generatedDates__value) => {
             if (generatedDates__value.begin === null) {
                 if (!(generatedDates__value.day in generatedDatesUndefinedMax)) {
                     generatedDatesUndefinedMax[generatedDates__value.day] = 0;
@@ -331,17 +286,14 @@ export default class Scheduler {
         });
 
         /* finalize */
-        generatedDates.forEach(date__value => {
+        generatedDates.forEach((date__value) => {
             let posTop, posBottom;
             if (date__value.begin === null) {
                 posTop =
-                    (generatedDatesUndefinedCur[date__value.day] /
-                        generatedDatesUndefinedMax[date__value.day]) *
-                    6.25;
+                    (generatedDatesUndefinedCur[date__value.day] / generatedDatesUndefinedMax[date__value.day]) * 6.25;
                 posBottom =
                     100 -
-                    ((generatedDatesUndefinedCur[date__value.day] + 1) /
-                        generatedDatesUndefinedMax[date__value.day]) *
+                    ((generatedDatesUndefinedCur[date__value.day] + 1) / generatedDatesUndefinedMax[date__value.day]) *
                         6.25;
                 generatedDatesUndefinedCur[date__value.day]++;
             } else {
@@ -357,8 +309,7 @@ export default class Scheduler {
                 width = 'calc(' + 12.5 / conflicts[date__value.conflict].count + '% - 4rem)';
                 posLeft =
                     12.5 * date__value.day +
-                    (12.5 / conflicts[date__value.conflict].count) *
-                        conflicts[date__value.conflict].painted;
+                    (12.5 / conflicts[date__value.conflict].count) * conflicts[date__value.conflict].painted;
                 conflicts[date__value.conflict].painted++;
             }
 
@@ -369,6 +320,48 @@ export default class Scheduler {
         });
 
         return generatedDates;
+    }
+
+    static determineNextFreeSlot(str) {
+        let d = Dates.parseDateString(str, 'scheduler')[0],
+            dates = [];
+        Store.data.tickets.forEach((tickets__value) => {
+            let parsed_values = Dates.parseDateString(tickets__value.date, 'scheduler');
+            if (parsed_values !== false && parsed_values.length > 0) {
+                parsed_values.forEach((parsed_values__value) => {
+                    dates.push({
+                        date: parsed_values__value.date,
+                        begin: parsed_values__value.begin,
+                        end: parsed_values__value.end,
+                    });
+                });
+            }
+        });
+        let conflict = true;
+        while (conflict === true) {
+            conflict = false;
+            dates.forEach((dates__value) => {
+                if (dates__value.begin === null || dates__value.end === null || d.begin === null || d.end === null) {
+                    return;
+                }
+                if (Dates.compareDates(d.date, dates__value.date) !== 0) {
+                    return;
+                }
+                if (d.end <= dates__value.begin || dates__value.end <= d.begin) {
+                    return;
+                }
+                d.begin += 0.5;
+                d.end += 0.5;
+                if (d.begin >= 21) {
+                    d.date.setDate(d.date.getDate() + 1);
+                    d.date.setHours(9);
+                    d.begin = 9;
+                    d.end = 9.5;
+                }
+                conflict = true;
+            });
+        }
+        return Dates.dateFormat(d.date, 'd.m.y') + ' ' + Dates.timeFormat(d.begin) + '-' + Dates.timeFormat(d.end);
     }
 
     static getStoreProperty(property, status, project = null, defValue = null) {
@@ -394,7 +387,7 @@ export default class Scheduler {
     }
 
     static updateColors() {
-        Store.data.tickets.forEach(tickets__value => {
+        Store.data.tickets.forEach((tickets__value) => {
             if (tickets__value.visible === true) {
                 let borderColor = Scheduler.getStoreProperty(
                         'border',
@@ -408,15 +401,8 @@ export default class Scheduler {
                         tickets__value.project,
                         null
                     ),
-                    opacity = Scheduler.getStoreProperty(
-                        'opacity',
-                        tickets__value.status,
-                        tickets__value.project,
-                        1
-                    ),
-                    el = document.querySelector(
-                        '.tickets .tickets__entry[data-id="' + tickets__value.id + '"]'
-                    );
+                    opacity = Scheduler.getStoreProperty('opacity', tickets__value.status, tickets__value.project, 1),
+                    el = document.querySelector('.tickets .tickets__entry[data-id="' + tickets__value.id + '"]');
                 if (borderColor) {
                     el.style.borderLeftColor = borderColor;
                 } else {

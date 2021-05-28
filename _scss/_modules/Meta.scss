@@ -38,19 +38,3 @@
 .metabar__sort {
     float: right;
 }
-
-@include responsive-medium {
-    .metabar__filter {
-        width: 100%;
-    }
-    .metabar__sort {
-        display: none;
-    }
-    .metabar__select {
-        width: 21.25%;
-        margin-right: 5%;
-    }
-    .metabar__select:last-child {
-        margin-right: 0;
-    }
-}

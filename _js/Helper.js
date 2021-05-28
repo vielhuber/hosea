@@ -2,15 +2,12 @@ export default class Helper {
     static prevAll(el, selector = null) {
         let prev = true;
         return [].filter
-            .call(el.parentNode.children, htmlElement => {
+            .call(el.parentNode.children, (htmlElement) => {
                 if (htmlElement === el) {
                     prev = false;
                     return false;
                 }
-                if (
-                    selector !== null &&
-                    !htmlElement.classList.contains(selector.replace('.', ''))
-                ) {
+                if (selector !== null && !htmlElement.classList.contains(selector.replace('.', ''))) {
                     return false;
                 }
                 return prev;
@@ -20,7 +17,7 @@ export default class Helper {
 
     static nextAll(el, selector = null) {
         let next = false;
-        return [].filter.call(el.parentNode.children, htmlElement => {
+        return [].filter.call(el.parentNode.children, (htmlElement) => {
             if (htmlElement === el) {
                 next = true;
                 return false;
@@ -45,16 +42,16 @@ export default class Helper {
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = () => resolve(reader.result.split(',')[1]);
-            reader.onerror = error => reject(error);
+            reader.onerror = (error) => reject(error);
         });
     }
 
     static debounce(func, wait, immediate) {
         var timeout;
-        return function() {
+        return function () {
             var context = this,
                 args = arguments;
-            var later = function() {
+            var later = function () {
                 timeout = null;
                 if (!immediate) func.apply(context, args);
             };

@@ -1,6 +1,9 @@
 .scheduler {
     width: calc(33.33% - #{$space-big});
-    bottom: calc(#{$space-big} + #{$footer-height});
+    bottom: calc(
+        #{$footer-height} + #{$space-big} + ((100% - (2 * #{$space-big}) - #{$footer-height}) / 2) +
+            (0.5 * #{$space-big})
+    );
     right: $space-big;
     top: $space-big;
     position: absolute;
@@ -143,15 +146,6 @@
 
 @include responsive-medium {
     .scheduler {
-        width: 100%;
-        bottom: auto;
-        right: auto;
-        top: 0;
-        left: 0;
-        height: calc((100vh - #{$footer-height}) / 2);
-        border-bottom: 0;
-    }
-    .scheduler__navigation-button {
-        padding: 0px 10rem;
+        display: none;
     }
 }

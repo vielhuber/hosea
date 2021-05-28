@@ -7,11 +7,9 @@ import Footer from './Footer';
 
 export default class Attachments {
     static bindDownload() {
-        document.querySelector('.tickets').addEventListener('click', e => {
+        document.querySelector('.tickets').addEventListener('click', (e) => {
             if (e.target.closest('.tickets__attachment-download')) {
-                Attachments.startDownload(
-                    e.target.closest('.tickets__attachment').getAttribute('data-id')
-                );
+                Attachments.startDownload(e.target.closest('.tickets__attachment').getAttribute('data-id'));
                 e.preventDefault();
             }
         });
@@ -22,13 +20,13 @@ export default class Attachments {
             .fetch('_api/attachments/' + attachment_id, {
                 method: 'GET',
                 cache: 'no-cache',
-                headers: { 'content-type': 'application/json' }
+                headers: { 'content-type': 'application/json' },
             })
-            .then(res => res.json())
-            .catch(err => {
+            .then((res) => res.json())
+            .catch((err) => {
                 console.error(err);
             })
-            .then(response => {
+            .then((response) => {
                 let base64 = response.data.data,
                     filename = response.data.name,
                     url = hlp.base64tourl(base64);
@@ -45,29 +43,32 @@ export default class Attachments {
     }
 
     static bindUpload() {
-        document.querySelector('.tickets').addEventListener('change', e => {
+        document.querySelector('.tickets').addEventListener('change', (e) => {
             if (e.target.closest('.tickets__entry input[type="file"]')) {
-                Attachments.startUploads(
+                Attachments.startUploadsAndBuildHtml(
                     e.target.closest('.tickets__entry').getAttribute('data-id'),
                     e.target.files
-                )
-                    .then(attachments => {
-                        e.target.value = '';
-                        attachments.forEach(attachments__value => {
-                            e.target
-                                .closest('.tickets__entry')
-                                .querySelector('.tickets__attachments')
-                                .insertAdjacentHTML(
-                                    'beforeend',
-                                    Html.createHtmlDownloadLine(attachments__value)
-                                );
-                        });
-                    })
-                    .catch(error => {
-                        console.error(error);
-                    });
+                );
             }
         });
+    }
+
+    static startUploadsAndBuildHtml(ticket_id, files) {
+        Attachments.startUploads(ticket_id, files)
+            .then((attachments) => {
+                let el = document.querySelector(
+                    '.tickets .tickets__entry[data-id="' + ticket_id + '"] input[type="file"]'
+                );
+                el.value = '';
+                attachments.forEach((attachments__value) => {
+                    el.closest('.tickets__entry')
+                        .querySelector('.tickets__attachments')
+                        .insertAdjacentHTML('beforeend', Html.createHtmlDownloadLine(attachments__value));
+                });
+            })
+            .catch((error) => {
+                console.error(error);
+            });
     }
 
     static async startUploads(ticket_id, files) {
@@ -95,23 +96,23 @@ export default class Attachments {
                 resolve(null);
                 return;
             }
-            Helper.fileToBase64(file).then(base64 => {
+            Helper.fileToBase64(file).then((base64) => {
                 Store.data.api
                     .fetch('_api/attachments', {
                         method: 'POST',
                         body: JSON.stringify({
                             name: file.name,
                             data: base64,
-                            ticket_id: ticket_id
+                            ticket_id: ticket_id,
                         }),
                         cache: 'no-cache',
-                        headers: { 'content-type': 'application/json' }
+                        headers: { 'content-type': 'application/json' },
                     })
-                    .then(res => res.json())
-                    .catch(err => {
+                    .then((res) => res.json())
+                    .catch((err) => {
                         console.error(err);
                     })
-                    .then(response => {
+                    .then((response) => {
                         resolve(response.data);
                     });
             });
@@ -119,27 +120,23 @@ export default class Attachments {
     }
 
     static bindDeleteAttachment() {
-        document.querySelector('.tickets').addEventListener('click', e => {
+        document.querySelector('.tickets').addEventListener('click', (e) => {
             if (e.target.closest('.tickets__attachment-delete')) {
-                if (
-                    Lock.ticketIsLocked(e.target.closest('.tickets__entry').getAttribute('data-id'))
-                ) {
+                if (Lock.ticketIsLocked(e.target.closest('.tickets__entry').getAttribute('data-id'))) {
                     e.preventDefault();
                 }
-                let attachment_id = e.target
-                    .closest('.tickets__attachment')
-                    .getAttribute('data-id');
+                let attachment_id = e.target.closest('.tickets__attachment').getAttribute('data-id');
                 Store.data.api
                     .fetch('_api/attachments/' + attachment_id, {
                         method: 'DELETE',
                         cache: 'no-cache',
-                        headers: { 'content-type': 'application/json' }
+                        headers: { 'content-type': 'application/json' },
                     })
-                    .then(res => res.json())
-                    .catch(err => {
+                    .then((res) => res.json())
+                    .catch((err) => {
                         console.error(err);
                     })
-                    .then(response => {
+                    .then((response) => {
                         e.target.closest('.tickets__attachment').remove();
                     });
                 e.preventDefault();

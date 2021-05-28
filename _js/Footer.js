@@ -15,10 +15,7 @@ export default class Footer {
                 '.' +
                 ('0' + (new Date().getMonth() + 1)).slice(-2) +
                 '.' +
-                new Date()
-                    .getFullYear()
-                    .toString()
-                    .substring(2, 4) +
+                new Date().getFullYear().toString().substring(2, 4) +
                 ' ' +
                 ('0' + new Date().getHours()).slice(-2) +
                 ':' +
@@ -44,14 +41,14 @@ export default class Footer {
         }, Footer.showTime);
     }
     static bindSave() {
-        document.querySelector('.footer').addEventListener('click', e => {
+        document.querySelector('.footer').addEventListener('click', (e) => {
             if (e.target.closest('.footer__save')) {
                 Footer.updateStatus('saving...', 'warning');
                 Tickets.saveTickets()
                     .then(() => {
                         Footer.updateStatus('saved!', 'success');
                     })
-                    .catch(error => {
+                    .catch((error) => {
                         Footer.updateStatus(error, 'error');
                     });
                 e.preventDefault();
@@ -59,22 +56,22 @@ export default class Footer {
         });
     }
     static bindCreate() {
-        document.querySelector('.footer').addEventListener('click', e => {
+        document.querySelector('.footer').addEventListener('click', (e) => {
             if (e.target.closest('.footer__create')) {
-                Tickets.prepareCreation();
+                Tickets.prepareCreateTicket();
                 e.preventDefault();
             }
         });
     }
     static bindLogout() {
-        document.querySelector('.footer').addEventListener('click', e => {
+        document.querySelector('.footer').addEventListener('click', (e) => {
             if (e.target.closest('.footer__logout')) {
                 Auth.logout()
                     .then(() => {
                         // we simply overcome the issue of deleting event listeners on document by simply refreshing the app
                         location.reload();
                     })
-                    .catch(error => {
+                    .catch((error) => {
                         console.error(error);
                     });
                 e.preventDefault();
@@ -82,8 +79,6 @@ export default class Footer {
         });
     }
     static linkiCal() {
-        document
-            .querySelector('.footer__ical')
-            .setAttribute('href', '_api/ical/' + Store.data.user.ical_key);
+        document.querySelector('.footer__ical').setAttribute('href', '_api/ical/' + Store.data.user.ical_key);
     }
 }

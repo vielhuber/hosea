@@ -3,6 +3,7 @@ import Tickets from './Tickets';
 import Sort from './Sort';
 import Store from './Store';
 import Scheduler from './Scheduler';
+import Quickbox from './Quickbox';
 import Textarea from './Textarea';
 
 export default class Filter {
@@ -20,16 +21,14 @@ export default class Filter {
             document
                 .querySelector('.metabar__filter')
                 .querySelectorAll('.metabar__select--filter')
-                .forEach(el => {
+                .forEach((el) => {
                     selected[el.getAttribute('name')] = el.value;
                 });
             document.querySelector('.metabar__filter').remove();
         }
 
-        document
-            .querySelector('.metabar')
-            .insertAdjacentHTML('beforeend', '<div class="metabar__filter"></div>');
-        ['status', 'priority', 'date', 'project'].forEach(columns__value => {
+        document.querySelector('.metabar').insertAdjacentHTML('beforeend', '<div class="metabar__filter"></div>');
+        ['status', 'priority', 'date', 'project'].forEach((columns__value) => {
             document.querySelector('.metabar__filter').insertAdjacentHTML(
                 'beforeend',
                 `
@@ -67,18 +66,12 @@ export default class Filter {
                 let options = [];
 
                 let skip_old_dates = [],
-                    skip_year_end =
-                        parseInt(
-                            new Date()
-                                .getFullYear()
-                                .toString()
-                                .slice(-2)
-                        ) - 1;
+                    skip_year_end = parseInt(new Date().getFullYear().toString().slice(-2)) - 1;
                 for (let skip_year = 17; skip_year <= skip_year_end; skip_year++) {
                     skip_old_dates.push('.' + skip_year);
                 }
 
-                Store.data.tickets.forEach(tickets__value => {
+                Store.data.tickets.forEach((tickets__value) => {
                     // skip old projects
                     if (columns__value === 'project') {
                         if (skip_old_dates.includes(tickets__value.date.substring(5, 8))) {
@@ -99,7 +92,7 @@ export default class Filter {
                     }
                     return a.toLowerCase().localeCompare(b.toLowerCase());
                 });
-                options.forEach(options__value => {
+                options.forEach((options__value) => {
                     document
                         .querySelector('.metabar__select--filter[name="' + columns__value + '"]')
                         .insertAdjacentHTML(
@@ -112,13 +105,11 @@ export default class Filter {
 
         if (update === true) {
             Object.entries(selected).forEach(([selected__key, selected__value]) => {
-                document.querySelector(
-                    '.metabar__filter [name="' + selected__key + '"]'
-                ).value = selected__value;
+                document.querySelector('.metabar__filter [name="' + selected__key + '"]').value = selected__value;
             });
         } else {
             Filter.doFilter();
-            document.querySelector('.metabar').addEventListener('change', e => {
+            document.querySelector('.metabar').addEventListener('change', (e) => {
                 if (e.target.closest('.metabar__select--filter')) {
                     let date = e.target.closest('.metabar__select--filter[name="date"]');
                     if (date && date.value !== '*' && date.value !== '') {
@@ -132,22 +123,18 @@ export default class Filter {
     }
 
     static doFilter() {
-        Store.data.tickets.forEach(tickets__value => {
+        Store.data.tickets.forEach((tickets__value) => {
             let visible = true;
             document
                 .querySelector('.metabar__filter')
                 .querySelectorAll('select')
-                .forEach(el => {
+                .forEach((el) => {
                     let val_search = el.value,
                         val_target = tickets__value[el.getAttribute('name')],
                         visible_this = false;
 
                     // date
-                    if (
-                        el.getAttribute('name') === 'date' &&
-                        val_search !== '*' &&
-                        val_search !== ''
-                    ) {
+                    if (el.getAttribute('name') === 'date' && val_search !== '*' && val_search !== '') {
                         let parsed_values = Dates.parseDateString(val_target, 'tickets');
                         if (parsed_values !== false && parsed_values.length > 0) {
                             visible_this = true;
@@ -164,8 +151,7 @@ export default class Filter {
                         el.getAttribute('name') == 'status' &&
                         val_search === '*' &&
                         val_target === 'billed' &&
-                        document.querySelector('.metabar__select--filter[name="date"]').value ===
-                            '*'
+                        document.querySelector('.metabar__select--filter[name="date"]').value === '*'
                     ) {
                         visible_this = false;
                     }

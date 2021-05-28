@@ -5,6 +5,7 @@ import Filter from './Filter';
 import Html from './Html';
 import Keyboard from './Keyboard';
 import Scheduler from './Scheduler';
+import Quickbox from './Quickbox';
 import Sort from './Sort';
 import Store from './Store';
 import Textarea from './Textarea';
@@ -20,6 +21,8 @@ export default class App {
         Html.buildHtml();
         Keyboard.initKeyboardNavigation();
         Scheduler.initScheduler();
+        Quickbox.initQuickbox();
+        Quickbox.bindQuickbox();
         Tickets.bindAutoTime();
         Tickets.bindChangeTracking();
         Tickets.bindValidation();

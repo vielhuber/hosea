@@ -7,6 +7,7 @@ export default class Html {
             `
             <div class="tickets"></div>
             <div class="scheduler"></div>
+            <div class="quickbox"></div>
             <div class="footer"></div>
         `
         );
@@ -40,13 +41,10 @@ export default class Html {
             </div>
         `
         );
-        Store.data.cols.forEach(cols__value => {
+        Store.data.cols.forEach((cols__value) => {
             document
                 .querySelector('.tickets__table-head tr')
-                .insertAdjacentHTML(
-                    'beforeend',
-                    '<td class="tickets__table-cell">' + cols__value + '</td>'
-                );
+                .insertAdjacentHTML('beforeend', '<td class="tickets__table-cell">' + cols__value + '</td>');
             if (cols__value === 'status') {
                 document.querySelector('.tickets__table-head tr td:last-child').insertAdjacentHTML(
                     'beforeend',
@@ -122,7 +120,7 @@ DD~N: weekday in calendar week N" class="tickets__table-tooltip">(?)</span>
                 <td class="tickets__table-cell"></td>
             `
         );
-        Store.data.tickets.forEach(tickets__value => {
+        Store.data.tickets.forEach((tickets__value) => {
             document
                 .querySelector('.tickets__table-body')
                 .insertAdjacentHTML('beforeend', Html.createHtmlLine(tickets__value, false));
@@ -139,7 +137,7 @@ DD~N: weekday in calendar week N" class="tickets__table-tooltip">(?)</span>
             ticket.id +
             '">';
 
-        Store.data.cols.forEach(cols__value => {
+        Store.data.cols.forEach((cols__value) => {
             html += '<td class="tickets__table-cell">';
             html +=
                 '<textarea class="tickets__textarea tickets__textarea--' +

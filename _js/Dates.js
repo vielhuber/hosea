@@ -13,6 +13,10 @@ export default class Dates {
         return Dates.getDayOfWeek(shift, Store.data.session.activeDay);
     }
 
+    static getDayOfCurrentWeek(shift) {
+        return Dates.getDayOfWeek(shift, this.getCurrentDate());
+    }
+
     static getDayOfWeek(shift, date) {
         let d = new Date(date),
             day = d.getDay(),
@@ -21,7 +25,7 @@ export default class Dates {
     }
 
     static parseDateString(string, view) {
-        if (!['tickets', 'scheduler', 'all'].includes(view)) {
+        if (!['tickets', 'scheduler', 'today', 'all'].includes(view)) {
             return false;
         }
 
@@ -33,13 +37,13 @@ export default class Dates {
             error = false,
             d;
 
-        string.split('\n').forEach(string__value => {
+        string.split('\n').forEach((string__value) => {
             // 01.01.18
             // 01.01.18 09:00-10:00
             if (
-                new RegExp(
-                    '^[0-9][0-9].[0-9][0-9].[1-2][0-9]( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?$'
-                ).test(string__value)
+                new RegExp('^[0-9][0-9].[0-9][0-9].[1-2][0-9]( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?$').test(
+                    string__value
+                )
             ) {
                 d = new Date(
                     '20' +
@@ -56,6 +60,7 @@ export default class Dates {
                 if (
                     (view === 'tickets' && Dates.dateIsActiveDay(d)) ||
                     (view === 'scheduler' && Dates.dateIsInActiveWeek(d)) ||
+                    (view === 'today' && Dates.dateIsToday(d)) ||
                     view === 'all'
                 ) {
                     let begin =
@@ -71,12 +76,16 @@ export default class Dates {
                     if (end === 0) {
                         end = 24;
                     }
+                    d.setHours(Math.floor(begin === null ? 0 : begin));
+                    d.setMinutes(((begin === null ? 0 : begin) % 1) * 60);
+                    d.setSeconds(0);
+                    d.setMilliseconds(0);
                     ret.push({
                         date: d,
                         day: ((d.getDay() + 6) % 7) + 1,
                         begin: begin,
                         end: end,
-                        time: end - begin
+                        time: end - begin,
                     });
                 }
             }
@@ -92,7 +101,11 @@ export default class Dates {
                     '^(MO|DI|MI|DO|FR|SA|SO)((#|~)[1-9][0-9]?)?( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?( (-|>|<)[0-9][0-9].[0-9][0-9].[1-2][0-9])*$'
                 ).test(string__value)
             ) {
-                d = Dates.getDayOfActiveWeek(Dates.getDayFromString(string__value.substring(0, 2)));
+                if (view === 'today') {
+                    d = Dates.getDayOfCurrentWeek(Dates.getDayFromString(string__value.substring(0, 2)));
+                } else {
+                    d = Dates.getDayOfActiveWeek(Dates.getDayFromString(string__value.substring(0, 2)));
+                }
                 if (isNaN(d)) {
                     error = true;
                     return;
@@ -123,6 +136,7 @@ export default class Dates {
                 if (
                     (view === 'tickets' && Dates.dateIsActiveDay(d)) ||
                     (view === 'scheduler' && Dates.dateIsInActiveWeek(d)) ||
+                    (view === 'today' && Dates.dateIsToday(d)) ||
                     view === 'all'
                 ) {
                     let begin = null,
@@ -139,12 +153,16 @@ export default class Dates {
                     if (end === 0) {
                         end = 24;
                     }
+                    d.setHours(Math.floor(begin));
+                    d.setMinutes((begin % 1) * 60);
+                    d.setSeconds(0);
+                    d.setMilliseconds(0);
                     ret.push({
                         date: d,
                         day: ((d.getDay() + 6) % 7) + 1,
                         begin: begin,
                         end: end,
-                        time: end - begin
+                        time: end - begin,
                     });
                 }
             }
@@ -156,7 +174,12 @@ export default class Dates {
                     '^[0-9][0-9].[0-9][0-9].( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?( (-|>|<)[0-9][0-9].[0-9][0-9].[1-2][0-9])*$'
                 ).test(string__value)
             ) {
-                let year = Dates.getActiveDate().getFullYear();
+                let year = null;
+                if (view === 'today') {
+                    year = Dates.getCurrentDate().getFullYear();
+                } else {
+                    year = Dates.getActiveDate().getFullYear();
+                }
                 // exception on year change
                 if (
                     Dates.weekNumber(Dates.getActiveDate()) === 1 &&
@@ -164,9 +187,7 @@ export default class Dates {
                 ) {
                     year--;
                 }
-                d = new Date(
-                    year + '-' + string__value.substring(3, 5) + '-' + string__value.substring(0, 2)
-                );
+                d = new Date(year + '-' + string__value.substring(3, 5) + '-' + string__value.substring(0, 2));
                 if (isNaN(d)) {
                     error = true;
                     return;
@@ -177,6 +198,7 @@ export default class Dates {
                 if (
                     (view === 'tickets' && Dates.dateIsActiveDay(d)) ||
                     (view === 'scheduler' && Dates.dateIsInActiveWeek(d)) ||
+                    (view === 'today' && Dates.dateIsToday(d)) ||
                     view === 'all'
                 ) {
                     let begin = null,
@@ -193,12 +215,16 @@ export default class Dates {
                     if (end === 0) {
                         end = 24;
                     }
+                    d.setHours(Math.floor(begin));
+                    d.setMinutes((begin % 1) * 60);
+                    d.setSeconds(0);
+                    d.setMilliseconds(0);
                     ret.push({
                         date: d,
                         day: ((d.getDay() + 6) % 7) + 1,
                         begin: begin,
                         end: end,
-                        time: end - begin
+                        time: end - begin,
                     });
                 }
             } else {
@@ -219,15 +245,7 @@ export default class Dates {
     }
 
     static germanDateTimeToEnglishString(str) {
-        return (
-            '20' +
-            str.substring(6, 8) +
-            '-' +
-            str.substring(3, 5) +
-            '-' +
-            str.substring(0, 2) +
-            str.substring(9)
-        );
+        return '20' + str.substring(6, 8) + '-' + str.substring(3, 5) + '-' + str.substring(0, 2) + str.substring(9);
     }
 
     static dateFormat(d, format) {
@@ -257,29 +275,17 @@ export default class Dates {
                     'September',
                     'Oktober',
                     'November',
-                    'Dezember'
+                    'Dezember',
                 ][d.getMonth()] +
                 ' ' +
                 d.getFullYear()
             );
         }
         if (format === 'Y-m-d') {
-            return (
-                d.getFullYear() +
-                '-' +
-                ('0' + (d.getMonth() + 1)).slice(-2) +
-                '-' +
-                ('0' + d.getDate()).slice(-2)
-            );
+            return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
         }
         if (format === 'd.m.Y') {
-            return (
-                ('0' + d.getDate()).slice(-2) +
-                '.' +
-                ('0' + (d.getMonth() + 1)).slice(-2) +
-                '.' +
-                d.getFullYear()
-            );
+            return ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2) + '.' + d.getFullYear();
         }
         if (format === 'd.m.y') {
             return (
@@ -287,10 +293,7 @@ export default class Dates {
                 '.' +
                 ('0' + (d.getMonth() + 1)).slice(-2) +
                 '.' +
-                d
-                    .getFullYear()
-                    .toString()
-                    .substring(2, 4)
+                d.getFullYear().toString().substring(2, 4)
             );
         }
         if (format === 'd.m.') {
@@ -309,6 +312,12 @@ export default class Dates {
             ':' +
             ('0' + d.getSeconds()).slice(-2)
         );
+    }
+
+    static timeFormat(float) {
+        let hours = Math.floor(float),
+            minutes = (float % 1) * 60;
+        return ('0' + hours).slice(-2) + ':' + ('0' + minutes).slice(-2);
     }
 
     static dateIsInActiveWeek(d) {
@@ -351,9 +360,7 @@ export default class Dates {
         let d1 = new Date(d),
             d2 = new Date();
         return (
-            d1.getDay() === d2.getDay() &&
-            d1.getMonth() === d2.getMonth() &&
-            d1.getFullYear() === d2.getFullYear()
+            d1.getDate() === d2.getDate() && d1.getMonth() === d2.getMonth() && d1.getFullYear() === d2.getFullYear()
         );
     }
 
@@ -381,9 +388,7 @@ export default class Dates {
         d1 = new Date(d1);
         d2 = new Date(d2);
         return (
-            d1.getFullYear() === d2.getFullYear() &&
-            d1.getMonth() === d2.getMonth() &&
-            d1.getDate() === d2.getDate()
+            d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate()
         );
     }
 
@@ -431,7 +436,7 @@ export default class Dates {
 
     static dateIsExcluded(d, str) {
         let ret = false;
-        str.split(' ').forEach(value => {
+        str.split(' ').forEach((value) => {
             let excludedDate = new Date(Dates.germanToEnglishString(value.substring(1)));
             if (value.indexOf('-') === 0) {
                 if (Dates.sameDay(excludedDate, d)) {
@@ -462,8 +467,7 @@ export default class Dates {
 
     static dayOfYear(date) {
         return (
-            (Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) -
-                Date.UTC(date.getFullYear(), 0, 0)) /
+            (Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) - Date.UTC(date.getFullYear(), 0, 0)) /
             24 /
             60 /
             60 /
@@ -482,7 +486,7 @@ export default class Dates {
             let match = date__value.match(new RegExp('>[0-9][0-9].[0-9][0-9].[1-2][0-9]', 'g')),
                 isObsolete = false;
             if (match !== null) {
-                match.forEach(match__value => {
+                match.forEach((match__value) => {
                     let curBound = new Date(Dates.germanToEnglishString(match__value.substring(1)));
                     if (Dates.compareDates(lowerBound, curBound) === 1) {
                         date__value = date__value.split(match__value).join('');
