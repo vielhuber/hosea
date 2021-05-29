@@ -2,7 +2,6 @@ import Tickets from './Tickets';
 import Store from './Store';
 import hlp from 'hlp';
 import PullToRefresh from 'pulltorefreshjs';
-import 'hammerjs';
 
 export default class Quickbox {
     static initQuickbox() {
@@ -264,6 +263,11 @@ export default class Quickbox {
 
         PullToRefresh.init({
             mainElement: '.quickbox__mails',
+            triggerElement: '.quickbox__mails',
+            classPrefix: 'quickbox__mails-pull-to-refresh--',
+            shouldPullToRefresh: function () {
+                return !this.mainElement.scrollTop;
+            },
             onRefresh() {
                 if (document.querySelector('.quickbox__mail--expanded') !== null) {
                     return;
@@ -271,16 +275,6 @@ export default class Quickbox {
                 Quickbox.fetchMails();
             },
         });
-
-        if (!hlp.isDesktop() && 1 == 0) {
-            let hammer = new Hammer(document.querySelector('.quickbox__mails')).on('swipedown', (ev) => {
-                if (document.querySelector('.quickbox__mail--expanded') !== null) {
-                    return;
-                }
-                Quickbox.fetchMails();
-            });
-            hammer.get('swipe').set({ direction: Hammer.DIRECTION_VERTICAL });
-        }
     }
 
     static allowUnselectRadio() {

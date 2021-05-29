@@ -186,6 +186,13 @@
     @include scrollbar;
 }
 
+.quickbox__mails-pull-to-refresh--text {
+    color: #fff !important;
+}
+.quickbox__mails-pull-to-refresh--icon {
+    color: #fff !important;
+}
+
 .quickbox__mails--loading {
     background-image: url('../_assets/loading.gif');
 }

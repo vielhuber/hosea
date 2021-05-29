@@ -3,7 +3,6 @@ import Tickets from './Tickets';
 import Sort from './Sort';
 import Store from './Store';
 import Scheduler from './Scheduler';
-import Quickbox from './Quickbox';
 import Textarea from './Textarea';
 
 export default class Filter {
