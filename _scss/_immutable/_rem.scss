@@ -2,7 +2,7 @@
 inspired by https://zellwk.com/blog/viewport-based-typography/
 */
 
-$rem_font_size_small: 0.95;
+$rem_font_size_small: 0.98;
 $rem_breakpoint_small: 600;
 $rem_font_size_big: 1;
 $rem_breakpoint_big: 1920;
@@ -15,7 +15,11 @@ html {
 /* 320px-1920px: 0.4px < 1rem < 1px */
 @media ( min-width: #{$rem_breakpoint_small}px ) {
     html {
-        font-size: calc(#{$rem_font_size_small}px + #{$rem_font_size_big - $rem_font_size_small} * (100vw - #{$rem_breakpoint_small}px) / #{$rem_breakpoint_big - $rem_breakpoint_small});
+        font-size: calc(
+            #{$rem_font_size_small}px + #{$rem_font_size_big - $rem_font_size_small} * (
+                    100vw - #{$rem_breakpoint_small}px
+                ) / #{$rem_breakpoint_big - $rem_breakpoint_small}
+        );
     }
 }
 
