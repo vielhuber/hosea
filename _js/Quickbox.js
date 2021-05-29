@@ -261,7 +261,7 @@ export default class Quickbox {
             }
         });
 
-        if (!hlp.isDesktop()) {
+        if (!hlp.isDesktop() && 1 == 0) {
             let hammer = new Hammer(document.querySelector('.quickbox__mails')).on('swipedown', (ev) => {
                 if (document.querySelector('.quickbox__mail--expanded') !== null) {
                     return;
