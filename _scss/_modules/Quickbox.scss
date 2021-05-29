@@ -165,7 +165,7 @@
 }
 .quickbox__today-ticket-description {
     width: 100%;
-    max-height: calc(2 * #{$space-big});
+    max-height: calc(3 * #{$space-big});
     overflow-y: auto;
     background-color: $color-grey;
     color: $color-white;
