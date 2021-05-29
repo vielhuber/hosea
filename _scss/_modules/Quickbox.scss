@@ -183,6 +183,7 @@
     background-position: center;
     overflow-x: hidden;
     overflow-y: auto;
+    touch-action: pan-y !important;
     @include scrollbar;
 }
 
