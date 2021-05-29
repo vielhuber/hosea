@@ -2,10 +2,8 @@ import Store from './Store';
 
 export default class Sort {
     static initSort() {
-        document
-            .querySelector('.metabar')
-            .insertAdjacentHTML('beforeend', '<div class="metabar__sort"></div>');
-        [1, 2].forEach(step => {
+        document.querySelector('.metabar').insertAdjacentHTML('beforeend', '<div class="metabar__sort"></div>');
+        [1, 2].forEach((step) => {
             document
                 .querySelector('.metabar__sort')
                 .insertAdjacentHTML(
@@ -16,7 +14,7 @@ export default class Sort {
                         step +
                         '</option></select>'
                 );
-            Store.data.cols.forEach(columns__value => {
+            Store.data.cols.forEach((columns__value) => {
                 document
                     .querySelector('.metabar__select--sort[name="sort_' + step + '"]')
                     .insertAdjacentHTML(
@@ -26,7 +24,7 @@ export default class Sort {
             });
         });
 
-        document.querySelector('.metabar').addEventListener('change', e => {
+        document.querySelector('.metabar').addEventListener('change', (e) => {
             if (e.target.closest('.metabar__select--sort')) {
                 Sort.doSort();
             }
@@ -37,9 +35,7 @@ export default class Sort {
         let sort_1 = document.querySelector('.metabar__select--sort[name="sort_1"]').value,
             sort_2 = document.querySelector('.metabar__select--sort[name="sort_2"]').value,
             sorted = [
-                ...document
-                    .querySelector('.tickets .tickets__table-body')
-                    .querySelectorAll('.tickets__entry--visible')
+                ...document.querySelector('.tickets .tickets__table-body').querySelectorAll('.tickets__entry--visible'),
             ].sort((a, b) => {
                 let val_a, val_b;
 
@@ -71,7 +67,7 @@ export default class Sort {
                             'scheduled',
                             'idle',
                             'recurring',
-                            'roaming'
+                            'roaming',
                         ]) {
                             if (val_a === status__value) {
                                 return -1;

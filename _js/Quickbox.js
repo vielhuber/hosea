@@ -12,7 +12,7 @@ export default class Quickbox {
     }
 
     static bindQuickbox() {
-        Quickbox.bindSwipe();
+        Quickbox.bindMails();
         Quickbox.allowUnselectRadio();
         Quickbox.bindNav();
         Quickbox.bindNew();
@@ -21,7 +21,7 @@ export default class Quickbox {
     static buildHtml() {
         document.querySelector('.quickbox').innerHTML = `
             <div class="quickbox__content">
-                <div class="quickbox__mails quickbox__mails--loading"></div>
+                <div class="quickbox__mails"></div>
                 <div class="quickbox__today"></div>
                 <div class="quickbox__new"></div>
             </div>
@@ -35,12 +35,19 @@ export default class Quickbox {
 
     static initMails() {
         Quickbox.fetchMails();
-        setInterval(() => {
-            Quickbox.fetchMails();
-        }, 60000);
+        if (hlp.isDesktop()) {
+            setInterval(() => {
+                Quickbox.fetchMails();
+            }, 60000);
+        }
     }
 
     static fetchMails() {
+        if (document.querySelector('.quickbox__mails').classList.contains('quickbox__mails--loading')) {
+            return;
+        }
+        document.querySelector('.quickbox__mails').classList.add('quickbox__mails--loading');
+        document.querySelector('.quickbox__mails').classList.remove('quickbox__mails--finished');
         Store.data.api
             .fetch('_api/mails', {
                 method: 'GET',
@@ -71,13 +78,15 @@ export default class Quickbox {
                 document.querySelector('.quickbox__mails').insertAdjacentHTML(
                     'beforeend',
                     `
-                    <div class="quickbox__mail" data-id="${mails__value.id}">
-                        <div class="quickbox__mail-from">
-                            ${mails__value.from_name + ' (' + mails__value.from_email + ')'}
-                        </div>
-                        <div class="quickbox__mail-subject">
-                            ${mails__value.subject}
-                        </div>
+                    <div class="quickbox__mail quickbox__mail--unread" data-id="${mails__value.id}">
+                        <a href="#" class="quickbox__mail-toggle">
+                            <div class="quickbox__mail-meta quickbox__mail-meta--from">
+                                ${mails__value.from_name + ' (' + mails__value.from_email + ')'}
+                            </div>
+                            <div class="quickbox__mail-meta quickbox__mail-meta--subject">
+                                ${mails__value.subject}
+                            </div>
+                        </a>
                         <iframe src="about:blank" class="quickbox__mail-content">
                             ${content}
                         </iframe>
@@ -114,6 +123,12 @@ export default class Quickbox {
                                             name="action_send_text"
                                         />
                                     </li>
+                                    <li class="quickbox__mail-inputrow quickbox__mail-inputrow--1/2">
+                                        <input class="quickbox__new-submit quickbox__new-submit--discard" type="submit" name="discard" value="_discard" />
+                                    </li>
+                                    <li class="quickbox__mail-inputrow quickbox__mail-inputrow--1/2">
+                                        <input class="quickbox__new-submit quickbox__new-submit--create" type="submit" name="create" value="_create" />
+                                    </li>
                                 </ul>
         	                </form>
                         </div>
@@ -149,8 +164,6 @@ export default class Quickbox {
                             el.setAttribute('target', '_blank');
                         });
                     }
-                    // bind swipe also inside iframe
-                    Quickbox.bindSwipe(iframe.contentDocument.body);
                 };
                 iframe.setAttribute('srcdoc', content);
             }
@@ -171,34 +184,92 @@ export default class Quickbox {
         if (document.querySelector('.quickbox__mails--loading') !== null) {
             document.querySelector('.quickbox__mails--loading').classList.remove('quickbox__mails--loading');
         }
+        if (document.querySelector('.quickbox__mail') === null) {
+            document.querySelector('.quickbox__mails').classList.add('quickbox__mails--finished');
+        }
     }
 
-    static bindSwipe(el = null) {
-        if (el === null) {
-            el = document.querySelector('.quickbox__mails');
-        }
-        new Hammer(el).on('swipeleft swiperight', (ev) => {
-            if (document.querySelector('.quickbox__mails').classList.contains('quickbox__mails--animating')) {
-                return;
+    static bindMails() {
+        document.addEventListener('click', (e) => {
+            let el = e.target.closest('.quickbox__mail-toggle');
+            if (el) {
+                if (el.closest('.quickbox__mail').classList.contains('quickbox__mail--expanded')) {
+                    el.closest('.quickbox__mail').classList.remove('quickbox__mail--expanded');
+                } else {
+                    if (el.closest('.quickbox__mail').classList.contains('quickbox__mail--unread')) {
+                        el.closest('.quickbox__mail').classList.remove('quickbox__mail--unread');
+                    }
+                    el.closest('.quickbox__mail').classList.add('quickbox__mail--expanded');
+                }
+                e.preventDefault();
             }
-            if (document.querySelector('.quickbox__mail') === null) {
-                return;
-            }
-            document.querySelector('.quickbox__mails').classList.add('quickbox__mails--animating');
-            document
-                .querySelector('.quickbox__mail:last-child')
-                .classList.add('quickbox__mail--move-' + (ev.type === 'swipeleft' ? 'left' : 'right'));
-            this.bindMailAction(ev.type === 'swipeleft' ? 'discard' : 'save');
-            setTimeout(() => {
-                Store.data.mails = Store.data.mails.filter(
-                    (mails__value) =>
-                        mails__value.id != document.querySelector('.quickbox__mail:last-child').getAttribute('data-id')
-                );
-                Quickbox.updateMailCount();
-                document.querySelector('.quickbox__mail:last-child').remove();
-                document.querySelector('.quickbox__mails').classList.remove('quickbox__mails--animating');
-            }, 500);
         });
+
+        document.addEventListener('click', (e) => {
+            let el = e.target.closest('.quickbox__new-submit');
+            if (el) {
+                let form = el.closest('.quickbox__mail-form'),
+                    id = form.closest('.quickbox__mail').getAttribute('data-id'),
+                    mail = Store.data.mails.filter((mails__value) => mails__value.id === id)[0],
+                    action = el.classList.contains('quickbox__new-submit--create') ? 'create' : 'discard';
+
+                form.closest('.quickbox__mail').classList.add(
+                    'quickbox__mail--move-' + (action === 'discard' ? 'left' : 'right')
+                );
+
+                if (action === 'create' && form.querySelector('[name="action_ticket_time"]:checked') !== null) {
+                    let date = form.querySelector('[name="action_ticket_time"]:checked').value;
+                    Tickets.createAndAppendTicket(
+                        {
+                            date: date,
+                            description: mail.subject,
+                            priority: 'A',
+                            project: 'mail',
+                            status: 'scheduled',
+                            time: '0,50',
+                            visible: true,
+                            attachments: [
+                                hlp.base64tofile(mail.eml, null, hlp.slugify(mail.subject + ' ' + mail.date) + '.eml'),
+                            ],
+                        },
+                        null,
+                        1,
+                        false,
+                        true
+                    );
+                }
+
+                Store.data.api
+                    .fetch('_api/mails', {
+                        method: 'PUT',
+                        body: new URLSearchParams(new FormData(form)),
+                        cache: 'no-cache',
+                        headers: { 'content-type': 'application/json' },
+                    })
+                    .then((res) => res.json())
+                    .catch(() => {})
+                    .then((response) => {});
+                e.preventDefault();
+
+                setTimeout(() => {
+                    Store.data.mails = Store.data.mails.filter(
+                        (mails__value) => mails__value.id != form.closest('.quickbox__mail').getAttribute('data-id')
+                    );
+                    Quickbox.renderMails();
+                    Quickbox.updateMailCount();
+                }, 500);
+            }
+        });
+
+        if (!hlp.isDesktop()) {
+            let hammer = new Hammer(document.querySelector('.quickbox__mails')).on('swipedown', (ev) => {
+                if (document.querySelector('.quickbox__mail--expanded') !== null) {
+                    return;
+                }
+                Quickbox.fetchMails();
+            });
+            hammer.get('swipe').set({ direction: Hammer.DIRECTION_VERTICAL });
+        }
     }
 
     static allowUnselectRadio() {
@@ -219,45 +290,6 @@ export default class Quickbox {
                 }
             }
         });
-    }
-
-    static bindMailAction(action) {
-        let form = document.querySelector('.quickbox__mail:last-child .quickbox__mail-form'),
-            id = form.closest('.quickbox__mail').getAttribute('data-id'),
-            mail = Store.data.mails.filter((mails__value) => mails__value.id === id)[0];
-
-        if (action === 'save' && form.querySelector('[name="action_ticket_time"]:checked') !== null) {
-            let date = form.querySelector('[name="action_ticket_time"]:checked').value;
-            Tickets.createAndAppendTicket(
-                {
-                    date: date,
-                    description: mail.subject,
-                    priority: 'A',
-                    project: 'mail',
-                    status: 'scheduled',
-                    time: '0,50',
-                    visible: true,
-                    attachments: [
-                        hlp.base64tofile(mail.eml, null, hlp.slugify(mail.subject + ' ' + mail.date) + '.eml'),
-                    ],
-                },
-                null,
-                1,
-                false,
-                true
-            );
-        }
-
-        Store.data.api
-            .fetch('_api/mails', {
-                method: 'PUT',
-                body: new URLSearchParams(new FormData(form)),
-                cache: 'no-cache',
-                headers: { 'content-type': 'application/json' },
-            })
-            .then((res) => res.json())
-            .catch(() => {})
-            .then((response) => {});
     }
 
     static bindNav() {
@@ -288,8 +320,15 @@ export default class Quickbox {
         document.querySelector('.quickbox__today').innerHTML = `
             <ul class="quickbox__today-tickets"></ul>
         `;
-        let count = 0;
-        Store.data.tickets.forEach((tickets__value) => {
+        let tickets = hlp.deepCopy(Store.data.tickets),
+            count = 0;
+        tickets.sort((a, b) => {
+            return hlp.spaceship(
+                Dates.germanDateTimeToEnglishString(a.date),
+                Dates.germanDateTimeToEnglishString(b.date)
+            );
+        });
+        tickets.forEach((tickets__value) => {
             let parsed_values = Dates.parseDateString(tickets__value.date, 'today');
             if (parsed_values !== false && parsed_values.length > 0) {
                 parsed_values.forEach((parsed_values__value) => {

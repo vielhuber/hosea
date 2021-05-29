@@ -58,7 +58,7 @@
     display: block;
     padding: $space-small;
     cursor: pointer;
-    background-color: $color-black;
+    background-color: $color-pink;
     color: $color-white;
     @include border;
     border-left: 0;
@@ -165,21 +165,37 @@
 }
 .quickbox__today-ticket-description {
     width: 100%;
+    max-height: calc(2 * #{$space-big});
+    overflow-y: auto;
+    background-color: $color-grey;
+    color: $color-white;
+    padding: $space-small;
+    margin-bottom: $space-small;
+    @include scrollbar;
 }
 
 .quickbox__mails {
     position: absolute;
     width: 100%;
     height: 100%;
-    background-image: url('../_assets/finished.gif');
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
-    transition: background-image 0.25s ease-in-out;
+    overflow-x: hidden;
+    overflow-y: auto;
+    @include scrollbar;
 }
 
 .quickbox__mails--loading {
     background-image: url('../_assets/loading.gif');
+}
+
+.quickbox__mails--loading .quickbox__mail {
+    opacity: 0.25;
+}
+
+.quickbox__mails--finished {
+    background-image: url('../_assets/finished.gif');
 }
 
 .quickbox__mails,
@@ -198,26 +214,24 @@
 }
 
 .quickbox__mail {
+    width: 100%;
+    height: auto;
+    background-color: $color-black;
+    @include border;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    transition: transform 0.25s ease-in-out, opacity 0.25s ease-in-out;
+}
+
+.quickbox__mail--expanded {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: $color-black;
-    padding: $space-small;
-    cursor: grab;
-    transition: transform 0.5s ease-in-out;
-}
-
-.quickbox__mail-from,
-.quickbox__mail-subject {
-    text-align: center;
-    line-height: $space-medium;
-    height: $space-medium;
-    margin-bottom: $space-small;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    border-bottom: 0;
+    z-index: 1;
 }
 
 .quickbox__mail--move-left {
@@ -228,13 +242,46 @@
     transform: translateX(100%);
 }
 
+.quickbox__mail--expanded .quickbox__mail-content,
+.quickbox__mail--expanded .quickbox__mail-actions {
+    display: block;
+}
+
+.quickbox__mail-toggle {
+    display: block;
+    padding: $space-small;
+}
+
+.quickbox__mail-meta {
+    text-align: center;
+    line-height: $space-medium;
+    height: $space-medium;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.quickbox__mail:not(.quickbox__mail--unread):not(.quickbox__mail--expanded) {
+    opacity: 0.5;
+}
+
+.quickbox__mail-meta--from {
+    margin-bottom: $space-small;
+}
+
 .quickbox__mail-content {
     @include border;
     background-color: $color-black;
     padding: $space-big;
     filter: grayscale(100%);
     width: 100%;
-    height: calc(100% - (4 * #{$space-small} + 2 * #{$space-medium} + 2 * #{$space-big}));
+    height: calc(100% - (7 * #{$space-small} + 2 * #{$space-medium} + 3 * #{$space-big}));
+    display: none;
+}
+
+.quickbox__mail-actions {
+    display: none;
+    padding: $space-small;
 }
 
 .quickbox__mail-inputrows {
@@ -408,6 +455,7 @@
 
 @include responsive-medium {
     .quickbox {
+        border: none;
         width: 100%;
         bottom: 0;
         right: 0;
