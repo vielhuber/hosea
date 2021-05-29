@@ -183,7 +183,6 @@
     background-position: center;
     overflow-x: hidden;
     overflow-y: auto;
-    overscroll-behavior-y: contain;
     @include scrollbar;
 }
 

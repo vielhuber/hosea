@@ -1,6 +1,7 @@
 import Tickets from './Tickets';
 import Store from './Store';
 import hlp from 'hlp';
+import PullToRefresh from 'pulltorefreshjs';
 import 'hammerjs';
 
 export default class Quickbox {
@@ -259,6 +260,16 @@ export default class Quickbox {
                     Quickbox.updateMailCount();
                 }, 500);
             }
+        });
+
+        PullToRefresh.init({
+            mainElement: '.quickbox__mails',
+            onRefresh() {
+                if (document.querySelector('.quickbox__mail--expanded') !== null) {
+                    return;
+                }
+                Quickbox.fetchMails();
+            },
         });
 
         if (!hlp.isDesktop() && 1 == 0) {
