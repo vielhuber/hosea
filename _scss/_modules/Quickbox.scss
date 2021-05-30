@@ -207,6 +207,7 @@
     color: $color-white;
     padding: $space-small;
     margin-bottom: $space-small;
+    font-size: $font-size-small;
     @include scrollbar;
 }
 
