@@ -229,6 +229,8 @@ export default class Quickbox {
                 form.closest('.quickbox__mail').classList.add(
                     'quickbox__mail--move-' + (action === 'discard' ? 'left' : 'right')
                 );
+                document.querySelector('.quickbox__mails').style.overflowY = 'auto';
+                document.querySelector('.quickbox__mails').scrollTop = this.lastScrollPos;
 
                 if (action === 'create' && form.querySelector('[name="action_ticket_time"]:checked') !== null) {
                     let date = form.querySelector('[name="action_ticket_time"]:checked').value;
@@ -270,8 +272,6 @@ export default class Quickbox {
                     );
                     Quickbox.renderMails();
                     Quickbox.updateMailCount();
-                    document.querySelector('.quickbox__mails').style.overflowY = 'auto';
-                    document.querySelector('.quickbox__mails').scrollTop = this.lastScrollPos;
                 }, 500);
             }
         });
