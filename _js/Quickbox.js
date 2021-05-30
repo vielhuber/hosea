@@ -346,6 +346,7 @@ export default class Quickbox {
         document.querySelector('.quickbox__today').innerHTML = `
             <div class="quickbox__today-nav">
                 <a class="quickbox__today-navitem quickbox__today-navitem--prev-day" href="#">&lt;</a>
+                <span class="quickbox__today-cur">${Dates.dateFormat(Dates.getActiveDate(), 'd.m.y')}</span>
                 <a class="quickbox__today-navitem quickbox__today-navitem--next-day" href="#">&gt;</a>
             </div>
             <ul class="quickbox__today-tickets"></ul>

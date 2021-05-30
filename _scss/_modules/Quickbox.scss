@@ -130,7 +130,7 @@
 }
 
 .quickbox__today-nav {
-    height: $space-big;
+    height: calc(#{$space-big} + 2 * #{$space-small});
     display: flex;
     justify-content: space-between;
     @include border;
@@ -140,16 +140,21 @@
 }
 
 .quickbox__today-navitem {
-    width: $space-big;
-    height: $space-big;
-    line-height: $space-big;
+    width: calc(#{$space-big} + 2 * #{$space-small});
+    height: calc(#{$space-big} + 2 * #{$space-small});
+    line-height: calc(#{$space-big} + 2 * #{$space-small});
+}
+
+.quickbox__today-navitem,
+.quickbox__today-cur {
+    line-height: calc(#{$space-big} + 2 * #{$space-small});
     font-size: $font-size-medium;
     text-align: center;
 }
 
 .quickbox__today-tickets {
     padding: $space-small;
-    height: calc(100% - #{$space-big});
+    height: calc(100% - #{$space-big} - 2 * #{$space-small});
     overflow-x: hidden;
     overflow-y: auto;
     @include scrollbar;
