@@ -8,13 +8,16 @@
         <script src="_build/bundle.js"></script>
         <link rel="icon" type="image/png" sizes="32x32" href="_assets/logo.png" />
 
-        <meta name="theme-color" content="#000000" />
+        <!-- pwa -->
         <link rel="manifest" href="manifest.json" />
+        <meta name="theme-color" content="#000000" />
+        <link rel="apple-touch-icon" href="_assets/_pwa/icon-192x192.png" />
         <script type="module">
             import 'https://cdn.jsdelivr.net/npm/@pwabuilder/pwaupdate';
             const el = document.createElement('pwa-update');
             document.body.appendChild(el);
         </script>
+        <!-- end of pwa -->
     </head>
 
     <body>
