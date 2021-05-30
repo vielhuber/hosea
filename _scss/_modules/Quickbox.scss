@@ -203,6 +203,9 @@
 
 .quickbox__mails--loading {
     background-image: url('../_assets/loading.gif');
+}
+
+.quickbox__mails--loading .quickbox__mails {
     pointer-events: none;
 }
 
