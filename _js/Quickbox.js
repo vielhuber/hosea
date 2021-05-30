@@ -275,6 +275,9 @@ export default class Quickbox {
                 distThreshold: 100,
                 distMax: 160,
                 distIgnore: 50,
+                instructionsPullToRefresh: '_swipe down to refresh',
+                instructionsReleaseToRefresh: '_release to refresh',
+                instructionsRefreshing: '_refreshing',
                 shouldPullToRefresh: function () {
                     return (
                         !this.mainElement.scrollTop &&
