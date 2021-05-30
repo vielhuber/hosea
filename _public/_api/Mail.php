@@ -78,9 +78,9 @@ class Mail extends Api
 
         usort($mails, function ($a, $b) {
             if ($a['date'] === $b['date']) {
-                return $a['id'] <=> $b['id'];
+                return -1 * ($a['id'] <=> $b['id']);
             }
-            return strtotime($a['date']) <=> strtotime($b['date']);
+            return -1 * (strtotime($a['date']) <=> strtotime($b['date']));
         });
 
         $this->response([

@@ -299,6 +299,15 @@ export default class Dates {
         if (format === 'd.m.') {
             return ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2) + '.';
         }
+        if (format === 'D H:i') {
+            return (
+                ['SO', 'MO', 'DI', 'MI', 'DO', 'FR', 'SA'][d.getDay()] +
+                ' ' +
+                ('0' + d.getHours()).slice(-2) +
+                ':' +
+                ('0' + d.getMinutes()).slice(-2)
+            );
+        }
         return (
             ('0' + d.getDate()).slice(-2) +
             '.' +

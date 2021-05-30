@@ -278,6 +278,10 @@
     z-index: 1;
 }
 
+.quickbox__mail:not(.quickbox__mail--unread):not(.quickbox__mail--expanded) {
+    opacity: 0.5;
+}
+
 .quickbox__mail--move-left {
     transform: translateX(-100%);
 }
@@ -292,12 +296,15 @@
 }
 
 .quickbox__mail-toggle {
-    display: block;
     padding: $space-small;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    align-content: flex-start;
 }
 
 .quickbox__mail-meta {
-    text-align: center;
     line-height: $space-medium;
     height: $space-medium;
     overflow: hidden;
@@ -305,12 +312,18 @@
     white-space: nowrap;
 }
 
-.quickbox__mail:not(.quickbox__mail--unread):not(.quickbox__mail--expanded) {
-    opacity: 0.5;
+.quickbox__mail-meta--from {
+    width: calc(100% - 50rem);
 }
 
-.quickbox__mail-meta--from {
-    margin-bottom: $space-small;
+.quickbox__mail-meta--date {
+    width: 50rem;
+    text-align: right;
+}
+
+.quickbox__mail-meta--subject {
+    width: 100%;
+    font-size: $font-size-small;
 }
 
 .quickbox__mail-content {

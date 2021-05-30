@@ -86,6 +86,9 @@ export default class Quickbox {
                             <div class="quickbox__mail-meta quickbox__mail-meta--from">
                                 ${mails__value.from_name + ' (' + mails__value.from_email + ')'}
                             </div>
+                            <div class="quickbox__mail-meta quickbox__mail-meta--date">
+                                ${Dates.dateFormat(new Date(mails__value.date), 'D H:i')}
+                            </div>
                             <div class="quickbox__mail-meta quickbox__mail-meta--subject">
                                 ${mails__value.subject}
                             </div>
