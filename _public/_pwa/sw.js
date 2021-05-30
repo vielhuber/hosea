@@ -1,6 +1,7 @@
 const OFFLINE_VERSION = 1;
 const CACHE_NAME = 'offline';
 const OFFLINE_URL = 'offline.html';
+
 self.addEventListener('install', (event) => {
     event.waitUntil(
         (async () => {
@@ -10,6 +11,7 @@ self.addEventListener('install', (event) => {
     );
     self.skipWaiting();
 });
+
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         (async () => {
@@ -20,6 +22,7 @@ self.addEventListener('activate', (event) => {
     );
     self.clients.claim();
 });
+
 self.addEventListener('fetch', (event) => {
     if (event.request.mode === 'navigate') {
         event.respondWith(

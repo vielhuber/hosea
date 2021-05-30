@@ -9,13 +9,13 @@
         <link rel="icon" type="image/png" sizes="32x32" href="_assets/logo.png" />
 
         <!-- pwa -->
-        <link rel="manifest" href="manifest.json" />
+        <link rel="manifest" href="_pwa/manifest.json" />
         <meta name="theme-color" content="#000000" />
-        <link rel="apple-touch-icon" href="_assets/_pwa/icon-192x192.png" />
+        <link rel="apple-touch-icon" href="_pwa/icon-192x192.png" />
         <script>
             window.addEventListener('load', () => {
                 if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.register('sw.js');
+                    navigator.serviceWorker.register('_pwa/sw.js');
                 }
             });
         </script>

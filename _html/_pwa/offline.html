@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="de">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,minimum-scale=1" />
+        <title>offline</title>
+        <script>
+            window.addEventListener('load', (e) => {
+                document.querySelector('.reload').addEventListener('click', () => {
+                    window.location.reload();
+                });
+                window.addEventListener('online', () => {
+                    window.location.reload();
+                });
+                async function checkNetworkAndReload() {
+                    try {
+                        const response = await fetch('.');
+                        if (response.status >= 200 && response.status < 500) {
+                            window.location.reload();
+                            return;
+                        }
+                    } catch {}
+                    window.setTimeout(checkNetworkAndReload, 2500);
+                }
+                checkNetworkAndReload();
+            });
+        </script>
+        <style>
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+            html {
+                font-family: Verdana, Geneva, sans-serif;
+                color: #fff;
+                background-color: #000;
+            }
+            .container {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+            }
+            .title {
+                font-size: 25px;
+                margin-bottom: 25px;
+            }
+            .reload {
+                font-size: 16px;
+                display: block;
+                padding: 10px 20px;
+                background-color: #fff;
+                color: #000;
+                text-decoration: none;
+                font-weight: bold;
+                text-transform: uppercase;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1 class="title">you are offline</h1>
+            <a class="reload" href="#">reload</a>
+        </div>
+    </body>
+</html>
