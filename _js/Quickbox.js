@@ -276,7 +276,7 @@ export default class Quickbox {
                     return (
                         !this.mainElement.scrollTop &&
                         document.querySelector('.quickbox__mails--loading') === null &&
-                        document.querySelector('.quickbox__mail--expanded') !== null
+                        document.querySelector('.quickbox__mail--expanded') === null
                     );
                 },
                 onRefresh() {
