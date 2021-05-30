@@ -288,7 +288,7 @@
 .quickbox__mail-content {
     @include border;
     background-color: $color-black;
-    padding: $space-big;
+    padding: $space-medium;
     filter: grayscale(100%);
     width: 100%;
     height: calc(100% - (7 * #{$space-small} + 2 * #{$space-medium} + 3 * #{$space-big}));

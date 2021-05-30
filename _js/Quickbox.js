@@ -274,7 +274,7 @@ export default class Quickbox {
                 classPrefix: 'quickbox__mails-pull-to-refresh--',
                 distThreshold: 100,
                 distMax: 160,
-                distIgnore: 50,
+                distIgnore: 0,
                 instructionsPullToRefresh: '_swipe down to refresh',
                 instructionsReleaseToRefresh: '_release to refresh',
                 instructionsRefreshing: '_refreshing',
