@@ -273,7 +273,11 @@ export default class Quickbox {
                 triggerElement: '.quickbox__mails',
                 classPrefix: 'quickbox__mails-pull-to-refresh--',
                 shouldPullToRefresh: function () {
-                    return !this.mainElement.scrollTop;
+                    return (
+                        !this.mainElement.scrollTop &&
+                        document.querySelector('.quickbox__mails--loading') === null &&
+                        document.querySelector('.quickbox__mail--expanded') !== null
+                    );
                 },
                 onRefresh() {
                     if (document.querySelector('.quickbox__mail--expanded') !== null) {
