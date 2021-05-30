@@ -190,15 +190,21 @@ export default class Quickbox {
     }
 
     static bindMails() {
+        let lastScrollPos = 0;
         document.addEventListener('click', (e) => {
             let el = e.target.closest('.quickbox__mail-toggle');
             if (el) {
                 if (el.closest('.quickbox__mail').classList.contains('quickbox__mail--expanded')) {
+                    el.closest('.quickbox__mails').style.overflowY = 'auto';
+                    el.closest('.quickbox__mails').scrollTop = lastScrollPos;
                     el.closest('.quickbox__mail').classList.remove('quickbox__mail--expanded');
                 } else {
                     if (el.closest('.quickbox__mail').classList.contains('quickbox__mail--unread')) {
                         el.closest('.quickbox__mail').classList.remove('quickbox__mail--unread');
                     }
+                    lastScrollPos = el.closest('.quickbox__mails').scrollTop;
+                    el.closest('.quickbox__mails').scrollTop = 0;
+                    el.closest('.quickbox__mails').style.overflowY = 'hidden';
                     el.closest('.quickbox__mail').classList.add('quickbox__mail--expanded');
                 }
                 e.preventDefault();
@@ -261,20 +267,22 @@ export default class Quickbox {
             }
         });
 
-        PullToRefresh.init({
-            mainElement: '.quickbox__mails',
-            triggerElement: '.quickbox__mails',
-            classPrefix: 'quickbox__mails-pull-to-refresh--',
-            shouldPullToRefresh: function () {
-                return !this.mainElement.scrollTop;
-            },
-            onRefresh() {
-                if (document.querySelector('.quickbox__mail--expanded') !== null) {
-                    return;
-                }
-                Quickbox.fetchMails();
-            },
-        });
+        if (!hlp.isDesktop()) {
+            PullToRefresh.init({
+                mainElement: '.quickbox__mails',
+                triggerElement: '.quickbox__mails',
+                classPrefix: 'quickbox__mails-pull-to-refresh--',
+                shouldPullToRefresh: function () {
+                    return !this.mainElement.scrollTop;
+                },
+                onRefresh() {
+                    if (document.querySelector('.quickbox__mail--expanded') !== null) {
+                        return;
+                    }
+                    Quickbox.fetchMails();
+                },
+            });
+        }
     }
 
     static allowUnselectRadio() {

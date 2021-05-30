@@ -128,12 +128,20 @@
     height: 100%;
     background-color: #000;
     overflow-x: hidden;
-    overflow-y: scroll;
+    overflow-y: auto;
     @include scrollbar;
 }
 
 .quickbox__today-tickets {
     padding: $space-small;
+}
+.quickbox__today-tickets:empty {
+    background-image: url('../_assets/finished.gif');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    width: 100%;
+    height: 100%;
 }
 .quickbox__today-ticket {
     display: flex;
@@ -195,6 +203,7 @@
 
 .quickbox__mails--loading {
     background-image: url('../_assets/loading.gif');
+    pointer-events: none;
 }
 
 .quickbox__mails--loading .quickbox__mail {
