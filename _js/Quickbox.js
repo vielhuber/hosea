@@ -346,7 +346,10 @@ export default class Quickbox {
         document.querySelector('.quickbox__today').innerHTML = `
             <div class="quickbox__today-nav">
                 <a class="quickbox__today-navitem quickbox__today-navitem--prev-day" href="#">&lt;</a>
-                <span class="quickbox__today-cur">${Dates.dateFormat(Dates.getActiveDate(), 'd.m.y')}</span>
+                <a class="quickbox__today-navitem quickbox__today-navitem--cur-day" href="#">${Dates.dateFormat(
+                    Dates.getActiveDate(),
+                    'd.m.y'
+                )}</a>
                 <a class="quickbox__today-navitem quickbox__today-navitem--next-day" href="#">&gt;</a>
             </div>
             <ul class="quickbox__today-tickets"></ul>
@@ -391,6 +394,9 @@ export default class Quickbox {
             if (el) {
                 if (e.target.closest('.quickbox__today-navitem--prev-day')) {
                     Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() - 1);
+                }
+                if (e.target.closest('.quickbox__today-navitem--cur-day')) {
+                    Store.data.session.activeDay = new Date();
                 }
                 if (e.target.closest('.quickbox__today-navitem--next-day')) {
                     Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() + 1);

@@ -45,6 +45,12 @@
         background-color: $color-white;
         box-shadow: -1rem 0 0 0 $color-white;
     }
+    @include responsive-medium {
+        &::-webkit-scrollbar {
+            width: 4rem;
+            height: 4rem;
+        }
+    }
 }
 
 @mixin animated-background {

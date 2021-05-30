@@ -140,16 +140,20 @@
 }
 
 .quickbox__today-navitem {
-    width: calc(#{$space-big} + 2 * #{$space-small});
     height: calc(#{$space-big} + 2 * #{$space-small});
-    line-height: calc(#{$space-big} + 2 * #{$space-small});
-}
-
-.quickbox__today-navitem,
-.quickbox__today-cur {
     line-height: calc(#{$space-big} + 2 * #{$space-small});
     font-size: $font-size-medium;
     text-align: center;
+}
+
+.quickbox__today-navitem--cur-day {
+    padding-left: $space-small;
+    padding-right: $space-small;
+}
+
+.quickbox__today-navitem--prev-day,
+.quickbox__today-navitem--next-day {
+    width: calc(#{$space-big} + 2 * #{$space-small});
 }
 
 .quickbox__today-tickets {
