@@ -6,6 +6,8 @@ import hlp from 'hlp';
 import PullToRefresh from 'pulltorefreshjs';
 
 export default class Quickbox {
+    lastScrollPos = 0;
+
     static initQuickbox() {
         Quickbox.buildHtml();
         Quickbox.initMails();
@@ -196,19 +198,18 @@ export default class Quickbox {
     }
 
     static bindMails() {
-        let lastScrollPos = 0;
         document.addEventListener('click', (e) => {
             let el = e.target.closest('.quickbox__mail-toggle');
             if (el) {
                 if (el.closest('.quickbox__mail').classList.contains('quickbox__mail--expanded')) {
                     el.closest('.quickbox__mails').style.overflowY = 'auto';
-                    el.closest('.quickbox__mails').scrollTop = lastScrollPos;
+                    el.closest('.quickbox__mails').scrollTop = this.lastScrollPos;
                     el.closest('.quickbox__mail').classList.remove('quickbox__mail--expanded');
                 } else {
                     if (el.closest('.quickbox__mail').classList.contains('quickbox__mail--unread')) {
                         el.closest('.quickbox__mail').classList.remove('quickbox__mail--unread');
                     }
-                    lastScrollPos = el.closest('.quickbox__mails').scrollTop;
+                    this.lastScrollPos = el.closest('.quickbox__mails').scrollTop;
                     el.closest('.quickbox__mails').scrollTop = 0;
                     el.closest('.quickbox__mails').style.overflowY = 'hidden';
                     el.closest('.quickbox__mail').classList.add('quickbox__mail--expanded');
@@ -269,6 +270,8 @@ export default class Quickbox {
                     );
                     Quickbox.renderMails();
                     Quickbox.updateMailCount();
+                    form.closest('.quickbox__mails').style.overflowY = 'auto';
+                    form.closest('.quickbox__mails').scrollTop = this.lastScrollPos;
                 }, 500);
             }
         });

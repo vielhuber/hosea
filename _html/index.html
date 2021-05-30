@@ -15,16 +15,7 @@
         <script>
             window.addEventListener('load', () => {
                 if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker
-                        .register('_pwa/sw.js', { scope: '/' })
-                        .then((reg) => {
-                            // registration worked
-                            console.log('Registration succeeded.');
-                        })
-                        .catch((error) => {
-                            // registration failed
-                            console.log('Registration failed with ' + error);
-                        });
+                    navigator.serviceWorker.register('_pwa/sw.js', { scope: '/' });
                 }
             });
         </script>
