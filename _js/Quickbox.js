@@ -143,7 +143,7 @@ export default class Quickbox {
                     style.textContent = `
                         body {
                             font-family: Verdana, Geneva, sans-serif;
-                            zoom:0.5;
+                            zoom:0.75;
                             background-color:#fff;
                             color:#000;
                         }
@@ -272,6 +272,9 @@ export default class Quickbox {
                 mainElement: '.quickbox__mails',
                 triggerElement: '.quickbox__mails',
                 classPrefix: 'quickbox__mails-pull-to-refresh--',
+                distThreshold: 100,
+                distMax: 160,
+                distIgnore: 50,
                 shouldPullToRefresh: function () {
                     return (
                         !this.mainElement.scrollTop &&
