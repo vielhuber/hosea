@@ -1,5 +1,7 @@
 import Tickets from './Tickets';
 import Store from './Store';
+import Scheduler from './Scheduler';
+import Filter from './Filter';
 import hlp from 'hlp';
 import PullToRefresh from 'pulltorefreshjs';
 
@@ -14,6 +16,7 @@ export default class Quickbox {
     static bindQuickbox() {
         Quickbox.bindMails();
         Quickbox.allowUnselectRadio();
+        Quickbox.bindToday();
         Quickbox.bindNav();
         Quickbox.bindNew();
     }
@@ -341,6 +344,10 @@ export default class Quickbox {
 
     static initToday() {
         document.querySelector('.quickbox__today').innerHTML = `
+            <div class="quickbox__today-nav">
+                <a class="quickbox__today-navitem quickbox__today-navitem--prev-day" href="#">&lt;</a>
+                <a class="quickbox__today-navitem quickbox__today-navitem--next-day" href="#">&gt;</a>
+            </div>
             <ul class="quickbox__today-tickets"></ul>
         `;
         let tickets = hlp.deepCopy(Store.data.tickets),
@@ -352,7 +359,10 @@ export default class Quickbox {
             );
         });
         tickets.forEach((tickets__value) => {
-            let parsed_values = Dates.parseDateString(tickets__value.date, 'today');
+            if (['done', 'billed'].includes(tickets__value.status)) {
+                return;
+            }
+            let parsed_values = Dates.parseDateString(tickets__value.date, 'tickets');
             if (parsed_values !== false && parsed_values.length > 0) {
                 parsed_values.forEach((parsed_values__value) => {
                     document.querySelector('.quickbox__today-tickets').insertAdjacentHTML(
@@ -372,6 +382,24 @@ export default class Quickbox {
             }
         });
         document.querySelector('.quickbox__navitem[href="#today"] .quickbox__navitem-count').innerText = count;
+    }
+
+    static bindToday() {
+        document.addEventListener('click', (e) => {
+            let el = e.target.closest('.quickbox__today-nav');
+            if (el) {
+                if (e.target.closest('.quickbox__today-navitem--prev-day')) {
+                    Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() - 1);
+                }
+                if (e.target.closest('.quickbox__today-navitem--next-day')) {
+                    Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() + 1);
+                }
+                Quickbox.initToday();
+                Scheduler.initScheduler();
+                Filter.doFilter();
+                e.preventDefault();
+            }
+        });
     }
 
     static initNew() {

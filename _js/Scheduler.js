@@ -2,6 +2,7 @@ import Store from './Store';
 import Dates from './Dates';
 import Filter from './Filter';
 import hlp from 'hlp';
+import Quickbox from './Quickbox';
 
 export default class Scheduler {
     static initScheduler() {
@@ -182,6 +183,7 @@ export default class Scheduler {
                     'Y-m-d'
                 );
                 Scheduler.initScheduler();
+                Quickbox.initToday();
                 Filter.doFilter();
                 e.preventDefault();
             }
