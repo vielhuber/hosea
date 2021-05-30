@@ -12,10 +12,12 @@
         <link rel="manifest" href="manifest.json" />
         <meta name="theme-color" content="#000000" />
         <link rel="apple-touch-icon" href="_assets/_pwa/icon-192x192.png" />
-        <script type="module">
-            import 'https://cdn.jsdelivr.net/npm/@pwabuilder/pwaupdate';
-            const el = document.createElement('pwa-update');
-            document.body.appendChild(el);
+        <script>
+            window.addEventListener('load', () => {
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('sw.js');
+                }
+            });
         </script>
         <!-- end of pwa -->
     </head>
