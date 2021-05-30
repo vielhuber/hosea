@@ -203,8 +203,8 @@ export default class Quickbox {
             if (el) {
                 if (el.closest('.quickbox__mail').classList.contains('quickbox__mail--expanded')) {
                     el.closest('.quickbox__mails').style.overflowY = 'auto';
-                    el.closest('.quickbox__mails').scrollTop = this.lastScrollPos;
                     el.closest('.quickbox__mail').classList.remove('quickbox__mail--expanded');
+                    el.closest('.quickbox__mails').scrollTop = this.lastScrollPos;
                 } else {
                     if (el.closest('.quickbox__mail').classList.contains('quickbox__mail--unread')) {
                         el.closest('.quickbox__mail').classList.remove('quickbox__mail--unread');
@@ -270,8 +270,8 @@ export default class Quickbox {
                     );
                     Quickbox.renderMails();
                     Quickbox.updateMailCount();
-                    form.closest('.quickbox__mails').style.overflowY = 'auto';
-                    form.closest('.quickbox__mails').scrollTop = this.lastScrollPos;
+                    document.querySelector('.quickbox__mails').style.overflowY = 'auto';
+                    document.querySelector('.quickbox__mails').scrollTop = this.lastScrollPos;
                 }, 500);
             }
         });
