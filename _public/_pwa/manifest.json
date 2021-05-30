@@ -2,7 +2,7 @@
     "theme_color": "#000000",
     "background_color": "#ff00e1",
     "display": "standalone",
-    "scope": "/hosea/",
+    "scope": "/_pwa/",
     "start_url": "/hosea/index.html",
     "dir": "ltr",
     "lang": "de",
