@@ -53,7 +53,8 @@ class Cli
                 time TEXT DEFAULT NULL,
                 project TEXT DEFAULT NULL,
                 description TEXT DEFAULT NULL,
-                user_id INT DEFAULT NULL
+                user_id INT DEFAULT NULL,
+                updated_at TEXT DEFAULT NULL
             )
         '
         );
@@ -83,7 +84,7 @@ class Cli
         $this->db->insert('users', [
             'email' => 'david@vielhuber.de',
             'password' => password_hash('secret', PASSWORD_DEFAULT),
-            'ical_key' => md5(uniqid(mt_rand(), true))
+            'ical_key' => md5(uniqid(mt_rand(), true)),
         ]);
 
         $this->db->clear('tickets');
@@ -94,7 +95,7 @@ class Cli
             'time' => '9',
             'project' => 'HovawartDB',
             'description' => 'Siehe Word',
-            'user_id' => 1
+            'user_id' => 1,
         ]);
         $this->db->insert('tickets', [
             'status' => 'scheduled',
@@ -103,7 +104,7 @@ class Cli
             'time' => '9',
             'project' => 'HovawartDB',
             'description' => 'Siehe Word',
-            'user_id' => 1
+            'user_id' => 1,
         ]);
         $this->db->insert('tickets', [
             'status' => 'scheduled',
@@ -112,7 +113,7 @@ class Cli
             'time' => '9',
             'project' => 'HovawartDB',
             'description' => 'Siehe Word',
-            'user_id' => 1
+            'user_id' => 1,
         ]);
 
         file_put_contents('test.txt', str_repeat('abc', 999999));
@@ -120,7 +121,7 @@ class Cli
         $this->db->insert('attachments', [
             'name' => 'test.txt',
             'data' => file_get_contents('test.txt'),
-            'ticket_id' => 1
+            'ticket_id' => 1,
         ]);
         unlink('test.txt');
     }

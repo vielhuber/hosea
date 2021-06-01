@@ -3,7 +3,7 @@ namespace HoseaApi;
 
 class Ticket extends Api
 {
-    public $cols = ['id', 'status', 'priority', 'date', 'time', 'project', 'description', 'user_id'];
+    public $cols = ['id', 'status', 'priority', 'date', 'time', 'project', 'description', 'user_id', 'updated_at'];
 
     public function __construct()
     {
@@ -70,6 +70,7 @@ class Ticket extends Api
                 tickets.time,
                 tickets.project,
                 tickets.description,
+                tickets.updated_at,
                 GROUP_CONCAT(CONCAT(attachments.id, \'SEP_COL\', attachments.name) SEPARATOR \'SEP_OBJ\') as attachments
             FROM tickets
             LEFT JOIN attachments ON attachments.ticket_id = tickets.id
@@ -99,7 +100,7 @@ class Ticket extends Api
         }
         $this->response([
             'success' => true,
-            'data' => $tickets
+            'data' => $tickets,
         ]);
     }
 
@@ -119,7 +120,7 @@ class Ticket extends Api
         );
         $this->response([
             'success' => true,
-            'data' => $ticket
+            'data' => $ticket,
         ]);
     }
 
@@ -130,12 +131,13 @@ class Ticket extends Api
             $values[$columns__value] = $this->getInput($columns__value);
         }
         $values['user_id'] = $this::$auth->getCurrentUserId();
+        $values['updated_at'] = time();
         $id = $this::$db->insert('tickets', $values);
         $this->response([
             'success' => true,
             'data' => [
-                'id' => $id
-            ]
+                'id' => $id,
+            ],
         ]);
     }
 
@@ -149,13 +151,14 @@ class Ticket extends Api
             }
         }
         if (!empty($values)) {
+            $values['updated_at'] = time();
             $this::$db->update('tickets', $values, ['id' => $id]);
         }
         $this->response([
             'success' => true,
             'data' => [
-                'id' => $id
-            ]
+                'id' => $id,
+            ],
         ]);
     }
 
@@ -171,6 +174,7 @@ class Ticket extends Api
                 }
             }
             if (!empty($values) && isset($tickets__value['id'])) {
+                $values['updated_at'] = time();
                 $this::$db->update('tickets', $values, ['id' => $tickets__value['id']]);
                 $ids[] = $tickets__value['id'];
             }
@@ -178,8 +182,8 @@ class Ticket extends Api
         $this->response([
             'success' => true,
             'data' => [
-                'ids' => $ids
-            ]
+                'ids' => $ids,
+            ],
         ]);
     }
 
@@ -188,7 +192,7 @@ class Ticket extends Api
         $this->checkId($id);
         $this::$db->delete('tickets', ['id' => $id]);
         $this->response([
-            'success' => true
+            'success' => true,
         ]);
     }
 
@@ -205,7 +209,7 @@ class Ticket extends Api
                 [
                     'success' => false,
                     'message' => 'unauthorized',
-                    'public_message' => 'Nicht authentifiziert'
+                    'public_message' => 'Nicht authentifiziert',
                 ],
                 401
             );

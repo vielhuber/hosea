@@ -56,7 +56,9 @@ export default class Tickets {
                     reject(err);
                 })
                 .then((response) => {
-                    Store.data.tickets = [];
+                    if (Store.data.tickets === null) {
+                        Store.data.tickets = [];
+                    }
                     response.data.forEach((tickets__value) => {
                         tickets__value.visible = false;
                         Store.data.tickets.push(tickets__value);

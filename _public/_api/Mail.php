@@ -143,10 +143,15 @@ class Mail extends Api
 
     protected function getMailData($mail_id, $mailbox)
     {
-        $mail = $mailbox->getMail($mail_id);
+        $mail = $mailbox->getMail($mail_id, false);
         $mail->embedImageAttachments();
         $eml_filename = tempnam(sys_get_temp_dir(), 'mail_') . '.eml';
+        $unseen = in_array($mail_id, $mailbox->searchMailbox('UNSEEN', true));
         $mailbox->saveMail($mail_id, $eml_filename);
+        // undo saveMail setting mail as read
+        if ($unseen) {
+            $mailbox->markMailAsUnread($mail_id);
+        }
         return [
             'id' => (string) $mail->id,
             'from_name' => (string) (isset($mail->fromName) ? $mail->fromName : $mail->fromAddress),

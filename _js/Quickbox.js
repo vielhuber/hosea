@@ -43,7 +43,7 @@ export default class Quickbox {
         if (hlp.isDesktop()) {
             setInterval(() => {
                 Quickbox.fetchMails();
-            }, 60000);
+            }, 3 * 60 * 1000);
         }
     }
 
@@ -132,10 +132,10 @@ export default class Quickbox {
                                         />
                                     </li>
                                     <li class="quickbox__mail-inputrow quickbox__mail-inputrow--1/2">
-                                        <input class="quickbox__new-submit quickbox__new-submit--discard" type="submit" name="discard" value="_discard" />
+                                        <input class="quickbox__mail-submit quickbox__mail-submit--discard" type="submit" name="discard" value="_discard" />
                                     </li>
                                     <li class="quickbox__mail-inputrow quickbox__mail-inputrow--1/2">
-                                        <input class="quickbox__new-submit quickbox__new-submit--create" type="submit" name="create" value="_create" />
+                                        <input class="quickbox__mail-submit quickbox__mail-submit--create" type="submit" name="create" value="_create" />
                                     </li>
                                 </ul>
         	                </form>
@@ -219,12 +219,12 @@ export default class Quickbox {
         });
 
         document.addEventListener('click', (e) => {
-            let el = e.target.closest('.quickbox__new-submit');
+            let el = e.target.closest('.quickbox__mail-submit');
             if (el) {
                 let form = el.closest('.quickbox__mail-form'),
                     id = form.closest('.quickbox__mail').getAttribute('data-id'),
                     mail = Store.data.mails.filter((mails__value) => mails__value.id === id)[0],
-                    action = el.classList.contains('quickbox__new-submit--create') ? 'create' : 'discard';
+                    action = el.classList.contains('quickbox__mail-submit--create') ? 'create' : 'discard';
 
                 form.closest('.quickbox__mail').classList.add(
                     'quickbox__mail--move-' + (action === 'discard' ? 'left' : 'right')
@@ -475,6 +475,8 @@ export default class Quickbox {
                 false,
                 true
             );
+            document.querySelector('.quickbox__new-form').reset();
+            document.querySelector('.quickbox__navitem[href="#today"]').click();
             e.preventDefault();
         });
     }
