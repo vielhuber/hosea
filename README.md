@@ -12,7 +12,8 @@ hosea is a personal assistant.
 -   convert recurring events to scheduled events
 -   attach emails or documents to tickets
 -   can be controlled keyboard-only
--   full mobile support
+-   full mobile support (pwa included)
+-   live sync changes from different devices
 -   advanced sorting and filtering of tickets
 -   frontend/backend validation
 -   all data (including attachments) are inside the db
