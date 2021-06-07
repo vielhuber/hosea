@@ -1,7 +1,7 @@
 .scheduler {
     width: calc(33.33% - #{$space-big});
     bottom: calc(
-        #{$footer-height} + #{$space-big} + ((100% - (2 * #{$space-big}) - #{$footer-height}) / 2) +
+        #{$footer-height} + #{$space-big} + ((100% - (2 * #{$space-big}) - #{$footer-height}) / 3) +
             (0.5 * #{$space-big})
     );
     right: $space-big;
