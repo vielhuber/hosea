@@ -120,13 +120,6 @@ DD~N: weekday in calendar week N" class="tickets__table-tooltip">(?)</span>
                 <td class="tickets__table-cell"></td>
             `
         );
-
-        /* TODO */
-        Store.data.tickets.forEach((tickets__value) => {
-            document
-                .querySelector('.tickets__table-body')
-                .insertAdjacentHTML('beforeend', Html.createHtmlLine(tickets__value, false));
-        });
     }
 
     static createHtmlLine(ticket, visible) {

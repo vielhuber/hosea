@@ -131,7 +131,6 @@ class Ticket extends Api
             $values[$columns__value] = $this->getInput($columns__value);
         }
         $values['user_id'] = $this::$auth->getCurrentUserId();
-        $values['updated_at'] = time();
         $id = $this::$db->insert('tickets', $values);
         $this->response([
             'success' => true,
@@ -151,7 +150,6 @@ class Ticket extends Api
             }
         }
         if (!empty($values)) {
-            $values['updated_at'] = time();
             $this::$db->update('tickets', $values, ['id' => $id]);
         }
         $this->response([
@@ -174,7 +172,6 @@ class Ticket extends Api
                 }
             }
             if (!empty($values) && isset($tickets__value['id'])) {
-                $values['updated_at'] = time();
                 $this::$db->update('tickets', $values, ['id' => $tickets__value['id']]);
                 $ids[] = $tickets__value['id'];
             }

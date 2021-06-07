@@ -39,20 +39,22 @@ export default class Quickbox {
     }
 
     static initMails() {
-        Quickbox.fetchMails();
+        Quickbox.fetchMails(true);
         if (hlp.isDesktop()) {
             setInterval(() => {
-                Quickbox.fetchMails();
-            }, 3 * 60 * 1000);
+                Quickbox.fetchMails(false);
+            }, 60 * 1000);
         }
     }
 
-    static fetchMails() {
+    static fetchMails(firstInit = false) {
         if (document.querySelector('.quickbox__mails').classList.contains('quickbox__mails--loading')) {
             return;
         }
-        document.querySelector('.quickbox__mails').classList.add('quickbox__mails--loading');
-        document.querySelector('.quickbox__mails').classList.remove('quickbox__mails--finished');
+        if (firstInit === true) {
+            document.querySelector('.quickbox__mails').classList.add('quickbox__mails--loading');
+            document.querySelector('.quickbox__mails').classList.remove('quickbox__mails--finished');
+        }
         Store.data.api
             .fetch('_api/mails', {
                 method: 'GET',
@@ -194,6 +196,8 @@ export default class Quickbox {
         }
         if (document.querySelector('.quickbox__mail') === null) {
             document.querySelector('.quickbox__mails').classList.add('quickbox__mails--finished');
+        } else {
+            document.querySelector('.quickbox__mails').classList.remove('quickbox__mails--finished');
         }
     }
 
@@ -280,7 +284,7 @@ export default class Quickbox {
             PullToRefresh.init({
                 mainElement: '.quickbox__mails',
                 triggerElement: '.quickbox__mails',
-                classPrefix: 'quickbox__mails-pull-to-refresh--',
+                classPrefix: 'quickbox__pull-to-refresh--',
                 distThreshold: 80,
                 distMax: 140,
                 distIgnore: 0,
@@ -298,7 +302,7 @@ export default class Quickbox {
                     if (document.querySelector('.quickbox__mail--expanded') !== null) {
                         return;
                     }
-                    Quickbox.fetchMails();
+                    Quickbox.fetchMails(false);
                 },
             });
         }
@@ -413,6 +417,26 @@ export default class Quickbox {
                 e.preventDefault();
             }
         });
+
+        if (!hlp.isDesktop()) {
+            PullToRefresh.init({
+                mainElement: '.quickbox__today',
+                triggerElement: '.quickbox__today',
+                classPrefix: 'quickbox__pull-to-refresh--',
+                distThreshold: 80,
+                distMax: 140,
+                distIgnore: 0,
+                instructionsPullToRefresh: '_swipe down to refresh',
+                instructionsReleaseToRefresh: '_release to refresh',
+                instructionsRefreshing: '_refreshing',
+                shouldPullToRefresh: function () {
+                    return !this.mainElement.scrollTop;
+                },
+                onRefresh() {
+                    Tickets.fetchAndRenderTicketsAndUpdateApp();
+                },
+            });
+        }
     }
 
     static initNew() {

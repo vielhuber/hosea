@@ -43,7 +43,26 @@ export default class Tickets {
             }
         });
     }
-    static fetchTickets() {
+    static fetchAndRenderTicketsInterval() {
+        if (hlp.isDesktop()) {
+            setInterval(() => {
+                Tickets.fetchAndRenderTicketsAndUpdateApp();
+            }, 1 * 60 * 1000);
+        }
+    }
+
+    static async fetchAndRenderTicketsAndUpdateApp() {
+        await Tickets.fetchAndRenderTickets();
+        Scheduler.initScheduler();
+        Scheduler.updateColors();
+        Quickbox.initToday();
+        Tickets.updateSum();
+        Filter.updateFilter();
+        Textarea.textareaSetVisibleHeights();
+        Filter.doFilter();
+    }
+
+    static fetchAndRenderTickets() {
         return new Promise((resolve, reject) => {
             Store.data.api
                 .fetch('_api/tickets', {
@@ -59,10 +78,53 @@ export default class Tickets {
                     if (Store.data.tickets === null) {
                         Store.data.tickets = [];
                     }
-                    response.data.forEach((tickets__value) => {
-                        tickets__value.visible = false;
-                        Store.data.tickets.push(tickets__value);
+
+                    // remove
+                    Store.data.tickets = Store.data.tickets.filter((tickets__value) => {
+                        let exists =
+                            response.data.filter((el) => {
+                                return el.id == tickets__value.id;
+                            }).length > 0;
+                        if (exists === false) {
+                            document.querySelector('.tickets__entry[data-id="' + tickets__value.id + '"]').remove();
+                            //console.log('removing ticket ' + tickets__value.id);
+                        }
+                        return exists;
                     });
+
+                    // edit
+                    response.data.forEach((tickets__value) => {
+                        Store.data.tickets.forEach((store__value, store__key) => {
+                            if (
+                                store__value.id == tickets__value.id &&
+                                store__value.updated_at != tickets__value.updated_at
+                            ) {
+                                tickets__value.visible = false;
+                                Store.data.tickets[store__key] = tickets__value;
+                                document.querySelector(
+                                    '.tickets__entry[data-id="' + tickets__value.id + '"]'
+                                ).outerHTML = Html.createHtmlLine(tickets__value, false);
+                                //console.log('editing ticket ' + tickets__value.id);
+                            }
+                        });
+                    });
+
+                    // add
+                    response.data.forEach((tickets__value) => {
+                        if (
+                            Store.data.tickets.filter((el) => {
+                                return el.id == tickets__value.id;
+                            }).length === 0
+                        ) {
+                            tickets__value.visible = false;
+                            Store.data.tickets.push(tickets__value);
+                            document
+                                .querySelector('.tickets__table-body')
+                                .insertAdjacentHTML('beforeend', Html.createHtmlLine(tickets__value, false));
+                            //console.log('adding ticket ' + tickets__value.id);
+                        }
+                    });
+
                     resolve();
                 });
         });
@@ -121,6 +183,7 @@ export default class Tickets {
                     Store.data.cols.forEach((cols__value) => {
                         data[cols__value] = el.querySelector('[name="' + cols__value + '"]').value;
                     });
+                    data['updated_at'] = Dates.time().toString();
                     Tickets.setTicketData(el.getAttribute('data-id'), data);
                     Lock.lockTicket(el.getAttribute('data-id'));
                     changed.push(Tickets.getTicketData(el.getAttribute('data-id')));
@@ -159,6 +222,7 @@ export default class Tickets {
             Store.data.cols.forEach((cols__value) => {
                 ticket[cols__value] = cols__value in data ? data[cols__value] : '';
             });
+            ticket['updated_at'] = Dates.time().toString();
             Store.data.api
                 .fetch('_api/tickets', {
                     method: 'POST',

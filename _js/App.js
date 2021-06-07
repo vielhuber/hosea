@@ -17,8 +17,9 @@ export default class App {
         Store.initStore();
         await Auth.login();
         await User.fetchUser();
-        await Tickets.fetchTickets();
         Html.buildHtml();
+        await Tickets.fetchAndRenderTickets();
+        Tickets.fetchAndRenderTicketsInterval();
         Keyboard.initKeyboardNavigation();
         Scheduler.initScheduler();
         Quickbox.initQuickbox();

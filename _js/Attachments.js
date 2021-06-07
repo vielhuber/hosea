@@ -4,6 +4,7 @@ import Lock from './Lock';
 import Store from './Store';
 import Tickets from './Tickets';
 import Footer from './Footer';
+import Dates from './Dates';
 
 export default class Attachments {
     static bindDownload() {
@@ -113,6 +114,17 @@ export default class Attachments {
                         console.error(err);
                     })
                     .then((response) => {
+                        let updated_at = Dates.time().toString();
+                        Tickets.setTicketData(ticket_id, 'updated_at', updated_at);
+                        Store.data.api.fetch('_api/tickets/' + ticket_id, {
+                            method: 'PUT',
+                            body: JSON.stringify({
+                                updated_at: updated_at,
+                            }),
+                            cache: 'no-cache',
+                            headers: { 'content-type': 'application/json' },
+                        });
+
                         resolve(response.data);
                     });
             });
@@ -122,7 +134,8 @@ export default class Attachments {
     static bindDeleteAttachment() {
         document.querySelector('.tickets').addEventListener('click', (e) => {
             if (e.target.closest('.tickets__attachment-delete')) {
-                if (Lock.ticketIsLocked(e.target.closest('.tickets__entry').getAttribute('data-id'))) {
+                let ticket_id = e.target.closest('.tickets__entry').getAttribute('data-id');
+                if (Lock.ticketIsLocked(ticket_id)) {
                     e.preventDefault();
                 }
                 let attachment_id = e.target.closest('.tickets__attachment').getAttribute('data-id');
@@ -137,6 +150,17 @@ export default class Attachments {
                         console.error(err);
                     })
                     .then((response) => {
+                        let updated_at = Dates.time().toString();
+                        Tickets.setTicketData(ticket_id, 'updated_at', updated_at);
+                        Store.data.api.fetch('_api/tickets/' + ticket_id, {
+                            method: 'PUT',
+                            body: JSON.stringify({
+                                updated_at: updated_at,
+                            }),
+                            cache: 'no-cache',
+                            headers: { 'content-type': 'application/json' },
+                        });
+
                         e.target.closest('.tickets__attachment').remove();
                     });
                 e.preventDefault();

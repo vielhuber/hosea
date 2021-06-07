@@ -514,6 +514,10 @@ export default class Dates {
         date = date.join('\n');
         return date;
     }
+
+    static time() {
+        return Math.floor(new Date().getTime() / 1000);
+    }
 }
 
 /* debug */
