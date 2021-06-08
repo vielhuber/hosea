@@ -5,11 +5,22 @@ export default class Html {
         document.querySelector('#app').insertAdjacentHTML(
             'beforeend',
             `
+            <div class="animation"></div>
             <div class="tickets"></div>
             <div class="scheduler"></div>
             <div class="quickbox"></div>
             <div class="footer"></div>
         `
+        );
+
+        document.querySelector('.animation').insertAdjacentHTML(
+            'beforeend',
+            `
+            <div class="animation__wrap">
+                <div class="animation__top"></div>
+                <div class="animation__bottom"></div>
+            </div>
+            `
         );
 
         document.querySelector('.footer').insertAdjacentHTML(

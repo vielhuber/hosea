@@ -1,0 +1,65 @@
+$color-grid: #e91e63;
+$color-bottom: #000000;
+$color-top: #000000;
+$perspective: 360px;
+$speed: 1s;
+
+.animation {
+    position: relative;
+    height: 100%;
+    background: linear-gradient($color-top 25%, $color-grid 50%, $color-grid 50%, $color-bottom 100%);
+}
+
+.animation__wrap {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    margin: 0 auto;
+    perspective: $perspective;
+    perspective-origin: 50% 50%;
+}
+
+.animation__top,
+.animation__bottom {
+    width: 200%;
+    height: 130%;
+    position: absolute;
+    bottom: -30%;
+    left: -50%;
+    background-image: -webkit-linear-gradient($color-grid 2px, transparent 2px),
+        -webkit-linear-gradient(left, $color-grid 2px, transparent 2px);
+    background-size: 100px 100px, 100px 100px;
+    background-position: -1px -1px, -1px -1px;
+    transform: rotateX(85deg);
+    animation: animation-top $speed infinite linear;
+}
+
+.animation__bottom {
+    transform: rotateX(-85deg);
+    top: -30%;
+    animation: animation-bottom $speed infinite linear;
+}
+
+@keyframes animation-top {
+    from {
+        background-position: 0px -100px, 0px 0px;
+    }
+    to {
+        background-position: 0px 0px, 100px 0px;
+    }
+}
+
+@keyframes animation-bottom {
+    from {
+        background-position: 0px 0px, 0px 0px;
+    }
+    to {
+        background-position: 0px -100px, 100px 0px;
+    }
+}
+
+@include responsive-medium {
+    .animation {
+        display: none !important;
+    }
+}
