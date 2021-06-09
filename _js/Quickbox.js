@@ -48,7 +48,7 @@ export default class Quickbox {
                 }
                 Quickbox.fetchMails(false);
                 Footer.updateStatus('successfully synced mails.', 'success');
-            }, 1 * 60 * 1000);
+            }, 70 * 1000); // must be non divisible by 60 (otherwise it blocks others)
         }
     }
 
