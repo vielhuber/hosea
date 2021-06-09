@@ -14,6 +14,7 @@ import hlp from 'hlp';
 export default class Tickets {
     static updateLocalTicket(ticket_id) {
         return new Promise((resolve, reject) => {
+            Store.data.busy = true;
             Store.data.api
                 .fetch('_api/tickets/' + ticket_id, {
                     method: 'GET',
@@ -25,6 +26,7 @@ export default class Tickets {
                     reject(err);
                 })
                 .then((response) => {
+                    Store.data.busy = false;
                     Tickets.setTicketData(ticket_id, response.data);
                     resolve();
                 });
@@ -46,7 +48,14 @@ export default class Tickets {
     static fetchAndRenderTicketsInterval() {
         if (hlp.isDesktop()) {
             setInterval(() => {
+                if (Store.data.busy === true) {
+                    return;
+                }
+                if (document.querySelector(':focus') !== null) {
+                    return;
+                }
                 Tickets.fetchAndRenderTicketsAndUpdateApp();
+                Footer.updateStatus('successfully synced tasks.', 'success');
             }, 1 * 60 * 1000);
         }
     }
@@ -64,6 +73,7 @@ export default class Tickets {
 
     static fetchAndRenderTickets() {
         return new Promise((resolve, reject) => {
+            Store.data.busy = true;
             Store.data.api
                 .fetch('_api/tickets', {
                     method: 'GET',
@@ -75,6 +85,7 @@ export default class Tickets {
                     reject(err);
                 })
                 .then((response) => {
+                    Store.data.busy = false;
                     if (Store.data.tickets === null) {
                         Store.data.tickets = [];
                     }
@@ -142,6 +153,7 @@ export default class Tickets {
 
     static deleteTicket(ticket_id) {
         return new Promise((resolve, reject) => {
+            Store.data.busy = true;
             Store.data.api
                 .fetch('_api/tickets/' + ticket_id, {
                     method: 'DELETE',
@@ -153,6 +165,7 @@ export default class Tickets {
                     console.error(err);
                 })
                 .then((response) => {
+                    Store.data.busy = false;
                     Store.data.tickets.forEach((tickets__value, tickets__key) => {
                         if (tickets__value.id == ticket_id) {
                             Store.data.tickets.splice(tickets__key, 1);
@@ -189,6 +202,7 @@ export default class Tickets {
                     changed.push(Tickets.getTicketData(el.getAttribute('data-id')));
                 });
 
+            Store.data.busy = true;
             Store.data.api
                 .fetch('_api/tickets', {
                     method: 'PUT',
@@ -203,6 +217,7 @@ export default class Tickets {
                     console.error(err);
                 })
                 .then((response) => {
+                    Store.data.busy = false;
                     response.data.ids.forEach((value) => {
                         Lock.unlockTicket(value);
                     });
@@ -223,6 +238,7 @@ export default class Tickets {
                 ticket[cols__value] = cols__value in data ? data[cols__value] : '';
             });
             ticket['updated_at'] = Dates.time().toString();
+            Store.data.busy = true;
             Store.data.api
                 .fetch('_api/tickets', {
                     method: 'POST',
@@ -235,6 +251,7 @@ export default class Tickets {
                     reject(err);
                 })
                 .then((response) => {
+                    Store.data.busy = false;
                     ticket.id = response.data.id;
                     ticket.visible = true;
                     Store.data.tickets.push(ticket);

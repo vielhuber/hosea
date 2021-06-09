@@ -3,6 +3,7 @@ export default class Store {
 
     static initStore() {
         Store.data = {
+            busy: false,
             api: null,
             user: null,
             tickets: null,

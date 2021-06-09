@@ -17,6 +17,7 @@ export default class Attachments {
     }
 
     static startDownload(attachment_id) {
+        Store.data.busy = true;
         Store.data.api
             .fetch('_api/attachments/' + attachment_id, {
                 method: 'GET',
@@ -28,6 +29,7 @@ export default class Attachments {
                 console.error(err);
             })
             .then((response) => {
+                Store.data.busy = false;
                 let base64 = response.data.data,
                     filename = response.data.name,
                     url = hlp.base64tourl(base64);
@@ -98,6 +100,7 @@ export default class Attachments {
                 return;
             }
             Helper.fileToBase64(file).then((base64) => {
+                Store.data.busy = true;
                 Store.data.api
                     .fetch('_api/attachments', {
                         method: 'POST',
@@ -114,16 +117,26 @@ export default class Attachments {
                         console.error(err);
                     })
                     .then((response) => {
+                        Store.data.busy = false;
                         let updated_at = Dates.time().toString();
                         Tickets.setTicketData(ticket_id, 'updated_at', updated_at);
-                        Store.data.api.fetch('_api/tickets/' + ticket_id, {
-                            method: 'PUT',
-                            body: JSON.stringify({
-                                updated_at: updated_at,
-                            }),
-                            cache: 'no-cache',
-                            headers: { 'content-type': 'application/json' },
-                        });
+                        Store.data.busy = true;
+                        Store.data.api
+                            .fetch('_api/tickets/' + ticket_id, {
+                                method: 'PUT',
+                                body: JSON.stringify({
+                                    updated_at: updated_at,
+                                }),
+                                cache: 'no-cache',
+                                headers: { 'content-type': 'application/json' },
+                            })
+                            .then((res) => res.json())
+                            .catch((err) => {
+                                console.error(err);
+                            })
+                            .then((response) => {
+                                Store.data.busy = false;
+                            });
 
                         resolve(response.data);
                     });
@@ -139,6 +152,7 @@ export default class Attachments {
                     e.preventDefault();
                 }
                 let attachment_id = e.target.closest('.tickets__attachment').getAttribute('data-id');
+                Store.data.busy = true;
                 Store.data.api
                     .fetch('_api/attachments/' + attachment_id, {
                         method: 'DELETE',
@@ -150,16 +164,26 @@ export default class Attachments {
                         console.error(err);
                     })
                     .then((response) => {
+                        Store.data.busy = false;
                         let updated_at = Dates.time().toString();
                         Tickets.setTicketData(ticket_id, 'updated_at', updated_at);
-                        Store.data.api.fetch('_api/tickets/' + ticket_id, {
-                            method: 'PUT',
-                            body: JSON.stringify({
-                                updated_at: updated_at,
-                            }),
-                            cache: 'no-cache',
-                            headers: { 'content-type': 'application/json' },
-                        });
+                        Store.data.busy = true;
+                        Store.data.api
+                            .fetch('_api/tickets/' + ticket_id, {
+                                method: 'PUT',
+                                body: JSON.stringify({
+                                    updated_at: updated_at,
+                                }),
+                                cache: 'no-cache',
+                                headers: { 'content-type': 'application/json' },
+                            })
+                            .then((res) => res.json())
+                            .catch((err) => {
+                                console.error(err);
+                            })
+                            .then((response) => {
+                                Store.data.busy = false;
+                            });
 
                         e.target.closest('.tickets__attachment').remove();
                     });

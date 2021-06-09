@@ -2,6 +2,7 @@ import Tickets from './Tickets';
 import Store from './Store';
 import Scheduler from './Scheduler';
 import Filter from './Filter';
+import Footer from './Footer';
 import hlp from 'hlp';
 import PullToRefresh from 'pulltorefreshjs';
 
@@ -42,8 +43,12 @@ export default class Quickbox {
         Quickbox.fetchMails(true);
         if (hlp.isDesktop()) {
             setInterval(() => {
+                if (Store.data.busy === true) {
+                    return;
+                }
                 Quickbox.fetchMails(false);
-            }, 60 * 1000);
+                Footer.updateStatus('successfully synced mails.', 'success');
+            }, 1 * 60 * 1000);
         }
     }
 
@@ -55,6 +60,7 @@ export default class Quickbox {
             document.querySelector('.quickbox__mails').classList.add('quickbox__mails--loading');
             document.querySelector('.quickbox__mails').classList.remove('quickbox__mails--finished');
         }
+        Store.data.busy = true;
         Store.data.api
             .fetch('_api/mails', {
                 method: 'GET',
@@ -64,6 +70,7 @@ export default class Quickbox {
             .then((res) => res.json())
             .catch(() => {})
             .then((response) => {
+                Store.data.busy = false;
                 Store.data.mails = [];
                 response.data.forEach((mails__value) => {
                     Store.data.mails.push(mails__value);
@@ -258,6 +265,7 @@ export default class Quickbox {
                     );
                 }
 
+                Store.data.busy = true;
                 Store.data.api
                     .fetch('_api/mails', {
                         method: 'PUT',
@@ -267,7 +275,9 @@ export default class Quickbox {
                     })
                     .then((res) => res.json())
                     .catch(() => {})
-                    .then((response) => {});
+                    .then((response) => {
+                        Store.data.busy = false;
+                    });
                 e.preventDefault();
 
                 setTimeout(() => {
