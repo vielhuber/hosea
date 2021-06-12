@@ -67,8 +67,6 @@ export default class Tickets {
         Quickbox.initToday();
         Tickets.updateSum();
         Filter.updateFilter();
-        Textarea.textareaSetVisibleHeights();
-        Filter.doFilter();
     }
 
     static fetchAndRenderTickets() {
