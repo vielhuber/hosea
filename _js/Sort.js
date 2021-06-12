@@ -120,7 +120,15 @@ export default class Sort {
                 return 0;
             });
         for (let i = 0; i < sorted.length; i++) {
+            // save scroll positions
+            sorted[i].querySelectorAll('textarea').forEach((el) => {
+                el.scrollTopBackup = el.scrollTop;
+            });
             sorted[i].parentNode.appendChild(sorted[i]);
+            // restore scroll positions
+            sorted[i].querySelectorAll('textarea').forEach((el) => {
+                el.scrollTop = el.scrollTopBackup;
+            });
         }
     }
 }

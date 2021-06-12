@@ -2,10 +2,10 @@ import Helper from './Helper';
 
 export default class Textarea {
     static textareaAutoHeight() {
-        let debounce = Helper.debounce(e => {
+        let debounce = Helper.debounce((e) => {
             Textarea.textareaSetHeight(e.target);
         }, 100);
-        document.querySelector('.tickets .tickets__table-body').addEventListener('input', e => {
+        document.querySelector('.tickets .tickets__table-body').addEventListener('input', (e) => {
             if (
                 e.target &&
                 e.target.tagName === 'TEXTAREA' &&
@@ -45,8 +45,8 @@ export default class Textarea {
         /* also set other textarea heights */
         let parent = el.parentNode;
         [...parent.parentNode.children]
-            .filter(child => child !== parent)
-            .forEach(i => {
+            .filter((child) => child !== parent)
+            .forEach((i) => {
                 if (i.querySelector('textarea') !== null) {
                     i.querySelector('textarea').style.height = height;
                 }
