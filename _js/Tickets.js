@@ -442,7 +442,7 @@ export default class Tickets {
                     }
                 }
                 if (e.target.closest('.tickets__textarea--project')) {
-                    if (new RegExp('[^a-zA-Z0-9äÄöÖüÜß .]').test(e.target.value)) {
+                    if (new RegExp('[^a-zA-Z0-9äÄöÖüÜß .-]').test(e.target.value)) {
                         e.target.setCustomValidity('wrong format');
                     } else {
                         e.target.setCustomValidity('');
