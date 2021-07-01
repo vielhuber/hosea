@@ -258,6 +258,51 @@ class Mail extends Api
                 }
             }
 
+            // embed images
+            $images = [];
+            preg_match_all('/src="([^"]*)"/i', $content, $images);
+            $images = $images[1];
+            $images = array_unique($images);
+            foreach ($images as $images__value) {
+                if (strpos($images__value, 'cid:') === false && strpos($images__value, 'http') === false) {
+                    $image_cid = md5($images__value);
+
+                    $image_extension = $images__value;
+                    if (strpos($images__value, 'base64,') !== false) {
+                        if (strpos($images__value, 'image/png') !== false) {
+                            $image_extension = 'png';
+                        } else {
+                            $image_extension = 'jpg';
+                        }
+                    } else {
+                        $image_extension = explode('.', $image_extension);
+                        $image_extension = $image_extension[count($image_extension) - 1];
+                    }
+
+                    $image_baseurl = $_SERVER['DOCUMENT_ROOT']; // modify this if needed
+
+                    $image_tmp_path = sys_get_temp_dir() . '/' . md5(uniqid()) . '.' . $image_extension;
+
+                    // base64
+                    if (strpos($images__value, 'base64,') !== false) {
+                        file_put_contents(
+                            $image_tmp_path,
+                            base64_decode(
+                                trim(substr($images__value, strpos($images__value, 'base64,') + strlen('base64')))
+                            )
+                        );
+                        $content = str_replace($images__value, 'cid:' . $image_cid, $content);
+                        $mail->addEmbeddedImage($image_tmp_path, $image_cid);
+                    }
+
+                    // relative paths
+                    elseif (file_exists($image_baseurl . '/' . $images__value)) {
+                        $content = str_replace($images__value, 'cid:' . $image_cid, $content);
+                        $mail->addEmbeddedImage($image_baseurl . '/' . $images__value, $image_cid);
+                    }
+                }
+            }
+
             $mail->Subject = $subject;
             $mail->Body = $content;
             $mail->AltBody = strip_tags(str_replace(['<br>', '<br/>', '<br />'], "\r\n", $content));
