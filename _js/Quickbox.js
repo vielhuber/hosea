@@ -457,7 +457,7 @@ export default class Quickbox {
                     <li class="quickbox__new-inputrow quickbox__new-inputrow--1/4"><label class="quickbox__new-label"><input class="quickbox__new-input quickbox__new-input--radio" type="radio" name="date" value="weekend" /><span class="quickbox__new-label-text">weekend</span></label></li>
                     <li class="quickbox__new-inputrow quickbox__new-inputrow--1/4"><label class="quickbox__new-label"><input class="quickbox__new-input quickbox__new-input--radio" type="radio" name="date" value="next" /><span class="quickbox__new-label-text">next</span></label></li>
                     <li class="quickbox__new-inputrow quickbox__new-inputrow--1/4"><input class="quickbox__new-input quickbox__new-input--text" type="text" name="date" placeholder="date" value="" /></li>
-                    <li class="quickbox__new-inputrow"><input class="quickbox__new-input quickbox__new-input--text" type="text" required="required" name="project" placeholder="project" value="" /></li>
+                    <li class="quickbox__new-inputrow"><input class="quickbox__new-input quickbox__new-input--text" type="text" required="required" name="project" placeholder="project" value="private" /></li>
                     <li class="quickbox__new-inputrow quickbox__new-inputrow--rheight">
                         <textarea
                             class="quickbox__new-input quickbox__new-input--textarea"
