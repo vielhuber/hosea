@@ -3,6 +3,7 @@ import Dates from './Dates';
 import Filter from './Filter';
 import hlp from 'hlp';
 import Quickbox from './Quickbox';
+import Weather from './Weather';
 
 export default class Scheduler {
     static initScheduler() {
@@ -43,6 +44,32 @@ export default class Scheduler {
                                 ${Dates.dateFormat(Dates.getDayOfActiveWeek(i + 1), 'D d.m.')}
                             </td>
                         `
+                            )
+                            .join('')}
+                    </tr>
+                    <tr class="scheduler__row">
+                        <td class="scheduler__cell"></td>
+                        ${Array(7)
+                            .join(0)
+                            .split(0)
+                            .map(
+                                (item, i) => `
+                                    <td class="
+                                        scheduler__cell
+                                        ${
+                                            Dates.sameDay(Dates.getDayOfActiveWeek(i + 1), Dates.getCurrentDate())
+                                                ? ' scheduler__cell--curday'
+                                                : ''
+                                        }
+                                        ${
+                                            Dates.sameDay(Dates.getDayOfActiveWeek(i + 1), Dates.getActiveDate())
+                                                ? ' scheduler__cell--activeday'
+                                                : ''
+                                        }
+                                    ">
+                                        ${Weather.outputWeather(Dates.getDayOfActiveWeek(i + 1))}
+                                    </td>
+                                `
                             )
                             .join('')}
                     </tr>

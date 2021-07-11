@@ -8,6 +8,7 @@ export default class Store {
             user: null,
             tickets: null,
             mails: null,
+            weather: null,
             cols: ['status', 'priority', 'date', 'time', 'project', 'description'],
             colors: {
                 status: {

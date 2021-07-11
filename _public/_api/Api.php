@@ -74,6 +74,7 @@ class Api
         $this->Ticket->getRequest();
         $this->Attachment->getRequest();
         $this->User->getRequest();
+        $this->Weather->getRequest();
         $this->Mail->getRequest();
         $this->iCal->getRequest();
         $this->response(

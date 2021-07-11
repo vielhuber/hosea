@@ -11,6 +11,7 @@ import Store from './Store';
 import Textarea from './Textarea';
 import Tickets from './Tickets';
 import User from './User';
+import Weather from './Weather';
 
 export default class App {
     static async init() {
@@ -19,6 +20,7 @@ export default class App {
         await User.fetchUser();
         Html.buildHtml();
         await Tickets.fetchAndRenderTickets();
+        await Weather.fetchWeather();
         Tickets.fetchAndRenderTicketsInterval();
         Keyboard.initKeyboardNavigation();
         Scheduler.initScheduler();
