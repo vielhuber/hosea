@@ -56,7 +56,7 @@ export default class Quickbox {
         if (document.querySelector('.quickbox__mails').classList.contains('quickbox__mails--loading')) {
             return;
         }
-        if (firstInit === true) {
+        if (firstInit === true || !hlp.isDesktop()) {
             document.querySelector('.quickbox__mails').classList.add('quickbox__mails--loading');
             document.querySelector('.quickbox__mails').classList.remove('quickbox__mails--finished');
         }

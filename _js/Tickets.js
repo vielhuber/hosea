@@ -496,7 +496,11 @@ export default class Tickets {
                             time = time.toFixed(2);
                         }
                         time = time.toString().replace('.', ',');
-                        e.target.closest('.tickets__entry').querySelector('[name="time"]').value = time;
+                        e.target.closest('.tickets__entry').querySelector('.tickets__textarea--time').value = time;
+                        e.target
+                            .closest('.tickets__entry')
+                            .querySelector('.tickets__textarea--time')
+                            .setCustomValidity('');
                     }
                 }
             }
