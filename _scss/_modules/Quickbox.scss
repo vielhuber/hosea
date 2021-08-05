@@ -518,6 +518,12 @@
     color: $color-black;
 }
 
+@media screen and (min-width: $breakpoint-medium) and (max-height: 850px) {
+    .quickbox__mail-content {
+        padding: 0;
+    }
+}
+
 @include responsive-medium {
     .quickbox {
         border: none;

@@ -65,11 +65,17 @@ class Mail extends Api
                     'UTF-8'
                 );
                 $mails_ids = $mailbox->searchMailbox('ALL');
+
+                $runtime_start = microtime(true);
+
                 foreach ($mails_ids as $mails_id__value) {
                     $mail_data = $this->getMailData($mails_id__value, $mailbox);
                     $mail_data['mailbox'] = $settings__value['username'];
                     $mail_data['editors'] = isset($_SERVER['EDITORS']) ? explode(';', $_SERVER['EDITORS']) : [];
                     $mails[] = $mail_data;
+                    if (microtime(true) - $runtime_start > 20) {
+                        break;
+                    }
                 }
             } catch (\Exception $e) {
                 continue;
@@ -150,7 +156,7 @@ class Mail extends Api
         $mailbox->saveMail($mail_id, $eml_filename);
         // undo saveMail setting mail as read
         if ($unseen) {
-            $mailbox->markMailAsUnread($mail_id);
+            //$mailbox->markMailAsUnread($mail_id);
         }
         return [
             'id' => (string) $mail->id,
