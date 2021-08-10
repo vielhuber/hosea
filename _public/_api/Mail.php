@@ -156,7 +156,7 @@ class Mail extends Api
         $mailbox->saveMail($mail_id, $eml_filename);
         // undo saveMail setting mail as read
         if ($unseen) {
-            //$mailbox->markMailAsUnread($mail_id);
+            $mailbox->markMailAsUnread($mail_id);
         }
         return [
             'id' => (string) $mail->id,
@@ -218,6 +218,8 @@ class Mail extends Api
     {
         $mailbox = $this->getMailbox($mailbox_name);
         $mailbox->moveMail($id, $this->getMailboxSettings($mailbox_name)['folder_archive']);
+        $mailbox->markMailAsRead($id);
+        sleep(1);
         $mailbox->markMailAsRead($id);
     }
 
