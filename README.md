@@ -31,7 +31,7 @@ hosea is a personal assistant.
 ### database
 
 -   create a new empty database
--   copy .env.example to .env and fill out your database credentials
+-   copy `.env.example` to `.env` and fill out your database credentials
 -   run `php migrate` to create the schema
 -   if you want some test data, also run `php seed`
 
