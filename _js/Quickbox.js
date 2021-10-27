@@ -297,7 +297,7 @@ export default class Quickbox {
                 classPrefix: 'quickbox__pull-to-refresh--',
                 distThreshold: 80,
                 distMax: 140,
-                distIgnore: 0,
+                distIgnore: 10,
                 instructionsPullToRefresh: '_swipe down to refresh',
                 instructionsReleaseToRefresh: '_release to refresh',
                 instructionsRefreshing: '_refreshing',
@@ -340,25 +340,45 @@ export default class Quickbox {
 
     static bindNav() {
         if (document.querySelector('.quickbox__content') !== null) {
-            document.querySelector('.quickbox__content').setAttribute('data-view', 'mails');
-            document.querySelector('.quickbox__navitem[href="#mails"]').classList.add('quickbox__navitem--active');
+            this.bindNavToggle('mails');
         }
         document.addEventListener('click', (e) => {
             let el = e.target.closest('.quickbox__navitem');
             if (el) {
                 if (!el.classList.contains('quickbox__navitem--active')) {
-                    if (document.querySelector('.quickbox__navitem--active') !== null) {
-                        document.querySelectorAll('.quickbox__navitem--active').forEach((navitem__value) => {
-                            navitem__value.classList.remove('quickbox__navitem--active');
-                        });
-                    }
-                    el.classList.add('quickbox__navitem--active');
-                    document
-                        .querySelector('.quickbox__content')
-                        .setAttribute('data-view', el.getAttribute('href').replace('#', ''));
+                    this.bindNavToggle(el.getAttribute('href').replace('#', ''));
                 }
                 e.preventDefault();
             }
+        });
+    }
+
+    static bindNavToggle(view) {
+        if (document.querySelector('.quickbox__content').classList.contains('quickbox__content--disabled')) {
+            return;
+        }
+        document.querySelector('.quickbox__content').classList.add('quickbox__content--disabled');
+        /* in chrome we want ctrl+f to not find hidden elements (so we must apply display:none) */
+        /* the following lines ensure to do exactly that */
+        document.querySelectorAll('.quickbox__content > *').forEach((el2) => {
+            el2.style.display = 'block';
+        });
+        requestAnimationFrame(() => {
+            setTimeout(() => {
+                document.querySelectorAll('.quickbox__content > *:not(.quickbox__' + view + ')').forEach((el2) => {
+                    el2.style.display = 'none';
+                });
+                document.querySelector('.quickbox__content').classList.remove('quickbox__content--disabled');
+            }, 250);
+            document.querySelector('.quickbox__content').setAttribute('data-view', view);
+            if (document.querySelector('.quickbox__navitem--active') !== null) {
+                document.querySelectorAll('.quickbox__navitem--active').forEach((navitem__value) => {
+                    navitem__value.classList.remove('quickbox__navitem--active');
+                });
+            }
+            document
+                .querySelector('.quickbox__navitem[href="#' + view + '"]')
+                .classList.add('quickbox__navitem--active');
         });
     }
 
@@ -435,12 +455,15 @@ export default class Quickbox {
                 classPrefix: 'quickbox__pull-to-refresh--',
                 distThreshold: 80,
                 distMax: 140,
-                distIgnore: 0,
+                distIgnore: 10,
                 instructionsPullToRefresh: '_swipe down to refresh',
                 instructionsReleaseToRefresh: '_release to refresh',
                 instructionsRefreshing: '_refreshing',
                 shouldPullToRefresh: function () {
-                    return !this.mainElement.scrollTop;
+                    return (
+                        this.mainElement.querySelector('.quickbox__today-tickets') !== null &&
+                        !this.mainElement.querySelector('.quickbox__today-tickets').scrollTop
+                    );
                 },
                 onRefresh() {
                     Tickets.fetchAndRenderTicketsAndUpdateApp();
