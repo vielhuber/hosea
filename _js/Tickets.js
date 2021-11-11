@@ -319,6 +319,7 @@ export default class Tickets {
         ) {
             let newDates = [];
             duplicateData.date.split('\n').forEach((duplicateData__value) => {
+                if( newDates.length > 0 ) { return; } // only add one
                 let newDate = Dates.dateFormat(Dates.getActiveDate(), 'd.m.y'),
                     extractedTime = Dates.extractTimeFromDate(duplicateData__value);
                 if (extractedTime) {
