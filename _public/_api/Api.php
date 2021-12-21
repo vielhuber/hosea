@@ -27,10 +27,18 @@ class Api
     protected function checkAuth()
     {
         $success = true;
-        if ($this->getRequestPathFirst() === 'ical') {
+        if ($this->getRequestPathFirst() === 'cron') {
             if (
                 $this->getRequestPathSecond() == '' ||
-                $this::$db->fetch_var('SELECT COUNT(*) FROM users WHERE ical_key = ?', $this->getRequestPathSecond()) ==
+                $this::$db->fetch_var('SELECT COUNT(*) FROM users WHERE api_key = ?', $this->getRequestPathSecond()) ==
+                    0
+            ) {
+                $success = false;
+            }
+        } elseif ($this->getRequestPathFirst() === 'ical') {
+            if (
+                $this->getRequestPathSecond() == '' ||
+                $this::$db->fetch_var('SELECT COUNT(*) FROM users WHERE api_key = ?', $this->getRequestPathSecond()) ==
                     0
             ) {
                 $success = false;
@@ -77,6 +85,7 @@ class Api
         $this->Weather->getRequest();
         $this->Mail->getRequest();
         $this->iCal->getRequest();
+        $this->Cron->getRequest();
         $this->response(
             [
                 'success' => false,

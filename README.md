@@ -42,3 +42,8 @@ hosea is a personal assistant.
     -   deploy the app outside of the root folder (e.g. `/var/hosea`)
     -   create a symlink (`ln -s /var/hosea/_public /var/www/hosea`)
 -   open up the url and have fun
+
+### cron
+
+-   to speed up caching and improve garbage collecting, point a recurring cronjob running every 5 minutes that calls https://tld.com/_api/cron/%API_KEY%
+-   you can find this link in the bottom right ("\_cron") of the gui

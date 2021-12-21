@@ -48,6 +48,32 @@ class Mail extends Api
 
     protected function index()
     {
+        $mails = $this->buildCache();
+        $this->response([
+            'success' => true,
+            'data' => $mails,
+        ]);
+    }
+
+    public function buildCache($force = false)
+    {
+        $mails = [];
+        $filename_cache = sys_get_temp_dir() . '/hosea-mail.cache';
+        if (
+            $force === true ||
+            !file_exists($filename_cache) ||
+            filemtime($filename_cache) < strtotime('now - 35 minutes')
+        ) {
+            $mails = $this->prepareMails();
+            file_put_contents($filename_cache, serialize($mails));
+        } elseif (file_exists($filename_cache)) {
+            $mails = unserialize(file_get_contents($filename_cache));
+        }
+        return $mails;
+    }
+
+    protected function prepareMails()
+    {
         $mails = [];
 
         foreach ($this->settings as $settings__value) {
@@ -73,7 +99,7 @@ class Mail extends Api
                     $mail_data['mailbox'] = $settings__value['username'];
                     $mail_data['editors'] = isset($_SERVER['EDITORS']) ? explode(';', $_SERVER['EDITORS']) : [];
                     $mails[] = $mail_data;
-                    if (microtime(true) - $runtime_start > 20) {
+                    if (microtime(true) - $runtime_start > 60) {
                         break;
                     }
                 }
@@ -89,10 +115,7 @@ class Mail extends Api
             return -1 * (strtotime($a['date']) <=> strtotime($b['date']));
         });
 
-        $this->response([
-            'success' => true,
-            'data' => $mails,
-        ]);
+        return $mails;
     }
 
     protected function update()
@@ -138,6 +161,8 @@ class Mail extends Api
                 $this->mailSend($recipient, $subject, $body);
             }
         }
+
+        $this->buildCache(true);
 
         $this->response([
             'success' => true,

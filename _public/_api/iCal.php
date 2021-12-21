@@ -5,11 +5,16 @@ namespace HoseaApi;
 class iCal extends Api
 {
     public function __construct()
-    { }
+    {
+    }
 
     protected function getRequest()
     {
-        if ($this->getRequestMethod() === 'GET' && $this->getRequestPathFirst() === 'ical' && $this->getRequestPathSecond() != '') {
+        if (
+            $this->getRequestMethod() === 'GET' &&
+            $this->getRequestPathFirst() === 'ical' &&
+            $this->getRequestPathSecond() != ''
+        ) {
             $this->generateICal();
         }
     }
@@ -17,14 +22,19 @@ class iCal extends Api
     protected function generateICal()
     {
         $vCalendar = new \Eluceo\iCal\Component\Calendar('ical');
-        $tickets = $this::$db->fetch_all('SELECT * FROM tickets WHERE user_id = (SELECT id FROM users WHERE ical_key = ?)', $this->getRequestPathSecond());
+        $tickets = $this::$db->fetch_all(
+            'SELECT * FROM tickets WHERE user_id = (SELECT id FROM users WHERE api_key = ?)',
+            $this->getRequestPathSecond()
+        );
         foreach ($tickets as $tickets__value) {
             $dates = $this->parseDateString($tickets__value['date']);
             foreach ($dates as $dates__value) {
                 $vEvent = new \Eluceo\iCal\Component\Event();
                 if (@$dates__value['date'] != '') {
                     if (@$dates__value['begin'] != '' && @$dates__value['end'] != '') {
-                        $vEvent->setDtStart(new \DateTime($dates__value['date'] . ' ' . $dates__value['begin'] . ':00'));
+                        $vEvent->setDtStart(
+                            new \DateTime($dates__value['date'] . ' ' . $dates__value['begin'] . ':00')
+                        );
                         $vEvent->setDtEnd(new \DateTime($dates__value['date'] . ' ' . $dates__value['end'] . ':00'));
                     } else {
                         $vEvent->setDtStart(new \DateTime($dates__value['date']));
@@ -56,21 +66,46 @@ class iCal extends Api
         /* warning: this logic is similiar to _js/Dates.js */
         $return = [];
         foreach (explode(PHP_EOL, $raw_date) as $dates__value) {
-            if (preg_match('/^[0-9][0-9].[0-9][0-9].[1-2][0-9]( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?$/', $dates__value)) {
-                $date = '20' . substr($dates__value, 6, 2) . '-' . substr($dates__value, 3, 2) . '-' . substr($dates__value, 0, 2);
+            if (
+                preg_match(
+                    '/^[0-9][0-9].[0-9][0-9].[1-2][0-9]( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?$/',
+                    $dates__value
+                )
+            ) {
+                $date =
+                    '20' .
+                    substr($dates__value, 6, 2) .
+                    '-' .
+                    substr($dates__value, 3, 2) .
+                    '-' .
+                    substr($dates__value, 0, 2);
                 [$begin, $end] = $this->extractTimeFromDate($dates__value);
                 $return[] = [
                     'date' => $date,
                     'begin' => $begin,
-                    'end' => $end
+                    'end' => $end,
                 ];
-            } elseif (preg_match('/^(MO|DI|MI|DO|FR|SA|SO)((#|~)[1-9][0-9]?)?( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?( (-|>|<)[0-9][0-9].[0-9][0-9].[1-2][0-9])*$/', $dates__value)) {
+            } elseif (
+                preg_match(
+                    '/^(MO|DI|MI|DO|FR|SA|SO)((#|~)[1-9][0-9]?)?( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?( (-|>|<)[0-9][0-9].[0-9][0-9].[1-2][0-9])*$/',
+                    $dates__value
+                )
+            ) {
                 $date = date(
                     'Y-m-d',
                     strtotime(
                         'first ' .
-                            ['MO' => 'monday', 'DI' => 'tuesday', 'MI' => 'wednesday', 'DO' => 'thursday', 'FR' => 'friday', 'SA' => 'saturday', 'SO' => 'sunday'][substr($dates__value, 0, 2)] .
-                            ' of january ' . (date('Y') - 1)
+                            [
+                                'MO' => 'monday',
+                                'DI' => 'tuesday',
+                                'MI' => 'wednesday',
+                                'DO' => 'thursday',
+                                'FR' => 'friday',
+                                'SA' => 'saturday',
+                                'SO' => 'sunday',
+                            ][substr($dates__value, 0, 2)] .
+                            ' of january ' .
+                            (date('Y') - 1)
                     )
                 );
                 [$begin, $end] = $this->extractTimeFromDate($dates__value);
@@ -79,12 +114,17 @@ class iCal extends Api
                         $return[] = [
                             'date' => $date,
                             'begin' => $begin,
-                            'end' => $end
+                            'end' => $end,
                         ];
                     }
                     $date = date('Y-m-d', strtotime($date . ' + 1 week'));
                 }
-            } elseif (preg_match('/^[0-9][0-9].[0-9][0-9].( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?( (-|>|<)[0-9][0-9].[0-9][0-9].[1-2][0-9])*$/', $dates__value)) {
+            } elseif (
+                preg_match(
+                    '/^[0-9][0-9].[0-9][0-9].( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?( (-|>|<)[0-9][0-9].[0-9][0-9].[1-2][0-9])*$/',
+                    $dates__value
+                )
+            ) {
                 $date = '2016-' . substr($dates__value, 3, 2) . '-' . substr($dates__value, 0, 2);
                 [$begin, $end] = $this->extractTimeFromDate($dates__value);
                 for ($i = 0; $i < 10; $i++) {
@@ -92,7 +132,7 @@ class iCal extends Api
                         $return[] = [
                             'date' => $date,
                             'begin' => $begin,
-                            'end' => $end
+                            'end' => $end,
                         ];
                     }
                     $date = date('Y-m-d', strtotime($date . ' + 1 year'));
@@ -144,7 +184,13 @@ class iCal extends Api
             }
         }
         foreach (explode(' ', $dates) as $dates__value) {
-            $excluded = '20' . substr($dates__value, 7, 2) . '-' . substr($dates__value, 4, 2) . '-' . substr($dates__value, 1, 2);
+            $excluded =
+                '20' .
+                substr($dates__value, 7, 2) .
+                '-' .
+                substr($dates__value, 4, 2) .
+                '-' .
+                substr($dates__value, 1, 2);
             if (substr($dates__value, 0, 1) === '-') {
                 if ($date === $excluded) {
                     return true;

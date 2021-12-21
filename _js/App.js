@@ -37,7 +37,7 @@ export default class App {
         Footer.bindSave();
         Footer.bindCreate();
         Footer.bindLogout();
-        Footer.linkiCal();
+        Footer.linkApiKey();
         Footer.initStatus();
         Keyboard.bindRefresh();
         Tickets.bindCreate();

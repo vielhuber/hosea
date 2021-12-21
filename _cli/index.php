@@ -35,7 +35,7 @@ class Cli
                 id SERIAL PRIMARY KEY,
                 email TEXT DEFAULT NULL,
                 password TEXT DEFAULT NULL,
-                ical_key TEXT DEFAULT NULL
+                api_key TEXT DEFAULT NULL
             )
         '
         );
@@ -84,7 +84,7 @@ class Cli
         $this->db->insert('users', [
             'email' => 'david@vielhuber.de',
             'password' => password_hash('secret', PASSWORD_DEFAULT),
-            'ical_key' => md5(uniqid(mt_rand(), true)),
+            'api_key' => md5(uniqid(mt_rand(), true)),
         ]);
 
         $this->db->clear('tickets');

@@ -3,8 +3,7 @@ namespace HoseaApi;
 
 class User extends Api
 {
-
-    public $cols = ['id', 'email', 'password', 'ical_key'];
+    public $cols = ['id', 'email', 'password', 'api_key'];
 
     public function __construct()
     {
@@ -24,13 +23,12 @@ class User extends Api
     protected function show($id)
     {
         $user = $this::$db->fetch_row(
-            'SELECT '.implode(',',$this->colsWithout('password')).' FROM users WHERE id = ?',
+            'SELECT ' . implode(',', $this->colsWithout('password')) . ' FROM users WHERE id = ?',
             $id
         );
         $this->response([
             'success' => true,
-            'data' => $user
+            'data' => $user,
         ]);
     }
-
 }

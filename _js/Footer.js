@@ -78,7 +78,8 @@ export default class Footer {
             }
         });
     }
-    static linkiCal() {
-        document.querySelector('.footer__ical').setAttribute('href', '_api/ical/' + Store.data.user.ical_key);
+    static linkApiKey() {
+        document.querySelector('.footer__cron').setAttribute('href', '_api/cron/' + Store.data.user.api_key);
+        document.querySelector('.footer__ical').setAttribute('href', '_api/ical/' + Store.data.user.api_key);
     }
 }
