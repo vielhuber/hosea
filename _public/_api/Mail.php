@@ -183,6 +183,21 @@ class Mail extends Api
         if ($unseen) {
             $mailbox->markMailAsUnread($mail_id);
         }
+        $content = $mail->textHtml != ''
+                    ? (mb_detect_encoding($mail->textHtml, 'UTF-8, ISO-8859-1') !== 'UTF-8'
+                        ? utf8_encode($mail->textHtml)
+                        : $mail->textHtml)
+                    : (mb_detect_encoding($mail->textPlain, 'UTF-8, ISO-8859-1') !== 'UTF-8'
+                        ? nl2br(utf8_encode($mail->textPlain))
+                        : nl2br($mail->textPlain));
+        // trim bad tags
+        foreach(['iframe','script'] as $tags__value) {
+            $content = preg_replace(
+                '/<' . $tags__value . '.*?>(.*)?<\/' . $tags__value . '>/ims',
+                '',
+                $content
+            );
+        }
         return [
             'id' => (string) $mail->id,
             'from_name' => (string) (isset($mail->fromName) ? $mail->fromName : $mail->fromAddress),
@@ -191,14 +206,7 @@ class Mail extends Api
             'date' => $mail->date,
             'subject' => (string) $mail->subject,
             'eml' => base64_encode(file_get_contents($eml_filename)),
-            'content' =>
-                $mail->textHtml != ''
-                    ? (mb_detect_encoding($mail->textHtml, 'UTF-8, ISO-8859-1') !== 'UTF-8'
-                        ? utf8_encode($mail->textHtml)
-                        : $mail->textHtml)
-                    : (mb_detect_encoding($mail->textPlain, 'UTF-8, ISO-8859-1') !== 'UTF-8'
-                        ? nl2br(utf8_encode($mail->textPlain))
-                        : nl2br($mail->textPlain)),
+            'content' => $content
         ];
     }
 
