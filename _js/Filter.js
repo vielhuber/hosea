@@ -82,6 +82,14 @@ export default class Filter {
                         options.push(options_value);
                     }
                 });
+                // combined filter
+                if (columns__value === 'status') {
+                    if (
+                        options.filter((options__value) => ['scheduled', 'working'].includes(options__value)).length > 0
+                    ) {
+                        options.push('scheduled|working');
+                    }
+                }
                 options.sort((a, b) => {
                     if (a === null) {
                         a = '';
@@ -141,7 +149,11 @@ export default class Filter {
                     }
 
                     // all others
-                    else if (val_search === '*' || val_target === val_search) {
+                    else if (
+                        val_search === '*' ||
+                        val_target === val_search ||
+                        (val_search.indexOf('|') > -1 && val_search.split('|').includes(val_target))
+                    ) {
                         visible_this = true;
                     }
 
