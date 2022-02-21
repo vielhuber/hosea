@@ -97,6 +97,12 @@ export default class Filter {
                     if (b === null) {
                         b = '';
                     }
+                    if (a.indexOf('|') > -1) {
+                        a = 'zz' + a;
+                    }
+                    if (b.indexOf('|') > -1) {
+                        b = 'zz' + b;
+                    }
                     return a.toLowerCase().localeCompare(b.toLowerCase());
                 });
                 options.forEach((options__value) => {
