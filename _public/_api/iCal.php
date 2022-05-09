@@ -87,7 +87,7 @@ class iCal extends Api
                 ];
             } elseif (
                 preg_match(
-                    '/^(MO|DI|MI|DO|FR|SA|SO)((#|~|%)[1-9][0-9]?)?( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?( (-|>|<)[0-9][0-9].[0-9][0-9].[1-2][0-9])*$/',
+                    '/^(MO|DI|MI|DO|FR|SA|SO)((#|~)[1-9][0-9]?)?( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?( (-|>|<)[0-9][0-9].[0-9][0-9].[1-2][0-9])*$/',
                     $dates__value
                 )
             ) {
@@ -180,13 +180,6 @@ class iCal extends Api
             $num = trim(substr($dates, 3, 2));
             $weekNumber = intval(date('W', strtotime($date)));
             if ($num != $weekNumber) {
-                return true;
-            }
-        }
-        if (strpos($dates, '%') === 2) {
-            $num = trim(substr($dates, 3, 2));
-            $weekNumber = intval(date('W', strtotime($date)));
-            if ($weekNumber % $num !== 0) {
                 return true;
             }
         }

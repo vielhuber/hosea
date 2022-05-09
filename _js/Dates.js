@@ -96,8 +96,7 @@ export default class Dates {
             // MO#12 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
             // MO~1 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
             // MO~12 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
-            // MO%1 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
-            // MO%12 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
+            // MO%2 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
             else if (
                 new RegExp(
                     '^(MO|DI|MI|DO|FR|SA|SO)((#|~|%)[1-9][0-9]?)?( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?( (-|>|<)[0-9][0-9].[0-9][0-9].[1-2][0-9])*$'
@@ -137,7 +136,11 @@ export default class Dates {
 
                 if (view !== 'all' && string__value.substring(2, 3) === '%') {
                     let num = parseInt(string__value.substring(3, 5).trim()),
-                        weekNumber = this.weekNumber(d);
+                        weekNumber = this.weekNumber(d),
+                        match = string__value.match(/>([0-9][0-9]\.[0-9][0-9]\.[0-9][0-9])/i);
+                    if (match) {
+                        weekNumber -= this.weekNumber(new Date(Dates.germanToEnglishString(match[1])));
+                    }
                     if (weekNumber % num !== 0) {
                         return;
                     }

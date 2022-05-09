@@ -101,12 +101,13 @@ MO#1 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
 MO#12 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
 MO~1 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
 MO~12 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
+MO%2 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
 01.01. [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
 01.01. 09:00-10:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
 
 DD#N: (N%4)th weekday in every ((N-1)/4)th month
 DD~N: weekday in calendar week N
-DD%N: weekday in calendar week N%2=0" class="tickets__table-tooltip">(?)</span>
+DD%N: weekday in calendar week N%2=0 (if >X specified, N -= calendar week of X)" class="tickets__table-tooltip">(?)</span>
                 `
                 );
             }
