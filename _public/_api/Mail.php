@@ -62,7 +62,7 @@ class Mail extends Api
         if (
             $force === true ||
             !file_exists($filename_cache) ||
-            filemtime($filename_cache) < strtotime('now - 35 minutes')
+            filemtime($filename_cache) < strtotime('now - 5 minutes')
         ) {
             $mails = $this->prepareMails();
             file_put_contents($filename_cache, serialize($mails));
