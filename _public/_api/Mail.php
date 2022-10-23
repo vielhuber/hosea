@@ -1,5 +1,6 @@
 <?php
 namespace HoseaApi;
+use Webklex\PHPIMAP\ClientManager;
 
 class Mail extends Api
 {
@@ -19,10 +20,15 @@ class Mail extends Api
                 $this->settings[] = [
                     'host' => explode(';', $_SERVER['MAILBOX_HOST'])[$parts__key],
                     'port' => explode(';', $_SERVER['MAILBOX_PORT'])[$parts__key],
+                    'encryption' => explode(';', $_SERVER['MAILBOX_ENCRYPTION'])[$parts__key],
+                    'authentication' => explode(';', $_SERVER['MAILBOX_AUTHENTICATION'])[$parts__key],
                     'username' => explode(';', $_SERVER['MAILBOX_USERNAME'])[$parts__key],
                     'password' => explode(';', $_SERVER['MAILBOX_PASSWORD'])[$parts__key],
                     'folder_inbox' => explode(';', $_SERVER['MAILBOX_FOLDER_INBOX'])[$parts__key],
                     'folder_archive' => explode(';', $_SERVER['MAILBOX_FOLDER_ARCHIVE'])[$parts__key],
+                    'oauth_tenant_id' => explode(';', $_SERVER['MAILBOX_OAUTH_TENANT_ID'])[$parts__key],
+                    'oauth_client_id' => explode(';', $_SERVER['MAILBOX_OAUTH_CLIENT_ID'])[$parts__key],
+                    'oauth_client_secret' => explode(';', $_SERVER['MAILBOX_OAUTH_CLIENT_SECRET'])[$parts__key],
                 ];
             }
         }
@@ -77,25 +83,20 @@ class Mail extends Api
         $mails = [];
 
         foreach ($this->settings as $settings__value) {
-            try {
-                $mailbox = new \PhpImap\Mailbox(
-                    '{' .
-                        $settings__value['host'] .
-                        ':' .
-                        $settings__value['port'] .
-                        '/imap/ssl}' .
-                        $settings__value['folder_inbox'],
-                    $settings__value['username'],
-                    $settings__value['password'],
-                    sys_get_temp_dir(),
-                    'UTF-8'
-                );
-                $mails_ids = $mailbox->searchMailbox('ALL');
+            $client = $this->connectToMailbox($settings__value);
 
+            $folders = $client->getFolders();
+            foreach ($folders as $folder) {
+                if ($folder->full_name !== $settings__value['folder_inbox']) {
+                    continue;
+                }
+                $messages = $folder
+                    ->messages()
+                    ->all()
+                    ->get();
                 $runtime_start = microtime(true);
-
-                foreach ($mails_ids as $mails_id__value) {
-                    $mail_data = $this->getMailData($mails_id__value, $mailbox);
+                foreach ($messages as $messages__value) {
+                    $mail_data = $this->getMailData($messages__value);
                     $mail_data['mailbox'] = $settings__value['username'];
                     $mail_data['editors'] = isset($_SERVER['EDITORS']) ? explode(';', $_SERVER['EDITORS']) : [];
                     $mails[] = $mail_data;
@@ -103,8 +104,6 @@ class Mail extends Api
                         break;
                     }
                 }
-            } catch (\Exception $e) {
-                continue;
             }
         }
 
@@ -118,16 +117,107 @@ class Mail extends Api
         return $mails;
     }
 
+    protected function connectToMailbox($settings__value)
+    {
+        $cm = new ClientManager();
+        if ($settings__value['authentication'] === 'oauth') {
+            $ch = curl_init();
+            try {
+                curl_setopt(
+                    $ch,
+                    CURLOPT_URL,
+                    'https://login.microsoftonline.com/' . $settings__value['oauth_tenant_id'] . '/oauth2/v2.0/token'
+                );
+                curl_setopt(
+                    $ch,
+                    CURLOPT_POSTFIELDS,
+                    http_build_query([
+                        'client_id' => $settings__value['oauth_client_id'],
+                        'client_secret' => $settings__value['oauth_client_secret'],
+                        'scope' => 'https://outlook.office365.com/.default',
+                        'grant_type' => 'client_credentials',
+                    ])
+                );
+                curl_setopt($ch, CURLOPT_POST, 1);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                $curl_result = curl_exec($ch);
+                if (empty($curl_result)) {
+                    throw new \Exception('Missing results.');
+                }
+                $curl_result = json_decode($curl_result);
+                if (empty($curl_result)) {
+                    throw new \Exception('Error decoding json result.');
+                }
+                if (!isset($curl_result->access_token)) {
+                    throw new \Exception('Missing access token from result.');
+                }
+                $access_token = $curl_result->access_token;
+            } finally {
+                curl_close($ch);
+            }
+            $client = $cm->make([
+                'host' => $settings__value['host'],
+                'port' => $settings__value['port'],
+                'encryption' => $settings__value['encryption'],
+                'validate_cert' => true,
+                'username' => $settings__value['username'],
+                'password' => $access_token,
+                'protocol' => 'imap',
+                'authentication' => 'oauth',
+            ]);
+        }
+        if ($settings__value['authentication'] === 'basic') {
+            $client = $cm->make([
+                'host' => $settings__value['host'],
+                'port' => $settings__value['port'],
+                'encryption' => $settings__value['encryption'],
+                'validate_cert' => true,
+                'username' => $settings__value['username'],
+                'password' => $settings__value['password'],
+                'protocol' => 'imap',
+                'authentication' => null,
+            ]);
+        }
+        $client->connect();
+        return $client;
+    }
+
     protected function update()
     {
         $id = $this->getInput('id');
-        $mailbox = $this->getMailbox($this->getInput('mailbox'));
-        $mail_data = $this->getMailData($id, $mailbox);
+        $mailbox = $this->getInput('mailbox');
         $action_send = $this->getInput('action_send');
         $action_send_text = $this->getInput('action_send_text');
         $action_ticket_time = $this->getInput('action_ticket_time');
 
-        $this->archiveMail($id, $this->getInput('mailbox'));
+        $mail = null;
+        foreach ($this->settings as $settings__value) {
+            if ($settings__value['username'] !== $mailbox) {
+                continue;
+            }
+            $client = $this->connectToMailbox($settings__value);
+            $folders = $client->getFolders();
+            foreach ($folders as $folder) {
+                if ($folder->full_name !== $settings__value['folder_inbox']) {
+                    continue;
+                }
+                $messages = $folder
+                    ->messages()
+                    ->all()
+                    ->get();
+                foreach ($messages as $messages__value) {
+                    if ($messages__value->getMessageId()[0] !== $id) {
+                        continue;
+                    }
+                    $mail = $messages__value;
+                }
+            }
+        }
+
+        $mail_data = $this->getMailData($mail);
+
+        $mail->setFlag('Seen');
+        $mail->move($this->getMailboxSettings($mailbox)['folder_archive']);
 
         if (!empty($action_send)) {
             foreach ($action_send as $action_send__value) {
@@ -172,68 +262,31 @@ class Mail extends Api
         ]);
     }
 
-    protected function getMailData($mail_id, $mailbox)
+    protected function getMailData($messages__value)
     {
-        $mail = $mailbox->getMail($mail_id, false);
-        $mail->embedImageAttachments();
-        $eml_filename = tempnam(sys_get_temp_dir(), 'mail_') . '.eml';
-        $unseen = in_array($mail_id, $mailbox->searchMailbox('UNSEEN', true));
-        $mailbox->saveMail($mail_id, $eml_filename);
-        // undo saveMail setting mail as read
-        if ($unseen) {
-            $mailbox->markMailAsUnread($mail_id);
-        }
-        $content = $mail->textHtml != ''
-                    ? (mb_detect_encoding($mail->textHtml, 'UTF-8, ISO-8859-1') !== 'UTF-8'
-                        ? utf8_encode($mail->textHtml)
-                        : $mail->textHtml)
-                    : (mb_detect_encoding($mail->textPlain, 'UTF-8, ISO-8859-1') !== 'UTF-8'
-                        ? nl2br(utf8_encode($mail->textPlain))
-                        : nl2br($mail->textPlain));
+        $content =
+            $messages__value->getHTMLBody() != ''
+                ? $messages__value->getHTMLBody()
+                : nl2br($messages__value->getTextBody());
         // trim bad tags
-        foreach(['iframe','script'] as $tags__value) {
-            $content = preg_replace(
-                '/<' . $tags__value . '.*?>(.*)?<\/' . $tags__value . '>/ims',
-                '',
-                $content
-            );
+        foreach (['iframe', 'script'] as $tags__value) {
+            $content = preg_replace('/<' . $tags__value . '.*?>(.*)?<\/' . $tags__value . '>/ims', '', $content);
         }
         return [
-            'id' => (string) $mail->id,
-            'from_name' => (string) (isset($mail->fromName) ? $mail->fromName : $mail->fromAddress),
-            'from_email' => (string) $mail->fromAddress,
-            'to' => (string) $mail->toString,
-            'date' => $mail->date,
-            'subject' => (string) $mail->subject,
-            'eml' => base64_encode(file_get_contents($eml_filename)),
-            'content' => $content
+            'id' => $messages__value->getMessageId()[0],
+            'from_name' => $messages__value->getFrom()[0]->personal,
+            'from_email' => $messages__value->getFrom()[0]->mail,
+            'to' => $messages__value->getTo()[0]->mail,
+            'date' => $messages__value
+                ->getDate()
+                ->toDate()
+                ->format('Y-m-d H:i:s'),
+            'subject' => $messages__value->getSubject()[0],
+            'eml' => base64_encode(
+                json_decode(json_encode($messages__value->getHeader()), true)['raw'] . $messages__value->getRawBody()
+            ),
+            'content' => $content,
         ];
-    }
-
-    protected function getMailbox($mailbox_name)
-    {
-        foreach ($this->settings as $settings__value) {
-            if ($settings__value['username'] != $mailbox_name) {
-                continue;
-            }
-            try {
-                return new \PhpImap\Mailbox(
-                    '{' .
-                        $settings__value['host'] .
-                        ':' .
-                        $settings__value['port'] .
-                        '/imap/ssl}' .
-                        $settings__value['folder_inbox'],
-                    $settings__value['username'],
-                    $settings__value['password'],
-                    sys_get_temp_dir(),
-                    'UTF-8'
-                );
-            } catch (\Exception $e) {
-                continue;
-            }
-        }
-        return null;
     }
 
     protected function getMailboxSettings($mailbox_name)
@@ -245,15 +298,6 @@ class Mail extends Api
             return $settings__value;
         }
         return null;
-    }
-
-    protected function archiveMail($id, $mailbox_name)
-    {
-        $mailbox = $this->getMailbox($mailbox_name);
-        $mailbox->moveMail($id, $this->getMailboxSettings($mailbox_name)['folder_archive']);
-        $mailbox->markMailAsRead($id);
-        sleep(1);
-        $mailbox->markMailAsRead($id);
     }
 
     protected function mailSend($recipients, $subject = '', $content = '', $attachments = null)

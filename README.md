@@ -20,6 +20,7 @@ hosea is a personal assistant.
 -   supports mysql/postgres databases
 -   save login system using jwt
 -   live ical export for outlook integration
+-   light mail client included (oauth2 supported)
 
 ## installation
 

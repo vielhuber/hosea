@@ -7,7 +7,8 @@
         "eluceo/ical": "*",
         "php-imap/php-imap": "*",
         "phpmailer/phpmailer": "*",
-        "vlucas/phpdotenv": "*"
+        "vlucas/phpdotenv": "*",
+        "webklex/php-imap": "*"
     },
     "autoload": {
         "psr-4": {
