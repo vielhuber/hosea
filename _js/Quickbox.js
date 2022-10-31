@@ -95,7 +95,11 @@ export default class Quickbox {
                     <div class="quickbox__mail quickbox__mail--unread" data-id="${mails__value.id}">
                         <a href="#" class="quickbox__mail-toggle">
                             <div class="quickbox__mail-meta quickbox__mail-meta--from">
-                                ${mails__value.from_name + ' (' + mails__value.from_email + ')'}
+                                ${
+                                    (mails__value.from_name !== undefined && mails__value.from_name !== null && mails__value.from_name !== false && mails__value.from_name !== '') ?
+                                    (mails__value.from_name + ' (' + mails__value.from_email + ')') :
+                                    (mails__value.from_email)
+                                }
                             </div>
                             <div class="quickbox__mail-meta quickbox__mail-meta--date">
                                 ${Dates.dateFormat(new Date(mails__value.date), 'D H:i')}
