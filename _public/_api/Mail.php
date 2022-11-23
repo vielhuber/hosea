@@ -65,6 +65,7 @@ class Mail extends Api
     {
         $mails = [];
         $filename_cache = sys_get_temp_dir() . '/hosea-mail.cache';
+
         if (
             $force === true ||
             !file_exists($filename_cache) ||
@@ -272,6 +273,14 @@ class Mail extends Api
         foreach (['iframe', 'script'] as $tags__value) {
             $content = preg_replace('/<' . $tags__value . '.*?>(.*)?<\/' . $tags__value . '>/ims', '', $content);
         }
+
+        $subject = @$messages__value->getSubject()[0];
+        $subject = trim($subject);
+        $subject = preg_replace("/\r\n|\r|\n/", '', trim(@$messages__value->getSubject()[0]));
+        if (mb_detect_encoding($subject, 'UTF-8, ISO-8859-1') !== 'UTF-8') {
+            $subject = utf8_encode($subject);
+        }
+
         return [
             'id' => $messages__value->getMessageId()[0],
             'from_name' => $messages__value->getFrom()[0]->personal,
@@ -281,7 +290,7 @@ class Mail extends Api
                 ->getDate()
                 ->toDate()
                 ->format('Y-m-d H:i:s'),
-            'subject' => $messages__value->getSubject()[0],
+            'subject' => $subject,
             'eml' => base64_encode(
                 json_decode(json_encode($messages__value->getHeader()), true)['raw'] . $messages__value->getRawBody()
             ),
