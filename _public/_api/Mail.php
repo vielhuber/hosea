@@ -66,6 +66,7 @@ class Mail extends Api
         $mails = [];
         $filename_cache = sys_get_temp_dir() . '/hosea-mail.cache';
 
+        $force = true;
         if (
             $force === true ||
             !file_exists($filename_cache) ||
