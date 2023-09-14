@@ -1,5 +1,6 @@
 import Tickets from './Tickets';
 import Store from './Store';
+import Dates from './Dates';
 import Scheduler from './Scheduler';
 import Filter from './Filter';
 import Footer from './Footer';
@@ -463,7 +464,22 @@ export default class Quickbox {
                                 }<small class="quickbox__today-ticket-project-status">[${
                             tickets__value.status
                         }]</small></div>
-                                <div class="quickbox__today-ticket-date">${tickets__value.date}</div>
+                                <div class="quickbox__today-ticket-date">
+                                    ${
+                                        tickets__value.status === 'fixed'
+                                            ? (parsed_values__value.minutes_left < 8 * 60
+                                                  ? '<span class="quickbox__today-ticket-date-countdown">'
+                                                  : '') +
+                                              (parsed_values__value.minutes_left < 0
+                                                  ? '⌛⌛⌛'
+                                                  : parsed_values__value.minutes_left < 8 * 60
+                                                  ? '⌛' + parsed_values__value.minutes_left + 'min⌛'
+                                                  : '') +
+                                              (parsed_values__value.minutes_left < 8 * 60 ? '</span>' : '')
+                                            : ''
+                                    }
+                                    ${tickets__value.date.split(' ')[1]}
+                                </div>
                                 <div class="quickbox__today-ticket-description">${hlp.nl2br(
                                     tickets__value.description
                                 )}</div>

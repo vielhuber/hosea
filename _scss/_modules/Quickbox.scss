@@ -199,6 +199,14 @@
     text-align: right;
     width: 50%;
 }
+.quickbox__today-ticket-date-countdown {
+    font-size: $font-size-small;
+    background-color: $color-pink;
+    color: $color-white;
+    font-weight: bold;
+    margin-right: 5rem;
+    padding: 2rem 4rem;
+}
 .quickbox__today-ticket-description {
     width: 100%;
     /*max-height: calc(3 * #{$space-big});*/

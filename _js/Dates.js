@@ -86,6 +86,7 @@ export default class Dates {
                         begin: begin,
                         end: end,
                         time: end - begin,
+                        minutes_left: this.dateDiffInMinutes(d, new Date()),
                     });
                 }
             }
@@ -176,6 +177,7 @@ export default class Dates {
                         begin: begin,
                         end: end,
                         time: end - begin,
+                        minutes_left: this.dateDiffInMinutes(d, new Date()),
                     });
                 }
             }
@@ -238,6 +240,7 @@ export default class Dates {
                         begin: begin,
                         end: end,
                         time: end - begin,
+                        minutes_left: this.dateDiffInMinutes(d, new Date()),
                     });
                 }
             } else {
@@ -320,6 +323,9 @@ export default class Dates {
                 ':' +
                 ('0' + d.getMinutes()).slice(-2)
             );
+        }
+        if (format === 'H:i') {
+            return ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
         }
         return (
             ('0' + d.getDate()).slice(-2) +
@@ -434,6 +440,10 @@ export default class Dates {
             return 1;
         }
         return 0;
+    }
+
+    static dateDiffInMinutes(d1, d2) {
+        return Math.round((d1 - d2) / (1000 * 60));
     }
 
     static weekNumber(d) {
