@@ -96,9 +96,12 @@ export default class Quickbox {
                         <a href="#" class="quickbox__mail-toggle">
                             <div class="quickbox__mail-meta quickbox__mail-meta--from">
                                 ${
-                                    (mails__value.from_name !== undefined && mails__value.from_name !== null && mails__value.from_name !== false && mails__value.from_name !== '') ?
-                                    (mails__value.from_name + ' (' + mails__value.from_email + ')') :
-                                    (mails__value.from_email)
+                                    mails__value.from_name !== undefined &&
+                                    mails__value.from_name !== null &&
+                                    mails__value.from_name !== false &&
+                                    mails__value.from_name !== ''
+                                        ? mails__value.from_name + ' (' + mails__value.from_email + ')'
+                                        : mails__value.from_email
                                 }
                             </div>
                             <div class="quickbox__mail-meta quickbox__mail-meta--date">
@@ -401,6 +404,33 @@ export default class Quickbox {
         let tickets = hlp.deepCopy(Store.data.tickets),
             count = 0;
         tickets.sort((a, b) => {
+            let sort_list = [
+                    'fixed',
+                    'scheduled',
+                    'idle',
+                    'working',
+                    'allday',
+                    'roaming',
+                    'recurring',
+                    'done',
+                    'billed',
+                ],
+                a_pos = null,
+                b_pos = null;
+            sort_list.forEach((sort_list__value, sort_list__key) => {
+                if (sort_list__value === a.status) {
+                    a_pos = sort_list__key;
+                }
+                if (sort_list__value === b.status) {
+                    b_pos = sort_list__key;
+                }
+            });
+            if (a_pos < b_pos) {
+                return -1;
+            }
+            if (a_pos > b_pos) {
+                return 1;
+            }
             return hlp.spaceship(
                 Dates.germanDateTimeToEnglishString(a.date),
                 Dates.germanDateTimeToEnglishString(b.date)
@@ -416,8 +446,23 @@ export default class Quickbox {
                     document.querySelector('.quickbox__today-tickets').insertAdjacentHTML(
                         'beforeend',
                         `
-                            <li class="quickbox__today-ticket">
-                                <div class="quickbox__today-ticket-project">${tickets__value.project}</div>
+                            <li class="quickbox__today-ticket"${
+                                tickets__value.status === 'fixed'
+                                    ? ' style="border: 4px solid ' +
+                                      Scheduler.getStoreProperty(
+                                          'border',
+                                          tickets__value.status,
+                                          tickets__value.project,
+                                          'transparent'
+                                      ) +
+                                      '"'
+                                    : ''
+                            };">
+                                <div class="quickbox__today-ticket-project">${
+                                    tickets__value.project
+                                }<small class="quickbox__today-ticket-project-status">[${
+                            tickets__value.status
+                        }]</small></div>
                                 <div class="quickbox__today-ticket-date">${tickets__value.date}</div>
                                 <div class="quickbox__today-ticket-description">${hlp.nl2br(
                                     tickets__value.description
