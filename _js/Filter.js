@@ -89,6 +89,9 @@ export default class Filter {
                     ) {
                         options.push('scheduled|working');
                     }
+                    if (options.filter((options__value) => ['fixed', 'working'].includes(options__value)).length > 0) {
+                        options.push('fixed|working');
+                    }
                 }
                 options.sort((a, b) => {
                     if (a === null) {
