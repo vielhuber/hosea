@@ -84,27 +84,30 @@ class Mail extends Api
         $mails = [];
 
         foreach ($this->settings as $settings__value) {
-            $client = $this->connectToMailbox($settings__value);
+            try {
+                $client = $this->connectToMailbox($settings__value);
 
-            $folders = $client->getFolders();
-            foreach ($folders as $folder) {
-                if ($folder->full_name !== $settings__value['folder_inbox']) {
-                    continue;
-                }
-                $messages = $folder
-                    ->messages()
-                    ->all()
-                    ->get();
-                $runtime_start = microtime(true);
-                foreach ($messages as $messages__value) {
-                    $mail_data = $this->getMailData($messages__value);
-                    $mail_data['mailbox'] = $settings__value['username'];
-                    $mail_data['editors'] = isset($_SERVER['EDITORS']) ? explode(';', $_SERVER['EDITORS']) : [];
-                    $mails[] = $mail_data;
-                    if (microtime(true) - $runtime_start > 60) {
-                        break;
+                $folders = $client->getFolders();
+                foreach ($folders as $folder) {
+                    if ($folder->full_name !== $settings__value['folder_inbox']) {
+                        continue;
+                    }
+                    $messages = $folder
+                        ->messages()
+                        ->all()
+                        ->get();
+                    $runtime_start = microtime(true);
+                    foreach ($messages as $messages__value) {
+                        $mail_data = $this->getMailData($messages__value);
+                        $mail_data['mailbox'] = $settings__value['username'];
+                        $mail_data['editors'] = isset($_SERVER['EDITORS']) ? explode(';', $_SERVER['EDITORS']) : [];
+                        $mails[] = $mail_data;
+                        if (microtime(true) - $runtime_start > 60) {
+                            break;
+                        }
                     }
                 }
+            } catch (\Throwable $e) {
             }
         }
 
@@ -196,23 +199,32 @@ class Mail extends Api
             if ($settings__value['username'] !== $mailbox) {
                 continue;
             }
-            $client = $this->connectToMailbox($settings__value);
-            $folders = $client->getFolders();
-            foreach ($folders as $folder) {
-                if ($folder->full_name !== $settings__value['folder_inbox']) {
-                    continue;
-                }
-                $messages = $folder
-                    ->messages()
-                    ->all()
-                    ->get();
-                foreach ($messages as $messages__value) {
-                    if ($messages__value->getMessageId()[0] !== $id) {
+            try {
+                $client = $this->connectToMailbox($settings__value);
+                $folders = $client->getFolders();
+                foreach ($folders as $folder) {
+                    if ($folder->full_name !== $settings__value['folder_inbox']) {
                         continue;
                     }
-                    $mail = $messages__value;
+                    $messages = $folder
+                        ->messages()
+                        ->all()
+                        ->get();
+                    foreach ($messages as $messages__value) {
+                        if ($messages__value->getMessageId()[0] !== $id) {
+                            continue;
+                        }
+                        $mail = $messages__value;
+                    }
                 }
+            } catch (\Throwable $e) {
             }
+        }
+
+        if ($mail === null) {
+            $this->response([
+                'success' => false,
+            ]);
         }
 
         $mail_data = $this->getMailData($mail);

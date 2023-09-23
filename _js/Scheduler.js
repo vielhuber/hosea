@@ -155,7 +155,7 @@ export default class Scheduler {
             document.querySelector('.scheduler__appointments').insertAdjacentHTML(
                 'beforeend',
                 `
-                    <div class="scheduler__appointment" title="${hlp.htmlEncode(date__value.title)}" style="
+                    <div class="scheduler__appointment" title="${date__value.title}" style="
                         left:${date__value.posLeft}%;
                         top:${date__value.posTop}%;
                         bottom:${date__value.posBottom}%;
@@ -221,7 +221,14 @@ export default class Scheduler {
         let generatedDates = [];
         Store.data.tickets.forEach((tickets__value) => {
             let name = tickets__value.project,
-                title = tickets__value.project + '\n' + (tickets__value.description || '').substring(0, 100),
+                title = hlp.htmlEncode(
+                    tickets__value.project +
+                        '\n' +
+                        (tickets__value.description || '')
+                            .split('\n')
+                            .map((i) => hlp.truncate_string(i, 100))
+                            .join('\n')
+                ),
                 project = tickets__value.project,
                 parsed_values = Dates.parseDateString(tickets__value.date, 'scheduler');
             let background =
