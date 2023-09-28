@@ -418,8 +418,8 @@ export default class Quickbox {
                     'billed',
                     */
                 ],
-                a_pos = null,
-                b_pos = null;
+                a_pos = Infinity,
+                b_pos = Infinity;
             sort_list.forEach((sort_list__value, sort_list__key) => {
                 if (sort_list__value === a.status) {
                     a_pos = sort_list__key;
