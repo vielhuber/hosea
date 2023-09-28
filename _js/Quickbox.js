@@ -407,14 +407,16 @@ export default class Quickbox {
         tickets.sort((a, b) => {
             let sort_list = [
                     'fixed',
+                    /*
                     'scheduled',
+                    'fixed',
                     'idle',
-                    'working',
                     'allday',
                     'roaming',
                     'recurring',
                     'done',
                     'billed',
+                    */
                 ],
                 a_pos = null,
                 b_pos = null;
@@ -447,18 +449,15 @@ export default class Quickbox {
                     document.querySelector('.quickbox__today-tickets').insertAdjacentHTML(
                         'beforeend',
                         `
-                            <li class="quickbox__today-ticket"${
-                                tickets__value.status === 'fixed'
-                                    ? ' style="border: 4px solid ' +
-                                      Scheduler.getStoreProperty(
-                                          'border',
-                                          tickets__value.status,
-                                          tickets__value.project,
-                                          'transparent'
-                                      ) +
-                                      '"'
-                                    : ''
-                            };">
+                            <li class="quickbox__today-ticket" style="
+                                    ${
+                                        ['fixed'].includes(tickets__value.status) ? 'border-color' : 'border-left-color'
+                                    }: ${Scheduler.getStoreProperty(
+                            'border',
+                            tickets__value.status,
+                            tickets__value.project,
+                            'transparent'
+                        )}; ${['fixed'].includes(tickets__value.status) ? 'border-width: 5rem;' : ''}">
                                 <div class="quickbox__today-ticket-project">${
                                     tickets__value.project
                                 }<small class="quickbox__today-ticket-project-status">[${

@@ -172,15 +172,13 @@
     flex-wrap: wrap;
     align-items: flex-start;
     align-content: flex-start;
-    @include border;
-    border-left: none;
-    border-right: none;
-    border-top: none;
     margin-bottom: $space-small;
+    border-width: 6rem;
+    border-style: solid;
+    border-color: transparent;
 }
 .quickbox__today-ticket:last-child {
     margin-bottom: 0;
-    border-bottom: none;
 }
 .quickbox__today-ticket-project,
 .quickbox__today-ticket-date,

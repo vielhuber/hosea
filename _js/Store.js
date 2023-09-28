@@ -37,6 +37,9 @@ export default class Store {
                     working: {
                         border: '#F44336',
                     },
+                    scheduled: {
+                        border: '#9E9E9E',
+                    },
                 },
                 project: {
                     Geburtstag: {
