@@ -477,7 +477,11 @@ export default class Quickbox {
                                               (parsed_values__value.minutes_left < 8 * 60 ? '</span>' : '')
                                             : ''
                                     }
-                                    ${tickets__value.date.split(' ')[1]}
+                                    ${
+                                        tickets__value.date.indexOf(' ') > -1
+                                            ? tickets__value.date.split(' ')[1]
+                                            : tickets__value.date
+                                    }
                                 </div>
                                 <div class="quickbox__today-ticket-description">${hlp.nl2br(
                                     tickets__value.description

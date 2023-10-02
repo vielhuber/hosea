@@ -345,10 +345,12 @@ export default class Tickets {
     static createAndAppendTicket(data, current = null, currentCol = 1, withSelect = true, doFilter = false) {
         if (['tonight', 'weekend', 'next'].includes(data.date)) {
             let d = new Date();
+            /*
             if (d.getHours() >= 21) {
                 d.setDate(d.getDate() + 1);
                 d.setHours(9);
             }
+            */
             if (data.date === 'weekend') {
                 while (d.getDay() % 6 !== 0) {
                     d.setDate(d.getDate() + 1);
