@@ -434,10 +434,21 @@ export default class Quickbox {
             if (a_pos > b_pos) {
                 return 1;
             }
-            return hlp.spaceship(
-                Dates.germanDateTimeToEnglishString(a.date),
-                Dates.germanDateTimeToEnglishString(b.date)
-            );
+            for (let [val_a, val_b] of [
+                [Dates.germanDateTimeToEnglishString(a.date), Dates.germanDateTimeToEnglishString(b.date)],
+                [a.priority, b.priority],
+                [a.project, b.project],
+                [a.description, b.description],
+                [a.id, b.id],
+            ]) {
+                if (val_a < val_b) {
+                    return -1;
+                }
+                if (val_a > val_b) {
+                    return 1;
+                }
+            }
+            return 0;
         });
         tickets.forEach((tickets__value) => {
             if (['done', 'billed'].includes(tickets__value.status)) {

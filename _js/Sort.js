@@ -90,31 +90,22 @@ export default class Sort {
                     }
                 }
 
-                val_a = Dates.germanDateTimeToEnglishString(a.querySelector('[name="date"]').value);
-                val_b = Dates.germanDateTimeToEnglishString(b.querySelector('[name="date"]').value);
-                if (val_a < val_b) {
-                    return -1;
-                }
-                if (val_a > val_b) {
-                    return 1;
-                }
-
-                val_a = a.querySelector('[name="priority"]').value;
-                val_b = b.querySelector('[name="priority"]').value;
-                if (val_a < val_b) {
-                    return -1;
-                }
-                if (val_a > val_b) {
-                    return 1;
-                }
-
-                val_a = a.getAttribute('data-id');
-                val_b = b.getAttribute('data-id');
-                if (val_a < val_b) {
-                    return -1;
-                }
-                if (val_a > val_b) {
-                    return 1;
+                for (let [val_a, val_b] of [
+                    [
+                        Dates.germanDateTimeToEnglishString(a.querySelector('[name="date"]').value),
+                        Dates.germanDateTimeToEnglishString(b.querySelector('[name="date"]').value),
+                    ],
+                    [a.querySelector('[name="priority"]').value, b.querySelector('[name="priority"]').value],
+                    [a.querySelector('[name="project"]').value, b.querySelector('[name="project"]').value],
+                    [a.querySelector('[name="description"]').value, b.querySelector('[name="description"]').value],
+                    [a.getAttribute('data-id'), b.getAttribute('data-id')],
+                ]) {
+                    if (val_a < val_b) {
+                        return -1;
+                    }
+                    if (val_a > val_b) {
+                        return 1;
+                    }
                 }
 
                 return 0;
