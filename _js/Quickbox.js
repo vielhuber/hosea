@@ -438,7 +438,7 @@ export default class Quickbox {
                 [Dates.germanDateTimeToEnglishString(a.date), Dates.germanDateTimeToEnglishString(b.date)],
                 [a.priority, b.priority],
                 [a.project, b.project],
-                [a.description, b.description],
+                //[a.description, b.description],
                 [a.id, b.id],
             ]) {
                 if (val_a < val_b) {
