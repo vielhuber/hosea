@@ -435,7 +435,9 @@ export default class Quickbox {
                 return 1;
             }
             for (let [val_a, val_b] of [
-                [Dates.germanDateTimeToEnglishString(a.date), Dates.germanDateTimeToEnglishString(b.date)],
+                a.status == 'recurring' && b.status == 'recurring'
+                    ? [a.date, b.date]
+                    : [Dates.germanDateTimeToEnglishString(a.date), Dates.germanDateTimeToEnglishString(b.date)],
                 [a.priority, b.priority],
                 [a.project, b.project],
                 //[a.description, b.description],

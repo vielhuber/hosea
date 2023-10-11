@@ -91,10 +91,13 @@ export default class Sort {
                 }
 
                 for (let [val_a, val_b] of [
-                    [
-                        Dates.germanDateTimeToEnglishString(a.querySelector('[name="date"]').value),
-                        Dates.germanDateTimeToEnglishString(b.querySelector('[name="date"]').value),
-                    ],
+                    a.querySelector('[name="status"]').value == 'recurring' &&
+                    b.querySelector('[name="status"]').value == 'recurring'
+                        ? [a.querySelector('[name="date"]').value, b.querySelector('[name="date"]').value]
+                        : [
+                              Dates.germanDateTimeToEnglishString(a.querySelector('[name="date"]').value),
+                              Dates.germanDateTimeToEnglishString(b.querySelector('[name="date"]').value),
+                          ],
                     [a.querySelector('[name="priority"]').value, b.querySelector('[name="priority"]').value],
                     [a.querySelector('[name="project"]').value, b.querySelector('[name="project"]').value],
                     [a.querySelector('[name="description"]').value, b.querySelector('[name="description"]').value],
