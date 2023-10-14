@@ -26,7 +26,8 @@ export default class App {
         Scheduler.initScheduler();
         Quickbox.initQuickbox();
         Quickbox.bindQuickbox();
-        Tickets.bindAutoTime();
+        // currently disabled, because we use both columns independently
+        //Tickets.bindAutoTime();
         Tickets.bindChangeTracking();
         Tickets.bindValidation();
         Attachments.bindUpload();
