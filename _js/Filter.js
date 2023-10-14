@@ -84,6 +84,9 @@ export default class Filter {
                 });
                 // combined filter
                 if (columns__value === 'status') {
+                    if (options.filter((options__value) => ['done', 'scheduled', 'working'].includes(options__value)).length > 0) {
+                        options.push('done|scheduled|working');
+                    }
                     if (
                         options.filter((options__value) => ['scheduled', 'working'].includes(options__value)).length > 0
                     ) {
