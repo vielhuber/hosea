@@ -546,7 +546,7 @@ export default class Tickets {
                 tickets__value.visible !== false &&
                 tickets__value.time !== null &&
                 tickets__value.time != '' &&
-                !['idle', 'allday', 'billed'].includes(tickets__value.status)
+                !['allday', 'billed'].includes(tickets__value.status)
             ) {
                 sum += parseFloat(tickets__value.time.replace(',', '.'));
             }
