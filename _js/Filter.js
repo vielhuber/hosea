@@ -117,6 +117,18 @@ export default class Filter {
                     if (b.indexOf('|') > -1) {
                         b = 'zz' + b;
                     }
+                    if (a.indexOf('&') > -1) {
+                        a = 'zz' + a;
+                    }
+                    if (b.indexOf('&') > -1) {
+                        b = 'zz' + b;
+                    }
+                    if (a.indexOf('!') > -1) {
+                        a = 'zz' + a;
+                    }
+                    if (b.indexOf('!') > -1) {
+                        b = 'zz' + b;
+                    }
                     return a.toLowerCase().localeCompare(b.toLowerCase());
                 });
                 options.forEach((options__value) => {
@@ -169,12 +181,25 @@ export default class Filter {
                     }
 
                     // all others
-                    else if (
-                        val_search === '*' ||
-                        val_target === val_search ||
-                        (val_search.indexOf('|') > -1 && val_search.split('|').includes(val_target))
-                    ) {
+                    else if (val_search === '*' || val_target === val_search) {
                         visible_this = true;
+                    } else if (val_search.indexOf('|') > -1) {
+                        if (val_search.split('|').includes(val_target)) {
+                            visible_this = true;
+                        }
+                    } else if (val_search.indexOf('&') > -1) {
+                        visible_this = true;
+                        val_search.split('&').forEach((val_search__val) => {
+                            if (val_search__val.indexOf('!') === 0) {
+                                if (val_search__val === val_target) {
+                                    visible_this = false;
+                                }
+                            } else {
+                                if (val_search__val !== val_target) {
+                                    visible_this = false;
+                                }
+                            }
+                        });
                     }
 
                     /* special behaviour: hide billed in overview */
