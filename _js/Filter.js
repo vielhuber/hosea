@@ -191,7 +191,7 @@ export default class Filter {
                         visible_this = true;
                         val_search.split('&').forEach((val_search__val) => {
                             if (val_search__val.indexOf('!') === 0) {
-                                if (val_search__val === val_target) {
+                                if (val_search__val.split('!').join('') === val_target) {
                                     visible_this = false;
                                 }
                             } else {
