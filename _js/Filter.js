@@ -84,7 +84,15 @@ export default class Filter {
                 });
                 // combined filter
                 if (columns__value === 'status') {
-                    if (options.filter((options__value) => ['done', 'scheduled', 'working'].includes(options__value)).length > 0) {
+                    if (
+                        options.filter((options__value) => !['done', 'recurring'].includes(options__value)).length > 0
+                    ) {
+                        options.push('!done&!recurring');
+                    }
+                    if (
+                        options.filter((options__value) => ['done', 'scheduled', 'working'].includes(options__value))
+                            .length > 0
+                    ) {
                         options.push('done|scheduled|working');
                     }
                     if (
