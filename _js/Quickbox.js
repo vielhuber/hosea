@@ -406,6 +406,7 @@ export default class Quickbox {
             count = 0;
         tickets.sort((a, b) => {
             let sort_list = [
+                    'working',
                     'fixed',
                     /*
                     'scheduled',
