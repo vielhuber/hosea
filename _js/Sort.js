@@ -82,6 +82,10 @@ export default class Sort {
                 if (sort_2 != '') {
                     val_a = a.querySelector('[name="' + sort_2 + '"]').value.toLowerCase();
                     val_b = b.querySelector('[name="' + sort_2 + '"]').value.toLowerCase();
+                    if (sort_2 === 'date') {
+                        val_a = Dates.germanDateTimeToEnglishString(val_a);
+                        val_b = Dates.germanDateTimeToEnglishString(val_b);
+                    }
                     if (val_a < val_b) {
                         return -1;
                     }
@@ -93,7 +97,10 @@ export default class Sort {
                 for (let [val_a, val_b] of [
                     a.querySelector('[name="status"]').value == 'recurring' &&
                     b.querySelector('[name="status"]').value == 'recurring'
-                        ? [a.querySelector('[name="date"]').value, b.querySelector('[name="date"]').value]
+                        ? [
+                              a.querySelector('[name="date"]').value.split(' ').slice(1).join(' '),
+                              b.querySelector('[name="date"]').value.split(' ').slice(1).join(' '),
+                          ]
                         : [
                               Dates.germanDateTimeToEnglishString(a.querySelector('[name="date"]').value),
                               Dates.germanDateTimeToEnglishString(b.querySelector('[name="date"]').value),
