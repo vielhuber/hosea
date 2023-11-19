@@ -160,6 +160,7 @@ export default class Scheduler {
                         top:${date__value.posTop}%;
                         bottom:${date__value.posBottom}%;
                         background:${date__value.background};
+                        animation:${date__value.animation};
                         opacity:${date__value.opacity};
                         width:${date__value.width};
                     ">
@@ -234,6 +235,12 @@ export default class Scheduler {
             let background =
                 Scheduler.getStoreProperty('background', tickets__value.status, tickets__value.project, null) ||
                 Scheduler.getStoreProperty('border', tickets__value.status, tickets__value.project, '#9E9E9E');
+            let animation = Scheduler.getStoreProperty(
+                'animation',
+                tickets__value.status,
+                tickets__value.project,
+                'none'
+            );
             if (parsed_values !== false && parsed_values.length > 0) {
                 parsed_values.forEach((parsed_values__value) => {
                     generatedDates.push({
@@ -245,6 +252,7 @@ export default class Scheduler {
                         project: project,
                         time: parsed_values__value.time,
                         background: background,
+                        animation: animation,
                         opacity: Scheduler.getStoreProperty(
                             'opacity',
                             tickets__value.status,
