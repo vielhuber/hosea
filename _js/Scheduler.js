@@ -6,6 +6,8 @@ import Quickbox from './Quickbox';
 import Weather from './Weather';
 
 export default class Scheduler {
+    static hourBegin = 6;
+
     static initScheduler() {
         document.querySelector('.scheduler').innerHTML = `
             <div class="scheduler__navigation">
@@ -99,11 +101,11 @@ export default class Scheduler {
                             )
                             .join('')}
                     </tr>
-                    ${Array(15)
+                    ${Array(24 - Scheduler.hourBegin)
                         .join(0)
                         .split(0)
                         .map((item, j) => {
-                            j = j + 9;
+                            j = j + Scheduler.hourBegin;
                             return `
                             <tr class="scheduler__row">
                                 <td class="scheduler__cell">${('0' + j).slice(-2)}&ndash;${('0' + (j + 1)).slice(
@@ -331,18 +333,21 @@ export default class Scheduler {
 
         /* finalize */
         generatedDates.forEach((date__value) => {
-            let posTop, posBottom;
+            let posTop,
+                posBottom,
+                heightFrac = 100 / (24 + 1 - Scheduler.hourBegin);
             if (date__value.begin === null) {
                 posTop =
-                    (generatedDatesUndefinedCur[date__value.day] / generatedDatesUndefinedMax[date__value.day]) * 6.25;
+                    (generatedDatesUndefinedCur[date__value.day] / generatedDatesUndefinedMax[date__value.day]) *
+                    heightFrac;
                 posBottom =
                     100 -
                     ((generatedDatesUndefinedCur[date__value.day] + 1) / generatedDatesUndefinedMax[date__value.day]) *
-                        6.25;
+                        heightFrac;
                 generatedDatesUndefinedCur[date__value.day]++;
             } else {
-                posTop = 6.25 * (date__value.begin - 8);
-                posBottom = 100 - 6.25 * (date__value.end - 8);
+                posTop = heightFrac * (date__value.begin - (Scheduler.hourBegin - 1));
+                posBottom = 100 - heightFrac * (date__value.end - (Scheduler.hourBegin - 1));
             }
 
             let width, posLeft;

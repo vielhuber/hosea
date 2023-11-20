@@ -50,7 +50,7 @@
 }
 
 .scheduler__row {
-    height: 6.25%;
+    height: calc(100% / (24 + 1 - 6));
     display: block;
     .scheduler__table-head & {
         height: 50%;
