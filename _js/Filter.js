@@ -147,7 +147,7 @@ export default class Filter {
                             '<option value="' +
                                 options__value +
                                 '">' +
-                                options__value.replace(/^.{0,3}[^\p{L}\p{N}\p{P}\p{Z}^$\n]/gu, '') +
+                                options__value.replace(/^.{0,6}[^\p{L}\p{N}\p{P}\p{Z}^$\n]/gu, '') +
                                 '</option>'
                         );
                 });
