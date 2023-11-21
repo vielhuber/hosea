@@ -105,12 +105,20 @@ export default class Filter {
                     }
                 }
                 options.sort((a, b) => {
+                    // normalize
                     if (a === null) {
                         a = '';
                     }
                     if (b === null) {
                         b = '';
                     }
+                    a = a.toLowerCase();
+                    b = b.toLowerCase();
+
+                    // remove emojis
+                    a = a.replace(/[^\p{L}\p{N}\p{P}\p{Z}^$\n]/gu, '');
+                    b = b.replace(/[^\p{L}\p{N}\p{P}\p{Z}^$\n]/gu, '');
+
                     if (a.indexOf('|') > -1) {
                         a = 'zz' + a;
                     }
@@ -129,7 +137,7 @@ export default class Filter {
                     if (b.indexOf('!') > -1) {
                         b = 'zz' + b;
                     }
-                    return a.toLowerCase().localeCompare(b.toLowerCase());
+                    return a.localeCompare(b);
                 });
                 options.forEach((options__value) => {
                     document
