@@ -140,15 +140,15 @@ export default class Filter {
                     return a.localeCompare(b);
                 });
                 options.forEach((options__value) => {
+                    let options__value_normalized =
+                        options__value.replace(/^.{0,6}[^\p{L}\p{N}\p{P}\p{Z}^$\n]/gu, '').length === 0
+                            ? options__value.replace(/^.{0,3}[^\p{L}\p{N}\p{P}\p{Z}^$\n]/gu, '')
+                            : options__value.replace(/^.{0,6}[^\p{L}\p{N}\p{P}\p{Z}^$\n]/gu, '');
                     document
                         .querySelector('.metabar__select--filter[name="' + columns__value + '"]')
                         .insertAdjacentHTML(
                             'beforeend',
-                            '<option value="' +
-                                options__value +
-                                '">' +
-                                options__value.replace(/^.{0,6}[^\p{L}\p{N}\p{P}\p{Z}^$\n]/gu, '') +
-                                '</option>'
+                            '<option value="' + options__value + '">' + options__value_normalized + '</option>'
                         );
                 });
             }
