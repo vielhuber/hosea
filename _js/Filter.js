@@ -144,7 +144,11 @@ export default class Filter {
                         .querySelector('.metabar__select--filter[name="' + columns__value + '"]')
                         .insertAdjacentHTML(
                             'beforeend',
-                            '<option value="' + options__value + '">' + options__value + '</option>'
+                            '<option value="' +
+                                options__value +
+                                '">' +
+                                options__value.replace(/^[^\p{L}\p{N}\p{P}\p{Z}^$\n]/gu, '') +
+                                '</option>'
                         );
                 });
             }
