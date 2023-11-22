@@ -100,6 +100,9 @@ export default class Filter {
                     ) {
                         options.push('scheduled|working');
                     }
+                    if (options.filter((options__value) => ['idle', 'working'].includes(options__value)).length > 0) {
+                        options.push('idle|working');
+                    }
                     if (options.filter((options__value) => ['fixed', 'working'].includes(options__value)).length > 0) {
                         options.push('fixed|working');
                     }
@@ -116,34 +119,23 @@ export default class Filter {
                     b = b.toLowerCase();
 
                     // remove emojis
-                    a = a.replace(/[^\p{L}\p{N}\p{P}\p{Z}^$\n]/gu, '');
-                    b = b.replace(/[^\p{L}\p{N}\p{P}\p{Z}^$\n]/gu, '');
+                    a = a.replaceAll(hlp.emojiRegex(), '');
+                    b = b.replaceAll(hlp.emojiRegex(), '');
 
-                    if (a.indexOf('|') > -1) {
+                    if (a.indexOf('|') > -1 || a.indexOf('&') > -1 || a.indexOf('!') > -1) {
                         a = 'zz' + a;
                     }
-                    if (b.indexOf('|') > -1) {
+                    if (b.indexOf('|') > -1 || b.indexOf('&') > -1 || b.indexOf('!') > -1) {
                         b = 'zz' + b;
                     }
-                    if (a.indexOf('&') > -1) {
-                        a = 'zz' + a;
-                    }
-                    if (b.indexOf('&') > -1) {
-                        b = 'zz' + b;
-                    }
-                    if (a.indexOf('!') > -1) {
-                        a = 'zz' + a;
-                    }
-                    if (b.indexOf('!') > -1) {
-                        b = 'zz' + b;
-                    }
+                    a = a.split('|').join('');
+                    b = b.split('|').join('');
+
                     return a.localeCompare(b);
                 });
                 options.forEach((options__value) => {
-                    let options__value_normalized =
-                        options__value.replace(/^.{0,6}[^\p{L}\p{N}\p{P}\p{Z}^$\n]/gu, '').length <= 1
-                            ? options__value.replace(/^.{0,3}[^\p{L}\p{N}\p{P}\p{Z}^$\n]/gu, '')
-                            : options__value.replace(/^.{0,6}[^\p{L}\p{N}\p{P}\p{Z}^$\n]/gu, '');
+                    let options__value_normalized = options__value.replace(hlp.emojiRegex(false), '');
+
                     document
                         .querySelector('.metabar__select--filter[name="' + columns__value + '"]')
                         .insertAdjacentHTML(
