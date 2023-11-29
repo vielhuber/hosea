@@ -295,12 +295,60 @@ export default class Tickets {
 
     static prepareCreateTicket() {
         let visibleAll = document
-                .querySelector('.tickets .tickets__table-body')
-                .querySelectorAll('.tickets__entry--visible'),
-            current = null,
-            currentCol = 1,
-            duplicateData = {};
+            .querySelector('.tickets .tickets__table-body')
+            .querySelectorAll('.tickets__entry--visible');
+
+        let copyBulkRecurring = null,
+            copyBulkRecurringOnly = null,
+            copyBulkRecurringCounter = 0,
+            copyType = null,
+            ticketDataToCopy = [],
+            askCounter = 0;
+
+        // determine copyBulkRecurring
         if (visibleAll.length > 0) {
+            visibleAll.forEach(($el) => {
+                let status = Tickets.getTicketData($el.getAttribute('data-id')).status;
+                if (status !== 'recurring') {
+                    copyBulkRecurringOnly = false;
+                }
+                if (status === 'recurring') {
+                    copyBulkRecurringCounter++;
+                    if (copyBulkRecurringOnly === null) {
+                        copyBulkRecurringOnly = true;
+                    }
+                }
+            });
+        }
+        copyBulkRecurring =
+            copyBulkRecurringOnly === true &&
+            copyBulkRecurringCounter > 1 &&
+            document.activeElement.closest('.tickets__entry') === null;
+
+        // determine copyType and ticketDataToCopy
+        if (visibleAll.length === 0) {
+            copyType = 'single';
+            ticketDataToCopy.push({
+                current: null,
+                currentCol: 1,
+                duplicateData: {},
+            });
+        } else if (copyBulkRecurring === true) {
+            copyType = 'bulk';
+            visibleAll.forEach(($el) => {
+                let duplicateData = Tickets.getTicketData($el.getAttribute('data-id'));
+                delete duplicateData['attachments'];
+                ticketDataToCopy.push({
+                    current: $el,
+                    currentCol: 1,
+                    duplicateData: duplicateData,
+                });
+            });
+        } else {
+            copyType = 'single';
+            let current = null,
+                currentCol = null,
+                duplicateData = null;
             if (document.activeElement.closest('.tickets__entry') !== null) {
                 current = document.activeElement.closest('.tickets__entry');
                 currentCol = Helper.prevAll(document.activeElement.closest('td')).length + 1;
@@ -310,36 +358,66 @@ export default class Tickets {
             }
             duplicateData = Tickets.getTicketData(current.getAttribute('data-id'));
             delete duplicateData['attachments'];
-        }
-        /* if source is a recurring ticket, do some magic */
-        if (
-            current !== null &&
-            duplicateData.status === 'recurring' &&
-            confirm('should the copy be a scheduled ticket and the recurring ticket automatically be postponed?')
-        ) {
-            let newDates = [];
-            duplicateData.date.split('\n').forEach((duplicateData__value) => {
-                // only add relevant
-                let parsed = Dates.parseDateString(duplicateData__value, 'tickets');
-                if (parsed.length === 0) {
-                    return;
-                }
-                let newDate = Dates.dateFormat(Dates.getActiveDate(), 'd.m.y'),
-                    extractedTime = Dates.extractTimeFromDate(duplicateData__value);
-                if (extractedTime) {
-                    newDate += ' ' + extractedTime;
-                }
-                newDates.push(newDate);
+            ticketDataToCopy.push({
+                current: current,
+                currentCol: currentCol,
+                duplicateData: duplicateData,
             });
-            current.querySelector('.tickets__textarea--date').value = Dates.includeNewLowerBoundInDate(
-                duplicateData.date,
-                Dates.getActiveDate()
-            );
-            current.querySelector('.tickets__textarea--date').dispatchEvent(new Event('input', { bubbles: true }));
-            duplicateData.date = newDates.join('\n');
-            duplicateData.status = 'scheduled';
         }
-        Tickets.createAndAppendTicket(duplicateData, current, currentCol, true, false);
+
+        ticketDataToCopy.forEach((ticketDataToCopy__value) => {
+            /* if source is a recurring ticket, do some magic */
+            if (
+                ticketDataToCopy__value.current !== null &&
+                ticketDataToCopy__value.duplicateData.status === 'recurring'
+            ) {
+                if (
+                    (copyType !== 'bulk' &&
+                        confirm(
+                            'should the copy be a scheduled ticket and the recurring ticket automatically be postponed?'
+                        )) ||
+                    (copyType === 'bulk' &&
+                        (askCounter > 0 ||
+                            confirm(
+                                'BULK ALERT: should the copy be a scheduled ticket and the recurring ticket automatically be postponed?'
+                            )))
+                ) {
+                    askCounter++;
+                    let newDates = [];
+                    ticketDataToCopy__value.duplicateData.date.split('\n').forEach((duplicateData__value) => {
+                        // only add relevant
+                        let parsed = Dates.parseDateString(duplicateData__value, 'tickets');
+                        if (parsed.length === 0) {
+                            return;
+                        }
+                        let newDate = Dates.dateFormat(Dates.getActiveDate(), 'd.m.y'),
+                            extractedTime = Dates.extractTimeFromDate(duplicateData__value);
+                        if (extractedTime) {
+                            newDate += ' ' + extractedTime;
+                        }
+                        newDates.push(newDate);
+                    });
+                    ticketDataToCopy__value.current.querySelector('.tickets__textarea--date').value =
+                        Dates.includeNewLowerBoundInDate(
+                            ticketDataToCopy__value.duplicateData.date,
+                            Dates.getActiveDate()
+                        );
+                    ticketDataToCopy__value.current
+                        .querySelector('.tickets__textarea--date')
+                        .dispatchEvent(new Event('input', { bubbles: true }));
+                    ticketDataToCopy__value.duplicateData.date = newDates.join('\n');
+                    ticketDataToCopy__value.duplicateData.status = 'fixed';
+                }
+            }
+
+            Tickets.createAndAppendTicket(
+                ticketDataToCopy__value.duplicateData,
+                ticketDataToCopy__value.current,
+                ticketDataToCopy__value.currentCol,
+                true,
+                false
+            );
+        });
     }
 
     static createAndAppendTicket(data, current = null, currentCol = 1, withSelect = true, doFilter = false) {

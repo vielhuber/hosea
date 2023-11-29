@@ -24,6 +24,12 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+    if (event.request.method !== 'GET') {
+        return;
+    }
+    if (!(event.request.url.indexOf('http') === 0)) {
+        return;
+    }
     if (event.request.mode === 'navigate') {
         event.respondWith(
             (async () => {
