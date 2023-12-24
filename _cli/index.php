@@ -93,7 +93,7 @@ class Cli
             'priority' => 'A',
             'date' => '2018-08-10T09:00:00\n2018-08-10T18:00:00',
             'time' => '9',
-            'project' => 'HovawartDB',
+            'project' => 'Testprojekt',
             'description' => 'Siehe Word',
             'user_id' => 1,
         ]);
@@ -102,7 +102,7 @@ class Cli
             'priority' => 'A',
             'date' => '2018-08-10T09:00:00\n2018-08-10T18:00:00',
             'time' => '9',
-            'project' => 'HovawartDB',
+            'project' => 'Testprojekt',
             'description' => 'Siehe Word',
             'user_id' => 1,
         ]);
@@ -111,7 +111,7 @@ class Cli
             'priority' => 'A',
             'date' => '2018-08-10T09:00:00\n2018-08-10T18:00:00',
             'time' => '9',
-            'project' => 'HovawartDB',
+            'project' => 'Testprojekt',
             'description' => 'Siehe Word',
             'user_id' => 1,
         ]);
