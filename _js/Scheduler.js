@@ -170,7 +170,7 @@ export default class Scheduler {
                     </div>
                 `
             );
-            if (date__value.time != '' && date__value.project !== 'Olga') {
+            if (date__value.time != '') {
                 weeklySum += date__value.time;
             }
         });
@@ -233,6 +233,7 @@ export default class Scheduler {
                             .join('\n')
                 ),
                 project = tickets__value.project,
+                status = tickets__value.status,
                 parsed_values = Dates.parseDateString(tickets__value.date, 'scheduler');
             let background =
                 Scheduler.getStoreProperty('background', tickets__value.status, tickets__value.project, null) ||
@@ -249,6 +250,7 @@ export default class Scheduler {
                         day: parsed_values__value.day,
                         begin: parsed_values__value.begin,
                         end: parsed_values__value.end,
+                        status: status,
                         name: name,
                         title: title,
                         project: project,
@@ -303,6 +305,9 @@ export default class Scheduler {
                 if ('conflict' in gv2 && 'conflict' in gv1 && gv2.conflict === gv1.conflict) {
                     return;
                 }
+                if (gv2.status === 'recurring' || gv1.status === 'recurring') {
+                    return;
+                }
                 if (gv2.begin < gv1.end) {
                     if ('conflict' in gv1) {
                         let conflictId = gv1.conflict;
@@ -329,6 +334,14 @@ export default class Scheduler {
                     }
                 }
             });
+        });
+
+        /* order/z-index */
+        generatedDates.sort((gv1, gv2) => {
+            if (gv1.status === 'recurring' || gv2.status === 'recurring') {
+                return -1;
+            }
+            return 0;
         });
 
         /* finalize */
