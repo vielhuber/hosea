@@ -175,6 +175,12 @@
         padding-right: 10rem;
         flex: 1 1 auto;
     }
+    .scheduler__navigation-button--prev-month,
+    .scheduler__navigation-button--prev-day,
+    .scheduler__navigation-button--next-day,
+    .scheduler__navigation-button--next-month {
+        display: none;
+    }
     /* !todo */
 }
 

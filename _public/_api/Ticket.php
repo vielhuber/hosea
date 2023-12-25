@@ -64,8 +64,8 @@ class Ticket extends Api
             $interval_prev = 60;
             $interval_next = null;
         } else {
-            $interval_prev = 20;
-            $interval_next = 30;
+            $interval_prev = 15;
+            $interval_next = 25;
         }
 
         $query =
