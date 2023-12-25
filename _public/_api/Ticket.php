@@ -58,9 +58,17 @@ class Ticket extends Api
     protected function index()
     {
         // load tickets with attachments:
-        // - regular tickets that reach back 3 months in the past
+        // - regular tickets in specific timespan
         // - all irregular tickets
-        $tickets = $this::$db->fetch_all(
+        if (!$this->Utils->isMobile()) {
+            $interval_prev = 60;
+            $interval_next = null;
+        } else {
+            $interval_prev = 20;
+            $interval_next = 30;
+        }
+
+        $query =
             '
             SELECT
                 tickets.id,
@@ -78,15 +86,29 @@ class Ticket extends Api
                 user_id = ?
                 AND
                 (
-                    date NOT REGEXP ?
-                    OR
-                    STR_TO_DATE(date,?) > DATE_SUB(NOW(), INTERVAL 90 DAY)
+                date NOT REGEXP ?
+                OR
+                (                    
+                ' .
+            ($interval_prev === null
+                ? '1=1'
+                : 'STR_TO_DATE(date,\'%d.%m.%y\') > DATE_SUB(NOW(), INTERVAL ' . $interval_prev . ' DAY)') .
+            '
+                AND
+                ' .
+            ($interval_next === null
+                ? '1=1'
+                : 'STR_TO_DATE(date,\'%d.%m.%y\') < DATE_ADD(NOW(), INTERVAL ' . $interval_next . ' DAY)') .
+            '                    
+                )
                 )
             GROUP BY tickets.id
-        ',
+        ';
+
+        $tickets = $this::$db->fetch_all(
+            $query,
             $this::$auth->getCurrentUserId(),
-            '^[0-9][0-9]\.[0-9][0-9]\.[0-9][0-9]( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?$',
-            '%d.%m.%y'
+            '^[0-9][0-9]\.[0-9][0-9]\.[0-9][0-9]( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?$'
         );
         foreach ($tickets as $tickets__key => $tickets__value) {
             if ($tickets__value['attachments'] == '') {
