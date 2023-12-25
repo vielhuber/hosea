@@ -140,11 +140,12 @@
     line-height: calc(#{$space-big} + 2 * #{$space-small});
     font-size: $font-size-medium;
     text-align: center;
+    box-shadow: 0 0 0 2rem inset $color-white;
 }
 
 .quickbox__today-navitem--cur-day {
-    padding-left: $space-small;
-    padding-right: $space-small;
+    padding-left: $space-medium;
+    padding-right: $space-medium;
 }
 
 .quickbox__today-navitem--prev-day,

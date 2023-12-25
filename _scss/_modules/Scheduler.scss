@@ -129,7 +129,7 @@
     float: right;
     display: block;
     margin-left: 2rem;
-    padding: 0px 6rem;
+    padding: 0 6rem;
 }
 
 .scheduler__navigation-button--next-month {
@@ -148,6 +148,33 @@
     .scheduler {
         display: none;
     }
+    /* todo */
+    /* rebuild scheduler navigation with flexbox and without float */
+    .scheduler {
+        display: block;
+        width: 100%;
+        height: auto;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: calc(#{$space-big} + 2 * #{$space-small});
+    }
+    .scheduler__navigation-week {
+        display: none;
+    }
+    .scheduler__navigation {
+        display: flex;
+        align-items: flex-start;
+        align-content: flex-start;
+        flex-direction: row-reverse;
+    }
+    .scheduler__navigation-button {
+        border: 2rem solid $color-white;
+        padding-left: 10rem;
+        padding-right: 10rem;
+        flex: 1 1 auto;
+    }
+    /* !todo */
 }
 
 @keyframes birthday-glow {

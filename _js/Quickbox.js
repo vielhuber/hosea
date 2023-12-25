@@ -372,6 +372,14 @@ export default class Quickbox {
             el2.style.display = 'block';
         });
         requestAnimationFrame(() => {
+            /* todo */
+            /* add a new tab called "_scheduler" */
+            if (view === 'mails') {
+                document.querySelector('.scheduler').style.zIndex = '1';
+            } else {
+                document.querySelector('.scheduler').style.zIndex = '';
+            }
+            /* !todo */
             setTimeout(() => {
                 document.querySelectorAll('.quickbox__content > *:not(.quickbox__' + view + ')').forEach((el2) => {
                     el2.style.display = 'none';
