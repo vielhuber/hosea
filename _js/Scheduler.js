@@ -4,6 +4,7 @@ import Filter from './Filter';
 import hlp from 'hlp';
 import Quickbox from './Quickbox';
 import Weather from './Weather';
+import tippy from 'tippy.js';
 
 export default class Scheduler {
     static hourBegin = 6;
@@ -174,6 +175,19 @@ export default class Scheduler {
                 weeklySum += date__value.time;
             }
         });
+
+        // custom tooltips instead of basic titles
+        tippy('.scheduler__appointment', {
+            content(reference) {
+                let title = reference.getAttribute('title');
+                title = title.split('\n').join('<br/>');
+                reference.removeAttribute('title');
+                return title;
+            },
+            allowHTML: true,
+            interactive: false,
+        });
+
         weeklySum = (Math.round(weeklySum * 100) / 100).toString().replace('.', ',');
 
         document.querySelector('.scheduler__navigation-week').innerHTML = `

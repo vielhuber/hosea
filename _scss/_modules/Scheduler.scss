@@ -147,11 +147,6 @@
 
 @include responsive-medium {
     .scheduler {
-        display: none;
-    }
-    /* todo */
-    /* rebuild scheduler navigation with flexbox and without float */
-    .scheduler {
         display: block;
         width: 100%;
         height: auto;
@@ -159,6 +154,14 @@
         left: 0;
         right: 0;
         bottom: calc(#{$space-big} + 2 * #{$space-small});
+        z-index: 1;
+        transition: opacity 0.25s ease-in-out;
+        opacity: 0;
+        pointer-events: none;
+    }
+    .scheduler--mobile-active {
+        opacity: 1;
+        pointer-events: auto;
     }
     .scheduler__navigation-week {
         display: none;
@@ -181,7 +184,6 @@
     .scheduler__navigation-button--next-month {
         display: none;
     }
-    /* !todo */
 }
 
 @keyframes birthday-glow {

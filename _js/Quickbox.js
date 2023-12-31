@@ -28,11 +28,13 @@ export default class Quickbox {
     static buildHtml() {
         document.querySelector('.quickbox').innerHTML = `
             <div class="quickbox__content">
+                <div class="quickbox__week"></div>
                 <div class="quickbox__mails"></div>
                 <div class="quickbox__today"></div>
                 <div class="quickbox__new"></div>
             </div>
             <div class="quickbox__nav">
+                <a href="#week" class="quickbox__navitem">_week</a>
                 <a href="#mails" class="quickbox__navitem">_mails<span class="quickbox__navitem-count"></span></a>
                 <a href="#today" class="quickbox__navitem">_today<span class="quickbox__navitem-count"></span></a>
                 <a href="#new" class="quickbox__navitem">_new</a>
@@ -348,7 +350,7 @@ export default class Quickbox {
 
     static bindNav() {
         if (document.querySelector('.quickbox__content') !== null) {
-            this.bindNavToggle('mails');
+            this.bindNavToggle('week');
         }
         document.addEventListener('click', (e) => {
             let el = e.target.closest('.quickbox__navitem');
@@ -372,21 +374,21 @@ export default class Quickbox {
             el2.style.display = 'block';
         });
         requestAnimationFrame(() => {
-            /* todo */
-            /* add a new tab called "_scheduler" */
-            if (view === 'mails') {
-                document.querySelector('.scheduler').style.zIndex = '1';
-            } else {
-                document.querySelector('.scheduler').style.zIndex = '';
-            }
-            /* !todo */
             setTimeout(() => {
                 document.querySelectorAll('.quickbox__content > *:not(.quickbox__' + view + ')').forEach((el2) => {
                     el2.style.display = 'none';
                 });
                 document.querySelector('.quickbox__content').classList.remove('quickbox__content--disabled');
             }, 250);
+
             document.querySelector('.quickbox__content').setAttribute('data-view', view);
+
+            if (view === 'week') {
+                document.querySelector('.scheduler').classList.add('scheduler--mobile-active');
+            } else {
+                document.querySelector('.scheduler').classList.remove('scheduler--mobile-active');
+            }
+
             if (document.querySelector('.quickbox__navitem--active') !== null) {
                 document.querySelectorAll('.quickbox__navitem--active').forEach((navitem__value) => {
                     navitem__value.classList.remove('quickbox__navitem--active');

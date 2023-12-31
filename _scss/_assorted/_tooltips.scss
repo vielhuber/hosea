@@ -1,0 +1,12 @@
+@import './../../node_modules/tippy.js/dist/tippy';
+.tippy-box {
+    font-size: 10rem;
+    font-weight: normal;
+    background-color: $color-black;
+    color: $color-white;
+    box-shadow: 0rem 0rem 0rem 3rem $color-white;
+    border-radius: 0;
+}
+.tippy-arrow {
+    display: none;
+}

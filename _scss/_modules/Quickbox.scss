@@ -118,11 +118,18 @@
     @include scrollbar;
 }
 
+.quickbox__week {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: $color-black;
+}
+
 .quickbox__today {
     position: absolute;
     width: 100%;
     height: 100%;
-    background-color: #000;
+    background-color: $color-black;
 }
 
 .quickbox__today-nav {
@@ -258,6 +265,7 @@
     transition: opacity 0.25s ease-in-out;
 }
 
+.quickbox__content[data-view='week'] .quickbox__week,
 .quickbox__content[data-view='mails'] .quickbox__mails,
 .quickbox__content[data-view='new'] .quickbox__new,
 .quickbox__content[data-view='today'] .quickbox__today {
