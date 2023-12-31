@@ -508,12 +508,27 @@
 }
 
 .quickbox__navitem {
-    width: 33.33%;
     height: 100%;
     line-height: calc(#{$space-big} + 2 * #{$space-small});
     display: block;
     text-align: center;
     flex: 0 1 auto;
+}
+
+.quickbox__nav--count-1 .quickbox__navitem {
+    width: 10%;
+}
+.quickbox__nav--count-2 .quickbox__navitem {
+    width: 50%;
+}
+.quickbox__nav--count-3 .quickbox__navitem {
+    width: 33.33%;
+}
+.quickbox__nav--count-4 .quickbox__navitem {
+    width: 25%;
+}
+.quickbox__nav--count-5 .quickbox__navitem {
+    width: 20%;
 }
 
 .quickbox__navitem-count {
@@ -535,6 +550,10 @@
 .quickbox__navitem--active {
     background-color: $color-white;
     color: $color-black;
+}
+
+.quickbox__navitem--hidden {
+    display: none;
 }
 
 @media screen and (min-width: $breakpoint-medium) and (max-height: 850px) {

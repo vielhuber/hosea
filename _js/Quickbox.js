@@ -33,10 +33,14 @@ export default class Quickbox {
                 <div class="quickbox__today"></div>
                 <div class="quickbox__new"></div>
             </div>
-            <div class="quickbox__nav">
-                <a href="#week" class="quickbox__navitem">_week</a>
+            <div class="quickbox__nav quickbox__nav--count-${hlp.isDesktop() ? '2' : '4'}">
+                <a href="#week" class="quickbox__navitem${
+                    hlp.isDesktop() ? ' quickbox__navitem--hidden' : ''
+                }">_week</a>
+                <a href="#today" class="quickbox__navitem${
+                    hlp.isDesktop() ? ' quickbox__navitem--hidden' : ''
+                }">_today<span class="quickbox__navitem-count"></span></a>
                 <a href="#mails" class="quickbox__navitem">_mails<span class="quickbox__navitem-count"></span></a>
-                <a href="#today" class="quickbox__navitem">_today<span class="quickbox__navitem-count"></span></a>
                 <a href="#new" class="quickbox__navitem">_new</a>
             </div>
         `;
@@ -84,7 +88,8 @@ export default class Quickbox {
     }
 
     static updateMailCount() {
-        document.querySelector('.quickbox__navitem-count').innerText = Store.data.mails.length;
+        document.querySelector('.quickbox__navitem[href="#mails"] .quickbox__navitem-count').innerText =
+            Store.data.mails.length;
     }
 
     static renderMails() {
@@ -350,7 +355,7 @@ export default class Quickbox {
 
     static bindNav() {
         if (document.querySelector('.quickbox__content') !== null) {
-            this.bindNavToggle('week');
+            this.bindNavToggle(hlp.isDesktop() ? 'mails' : 'week');
         }
         document.addEventListener('click', (e) => {
             let el = e.target.closest('.quickbox__navitem');
