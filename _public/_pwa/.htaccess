@@ -1,1 +1,6 @@
 Header add Service-Worker-Allowed /
+
+RewriteEngine on
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^manifest\.json$ /_pwa/_manifest.json.php [L,QSA]

@@ -2,8 +2,8 @@
     "theme_color": "#000000",
     "background_color": "#ff00e1",
     "display": "standalone",
-    "scope": "/hosea/",
-    "start_url": "/hosea/index.html",
+    "scope": "%SUBPATH%/",
+    "start_url": "%SUBPATH%/index.html",
     "dir": "ltr",
     "lang": "de",
     "name": "hosea",
@@ -12,27 +12,27 @@
     "orientation": "portrait",
     "icons": [
         {
-            "src": "/hosea/_pwa/icon-192x192.png",
+            "src": "%SUBPATH%/_pwa/icon-192x192.png",
             "sizes": "192x192",
             "type": "image/png"
         },
         {
-            "src": "/hosea/_pwa/icon-256x256.png",
+            "src": "%SUBPATH%/_pwa/icon-256x256.png",
             "sizes": "256x256",
             "type": "image/png"
         },
         {
-            "src": "/hosea/_pwa/icon-384x384.png",
+            "src": "%SUBPATH%/_pwa/icon-384x384.png",
             "sizes": "384x384",
             "type": "image/png"
         },
         {
-            "src": "/hosea/_pwa/icon-512x512.png",
+            "src": "%SUBPATH%/_pwa/icon-512x512.png",
             "sizes": "512x512",
             "type": "image/png"
         },
         {
-            "src": "/hosea/_pwa/icon-maskable.png",
+            "src": "%SUBPATH%/_pwa/icon-maskable.png",
             "sizes": "196x196",
             "type": "image/png",
             "purpose": "any maskable"
