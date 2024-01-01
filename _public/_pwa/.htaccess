@@ -1,6 +1,10 @@
 Header add Service-Worker-Allowed /
 
+<If "%{REQUEST_URI} =~ /hosea/">
 RewriteEngine on
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule manifest\.json$ /_pwa/_manifest.json.php [L,QSA]
+RewriteRule manifest\.json$ /hosea/_pwa/manifest.json.php [L,QSA]
+</If>
+<Else>
+RewriteEngine on
+RewriteRule manifest\.json$ /_pwa/manifest.json.php [L,QSA]
+</Else>
