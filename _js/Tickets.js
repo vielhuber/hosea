@@ -309,13 +309,15 @@ export default class Tickets {
         if (visibleAll.length > 0) {
             visibleAll.forEach(($el) => {
                 let status = Tickets.getTicketData($el.getAttribute('data-id')).status;
-                if (status !== 'recurring') {
-                    copyBulkRecurringOnly = false;
-                }
-                if (status === 'recurring') {
-                    copyBulkRecurringCounter++;
-                    if (copyBulkRecurringOnly === null) {
-                        copyBulkRecurringOnly = true;
+                if (status !== 'allday' && status !== 'birthday') {
+                    if (status !== 'recurring') {
+                        copyBulkRecurringOnly = false;
+                    }
+                    if (status === 'recurring') {
+                        copyBulkRecurringCounter++;
+                        if (copyBulkRecurringOnly === null) {
+                            copyBulkRecurringOnly = true;
+                        }
                     }
                 }
             });
@@ -337,12 +339,14 @@ export default class Tickets {
             copyType = 'bulk';
             visibleAll.forEach(($el) => {
                 let duplicateData = Tickets.getTicketData($el.getAttribute('data-id'));
-                delete duplicateData['attachments'];
-                ticketDataToCopy.push({
-                    current: $el,
-                    currentCol: 1,
-                    duplicateData: duplicateData,
-                });
+                if (duplicateData.status !== 'allday' && duplicateData.status !== 'birthday') {
+                    delete duplicateData['attachments'];
+                    ticketDataToCopy.push({
+                        current: $el,
+                        currentCol: 1,
+                        duplicateData: duplicateData,
+                    });
+                }
             });
         } else {
             copyType = 'single';
