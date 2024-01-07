@@ -319,7 +319,12 @@ export default class Scheduler {
                 if ('conflict' in gv2 && 'conflict' in gv1 && gv2.conflict === gv1.conflict) {
                     return;
                 }
-                if (gv2.status === 'recurring' || gv1.status === 'recurring') {
+                if (
+                    gv1.status === 'recurring' ||
+                    gv2.status === 'recurring' ||
+                    gv1.status === 'allday' ||
+                    gv2.status === 'allday'
+                ) {
                     return;
                 }
                 if (gv2.begin < gv1.end) {
@@ -352,13 +357,13 @@ export default class Scheduler {
 
         /* order/z-index */
         generatedDates.sort((gv1, gv2) => {
-            if (gv1.status === 'recurring' && gv2.status !== 'recurring') {
+            if (['recurring', 'allday'].includes(gv1.status) && !['recurring', 'allday'].includes(gv2.status)) {
                 return -1;
             }
-            if (gv1.status !== 'recurring' && gv2.status === 'recurring') {
+            if (!['recurring', 'allday'].includes(gv1.status) && ['recurring', 'allday'].includes(gv2.status)) {
                 return 1;
             }
-            if (gv1.status === 'recurring' && gv2.status === 'recurring') {
+            if (['recurring', 'allday'].includes(gv1.status) && ['recurring', 'allday'].includes(gv2.status)) {
                 return gv1.begin - gv2.begin;
             }
             return 0;
