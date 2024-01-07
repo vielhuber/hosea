@@ -352,11 +352,14 @@ export default class Scheduler {
 
         /* order/z-index */
         generatedDates.sort((gv1, gv2) => {
-            if (gv1.status === 'recurring') {
+            if (gv1.status === 'recurring' && gv2.status !== 'recurring') {
                 return -1;
             }
-            if (gv2.status === 'recurring') {
+            if (gv1.status !== 'recurring' && gv2.status === 'recurring') {
                 return 1;
+            }
+            if (gv1.status === 'recurring' && gv2.status === 'recurring') {
+                return gv1.begin - gv2.begin;
             }
             return 0;
         });
