@@ -5,7 +5,6 @@ export default class Html {
         document.querySelector('#app').insertAdjacentHTML(
             'beforeend',
             `
-            <div class="animation"></div>
             <div class="tickets"></div>
             <div class="scheduler"></div>
             <div class="quickbox"></div>
@@ -14,13 +13,15 @@ export default class Html {
         );
 
         if (window.innerWidth >= 1900) {
-            document.querySelector('.animation').insertAdjacentHTML(
-                'beforeend',
+            document.querySelector('#app').insertAdjacentHTML(
+                'afterbegin',
                 `
-            <div class="animation__wrap">
-                <div class="animation__top"></div>
-                <div class="animation__bottom"></div>
-            </div>
+                <div class="animation">
+                    <div class="animation__wrap">
+                        <div class="animation__top"></div>
+                        <div class="animation__bottom"></div>
+                    </div>
+                </div>
             `
             );
         }
