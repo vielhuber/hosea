@@ -13,15 +13,17 @@ export default class Html {
         `
         );
 
-        document.querySelector('.animation').insertAdjacentHTML(
-            'beforeend',
-            `
+        if (window.innerWidth >= 1900) {
+            document.querySelector('.animation').insertAdjacentHTML(
+                'beforeend',
+                `
             <div class="animation__wrap">
                 <div class="animation__top"></div>
                 <div class="animation__bottom"></div>
             </div>
             `
-        );
+            );
+        }
 
         document.querySelector('.footer').insertAdjacentHTML(
             'beforeend',
