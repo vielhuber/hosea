@@ -451,6 +451,53 @@ export default class Scheduler {
         return Dates.dateFormat(d.date, 'd.m.y') + ' ' + Dates.timeFormat(d.begin) + '-' + Dates.timeFormat(d.end);
     }
 
+    static determineNextFreeSlotAdvanced(priority, time) {
+        return '21.01.24 07:00-07:01'; // remove this;
+
+        let str = '21.01.24 09:00-09:30', // todo (generate based on current date/time + var time
+            d = Dates.parseDateString(str, 'all')[0],
+            dates = [];
+        // fetch all existing tickets and parse their times
+        Store.data.tickets.forEach((tickets__value) => {
+            let parsed_values = Dates.parseDateString(tickets__value.date, 'all');
+            if (parsed_values !== false && parsed_values.length > 0) {
+                parsed_values.forEach((parsed_values__value) => {
+                    dates.push({
+                        date: parsed_values__value.date,
+                        begin: parsed_values__value.begin,
+                        end: parsed_values__value.end,
+                    });
+                });
+            }
+        });
+        // move to next free slot and check if slot fulfils certain criteria (priority, weekend, holidays)
+        let conflict = true;
+        while (conflict === true) {
+            conflict = false;
+            dates.forEach((dates__value) => {
+                if (dates__value.begin === null || dates__value.end === null || d.begin === null || d.end === null) {
+                    return;
+                }
+                if (Dates.compareDates(d.date, dates__value.date) !== 0) {
+                    return;
+                }
+                if (d.end <= dates__value.begin || dates__value.end <= d.begin) {
+                    return;
+                }
+                d.begin += 0.5;
+                d.end += 0.5;
+                if (d.begin >= 21) {
+                    d.date.setDate(d.date.getDate() + 1);
+                    d.date.setHours(9);
+                    d.begin = 9;
+                    d.end = 9.5;
+                }
+                conflict = true;
+            });
+        }
+        return Dates.dateFormat(d.date, 'd.m.y') + ' ' + Dates.timeFormat(d.begin) + '-' + Dates.timeFormat(d.end);
+    }
+
     static getStoreProperty(property, status, project = null, defValue = null) {
         if (
             project !== null &&
