@@ -197,6 +197,7 @@ export default class Tickets {
                     data['updated_at'] = Dates.time().toString();
                     // auto update date
                     if (data['date'] == '') {
+                        Tickets.setTicketData(el.getAttribute('data-id'), data);
                         data['date'] = Scheduler.determineNextFreeSlotAdvanced(data['priority'], data['time']);
                         el.querySelector('[name="date"]').value = data['date'];
                     }

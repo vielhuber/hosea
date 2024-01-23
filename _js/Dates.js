@@ -446,6 +446,20 @@ export default class Dates {
         return Math.round((d1 - d2) / (1000 * 60));
     }
 
+    static dateDiffInWeeks(d1, d2) {
+        let weekNumber1 = this.weekNumber(d1),
+            weekNumber2 = this.weekNumber(d2),
+            year1 = d1.getFullYear(),
+            year2 = d1.getFullYear();
+        if (year1 > year2) {
+            weekNumber1 += 52;
+        }
+        if (year1 < year2) {
+            weekNumber2 += 52;
+        }
+        return weekNumber1 - weekNumber2;
+    }
+
     static weekNumber(d) {
         d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
         let dayNum = d.getUTCDay() || 7;

@@ -452,49 +452,103 @@ export default class Scheduler {
     }
 
     static determineNextFreeSlotAdvanced(priority, time) {
-        return '21.01.24 07:00-07:01'; // remove this;
+        time = parseFloat(time.split(',').join('.'));
 
-        let str = '21.01.24 09:00-09:30', // todo (generate based on current date/time + var time
-            d = Dates.parseDateString(str, 'all')[0],
-            dates = [];
-        // fetch all existing tickets and parse their times
-        Store.data.tickets.forEach((tickets__value) => {
-            let parsed_values = Dates.parseDateString(tickets__value.date, 'all');
-            if (parsed_values !== false && parsed_values.length > 0) {
-                parsed_values.forEach((parsed_values__value) => {
-                    dates.push({
-                        date: parsed_values__value.date,
-                        begin: parsed_values__value.begin,
-                        end: parsed_values__value.end,
-                    });
-                });
-            }
-        });
+        let t_begin = new Date().getHours(),
+            t_end = t_begin + time;
+
+        let str = '';
+        str += Dates.dateFormat(new Date(), 'd.m.y');
+        str += ' ';
+        str += Dates.timeFormat(t_begin);
+        str += '-';
+        str += Dates.timeFormat(t_end);
+
+        let d = Dates.parseDateString(str, 'all')[0];
+
         // move to next free slot and check if slot fulfils certain criteria (priority, weekend, holidays)
         let conflict = true;
-        while (conflict === true) {
+        while (1 === 1) {
+            if (conflict === true) {
+                d.begin += 0.5;
+                d.end += 0.5;
+                if (d.end > 18) {
+                    let d_shift = 1;
+                    if (d.date.getDay() === 5) {
+                        d_shift = 3;
+                    } else if (d.date.getDay() === 6) {
+                        d_shift = 2;
+                    }
+                    d.date.setDate(d.date.getDate() + d_shift);
+                    d.date.setHours(9);
+                    d.begin = 9;
+                    d.end = d.begin + time;
+                } else if (d.begin < 9) {
+                    d.date.setHours(9);
+                    d.begin = 9;
+                    d.end = d.begin + time;
+                }
+            }
             conflict = false;
+
+            // we have to calculate the dates in the context of this day
+            let dates = [];
+            Store.data.session.activeDay = d.date;
+            Store.data.tickets.forEach((tickets__value) => {
+                let parsed_values = Dates.parseDateString(tickets__value.date, 'tickets');
+                if (parsed_values !== false && parsed_values.length > 0) {
+                    parsed_values.forEach((parsed_values__value) => {
+                        dates.push({
+                            project: tickets__value.project,
+                            description: tickets__value.description,
+                            date: parsed_values__value.date,
+                            begin: parsed_values__value.begin,
+                            end: parsed_values__value.end,
+                        });
+                    });
+                }
+            });
             dates.forEach((dates__value) => {
+                if (conflict === true) {
+                    return;
+                }
                 if (dates__value.begin === null || dates__value.end === null || d.begin === null || d.end === null) {
                     return;
                 }
                 if (Dates.compareDates(d.date, dates__value.date) !== 0) {
                     return;
                 }
-                if (d.end <= dates__value.begin || dates__value.end <= d.begin) {
+                if (d.end <= dates__value.begin || d.begin >= dates__value.end) {
                     return;
                 }
-                d.begin += 0.5;
-                d.end += 0.5;
-                if (d.begin >= 21) {
-                    d.date.setDate(d.date.getDate() + 1);
-                    d.date.setHours(9);
-                    d.begin = 9;
-                    d.end = 9.5;
-                }
+
+                //console.log(JSON.stringify(['conflict between', d, dates__value]));
+
                 conflict = true;
             });
+            if (conflict === false) {
+                let differenceInWeeks = Dates.dateDiffInWeeks(d.date, new Date());
+                console.log('differenceInWeeks: ' + differenceInWeeks);
+                if (priority !== undefined && priority !== null && priority !== '') {
+                    if (
+                        (priority === 'A' && differenceInWeeks <= -1) ||
+                        (priority === 'B' && differenceInWeeks <= 0) ||
+                        (priority === 'C' && differenceInWeeks <= 1) ||
+                        (priority === 'D' && differenceInWeeks <= 2)
+                    ) {
+                        conflict = true;
+                    }
+                }
+            }
+            if (conflict === false) {
+                break;
+            }
         }
+
+        //return '';
+        //return '21.01.24 07:00-07:01'; // remove this;
+        //console.log(JSON.parse(JSON.stringify([priority, time, str, d, dates])));
+
         return Dates.dateFormat(d.date, 'd.m.y') + ' ' + Dates.timeFormat(d.begin) + '-' + Dates.timeFormat(d.end);
     }
 
