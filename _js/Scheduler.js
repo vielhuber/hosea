@@ -152,8 +152,6 @@ export default class Scheduler {
 
         let generatedDates = Scheduler.generateDates();
 
-        let weeklySum = 0;
-
         generatedDates.forEach((date__value) => {
             document.querySelector('.scheduler__appointments').insertAdjacentHTML(
                 'beforeend',
@@ -171,9 +169,6 @@ export default class Scheduler {
                     </div>
                 `
             );
-            if (date__value.time != '') {
-                weeklySum += date__value.time;
-            }
         });
 
         // custom tooltips instead of basic titles
@@ -188,44 +183,72 @@ export default class Scheduler {
             interactive: false,
         });
 
-        weeklySum = (Math.round(weeklySum * 100) / 100).toString().replace('.', ',');
+        let statsSumWeekly = 0;
+        generatedDates.forEach((date__value) => {
+            if (date__value.status !== 'allday') {
+                if (date__value.begin !== null && date__value.end !== null) {
+                    statsSumWeekly += date__value.end - date__value.begin;
+                }
+            }
+        });
+        statsSumWeekly = (Math.round(statsSumWeekly * 100) / 100).toString().replace('.', ',');
+
+        let linkToEmptyDates = '',
+            linkToEmptyDatesSum = 0;
+        Store.data.tickets.forEach((tickets__value) => {
+            if (tickets__value.date === '') {
+                linkToEmptyDatesSum += parseFloat(tickets__value.time.replace(',', '.'));
+            }
+        });
+        linkToEmptyDates +=
+            '<a href="#" class="scheduler__navigation-week-link-to-empty">❗' + linkToEmptyDatesSum + 'h❗</a>';
 
         document.querySelector('.scheduler__navigation-week').innerHTML = `
             ${Dates.dateFormat(Dates.getDayOfActiveWeek(1), 'd.m.')} &ndash; ${Dates.dateFormat(
             Dates.getDayOfActiveWeek(7),
             'd.m.Y'
-        )} /// _kw ${Dates.weekNumber(Dates.getDayOfActiveWeek(1))} /// ${weeklySum} hours
+        )} /// _kw ${Dates.weekNumber(Dates.getDayOfActiveWeek(1))} /// ${statsSumWeekly}h /// ${linkToEmptyDates}
         `;
     }
 
     static bindScheduler() {
         document.querySelector('.scheduler').addEventListener('click', (e) => {
-            if (e.target.closest('.scheduler__navigation-button')) {
-                if (e.target.closest('.scheduler__navigation-button--today')) {
-                    Store.data.session.activeDay = new Date();
+            if (
+                e.target.closest('.scheduler__navigation-button') ||
+                e.target.closest('.scheduler__navigation-week-link-to-empty')
+            ) {
+                if (e.target.closest('.scheduler__navigation-button')) {
+                    if (e.target.closest('.scheduler__navigation-button--today')) {
+                        Store.data.session.activeDay = new Date();
+                    }
+                    if (e.target.closest('.scheduler__navigation-button--prev-day')) {
+                        Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() - 1);
+                    }
+                    if (e.target.closest('.scheduler__navigation-button--next-day')) {
+                        Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() + 1);
+                    }
+                    if (e.target.closest('.scheduler__navigation-button--prev-week')) {
+                        Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() - 7);
+                    }
+                    if (e.target.closest('.scheduler__navigation-button--next-week')) {
+                        Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() + 7);
+                    }
+                    if (e.target.closest('.scheduler__navigation-button--prev-month')) {
+                        Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() - 28);
+                    }
+                    if (e.target.closest('.scheduler__navigation-button--next-month')) {
+                        Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() + 28);
+                    }
+                    document.querySelector('.metabar__select--filter[name="date"]').value = Dates.dateFormat(
+                        Store.data.session.activeDay,
+                        'Y-m-d'
+                    );
                 }
-                if (e.target.closest('.scheduler__navigation-button--prev-day')) {
-                    Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() - 1);
+                if (e.target.closest('.scheduler__navigation-week-link-to-empty')) {
+                    document.querySelector('.metabar__select--filter[name="date"]').value = '';
+                    document.querySelector('.metabar__select--sort[name="sort_1"]').value = 'priority';
                 }
-                if (e.target.closest('.scheduler__navigation-button--next-day')) {
-                    Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() + 1);
-                }
-                if (e.target.closest('.scheduler__navigation-button--prev-week')) {
-                    Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() - 7);
-                }
-                if (e.target.closest('.scheduler__navigation-button--next-week')) {
-                    Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() + 7);
-                }
-                if (e.target.closest('.scheduler__navigation-button--prev-month')) {
-                    Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() - 28);
-                }
-                if (e.target.closest('.scheduler__navigation-button--next-month')) {
-                    Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() + 28);
-                }
-                document.querySelector('.metabar__select--filter[name="date"]').value = Dates.dateFormat(
-                    Store.data.session.activeDay,
-                    'Y-m-d'
-                );
+
                 Scheduler.initScheduler();
                 Quickbox.initToday();
                 Filter.doFilter();
@@ -522,8 +545,6 @@ export default class Scheduler {
                     return;
                 }
 
-                //console.log(JSON.stringify(['conflict between', d, dates__value]));
-
                 conflict = true;
             });
             if (conflict === false) {
@@ -544,10 +565,6 @@ export default class Scheduler {
                 break;
             }
         }
-
-        //return '';
-        //return '21.01.24 07:00-07:01'; // remove this;
-        //console.log(JSON.parse(JSON.stringify([priority, time, str, d, dates])));
 
         return Dates.dateFormat(d.date, 'd.m.y') + ' ' + Dates.timeFormat(d.begin) + '-' + Dates.timeFormat(d.end);
     }

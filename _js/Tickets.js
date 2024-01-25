@@ -196,7 +196,7 @@ export default class Tickets {
                     });
                     data['updated_at'] = Dates.time().toString();
                     // auto update date
-                    if (data['date'] == '') {
+                    if (data['date'] == '*') {
                         Tickets.setTicketData(el.getAttribute('data-id'), data);
                         data['date'] = Scheduler.determineNextFreeSlotAdvanced(data['priority'], data['time']);
                         el.querySelector('[name="date"]').value = data['date'];
@@ -519,7 +519,7 @@ export default class Tickets {
         document.querySelector('.tickets').addEventListener('input', (e) => {
             if (e.target.value !== '') {
                 if (e.target.closest('.tickets__textarea--date')) {
-                    if (Dates.parseDateString(e.target.value, 'tickets') === false) {
+                    if (e.target.value !== '*' && Dates.parseDateString(e.target.value, 'tickets') === false) {
                         e.target.setCustomValidity('wrong format');
                     } else {
                         e.target.setCustomValidity('');
