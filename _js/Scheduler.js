@@ -196,10 +196,11 @@ export default class Scheduler {
         let linkToEmptyDates = '',
             linkToEmptyDatesSum = 0;
         Store.data.tickets.forEach((tickets__value) => {
-            if (tickets__value.date === '') {
+            if (tickets__value.date === '' && tickets__value.priority === 'A') {
                 linkToEmptyDatesSum += parseFloat(tickets__value.time.replace(',', '.'));
             }
         });
+        linkToEmptyDatesSum = linkToEmptyDatesSum.toString().replace('.', ',');
         linkToEmptyDates +=
             '<a href="#" class="scheduler__navigation-week-link-to-empty">❗' + linkToEmptyDatesSum + 'h❗</a>';
 
@@ -243,6 +244,7 @@ export default class Scheduler {
                         Store.data.session.activeDay,
                         'Y-m-d'
                     );
+                    document.querySelector('.metabar__select--sort[name="sort_1"]').value = '';
                 }
                 if (e.target.closest('.scheduler__navigation-week-link-to-empty')) {
                     document.querySelector('.metabar__select--filter[name="date"]').value = '';
