@@ -7,7 +7,7 @@ import Weather from './Weather';
 import tippy from 'tippy.js';
 
 export default class Scheduler {
-    static hourBegin = 6;
+    static hourBegin = 9;
 
     static initScheduler() {
         document.querySelector('.scheduler').innerHTML = `
