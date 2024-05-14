@@ -12,7 +12,7 @@ export default class Html {
         `
         );
 
-        if (window.innerWidth >= 1900) {
+        if (window.screen.width >= 1900) {
             document.querySelector('#app').insertAdjacentHTML(
                 'afterbegin',
                 `
