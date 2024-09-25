@@ -41,7 +41,7 @@ export default class Dates {
             // 01.01.18
             // 01.01.18 09:00-10:00
             if (
-                new RegExp('^[0-9][0-9].[0-9][0-9].[1-2][0-9]( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?$').test(
+                new RegExp('^[0-9][0-9].[0-9][0-9].[1-3][0-9]( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?$').test(
                     string__value
                 )
             ) {
@@ -100,7 +100,7 @@ export default class Dates {
             // MO%2 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
             else if (
                 new RegExp(
-                    '^(MO|DI|MI|DO|FR|SA|SO)((#|~|%)[1-9][0-9]?)?( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?( (-|>|<)[0-9][0-9].[0-9][0-9].[1-2][0-9])*$'
+                    '^(MO|DI|MI|DO|FR|SA|SO)((#|~|%)[1-9][0-9]?)?( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?( (-|>|<)[0-9][0-9].[0-9][0-9].[1-3][0-9])*$'
                 ).test(string__value)
             ) {
                 if (view === 'today') {
@@ -186,7 +186,7 @@ export default class Dates {
             // 01.01. 09:00-10:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
             else if (
                 new RegExp(
-                    '^[0-9][0-9].[0-9][0-9].( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?( (-|>|<)[0-9][0-9].[0-9][0-9].[1-2][0-9])*$'
+                    '^[0-9][0-9].[0-9][0-9].( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?( (-|>|<)[0-9][0-9].[0-9][0-9].[1-3][0-9])*$'
                 ).test(string__value)
             ) {
                 let year = null;
@@ -529,7 +529,7 @@ export default class Dates {
     static includeNewLowerBoundInDate(date, lowerBound) {
         date = date.split('\n');
         date.forEach((date__value, date__key) => {
-            let match = date__value.match(new RegExp('>[0-9][0-9].[0-9][0-9].[1-2][0-9]', 'g')),
+            let match = date__value.match(new RegExp('>[0-9][0-9].[0-9][0-9].[1-3][0-9]', 'g')),
                 isObsolete = false;
             if (match !== null) {
                 match.forEach((match__value) => {
