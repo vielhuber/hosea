@@ -65,7 +65,7 @@ class Ticket extends Api
             $interval_next = null;
         } else {
             $interval_prev = 15;
-            $interval_next = 25;
+            $interval_next = 75;
         }
 
         $query =
@@ -88,7 +88,7 @@ class Ticket extends Api
                 (
                 date NOT REGEXP ?
                 OR
-                (                    
+                (
                 ' .
             ($interval_prev === null
                 ? '1=1'
@@ -99,7 +99,7 @@ class Ticket extends Api
             ($interval_next === null
                 ? '1=1'
                 : 'STR_TO_DATE(date,\'%d.%m.%y\') < DATE_ADD(NOW(), INTERVAL ' . $interval_next . ' DAY)') .
-            '                    
+            '
                 )
                 )
             GROUP BY tickets.id
@@ -108,7 +108,7 @@ class Ticket extends Api
         $tickets = $this::$db->fetch_all(
             $query,
             $this::$auth->getCurrentUserId(),
-            '^[0-9][0-9]\.[0-9][0-9]\.[0-9][0-9]( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?$'
+            '^[0-9][0-9]\.[0-9][0-9]\.[0-9][0-9]( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?'
         );
         foreach ($tickets as $tickets__key => $tickets__value) {
             if ($tickets__value['attachments'] == '') {
