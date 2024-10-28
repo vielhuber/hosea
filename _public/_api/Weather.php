@@ -41,7 +41,7 @@ class Weather extends Api
     protected function index()
     {
         $response = @file_get_contents(
-            'https://api.openweathermap.org/data/2.5/onecall' .
+            'https://api.openweathermap.org/data/3.0/onecall' .
                 '?lat=' .
                 $this->lat .
                 '&lon=' .

@@ -23,7 +23,12 @@ export default class Weather {
         });
     }
     static outputWeather(date) {
-        if (!(Dates.dateFormat(date, 'Y-m-d') in Store.data.weather)) {
+        if (
+            Store.data.weather === undefined ||
+            Store.data.weather === null ||
+            Store.data.weather === '' ||
+            !(Dates.dateFormat(date, 'Y-m-d') in Store.data.weather)
+        ) {
             return '';
         }
         let html = '',
