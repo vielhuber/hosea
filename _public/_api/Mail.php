@@ -301,6 +301,7 @@ class Mail extends Api
             'date' => $messages__value
                 ->getDate()
                 ->toDate()
+                ->setTimezone(date_default_timezone_get())
                 ->format('Y-m-d H:i:s'),
             'subject' => $subject,
             'eml' => base64_encode(
