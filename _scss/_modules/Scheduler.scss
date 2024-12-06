@@ -1,5 +1,5 @@
 .scheduler {
-    width: calc(33.33% - #{$space-big});
+    width: calc((100% - #{$container-width-big}) - #{$space-big});
     bottom: calc(
         #{$footer-height} + #{$space-big} + ((100% - (2 * #{$space-big}) - #{$footer-height}) / 3) +
             (0.5 * #{$space-big})
@@ -12,6 +12,9 @@
     overflow: hidden;
     @include border;
     @include shadow;
+    .view-mode--shifting & {
+        width: calc((100% - #{$container-width-small}) - #{$space-big});
+    }
 }
 
 .scheduler__navigation {
@@ -58,7 +61,6 @@
 }
 
 .scheduler__cell {
-    width: 12.5%;
     height: 100%;
     padding: 0 $space-small;
     float: left;
@@ -100,7 +102,6 @@
 
 .scheduler__appointment {
     position: absolute;
-    width: calc(12.5% - 4rem);
     padding: 1rem 3rem;
     font-size: $font-size-medium;
     line-height: 8rem;
