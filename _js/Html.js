@@ -12,6 +12,8 @@ export default class Html {
         `
         );
 
+        document.querySelector('#app').classList.add('view-mode--' + (Store.data.shiftingView ? 'shifting' : ''));
+
         if (window.screen.width >= 1900) {
             document.querySelector('#app').insertAdjacentHTML(
                 'afterbegin',
@@ -180,7 +182,7 @@ DD%N: weekday in calendar week %N=0 (if >X specified, N -= calendar week of X)
                 <label class="tickets__upload" title="_upload">
                     <input class="tickets__upload-input" type="file" name="attachments" multiple="multiple" />
                 </label>
-   
+
             </td>
             <td class="tickets__table-cell">
                 <a href="#" class="tickets__entry__delete">x</a>
