@@ -1,5 +1,5 @@
 .quickbox {
-    width: calc(33.33% - #{$space-big});
+    width: calc((100% - #{$container-width-big}) - #{$space-big});
     bottom: calc(#{$footer-height} + #{$space-big});
     right: $space-big;
     top: calc(#{$space-big} + ((100% - (2 * #{$space-big}) - #{$footer-height}) / 1.5) + (0.5 * #{$space-big}));
@@ -9,6 +9,9 @@
     overflow: hidden;
     @include border;
     @include shadow;
+    .view-mode--shifting & {
+        width: calc((100% - #{$container-width-small}) - #{$space-big});
+    }
 }
 
 .quickbox__content {
