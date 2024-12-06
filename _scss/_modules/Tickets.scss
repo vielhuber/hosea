@@ -1,5 +1,5 @@
 .tickets {
-    width: calc(66.66% - 2 * #{$space-big});
+    width: calc(#{$container-width-big} - 2 * #{$space-big});
     bottom: calc(#{$space-big} + #{$footer-height});
     left: $space-big;
     top: $space-big;
@@ -8,6 +8,9 @@
     position: absolute;
     @include border;
     @include shadow;
+    .view-mode--shifting & {
+        width: calc(#{$container-width-small} - 2 * #{$space-big});
+    }
 }
 
 .tickets__table-container {
