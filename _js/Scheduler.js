@@ -25,8 +25,8 @@ export default class Scheduler {
             <table class="scheduler__table">
                 <thead class="scheduler__table-head">
                     <tr class="scheduler__row">
-                        <td class="scheduler__cell"></td>   
-                        ${Array(7)
+                        <td class="scheduler__cell"></td>
+                        ${Array(Store.data.shiftingView ? Store.data.shiftingDays : 7)
                             .join(0)
                             .split(0)
                             .map(
@@ -52,7 +52,7 @@ export default class Scheduler {
                     </tr>
                     <tr class="scheduler__row">
                         <td class="scheduler__cell"></td>
-                        ${Array(7)
+                        ${Array(Store.data.shiftingView ? Store.data.shiftingDays : 7)
                             .join(0)
                             .split(0)
                             .map(
@@ -79,8 +79,8 @@ export default class Scheduler {
                 </thead>
                 <tbody class="scheduler__table-body">
                     <tr class="scheduler__row">
-                        <td class="scheduler__cell"></td>   
-                        ${Array(7)
+                        <td class="scheduler__cell"></td>
+                        ${Array(Store.data.shiftingView ? Store.data.shiftingDays : 7)
                             .join(0)
                             .split(0)
                             .map(
@@ -112,7 +112,7 @@ export default class Scheduler {
                                 <td class="scheduler__cell">${('0' + j).slice(-2)}&ndash;${('0' + (j + 1)).slice(
                                 -2
                             )}</td>
-                                ${Array(7)
+                                ${Array(Store.data.shiftingView ? Store.data.shiftingDays : 7)
                                     .join(0)
                                     .split(0)
                                     .map(
@@ -130,8 +130,11 @@ export default class Scheduler {
                                                 : ''
                                         }
                                         ${
-                                            i < 5 && ((j >= 9 && j < 13) || (j >= 14 && j < 18))
-                                                ? ' scheduler__cell--main'
+                                            // MO-FR
+                                            [1, 2, 3, 4, 5].includes(Dates.getDayOfActiveWeek(i + 1).getDay()) &&
+                                            // 09:00-13:00, 14:00-18:00
+                                            ((j >= 9 && j < 13) || (j >= 14 && j < 18))
+                                                ? Dates.getDayOfActiveWeek(i + 1).getDay() + ' scheduler__cell--main'
                                                 : ''
                                         }
                                     ">
@@ -149,6 +152,10 @@ export default class Scheduler {
             <div class="scheduler__appointments">
             </div>
         `;
+
+        document.querySelectorAll('.scheduler__cell').forEach(($el) => {
+            $el.style.width = 100 / ((Store.data.shiftingView ? Store.data.shiftingDays : 7) + 1) + '%';
+        });
 
         let generatedDates = Scheduler.generateDates();
 
@@ -413,15 +420,17 @@ export default class Scheduler {
                 posBottom = 100 - heightFrac * (date__value.end - (Scheduler.hourBegin - 1));
             }
 
-            let width, posLeft;
+            let width,
+                posLeft,
+                fraction = 100 / ((Store.data.shiftingView ? Store.data.shiftingDays : 7) + 1);
             if (!('conflict' in date__value)) {
-                width = 'calc(12.5% - 4rem)';
-                posLeft = 12.5 * date__value.day;
+                width = 'calc(' + fraction + '% - 4rem)';
+                posLeft = fraction * date__value.day;
             } else {
-                width = 'calc(' + 12.5 / conflicts[date__value.conflict].count + '% - 4rem)';
+                width = 'calc(' + fraction / conflicts[date__value.conflict].count + '% - 4rem)';
                 posLeft =
-                    12.5 * date__value.day +
-                    (12.5 / conflicts[date__value.conflict].count) * conflicts[date__value.conflict].painted;
+                    fraction * date__value.day +
+                    (fraction / conflicts[date__value.conflict].count) * conflicts[date__value.conflict].painted;
                 conflicts[date__value.conflict].painted++;
             }
 
@@ -551,7 +560,6 @@ export default class Scheduler {
             });
             if (conflict === false) {
                 let differenceInWeeks = Dates.dateDiffInWeeks(d.date, new Date());
-                console.log('differenceInWeeks: ' + differenceInWeeks);
                 if (priority !== undefined && priority !== null && priority !== '') {
                     if (
                         (priority === 'A' && differenceInWeeks <= -1) ||
