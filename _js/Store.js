@@ -10,7 +10,7 @@ export default class Store {
             mails: null,
             weather: null,
             shiftingView: true,
-            shiftingDays: 14,
+            shiftingDays: 21,
             cols: ['status', 'priority', 'date', 'time', 'project', 'description'],
             colors: {
                 status: {

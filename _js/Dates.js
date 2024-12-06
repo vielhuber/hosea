@@ -124,6 +124,7 @@ export default class Dates {
                         let dayOfActiveWeek = this.getDayOfActiveWeek(0).getDay() + 1,
                             dayOfDateToParse = Dates.getDayFromString(string__value.substring(0, 2)),
                             dayOfDateToParseShift = dayOfDateToParse - dayOfActiveWeek;
+                        /* TODO */
                         while (dayOfDateToParseShift <= 13) {
                             if (dayOfDateToParseShift >= 0) {
                                 d_all.push(Dates.getDayOfActiveWeek(dayOfDateToParseShift + 1));
