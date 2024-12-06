@@ -18,10 +18,14 @@ export default class Dates {
     }
 
     static getDayOfWeek(shift, date) {
-        let d = new Date(date),
-            day = d.getDay(),
-            diff = d.getDate() - day + (day == 0 ? -6 : 1) + (shift - 1);
-        return new Date(d.setDate(diff));
+        let d = new Date(date);
+        if (Store.data.shiftingView) {
+            return this.addDays(d, shift - 1);
+        } else {
+            let day = d.getDay(),
+                diff = d.getDate() - day + (day == 0 ? -6 : 1) + (shift - 1);
+            return new Date(d.setDate(diff));
+        }
     }
 
     static parseDateString(string, view) {
@@ -80,9 +84,17 @@ export default class Dates {
                     d.setMinutes(((begin === null ? 0 : begin) % 1) * 60);
                     d.setSeconds(0);
                     d.setMilliseconds(0);
+
+                    let day = null;
+                    if (Store.data.shiftingView) {
+                        day = this.dateDiffInDays(d, Store.data.session.activeDay) + 1;
+                    } else {
+                        day = ((d.getDay() + 6) % 7) + 1;
+                    }
+
                     ret.push({
                         date: d,
-                        day: ((d.getDay() + 6) % 7) + 1,
+                        day: day,
                         begin: begin,
                         end: end,
                         time: end - begin,
@@ -103,82 +115,107 @@ export default class Dates {
                     '^(MO|DI|MI|DO|FR|SA|SO)((#|~|%)[1-9][0-9]?)?( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?( (-|>|<)[0-9][0-9].[0-9][0-9].[1-3][0-9])*$'
                 ).test(string__value)
             ) {
+                let d_all = [];
+
                 if (view === 'today') {
-                    d = Dates.getDayOfCurrentWeek(Dates.getDayFromString(string__value.substring(0, 2)));
+                    d_all.push(Dates.getDayOfCurrentWeek(Dates.getDayFromString(string__value.substring(0, 2))));
                 } else {
-                    d = Dates.getDayOfActiveWeek(Dates.getDayFromString(string__value.substring(0, 2)));
-                }
-                if (isNaN(d)) {
-                    error = true;
-                    return;
-                }
-                if (view !== 'all' && Dates.dateIsExcluded(d, string__value)) {
-                    return;
-                }
-
-                if (view !== 'all' && string__value.substring(2, 3) === '#') {
-                    let num = parseInt(string__value.substring(3, 5).trim()),
-                        nthWeekdayOfMonth = this.nthWeekdayOfMonth(d);
-                    if (num % 4 !== nthWeekdayOfMonth) {
-                        return;
-                    }
-                    if ((d.getMonth() + 1) % (Math.floor((num - 1) / 4) + 1) !== 0) {
-                        return;
+                    if (Store.data.shiftingView) {
+                        let dayOfActiveWeek = this.getDayOfActiveWeek(0).getDay() + 1,
+                            dayOfDateToParse = Dates.getDayFromString(string__value.substring(0, 2)),
+                            dayOfDateToParseShift = dayOfDateToParse - dayOfActiveWeek;
+                        while (dayOfDateToParseShift <= 13) {
+                            if (dayOfDateToParseShift >= 0) {
+                                d_all.push(Dates.getDayOfActiveWeek(dayOfDateToParseShift + 1));
+                            }
+                            dayOfDateToParseShift += 7;
+                        }
+                    } else {
+                        d_all.push(Dates.getDayOfActiveWeek(Dates.getDayFromString(string__value.substring(0, 2))));
                     }
                 }
 
-                if (view !== 'all' && string__value.substring(2, 3) === '~') {
-                    let num = parseInt(string__value.substring(3, 5).trim()),
-                        weekNumber = this.weekNumber(d);
-                    if (num != weekNumber) {
-                        return;
+                for (let d of d_all) {
+                    if (isNaN(d)) {
+                        error = true;
+                        continue;
                     }
-                }
+                    if (view !== 'all' && Dates.dateIsExcluded(d, string__value)) {
+                        continue;
+                    }
 
-                if (view !== 'all' && string__value.substring(2, 3) === '%') {
-                    let num = parseInt(string__value.substring(3, 5).trim()),
-                        weekNumber = this.weekNumber(d),
-                        match = string__value.match(/>([0-9][0-9]\.[0-9][0-9]\.[0-9][0-9])/i);
-                    if (match) {
-                        weekNumber -= this.weekNumber(new Date(Dates.germanToEnglishString(match[1])));
+                    if (view !== 'all' && string__value.substring(2, 3) === '#') {
+                        let num = parseInt(string__value.substring(3, 5).trim()),
+                            nthWeekdayOfMonth = this.nthWeekdayOfMonth(d);
+                        if (num % 4 !== nthWeekdayOfMonth) {
+                            continue;
+                        }
+                        if ((d.getMonth() + 1) % (Math.floor((num - 1) / 4) + 1) !== 0) {
+                            continue;
+                        }
                     }
-                    if (weekNumber % num !== 0) {
-                        return;
-                    }
-                }
 
-                if (
-                    (view === 'tickets' && Dates.dateIsActiveDay(d)) ||
-                    (view === 'scheduler' && Dates.dateIsInActiveWeek(d)) ||
-                    (view === 'today' && Dates.dateIsToday(d)) ||
-                    view === 'all'
-                ) {
-                    let begin = null,
-                        end = null;
-                    if (string__value.split(':').length === 3) {
-                        let shift = string__value.indexOf(':') - 2;
-                        begin =
-                            parseInt(string__value.substring(shift, shift + 2)) +
-                            parseInt(string__value.substring(shift + 3, shift + 5)) / 60;
-                        end =
-                            parseInt(string__value.substring(shift + 6, shift + 8)) +
-                            parseInt(string__value.substring(shift + 9, shift + 11)) / 60;
+                    if (view !== 'all' && string__value.substring(2, 3) === '~') {
+                        let num = parseInt(string__value.substring(3, 5).trim()),
+                            weekNumber = this.weekNumber(d);
+                        if (num != weekNumber) {
+                            continue;
+                        }
                     }
-                    if (end === 0) {
-                        end = 24;
+
+                    if (view !== 'all' && string__value.substring(2, 3) === '%') {
+                        let num = parseInt(string__value.substring(3, 5).trim()),
+                            weekNumber = this.weekNumber(d),
+                            match = string__value.match(/>([0-9][0-9]\.[0-9][0-9]\.[0-9][0-9])/i);
+                        if (match) {
+                            weekNumber -= this.weekNumber(new Date(Dates.germanToEnglishString(match[1])));
+                        }
+                        if (weekNumber % num !== 0) {
+                            continue;
+                        }
                     }
-                    d.setHours(Math.floor(begin));
-                    d.setMinutes((begin % 1) * 60);
-                    d.setSeconds(0);
-                    d.setMilliseconds(0);
-                    ret.push({
-                        date: d,
-                        day: ((d.getDay() + 6) % 7) + 1,
-                        begin: begin,
-                        end: end,
-                        time: end - begin,
-                        minutes_left: this.dateDiffInMinutes(d, new Date()),
-                    });
+
+                    if (
+                        (view === 'tickets' && Dates.dateIsActiveDay(d)) ||
+                        (view === 'scheduler' && Dates.dateIsInActiveWeek(d)) ||
+                        (view === 'today' && Dates.dateIsToday(d)) ||
+                        view === 'all'
+                    ) {
+                        let begin = null,
+                            end = null;
+                        if (string__value.split(':').length === 3) {
+                            let shift = string__value.indexOf(':') - 2;
+                            begin =
+                                parseInt(string__value.substring(shift, shift + 2)) +
+                                parseInt(string__value.substring(shift + 3, shift + 5)) / 60;
+                            end =
+                                parseInt(string__value.substring(shift + 6, shift + 8)) +
+                                parseInt(string__value.substring(shift + 9, shift + 11)) / 60;
+                        }
+                        if (end === 0) {
+                            end = 24;
+                        }
+                        d.setHours(Math.floor(begin));
+                        d.setMinutes((begin % 1) * 60);
+                        d.setSeconds(0);
+                        d.setMilliseconds(0);
+
+                        let day = null;
+                        if (Store.data.shiftingView) {
+                            day = this.dateDiffInDays(d, Store.data.session.activeDay) + 1;
+                        } else {
+                            day = ((d.getDay() + 6) % 7) + 1;
+                        }
+
+                        ret.push({
+                            date: d,
+                            day: day,
+                            begin: begin,
+                            end: end,
+                            time: end - begin,
+                            minutes_left: this.dateDiffInMinutes(d, new Date()),
+                        });
+                    }
                 }
             }
 
@@ -234,9 +271,17 @@ export default class Dates {
                     d.setMinutes((begin % 1) * 60);
                     d.setSeconds(0);
                     d.setMilliseconds(0);
+
+                    let day = null;
+                    if (Store.data.shiftingView) {
+                        day = this.dateDiffInDays(d, Store.data.session.activeDay) + 1;
+                    } else {
+                        day = ((d.getDay() + 6) % 7) + 1;
+                    }
+
                     ret.push({
                         date: d,
-                        day: ((d.getDay() + 6) % 7) + 1,
+                        day: day,
                         begin: begin,
                         end: end,
                         time: end - begin,
@@ -353,7 +398,15 @@ export default class Dates {
             return false;
         }
         d = new Date(d);
-        return Dates.sameDay(Dates.getDayOfWeek(1, d), Dates.getDayOfActiveWeek(1));
+
+        if (Store.data.shiftingView) {
+            return (
+                Dates.dateDiffInDays(d, Store.data.session.activeDay) < 14 &&
+                Dates.dateDiffInDays(d, Store.data.session.activeDay) >= 0
+            );
+        } else {
+            return Dates.sameDay(Dates.getDayOfWeek(1, d), Dates.getDayOfActiveWeek(1));
+        }
     }
 
     static dateIsActiveDay(d) {
@@ -446,6 +499,18 @@ export default class Dates {
         return Math.round((d1 - d2) / (1000 * 60));
     }
 
+    static dateDiffInDays(d1, d2) {
+        d1.setHours(0);
+        d1.setMinutes(0);
+        d1.setSeconds(0);
+        d1.setMilliseconds(0);
+        d2.setHours(0);
+        d2.setMinutes(0);
+        d2.setSeconds(0);
+        d2.setMilliseconds(0);
+        return Math.round((d1 - d2) / (1000 * 60 * 60 * 24));
+    }
+
     static dateDiffInWeeks(d1, d2) {
         let weekNumber1 = this.weekNumber(d1),
             weekNumber2 = this.weekNumber(d2),
@@ -460,6 +525,11 @@ export default class Dates {
         return weekNumber1 - weekNumber2;
     }
 
+    static addDays(date, days) {
+        let result = new Date(date);
+        result.setDate(result.getDate() + days);
+        return result;
+    }
     static weekNumber(d) {
         d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
         let dayNum = d.getUTCDay() || 7;
