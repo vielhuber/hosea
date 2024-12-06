@@ -9,6 +9,8 @@ export default class Store {
             tickets: null,
             mails: null,
             weather: null,
+            shiftingView: true,
+            shiftingDays: 14,
             cols: ['status', 'priority', 'date', 'time', 'project', 'description'],
             colors: {
                 status: {
