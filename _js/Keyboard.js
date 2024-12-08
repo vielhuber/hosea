@@ -3,10 +3,15 @@ import Helper from './Helper';
 
 export default class Keyboard {
     static initKeyboardNavigation() {
+        Keyboard.initKeyboardNavigationTickets();
+        Keyboard.initKeyboardNavigationScheduler();
+    }
+
+    static initKeyboardNavigationTickets() {
         // one more keyboard event is needed (so that jumps are not too early)
         // therefore we save the previous cursor pointer here
         let selectionEndBefore = 1;
-        document.querySelector('.tickets').addEventListener('keyup', e => {
+        document.querySelector('.tickets').addEventListener('keyup', (e) => {
             if (!e.target || (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA')) {
                 return;
             }
@@ -28,23 +33,13 @@ export default class Keyboard {
                 e.preventDefault();
             }
             // arrow left (switch)
-            else if (
-                e.keyCode === 37 &&
-                left !== null &&
-                e.target.selectionEnd <= 0 &&
-                selectionEndBefore <= 0
-            ) {
+            else if (e.keyCode === 37 && left !== null && e.target.selectionEnd <= 0 && selectionEndBefore <= 0) {
                 left.querySelector('input, textarea').select();
                 selectionEndBefore = 1;
                 e.preventDefault();
             }
             // arrow top (switch)
-            else if (
-                e.keyCode === 38 &&
-                top !== undefined &&
-                e.target.selectionEnd <= 0 &&
-                selectionEndBefore <= 0
-            ) {
+            else if (e.keyCode === 38 && top !== undefined && e.target.selectionEnd <= 0 && selectionEndBefore <= 0) {
                 top.querySelector('td:nth-child(' + index + ')')
                     .querySelector('input, textarea')
                     .select();
@@ -69,12 +64,32 @@ export default class Keyboard {
         });
     }
 
+    static initKeyboardNavigationScheduler() {
+        document.addEventListener('keydown', (e) => {
+            console.log(e.keyCode);
+            if (e.target !== document.body) {
+                return;
+            }
+            let assignedKeys = {
+                37: 'prev-day', // arrow left
+                39: 'next-day', // arrow right
+                33: 'prev-week', // page up
+                34: 'next-week', // page down
+            };
+            console.log([Object.keys(assignedKeys), Object.keys(assignedKeys).includes(e.keyCode), e.keyCode]);
+            if (Object.keys(assignedKeys).includes(e.keyCode.toString())) {
+                document.querySelector('.scheduler__navigation-button--' + assignedKeys[e.keyCode]).click();
+                e.preventDefault();
+            }
+        });
+    }
+
     static bindRefresh() {
         // f5
-        document.addEventListener('keydown', event => {
-            if (event.keyCode === 116) {
+        document.addEventListener('keydown', (e) => {
+            if (e.keyCode === 116) {
                 Filter.doFilter();
-                event.preventDefault();
+                e.preventDefault();
             }
         });
     }

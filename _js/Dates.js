@@ -124,8 +124,7 @@ export default class Dates {
                         let dayOfActiveWeek = this.getDayOfActiveWeek(0).getDay() + 1,
                             dayOfDateToParse = Dates.getDayFromString(string__value.substring(0, 2)),
                             dayOfDateToParseShift = dayOfDateToParse - dayOfActiveWeek;
-                        /* TODO */
-                        while (dayOfDateToParseShift <= 13) {
+                        while (dayOfDateToParseShift <= Store.data.shiftingDays - 1) {
                             if (dayOfDateToParseShift >= 0) {
                                 d_all.push(Dates.getDayOfActiveWeek(dayOfDateToParseShift + 1));
                             }
@@ -402,7 +401,7 @@ export default class Dates {
 
         if (Store.data.shiftingView) {
             return (
-                Dates.dateDiffInDays(d, Store.data.session.activeDay) < 14 &&
+                Dates.dateDiffInDays(d, Store.data.session.activeDay) < Store.data.shiftingDays &&
                 Dates.dateDiffInDays(d, Store.data.session.activeDay) >= 0
             );
         } else {

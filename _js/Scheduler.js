@@ -14,11 +14,11 @@ export default class Scheduler {
             <div class="scheduler__navigation">
                 <span class="scheduler__navigation-week"></span>
                 <a href="#" class="scheduler__navigation-button scheduler__navigation-button--next-month" title="_next_month">&gt;&gt;&gt;</a>
-                <a href="#" class="scheduler__navigation-button scheduler__navigation-button--next-week" title="_next_week">&gt;&gt;</a>
-                <a href="#" class="scheduler__navigation-button scheduler__navigation-button--next-day" title="_next_day">&gt;</a>
+                <a href="#" class="scheduler__navigation-button scheduler__navigation-button--next-week" title="_next_week [⤴page down]">&gt;&gt;</a>
+                <a href="#" class="scheduler__navigation-button scheduler__navigation-button--next-day" title="_next_day [⤴right arrow]">&gt;</a>
                 <a href="#" class="scheduler__navigation-button scheduler__navigation-button--today" title="_next_today">_</a>
-                <a href="#" class="scheduler__navigation-button scheduler__navigation-button--prev-day" title="_prev_day">&lt;</a>
-                <a href="#" class="scheduler__navigation-button scheduler__navigation-button--prev-week" title="_prev_week">&lt;&lt;</a>
+                <a href="#" class="scheduler__navigation-button scheduler__navigation-button--prev-day" title="_prev_day [⤴left arrow]">&lt;</a>
+                <a href="#" class="scheduler__navigation-button scheduler__navigation-button--prev-week" title="_prev_week [⤴page up]">&lt;&lt;</a>
                 <a href="#" class="scheduler__navigation-button scheduler__navigation-button--prev-month" title="_prev_month">&lt;&lt;&lt;</a>
             </div>
 
