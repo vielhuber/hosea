@@ -37,6 +37,7 @@ export default class App {
         Tickets.bindSave();
         Footer.bindSave();
         Footer.bindCreate();
+        Footer.bindView();
         Footer.bindLogout();
         Footer.linkApiKey();
         Footer.initStatus();
