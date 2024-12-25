@@ -66,7 +66,6 @@ export default class Keyboard {
 
     static initKeyboardNavigationScheduler() {
         document.addEventListener('keydown', (e) => {
-            console.log(e.keyCode);
             if (e.target !== document.body) {
                 return;
             }
@@ -76,7 +75,6 @@ export default class Keyboard {
                 33: 'prev-week', // page up
                 34: 'next-week', // page down
             };
-            console.log([Object.keys(assignedKeys), Object.keys(assignedKeys).includes(e.keyCode), e.keyCode]);
             if (Object.keys(assignedKeys).includes(e.keyCode.toString())) {
                 document.querySelector('.scheduler__navigation-button--' + assignedKeys[e.keyCode]).click();
                 e.preventDefault();
