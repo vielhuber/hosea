@@ -285,6 +285,8 @@ class Mail extends Api
         foreach (['iframe', 'script'] as $tags__value) {
             $content = preg_replace('/<' . $tags__value . '.*?>(.*)?<\/' . $tags__value . '>/ims', '', $content);
         }
+        // remove external scripts
+        $content = preg_replace('/<link.+?href=".+?>/', '', $content);
 
         $subject = @$messages__value->getSubject()[0];
         $subject = trim($subject);
