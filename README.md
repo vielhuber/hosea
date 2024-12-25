@@ -7,7 +7,7 @@ hosea is a personal assistant.
 ## features
 
 -   ticket table view
--   scheduler view
+-   scheduler views (fixed, shifting, different week numbers)
 -   recurring events
 -   convert recurring events to scheduled events
 -   attach emails or documents to tickets
