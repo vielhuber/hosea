@@ -46,7 +46,7 @@ export default class Tickets {
         });
     }
     static fetchAndRenderTicketsInterval() {
-        if (hlp.isDesktop()) {
+        if (!hlp.isMobile()) {
             setInterval(() => {
                 if (Store.data.busy === true) {
                     return;
@@ -96,7 +96,6 @@ export default class Tickets {
                             }).length > 0;
                         if (exists === false) {
                             document.querySelector('.tickets__entry[data-id="' + tickets__value.id + '"]').remove();
-                            //console.log('removing ticket ' + tickets__value.id);
                         }
                         return exists;
                     });
@@ -113,7 +112,6 @@ export default class Tickets {
                                 document.querySelector(
                                     '.tickets__entry[data-id="' + tickets__value.id + '"]'
                                 ).outerHTML = Html.createHtmlLine(tickets__value, false);
-                                //console.log('editing ticket ' + tickets__value.id);
                             }
                         });
                     });
@@ -130,7 +128,6 @@ export default class Tickets {
                             document
                                 .querySelector('.tickets__table-body')
                                 .insertAdjacentHTML('beforeend', Html.createHtmlLine(tickets__value, false));
-                            //console.log('adding ticket ' + tickets__value.id);
                         }
                     });
 
@@ -250,16 +247,28 @@ export default class Tickets {
                     cache: 'no-cache',
                     headers: { 'content-type': 'application/json' },
                 })
-                .then((res) => res.json())
-                .catch((err) => {
-                    reject(err);
+                .then((response) => {
+                    let data = response.json(),
+                        status = response.status;
+                    if (status == 200 || status == 304) {
+                        return data;
+                    }
+                    return { success: false, message: status };
+                })
+                .catch((error) => {
+                    return { success: false, message: error };
                 })
                 .then((response) => {
                     Store.data.busy = false;
-                    ticket.id = response.data.id;
-                    ticket.visible = true;
-                    Store.data.tickets.push(ticket);
-                    resolve(ticket);
+                    if (response.success === false) {
+                        reject(response.message);
+                        return;
+                    } else {
+                        ticket.id = response.data.id;
+                        ticket.visible = true;
+                        Store.data.tickets.push(ticket);
+                        resolve(ticket);
+                    }
                 });
         });
     }
@@ -431,77 +440,82 @@ export default class Tickets {
     }
 
     static createAndAppendTicket(data, current = null, currentCol = 1, withSelect = true, doFilter = false) {
-        if (['tonight', 'weekend', 'next'].includes(data.date)) {
-            let d = new Date();
-            /*
-            if (d.getHours() >= 21) {
-                d.setDate(d.getDate() + 1);
-                d.setHours(9);
-            }
-            */
-            if (data.date === 'weekend') {
-                while (d.getDay() % 6 !== 0) {
+        return new Promise((resolve, reject) => {
+            if (['tonight', 'weekend', 'next'].includes(data.date)) {
+                let d = new Date();
+                /*
+                if (d.getHours() >= 21) {
                     d.setDate(d.getDate() + 1);
+                    d.setHours(9);
                 }
-            }
-            if (data.date === 'next') {
-                data.date = Scheduler.determineNextFreeSlot(
-                    ('0' + d.getDate()).slice(-2) +
+                */
+                if (data.date === 'weekend') {
+                    while (d.getDay() % 6 !== 0) {
+                        d.setDate(d.getDate() + 1);
+                    }
+                }
+                if (data.date === 'next') {
+                    data.date = Scheduler.determineNextFreeSlot(
+                        ('0' + d.getDate()).slice(-2) +
+                            '.' +
+                            ('0' + (d.getMonth() + 1)).slice(-2) +
+                            '.' +
+                            d.getFullYear().toString().substr(-2) +
+                            ' ' +
+                            Dates.timeFormat(d.getHours() + 1) +
+                            '-' +
+                            Dates.timeFormat(d.getHours() + 1.5)
+                    );
+                } else {
+                    data.date =
+                        ('0' + d.getDate()).slice(-2) +
                         '.' +
                         ('0' + (d.getMonth() + 1)).slice(-2) +
                         '.' +
                         d.getFullYear().toString().substr(-2) +
-                        ' ' +
-                        Dates.timeFormat(d.getHours() + 1) +
-                        '-' +
-                        Dates.timeFormat(d.getHours() + 1.5)
-                );
-            } else {
-                data.date =
-                    ('0' + d.getDate()).slice(-2) +
-                    '.' +
-                    ('0' + (d.getMonth() + 1)).slice(-2) +
-                    '.' +
-                    d.getFullYear().toString().substr(-2) +
-                    ' 21:00-21:30';
+                        ' 21:00-21:30';
+                }
             }
-        }
 
-        Tickets.createTicket(data)
-            .then((ticket) => {
-                let next;
-                if (current !== null) {
-                    current.insertAdjacentHTML('afterend', Html.createHtmlLine(ticket, true));
-                    next = current.nextElementSibling;
-                } else {
-                    document
-                        .querySelector('.tickets .tickets__table-body')
-                        .insertAdjacentHTML('beforeend', Html.createHtmlLine(ticket, true));
-                    next = document
-                        .querySelector('.tickets .tickets__table-body')
-                        .querySelector('.tickets__entry--visible[data-id="' + ticket.id + '"]');
-                }
-                if (withSelect === true) {
-                    let input = next.querySelector('td:nth-child(' + currentCol + ')').querySelector('input, textarea');
-                    input.select();
-                    input.dispatchEvent(new Event('input', { bubbles: true }));
-                }
-                Scheduler.initScheduler();
-                Scheduler.updateColors();
-                Quickbox.initToday();
-                Tickets.updateSum();
-                Filter.updateFilter();
-                Textarea.textareaSetVisibleHeights();
-                if (doFilter === true) {
-                    Filter.doFilter();
-                }
-                if ('attachments' in data && data.attachments.length > 0) {
-                    Attachments.startUploadsAndBuildHtml(ticket.id, data.attachments);
-                }
-            })
-            .catch((error) => {
-                console.error(error);
-            });
+            Tickets.createTicket(data)
+                .then((ticket) => {
+                    let next;
+                    if (current !== null) {
+                        current.insertAdjacentHTML('afterend', Html.createHtmlLine(ticket, true));
+                        next = current.nextElementSibling;
+                    } else {
+                        document
+                            .querySelector('.tickets .tickets__table-body')
+                            .insertAdjacentHTML('beforeend', Html.createHtmlLine(ticket, true));
+                        next = document
+                            .querySelector('.tickets .tickets__table-body')
+                            .querySelector('.tickets__entry--visible[data-id="' + ticket.id + '"]');
+                    }
+                    if (withSelect === true) {
+                        let input = next
+                            .querySelector('td:nth-child(' + currentCol + ')')
+                            .querySelector('input, textarea');
+                        input.select();
+                        input.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+                    Scheduler.initScheduler();
+                    Scheduler.updateColors();
+                    Quickbox.initToday();
+                    Tickets.updateSum();
+                    Filter.updateFilter();
+                    Textarea.textareaSetVisibleHeights();
+                    if (doFilter === true) {
+                        Filter.doFilter();
+                    }
+                    if ('attachments' in data && data.attachments.length > 0) {
+                        Attachments.startUploadsAndBuildHtml(ticket.id, data.attachments);
+                    }
+                    resolve({ success: true });
+                })
+                .catch(() => {
+                    reject({ success: false });
+                });
+        });
     }
 
     static bindChangeTracking() {
