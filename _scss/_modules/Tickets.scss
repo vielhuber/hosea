@@ -4,11 +4,11 @@
     left: $space-big;
     top: $space-big;
     color: $color-white;
-    background-color: $color-black;
+    background-color: $color-black-transparent;
     position: absolute;
     @include border;
     @include shadow;
-    .view-mode--shifting & {
+    .view-mode--wide & {
         width: calc(#{$container-width-small} - 2 * #{$space-big});
     }
 }

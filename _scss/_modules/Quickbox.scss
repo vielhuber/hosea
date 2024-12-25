@@ -4,12 +4,12 @@
     right: $space-big;
     top: calc(#{$space-big} + ((100% - (2 * #{$space-big}) - #{$footer-height}) / 1.5) + (0.5 * #{$space-big}));
     position: absolute;
-    background-color: $color-black;
+    background-color: $color-black-transparent;
     color: $color-white;
     overflow: hidden;
     @include border;
     @include shadow;
-    .view-mode--shifting & {
+    .view-mode--wide & {
         width: calc((100% - #{$container-width-small}) - #{$space-big});
     }
 }
@@ -26,7 +26,6 @@
     position: absolute;
     width: 100%;
     height: 100%;
-    background-color: $color-black;
 }
 
 .quickbox__new-form {
@@ -125,14 +124,12 @@
     position: absolute;
     width: 100%;
     height: 100%;
-    background-color: $color-black;
 }
 
 .quickbox__today {
     position: absolute;
     width: 100%;
     height: 100%;
-    background-color: $color-black;
 }
 
 .quickbox__today-nav {
@@ -279,7 +276,6 @@
 .quickbox__mail {
     width: 100%;
     height: auto;
-    background-color: $color-black;
     @include border;
     border-left: none;
     border-right: none;
@@ -295,6 +291,7 @@
     height: 100%;
     border-bottom: 0;
     z-index: 1;
+    background-color: $color-black;
 }
 
 .quickbox__mail:not(.quickbox__mail--unread):not(.quickbox__mail--expanded) {
@@ -347,7 +344,6 @@
 
 .quickbox__mail-content {
     @include border;
-    background-color: $color-black;
     padding: $space-medium;
     filter: grayscale(100%);
     width: 100%;
@@ -495,7 +491,6 @@
 }
 
 .quickbox__nav {
-    background-color: $color-black;
     @include border;
     border-left: none;
     border-right: none;
@@ -572,5 +567,8 @@
         bottom: 0;
         right: 0;
         top: 0;
+        .view-mode--wide & {
+            width: 100%;
+        }
     }
 }

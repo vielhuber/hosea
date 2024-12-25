@@ -7,12 +7,12 @@
     right: $space-big;
     top: $space-big;
     position: absolute;
-    background-color: $color-black;
+    background-color: $color-black-transparent;
     color: $color-white;
     overflow: hidden;
     @include border;
     @include shadow;
-    .view-mode--shifting & {
+    .view-mode--wide & {
         width: calc((100% - #{$container-width-small}) - #{$space-big});
     }
 }
@@ -65,6 +65,8 @@
     padding: 0 $space-small;
     float: left;
     box-shadow: 0px 0px 0px 1px $color-grey;
+    white-space: nowrap;
+    overflow: hidden;
     .scheduler__table-head & {
         text-align: center;
         line-height: calc(#{$bar-height} / 2);
@@ -159,6 +161,15 @@
         transition: opacity 0.25s ease-in-out;
         opacity: 0;
         pointer-events: none;
+        .view-mode--wide & {
+            width: 100%;
+        }
+    }
+    .scheduler__appointment {
+        font-size: $font-size-small;
+    }
+    .scheduler__cell {
+        font-size: $font-size-small;
     }
     .scheduler--mobile-active {
         opacity: 1;
