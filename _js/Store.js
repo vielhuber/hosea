@@ -1,3 +1,4 @@
+import hlp from 'hlp';
 export default class Store {
     static data = {};
 
@@ -9,8 +10,12 @@ export default class Store {
             tickets: null,
             mails: null,
             weather: null,
-            shiftingView: true,
-            shiftingDays: 21,
+
+            hourBegin: 9,
+            shiftingView: !hlp.isMobile() ? true : false,
+            shiftingViewPrevDays: !hlp.isMobile() ? 1 : 0,
+            weeksInViewport: !hlp.isMobile() ? 2 : 1,
+
             cols: ['status', 'priority', 'date', 'time', 'project', 'description'],
             colors: {
                 status: {
