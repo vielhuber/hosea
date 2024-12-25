@@ -33,7 +33,7 @@ export default class Dates {
             let day = d.getDay(),
                 diff =
                     d.getDate() -
-                    (day - 1) + // subtract day number (so we reach monday)
+                    (day - 1) + // subtract day number (so we reach now monday)
                     (day == 0 ? -7 : 0) - // subtract 7 days if sunday (this fixes sunday)
                     ((wD -
                         wNow +
