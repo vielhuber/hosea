@@ -1,5 +1,6 @@
 import Tickets from './Tickets';
 import Auth from './Auth';
+import Scheduler from './Scheduler';
 
 export default class Footer {
     static blockStatusUpdate = false;
@@ -59,6 +60,14 @@ export default class Footer {
         document.querySelector('.footer').addEventListener('click', (e) => {
             if (e.target.closest('.footer__create')) {
                 Tickets.prepareCreateTicket();
+                e.preventDefault();
+            }
+        });
+    }
+    static bindView() {
+        document.querySelector('.footer').addEventListener('click', (e) => {
+            if (e.target.closest('.footer__view')) {
+                Scheduler.changeView();
                 e.preventDefault();
             }
         });
