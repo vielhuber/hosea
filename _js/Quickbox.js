@@ -6,6 +6,7 @@ import Filter from './Filter';
 import Footer from './Footer';
 import hlp from 'hlp';
 import PullToRefresh from 'pulltorefreshjs';
+import Swal from 'sweetalert2';
 
 export default class Quickbox {
     lastScrollPos = 0;
@@ -33,12 +34,12 @@ export default class Quickbox {
                 <div class="quickbox__today"></div>
                 <div class="quickbox__new"></div>
             </div>
-            <div class="quickbox__nav quickbox__nav--count-${hlp.isDesktop() ? '2' : '4'}">
+            <div class="quickbox__nav quickbox__nav--count-${!hlp.isMobile() ? '2' : '4'}">
                 <a href="#week" class="quickbox__navitem${
-                    hlp.isDesktop() ? ' quickbox__navitem--hidden' : ''
+                    !hlp.isMobile() ? ' quickbox__navitem--hidden' : ''
                 }">_week</a>
                 <a href="#today" class="quickbox__navitem${
-                    hlp.isDesktop() ? ' quickbox__navitem--hidden' : ''
+                    !hlp.isMobile() ? ' quickbox__navitem--hidden' : ''
                 }">_today<span class="quickbox__navitem-count"></span></a>
                 <a href="#mails" class="quickbox__navitem">_mails<span class="quickbox__navitem-count"></span></a>
                 <a href="#new" class="quickbox__navitem">_new</a>
@@ -48,7 +49,7 @@ export default class Quickbox {
 
     static initMails() {
         Quickbox.fetchMails(true);
-        if (hlp.isDesktop()) {
+        if (!hlp.isMobile()) {
             setInterval(() => {
                 if (Store.data.busy === true) {
                     return;
@@ -63,7 +64,7 @@ export default class Quickbox {
         if (document.querySelector('.quickbox__mails').classList.contains('quickbox__mails--loading')) {
             return;
         }
-        if (firstInit === true || !hlp.isDesktop()) {
+        if (firstInit === true || hlp.isMobile()) {
             document.querySelector('.quickbox__mails').classList.add('quickbox__mails--loading');
             document.querySelector('.quickbox__mails').classList.remove('quickbox__mails--finished');
         }
@@ -305,7 +306,7 @@ export default class Quickbox {
             }
         });
 
-        if (!hlp.isDesktop()) {
+        if (hlp.isMobile()) {
             PullToRefresh.init({
                 mainElement: '.quickbox__mails',
                 triggerElement: '.quickbox__mails',
@@ -355,7 +356,7 @@ export default class Quickbox {
 
     static bindNav() {
         if (document.querySelector('.quickbox__content') !== null) {
-            this.bindNavToggle(hlp.isDesktop() ? 'mails' : 'week');
+            this.bindNavToggle(!hlp.isMobile() ? 'mails' : 'week');
         }
         document.addEventListener('click', (e) => {
             let el = e.target.closest('.quickbox__navitem');
@@ -421,13 +422,13 @@ export default class Quickbox {
             count = 0;
         tickets.sort((a, b) => {
             let sort_list = [
+                    'allday',
                     'working',
                     'fixed',
                     /*
                     'scheduled',
                     'fixed',
                     'idle',
-                    'allday',
                     'roaming',
                     'recurring',
                     'done',
@@ -486,6 +487,11 @@ export default class Quickbox {
                             tickets__value.status,
                             tickets__value.project,
                             'transparent'
+                        )}; opacity: ${Scheduler.getStoreProperty(
+                            'opacity',
+                            tickets__value.status,
+                            tickets__value.project,
+                            1
                         )}; ${['fixed'].includes(tickets__value.status) ? 'border-width: 5rem;' : ''}">
                                 <div class="quickbox__today-ticket-project">${
                                     tickets__value.project
@@ -512,9 +518,13 @@ export default class Quickbox {
                                             : tickets__value.date
                                     }
                                 </div>
-                                <div class="quickbox__today-ticket-description">${hlp.nl2br(
-                                    tickets__value.description
-                                )}</div>
+                                ${
+                                    tickets__value.description !== null && tickets__value.description !== ''
+                                        ? `<div class="quickbox__today-ticket-description">${hlp.nl2br(
+                                              tickets__value.description
+                                          )}</div>`
+                                        : ''
+                                }
                             </li>
                         `
                     );
@@ -545,7 +555,7 @@ export default class Quickbox {
             }
         });
 
-        if (!hlp.isDesktop()) {
+        if (hlp.isMobile()) {
             PullToRefresh.init({
                 mainElement: '.quickbox__today',
                 triggerElement: '.quickbox__today',
@@ -611,6 +621,7 @@ export default class Quickbox {
             });
         });
         document.querySelector('.quickbox__new-form').addEventListener('submit', (e) => {
+            document.querySelector('.quickbox__new-submit').disabled = true;
             Tickets.createAndAppendTicket(
                 {
                     date:
@@ -628,9 +639,35 @@ export default class Quickbox {
                 1,
                 false,
                 true
-            );
-            document.querySelector('.quickbox__new-form').reset();
-            document.querySelector('.quickbox__navitem[href="#today"]').click();
+            )
+                .then((response) => {
+                    return response;
+                })
+                .catch((error) => {
+                    return error;
+                })
+                .then((response) => {
+                    document.querySelector('.quickbox__new-submit').disabled = false;
+                    if (response.success === true) {
+                        Swal.fire({
+                            text: 'successfully created new ticket',
+                            icon: 'success',
+                            timer: 2000,
+                            timerProgressBar: true,
+                            showConfirmButton: false,
+                        });
+                        document.querySelector('.quickbox__new-form').reset();
+                        document.querySelector('.quickbox__navitem[href="#today"]').click();
+                    } else {
+                        Swal.fire({
+                            text: 'error creating new ticket',
+                            icon: 'error',
+                            timer: 2000,
+                            timerProgressBar: true,
+                            showConfirmButton: false,
+                        });
+                    }
+                });
             e.preventDefault();
         });
     }
