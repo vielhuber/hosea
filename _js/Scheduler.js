@@ -5,10 +5,9 @@ import hlp from 'hlp';
 import Quickbox from './Quickbox';
 import Weather from './Weather';
 import tippy from 'tippy.js';
+import Html from './Html';
 
 export default class Scheduler {
-    static hourBegin = 9;
-
     static initScheduler() {
         document.querySelector('.scheduler').innerHTML = `
             <div class="scheduler__navigation">
@@ -26,7 +25,11 @@ export default class Scheduler {
                 <thead class="scheduler__table-head">
                     <tr class="scheduler__row">
                         <td class="scheduler__cell"></td>
-                        ${Array(Store.data.shiftingView ? Store.data.shiftingDays : 7)
+                        ${Array(
+                            Store.data.shiftingView
+                                ? Store.data.shiftingViewPrevDays + Store.data.weeksInViewport * 7
+                                : Store.data.weeksInViewport * 7
+                        )
                             .join(0)
                             .split(0)
                             .map(
@@ -34,17 +37,17 @@ export default class Scheduler {
                             <td class="
                                 scheduler__cell
                                 ${
-                                    Dates.sameDay(Dates.getDayOfActiveWeek(i + 1), Dates.getCurrentDate())
+                                    Dates.sameDay(Dates.getDayOfActiveViewport(i + 1), Dates.getCurrentDate())
                                         ? ' scheduler__cell--curday'
                                         : ''
                                 }
                                 ${
-                                    Dates.sameDay(Dates.getDayOfActiveWeek(i + 1), Dates.getActiveDate())
+                                    Dates.sameDay(Dates.getDayOfActiveViewport(i + 1), Dates.getActiveDate())
                                         ? ' scheduler__cell--activeday'
                                         : ''
                                 }
                             ">
-                                ${Dates.dateFormat(Dates.getDayOfActiveWeek(i + 1), 'D d.m.')}
+                                ${Dates.dateFormat(Dates.getDayOfActiveViewport(i + 1), 'D d.m.')}
                             </td>
                         `
                             )
@@ -52,7 +55,11 @@ export default class Scheduler {
                     </tr>
                     <tr class="scheduler__row">
                         <td class="scheduler__cell"></td>
-                        ${Array(Store.data.shiftingView ? Store.data.shiftingDays : 7)
+                        ${Array(
+                            Store.data.shiftingView
+                                ? Store.data.shiftingViewPrevDays + Store.data.weeksInViewport * 7
+                                : Store.data.weeksInViewport * 7
+                        )
                             .join(0)
                             .split(0)
                             .map(
@@ -60,17 +67,17 @@ export default class Scheduler {
                                     <td class="
                                         scheduler__cell
                                         ${
-                                            Dates.sameDay(Dates.getDayOfActiveWeek(i + 1), Dates.getCurrentDate())
+                                            Dates.sameDay(Dates.getDayOfActiveViewport(i + 1), Dates.getCurrentDate())
                                                 ? ' scheduler__cell--curday'
                                                 : ''
                                         }
                                         ${
-                                            Dates.sameDay(Dates.getDayOfActiveWeek(i + 1), Dates.getActiveDate())
+                                            Dates.sameDay(Dates.getDayOfActiveViewport(i + 1), Dates.getActiveDate())
                                                 ? ' scheduler__cell--activeday'
                                                 : ''
                                         }
                                     ">
-                                        ${Weather.outputWeather(Dates.getDayOfActiveWeek(i + 1))}
+                                        ${Weather.outputWeather(Dates.getDayOfActiveViewport(i + 1))}
                                     </td>
                                 `
                             )
@@ -80,7 +87,11 @@ export default class Scheduler {
                 <tbody class="scheduler__table-body">
                     <tr class="scheduler__row">
                         <td class="scheduler__cell"></td>
-                        ${Array(Store.data.shiftingView ? Store.data.shiftingDays : 7)
+                        ${Array(
+                            Store.data.shiftingView
+                                ? Store.data.shiftingViewPrevDays + Store.data.weeksInViewport * 7
+                                : Store.data.weeksInViewport * 7
+                        )
                             .join(0)
                             .split(0)
                             .map(
@@ -88,12 +99,12 @@ export default class Scheduler {
                             <td class="
                                 scheduler__cell
                                 ${
-                                    Dates.sameDay(Dates.getDayOfActiveWeek(i + 1), Dates.getCurrentDate())
+                                    Dates.sameDay(Dates.getDayOfActiveViewport(i + 1), Dates.getCurrentDate())
                                         ? ' scheduler__cell--curday'
                                         : ''
                                 }
                                 ${
-                                    Dates.sameDay(Dates.getDayOfActiveWeek(i + 1), Dates.getActiveDate())
+                                    Dates.sameDay(Dates.getDayOfActiveViewport(i + 1), Dates.getActiveDate())
                                         ? ' scheduler__cell--activeday'
                                         : ''
                                 }
@@ -102,17 +113,21 @@ export default class Scheduler {
                             )
                             .join('')}
                     </tr>
-                    ${Array(24 - Scheduler.hourBegin)
+                    ${Array(24 - Store.data.hourBegin)
                         .join(0)
                         .split(0)
                         .map((item, j) => {
-                            j = j + Scheduler.hourBegin;
+                            j = j + Store.data.hourBegin;
                             return `
                             <tr class="scheduler__row">
                                 <td class="scheduler__cell">${('0' + j).slice(-2)}&ndash;${('0' + (j + 1)).slice(
                                 -2
                             )}</td>
-                                ${Array(Store.data.shiftingView ? Store.data.shiftingDays : 7)
+                                ${Array(
+                                    Store.data.shiftingView
+                                        ? Store.data.shiftingViewPrevDays + Store.data.weeksInViewport * 7
+                                        : Store.data.weeksInViewport * 7
+                                )
                                     .join(0)
                                     .split(0)
                                     .map(
@@ -120,21 +135,22 @@ export default class Scheduler {
                                     <td class="
                                         scheduler__cell
                                         ${
-                                            Dates.sameDay(Dates.getDayOfActiveWeek(i + 1), Dates.getCurrentDate())
+                                            Dates.sameDay(Dates.getDayOfActiveViewport(i + 1), Dates.getCurrentDate())
                                                 ? ' scheduler__cell--curday'
                                                 : ''
                                         }
                                         ${
-                                            Dates.sameDay(Dates.getDayOfActiveWeek(i + 1), Dates.getActiveDate())
+                                            Dates.sameDay(Dates.getDayOfActiveViewport(i + 1), Dates.getActiveDate())
                                                 ? ' scheduler__cell--activeday'
                                                 : ''
                                         }
                                         ${
                                             // MO-FR
-                                            [1, 2, 3, 4, 5].includes(Dates.getDayOfActiveWeek(i + 1).getDay()) &&
+                                            [1, 2, 3, 4, 5].includes(Dates.getDayOfActiveViewport(i + 1).getDay()) &&
                                             // 09:00-13:00, 14:00-18:00
                                             ((j >= 9 && j < 13) || (j >= 14 && j < 18))
-                                                ? Dates.getDayOfActiveWeek(i + 1).getDay() + ' scheduler__cell--main'
+                                                ? Dates.getDayOfActiveViewport(i + 1).getDay() +
+                                                  ' scheduler__cell--main'
                                                 : ''
                                         }
                                     ">
@@ -154,7 +170,13 @@ export default class Scheduler {
         `;
 
         document.querySelectorAll('.scheduler__cell').forEach(($el) => {
-            $el.style.width = 100 / ((Store.data.shiftingView ? Store.data.shiftingDays : 7) + 1) + '%';
+            $el.style.width =
+                100 /
+                    ((Store.data.shiftingView
+                        ? Store.data.shiftingViewPrevDays + Store.data.weeksInViewport * 7
+                        : Store.data.weeksInViewport * 7) +
+                        1) +
+                '%';
         });
 
         let generatedDates = Scheduler.generateDates();
@@ -182,7 +204,7 @@ export default class Scheduler {
         tippy('.scheduler__appointment', {
             content(reference) {
                 let title = reference.getAttribute('title');
-                title = title.split('\n').join('<br/>');
+                title = title.split('\n').join('<br/>').split(' ').join('&nbsp;');
                 reference.removeAttribute('title');
                 return title;
             },
@@ -212,10 +234,15 @@ export default class Scheduler {
             '<a href="#" class="scheduler__navigation-week-link-to-empty">❗' + linkToEmptyDatesSum + 'h❗</a>';
 
         document.querySelector('.scheduler__navigation-week').innerHTML = `
-            ${Dates.dateFormat(Dates.getDayOfActiveWeek(1), 'd.m.')} &ndash; ${Dates.dateFormat(
-            Dates.getDayOfActiveWeek(7),
+            ${Dates.dateFormat(Dates.getDayOfActiveViewport(1), 'd.m.')} &ndash; ${Dates.dateFormat(
+            Dates.getDayOfActiveViewport(7),
             'd.m.Y'
-        )} /// _kw ${Dates.weekNumber(Dates.getDayOfActiveWeek(1))} /// ${statsSumWeekly}h /// ${linkToEmptyDates}
+        )} /// _kw ${
+            Dates.weekNumber(Dates.getDayOfActiveViewport(1)) +
+            (Store.data.weeksInViewport > 1
+                ? '–' + Dates.weekNumber(Dates.getDayOfActiveViewport(Store.data.weeksInViewport * 7))
+                : '')
+        } /// ${statsSumWeekly}h /// ${linkToEmptyDates}
         `;
     }
 
@@ -236,16 +263,24 @@ export default class Scheduler {
                         Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() + 1);
                     }
                     if (e.target.closest('.scheduler__navigation-button--prev-week')) {
-                        Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() - 7);
+                        Store.data.session.activeDay.setDate(
+                            Store.data.session.activeDay.getDate() - Store.data.weeksInViewport * 7
+                        );
                     }
                     if (e.target.closest('.scheduler__navigation-button--next-week')) {
-                        Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() + 7);
+                        Store.data.session.activeDay.setDate(
+                            Store.data.session.activeDay.getDate() + Store.data.weeksInViewport * 7
+                        );
                     }
                     if (e.target.closest('.scheduler__navigation-button--prev-month')) {
-                        Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() - 28);
+                        Store.data.session.activeDay.setDate(
+                            Store.data.session.activeDay.getDate() - Store.data.weeksInViewport * 7 * 4
+                        );
                     }
                     if (e.target.closest('.scheduler__navigation-button--next-month')) {
-                        Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() + 28);
+                        Store.data.session.activeDay.setDate(
+                            Store.data.session.activeDay.getDate() + Store.data.weeksInViewport * 7 * 4
+                        );
                     }
                     document.querySelector('.metabar__select--filter[name="date"]').value = Dates.dateFormat(
                         Store.data.session.activeDay,
@@ -270,14 +305,7 @@ export default class Scheduler {
         let generatedDates = [];
         Store.data.tickets.forEach((tickets__value) => {
             let name = tickets__value.project,
-                title = hlp.htmlEncode(
-                    tickets__value.project +
-                        '\n' +
-                        (tickets__value.description || '')
-                            .split('\n')
-                            .map((i) => hlp.truncate_string(i, 100))
-                            .join('\n')
-                ),
+                title = hlp.htmlEncode(tickets__value.project + '\n' + (tickets__value.description || '')),
                 project = tickets__value.project,
                 status = tickets__value.status,
                 parsed_values = Dates.parseDateString(tickets__value.date, 'scheduler');
@@ -405,7 +433,7 @@ export default class Scheduler {
         generatedDates.forEach((date__value) => {
             let posTop,
                 posBottom,
-                heightFrac = 100 / (24 + 1 - Scheduler.hourBegin);
+                heightFrac = 100 / (24 + 1 - Store.data.hourBegin);
             if (date__value.begin === null) {
                 posTop =
                     (generatedDatesUndefinedCur[date__value.day] / generatedDatesUndefinedMax[date__value.day]) *
@@ -416,13 +444,18 @@ export default class Scheduler {
                         heightFrac;
                 generatedDatesUndefinedCur[date__value.day]++;
             } else {
-                posTop = heightFrac * (date__value.begin - (Scheduler.hourBegin - 1));
-                posBottom = 100 - heightFrac * (date__value.end - (Scheduler.hourBegin - 1));
+                posTop = heightFrac * (date__value.begin - (Store.data.hourBegin - 1));
+                posBottom = 100 - heightFrac * (date__value.end - (Store.data.hourBegin - 1));
             }
 
             let width,
                 posLeft,
-                fraction = 100 / ((Store.data.shiftingView ? Store.data.shiftingDays : 7) + 1);
+                fraction =
+                    100 /
+                    ((Store.data.shiftingView
+                        ? Store.data.shiftingViewPrevDays + Store.data.weeksInViewport * 7
+                        : Store.data.weeksInViewport * 7) +
+                        1);
             if (!('conflict' in date__value)) {
                 width = 'calc(' + fraction + '% - 4rem)';
                 posLeft = fraction * date__value.day;
@@ -635,5 +668,31 @@ export default class Scheduler {
                 }
             }
         });
+    }
+
+    static changeView() {
+        if (
+            Store.data.shiftingView === true &&
+            Store.data.shiftingViewPrevDays === 1 &&
+            Store.data.weeksInViewport === 2
+        ) {
+            Store.data.shiftingView = false;
+            Store.data.shiftingViewPrevDays = 0;
+            Store.data.weeksInViewport = 1;
+        } else if (
+            Store.data.shiftingView === false &&
+            Store.data.shiftingViewPrevDays === 0 &&
+            Store.data.weeksInViewport === 1
+        ) {
+            Store.data.weeksInViewport = 2;
+        } else {
+            Store.data.shiftingView = true;
+            Store.data.shiftingViewPrevDays = 1;
+            Store.data.weeksInViewport = 2;
+        }
+        Html.setViewClass();
+        Scheduler.initScheduler();
+        Quickbox.initToday();
+        Filter.doFilter();
     }
 }
