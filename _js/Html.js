@@ -12,27 +12,26 @@ export default class Html {
         `
         );
 
-        document.querySelector('#app').classList.add('view-mode--' + (Store.data.shiftingView ? 'shifting' : ''));
+        Html.setViewClass();
 
-        if (window.screen.width >= 1900) {
-            document.querySelector('#app').insertAdjacentHTML(
-                'afterbegin',
-                `
+        document.querySelector('#app').insertAdjacentHTML(
+            'afterbegin',
+            `
                 <div class="animation">
-                    <div class="animation__wrap">
-                        <div class="animation__top"></div>
-                        <div class="animation__bottom"></div>
+                    <div class="animation__grid">
+                        <div class="animation__grid-lines"></div>
                     </div>
+                    <div class="animation__mask"></div>
                 </div>
             `
-            );
-        }
+        );
 
         document.querySelector('.footer').insertAdjacentHTML(
             'beforeend',
             `
             <a href="#" class="footer__save">_save</a>
             <a href="#" class="footer__create">_create</a>
+            <a href="#" class="footer__view">_view</a>
             <span class="footer__status"></span>
             <a href="#" class="footer__cron" target="_blank">_cron</a>
             <a href="#" class="footer__ical" target="_blank">_ical</a>
@@ -199,5 +198,13 @@ DD%N: weekday in calendar week %N=0 (if >X specified, N -= calendar week of X)
                 <a class="tickets__attachment-delete" href="#" title="_delete"></a>
             </li>
         `;
+    }
+
+    static setViewClass() {
+        if (Store.data.weeksInViewport > 1) {
+            document.querySelector('#app').classList.add('view-mode--wide');
+        } else {
+            document.querySelector('#app').classList.remove('view-mode--wide');
+        }
     }
 }
