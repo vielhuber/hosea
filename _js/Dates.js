@@ -9,21 +9,40 @@ export default class Dates {
         return Store.data.session.activeDay;
     }
 
-    static getDayOfActiveWeek(shift) {
-        return Dates.getDayOfWeek(shift, Store.data.session.activeDay);
+    static getDayOfActiveViewport(shift) {
+        return Dates.getDayOfViewport(shift, Store.data.session.activeDay);
     }
 
-    static getDayOfCurrentWeek(shift) {
-        return Dates.getDayOfWeek(shift, this.getCurrentDate());
+    static getDayOfCurrentViewport(shift) {
+        return Dates.getDayOfViewport(shift, Dates.getCurrentDate());
     }
 
-    static getDayOfWeek(shift, date) {
+    static getDayOfViewport(shift, date) {
         let d = new Date(date);
         if (Store.data.shiftingView) {
-            return this.addDays(d, shift - 1);
+            return Dates.addDays(d, shift - 1 - Store.data.shiftingViewPrevDays);
         } else {
+            let wNow = Dates.weekNumber(new Date());
+            let wD = Dates.weekNumber(d);
+            if (wNow < wD && Dates.compareDates(new Date(), d) === 1) {
+                wNow += 52;
+            }
+            if (wD < wNow && Dates.compareDates(d, new Date()) === 1) {
+                wD += 52;
+            }
             let day = d.getDay(),
-                diff = d.getDate() - day + (day == 0 ? -6 : 1) + (shift - 1);
+                diff =
+                    d.getDate() -
+                    (day - 1) + // subtract day number (so we reach monday)
+                    (day == 0 ? -7 : 0) - // subtract 7 days if sunday (this fixes sunday)
+                    ((wD -
+                        wNow +
+                        (wD < wNow
+                            ? Math.ceil((wNow - wD) / Store.data.weeksInViewport) * Store.data.weeksInViewport
+                            : 0)) % // correct weeks resulting in negative values
+                        Store.data.weeksInViewport) *
+                        7 + // subtract 7 days for each week in the viewport
+                    (shift - 1); // add the shift
             return new Date(d.setDate(diff));
         }
     }
@@ -87,9 +106,13 @@ export default class Dates {
 
                     let day = null;
                     if (Store.data.shiftingView) {
-                        day = this.dateDiffInDays(d, Store.data.session.activeDay) + 1;
+                        day =
+                            Dates.dateDiffInDays(d, Store.data.session.activeDay) + 1 + Store.data.shiftingViewPrevDays;
                     } else {
+                        // map to 1-7
                         day = ((d.getDay() + 6) % 7) + 1;
+                        // shift by weeks in viewport
+                        day += Dates.shiftByDatesInViewport(d);
                     }
 
                     ret.push({
@@ -98,7 +121,7 @@ export default class Dates {
                         begin: begin,
                         end: end,
                         time: end - begin,
-                        minutes_left: this.dateDiffInMinutes(d, new Date()),
+                        minutes_left: Dates.dateDiffInMinutes(d, new Date()),
                     });
                 }
             }
@@ -118,20 +141,33 @@ export default class Dates {
                 let d_all = [];
 
                 if (view === 'today') {
-                    d_all.push(Dates.getDayOfCurrentWeek(Dates.getDayFromString(string__value.substring(0, 2))));
+                    d_all.push(Dates.getDayOfCurrentViewport(Dates.getDayFromString(string__value.substring(0, 2))));
                 } else {
                     if (Store.data.shiftingView) {
-                        let dayOfActiveWeek = this.getDayOfActiveWeek(0).getDay() + 1,
+                        let dayOfActiveWeek =
+                                Dates.getDayOfActiveViewport(0 + Store.data.shiftingViewPrevDays).getDay() + 1,
                             dayOfDateToParse = Dates.getDayFromString(string__value.substring(0, 2)),
                             dayOfDateToParseShift = dayOfDateToParse - dayOfActiveWeek;
-                        while (dayOfDateToParseShift <= Store.data.shiftingDays - 1) {
-                            if (dayOfDateToParseShift >= 0) {
-                                d_all.push(Dates.getDayOfActiveWeek(dayOfDateToParseShift + 1));
+                        while (
+                            dayOfDateToParseShift <=
+                            Store.data.shiftingViewPrevDays + Store.data.weeksInViewport * 7 - 1
+                        ) {
+                            if (dayOfDateToParseShift >= 0 - Store.data.shiftingViewPrevDays) {
+                                d_all.push(
+                                    Dates.getDayOfActiveViewport(
+                                        dayOfDateToParseShift + 1 + Store.data.shiftingViewPrevDays
+                                    )
+                                );
                             }
                             dayOfDateToParseShift += 7;
                         }
                     } else {
-                        d_all.push(Dates.getDayOfActiveWeek(Dates.getDayFromString(string__value.substring(0, 2))));
+                        let dayOfDateToParse = Dates.getDayFromString(string__value.substring(0, 2)),
+                            dayOfDateToParseShift = dayOfDateToParse - 1;
+                        while (dayOfDateToParseShift <= Store.data.weeksInViewport * 7 - 1) {
+                            d_all.push(Dates.getDayOfActiveViewport(dayOfDateToParseShift + 1));
+                            dayOfDateToParseShift += 7;
+                        }
                     }
                 }
 
@@ -146,7 +182,7 @@ export default class Dates {
 
                     if (view !== 'all' && string__value.substring(2, 3) === '#') {
                         let num = parseInt(string__value.substring(3, 5).trim()),
-                            nthWeekdayOfMonth = this.nthWeekdayOfMonth(d);
+                            nthWeekdayOfMonth = Dates.nthWeekdayOfMonth(d);
                         if (num % 4 !== nthWeekdayOfMonth) {
                             continue;
                         }
@@ -157,7 +193,7 @@ export default class Dates {
 
                     if (view !== 'all' && string__value.substring(2, 3) === '~') {
                         let num = parseInt(string__value.substring(3, 5).trim()),
-                            weekNumber = this.weekNumber(d);
+                            weekNumber = Dates.weekNumber(d);
                         if (num != weekNumber) {
                             continue;
                         }
@@ -165,10 +201,10 @@ export default class Dates {
 
                     if (view !== 'all' && string__value.substring(2, 3) === '%') {
                         let num = parseInt(string__value.substring(3, 5).trim()),
-                            weekNumber = this.weekNumber(d),
+                            weekNumber = Dates.weekNumber(d),
                             match = string__value.match(/>([0-9][0-9]\.[0-9][0-9]\.[0-9][0-9])/i);
                         if (match) {
-                            weekNumber -= this.weekNumber(new Date(Dates.germanToEnglishString(match[1])));
+                            weekNumber -= Dates.weekNumber(new Date(Dates.germanToEnglishString(match[1])));
                         }
                         if (weekNumber % num !== 0) {
                             continue;
@@ -202,9 +238,15 @@ export default class Dates {
 
                         let day = null;
                         if (Store.data.shiftingView) {
-                            day = this.dateDiffInDays(d, Store.data.session.activeDay) + 1;
+                            day =
+                                Dates.dateDiffInDays(d, Store.data.session.activeDay) +
+                                1 +
+                                Store.data.shiftingViewPrevDays;
                         } else {
+                            // map to 1-7
                             day = ((d.getDay() + 6) % 7) + 1;
+                            // shift by weeks in viewport
+                            day += Dates.shiftByDatesInViewport(d);
                         }
 
                         ret.push({
@@ -213,7 +255,7 @@ export default class Dates {
                             begin: begin,
                             end: end,
                             time: end - begin,
-                            minutes_left: this.dateDiffInMinutes(d, new Date()),
+                            minutes_left: Dates.dateDiffInMinutes(d, new Date()),
                         });
                     }
                 }
@@ -226,20 +268,28 @@ export default class Dates {
                     '^[0-9][0-9].[0-9][0-9].( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?( (-|>|<)[0-9][0-9].[0-9][0-9].[1-3][0-9])*$'
                 ).test(string__value)
             ) {
+                // determine proper year
                 let year = null;
                 if (view === 'today') {
                     year = Dates.getCurrentDate().getFullYear();
                 } else {
                     year = Dates.getActiveDate().getFullYear();
                 }
-                // exception on year change
-                if (
-                    Dates.weekNumber(Dates.getActiveDate()) === 1 &&
-                    Dates.getActiveDate().getMonth() + 1 != string__value.substring(3, 5)
+                year--;
+                while (
+                    Math.abs(
+                        Dates.dateDiffInDays(
+                            new Date(year + '-' + string__value.substring(3, 5) + '-' + string__value.substring(0, 2)),
+                            Dates.getActiveDate()
+                        )
+                    ) >
+                    365 / 2
                 ) {
-                    year--;
+                    year++;
                 }
+
                 d = new Date(year + '-' + string__value.substring(3, 5) + '-' + string__value.substring(0, 2));
+
                 if (isNaN(d)) {
                     error = true;
                     return;
@@ -274,9 +324,13 @@ export default class Dates {
 
                     let day = null;
                     if (Store.data.shiftingView) {
-                        day = this.dateDiffInDays(d, Store.data.session.activeDay) + 1;
+                        day =
+                            Dates.dateDiffInDays(d, Store.data.session.activeDay) + 1 + Store.data.shiftingViewPrevDays;
                     } else {
+                        // map to 1-7
                         day = ((d.getDay() + 6) % 7) + 1;
+                        // shift by weeks in viewport
+                        day += Dates.shiftByDatesInViewport(d);
                     }
 
                     ret.push({
@@ -285,7 +339,7 @@ export default class Dates {
                         begin: begin,
                         end: end,
                         time: end - begin,
-                        minutes_left: this.dateDiffInMinutes(d, new Date()),
+                        minutes_left: Dates.dateDiffInMinutes(d, new Date()),
                     });
                 }
             } else {
@@ -393,6 +447,23 @@ export default class Dates {
         return ('0' + hours).slice(-2) + ':' + ('0' + minutes).slice(-2);
     }
 
+    static shiftByDatesInViewport(d) {
+        let dW = Dates.weekNumber(d);
+        let dC = Dates.weekNumber(new Date());
+        if (dW > dC && Dates.compareDates(new Date(), d) === 1) {
+            dC += 52;
+        } else if (dC > dW && Dates.compareDates(d, new Date()) === 1) {
+            dW += 52;
+        }
+        return (
+            ((dW -
+                dC +
+                (dW < dC ? Math.ceil((dC - dW) / Store.data.weeksInViewport) * Store.data.weeksInViewport : 0)) % // correct weeks resulting in negative values
+                Store.data.weeksInViewport) *
+            7
+        );
+    }
+
     static dateIsInActiveWeek(d) {
         if (d === null || d === '') {
             return false;
@@ -401,11 +472,11 @@ export default class Dates {
 
         if (Store.data.shiftingView) {
             return (
-                Dates.dateDiffInDays(d, Store.data.session.activeDay) < Store.data.shiftingDays &&
-                Dates.dateDiffInDays(d, Store.data.session.activeDay) >= 0
+                Dates.dateDiffInDays(d, Store.data.session.activeDay) < Store.data.weeksInViewport * 7 &&
+                Dates.dateDiffInDays(d, Store.data.session.activeDay) >= 0 - Store.data.shiftingViewPrevDays
             );
         } else {
-            return Dates.sameDay(Dates.getDayOfWeek(1, d), Dates.getDayOfActiveWeek(1));
+            return Dates.sameDay(Dates.getDayOfViewport(1, d), Dates.getDayOfActiveViewport(1));
         }
     }
 
@@ -512,8 +583,8 @@ export default class Dates {
     }
 
     static dateDiffInWeeks(d1, d2) {
-        let weekNumber1 = this.weekNumber(d1),
-            weekNumber2 = this.weekNumber(d2),
+        let weekNumber1 = Dates.weekNumber(d1),
+            weekNumber2 = Dates.weekNumber(d2),
             year1 = d1.getFullYear(),
             year2 = d1.getFullYear();
         if (year1 > year2) {
