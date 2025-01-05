@@ -92,17 +92,17 @@ class Ticket extends Api
                 ' .
             ($interval_prev === null
                 ? '1=1'
-                : 'INSTR(project,\'FEIER_OFF_TAG\') OR STR_TO_DATE(date,\'%d.%m.%y\') > DATE_SUB(NOW(), INTERVAL ' .
+                : '(INSTR(project,\'FEIERTAG\') OR STR_TO_DATE(date,\'%d.%m.%y\') > DATE_SUB(NOW(), INTERVAL ' .
                     $interval_prev .
-                    ' DAY)') .
+                    ' DAY))') .
             '
                 AND
                 ' .
             ($interval_next === null
                 ? '1=1'
-                : 'INSTR(project,\'FEIER_OFF_TAG\') OR STR_TO_DATE(date,\'%d.%m.%y\') < DATE_ADD(NOW(), INTERVAL ' .
+                : '(INSTR(project,\'FEIERTAG\') OR STR_TO_DATE(date,\'%d.%m.%y\') < DATE_ADD(NOW(), INTERVAL ' .
                     $interval_next .
-                    ' DAY)') .
+                    ' DAY))') .
             '
                 )
                 )
