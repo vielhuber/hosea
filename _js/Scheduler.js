@@ -34,8 +34,8 @@ export default class Scheduler {
                             .split(0)
                             .map(
                                 (item, i) => `
-                            <td class="
-                                scheduler__cell
+                            <td data-date="${Dates.dateFormat(Dates.getDayOfActiveViewport(i + 1), 'Y-m-d')}" class="
+                                scheduler__cell scheduler__navigation-daylink
                                 ${
                                     Dates.sameDay(Dates.getDayOfActiveViewport(i + 1), Dates.getCurrentDate())
                                         ? ' scheduler__cell--curday'
@@ -222,17 +222,6 @@ export default class Scheduler {
         });
         statsSumWeekly = (Math.round(statsSumWeekly * 100) / 100).toString().replace('.', ',');
 
-        let linkToEmptyDates = '',
-            linkToEmptyDatesSum = 0;
-        Store.data.tickets.forEach((tickets__value) => {
-            if (tickets__value.date === '' && tickets__value.priority === 'A') {
-                linkToEmptyDatesSum += parseFloat(tickets__value.time.replace(',', '.'));
-            }
-        });
-        linkToEmptyDatesSum = linkToEmptyDatesSum.toString().replace('.', ',');
-        linkToEmptyDates +=
-            '<a href="#" class="scheduler__navigation-week-link-to-empty">❗' + linkToEmptyDatesSum + 'h❗</a>';
-
         document.querySelector('.scheduler__navigation-week').innerHTML = `
             ${Dates.dateFormat(Dates.getDayOfActiveViewport(1), 'd.m.')} &ndash; ${Dates.dateFormat(
             Dates.getDayOfActiveViewport(7),
@@ -242,7 +231,9 @@ export default class Scheduler {
             (Store.data.weeksInViewport > 1
                 ? '–' + Dates.weekNumber(Dates.getDayOfActiveViewport(Store.data.weeksInViewport * 7))
                 : '')
-        } /// ${statsSumWeekly}h /// ${linkToEmptyDates}
+        } /// ${statsSumWeekly}h /// <a href="#" class="scheduler__navigation-week-link-to-empty">
+            ${Scheduler.generateLinkToEmptyDatesSum()}
+        </a>
         `;
     }
 
@@ -250,36 +241,40 @@ export default class Scheduler {
         document.querySelector('.scheduler').addEventListener('click', (e) => {
             if (
                 e.target.closest('.scheduler__navigation-button') ||
+                e.target.closest('.scheduler__navigation-daylink') ||
                 e.target.closest('.scheduler__navigation-week-link-to-empty')
             ) {
-                if (e.target.closest('.scheduler__navigation-button')) {
-                    if (e.target.closest('.scheduler__navigation-button--today')) {
-                        Store.data.session.activeDay = new Date();
-                    }
-                    if (e.target.closest('.scheduler__navigation-button--prev-day')) {
-                        Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() - 1);
-                    }
-                    if (e.target.closest('.scheduler__navigation-button--next-day')) {
-                        Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() + 1);
-                    }
-                    if (e.target.closest('.scheduler__navigation-button--prev-week')) {
-                        Store.data.session.activeDay.setDate(
-                            Store.data.session.activeDay.getDate() - Store.data.weeksInViewport * 7
-                        );
-                    }
-                    if (e.target.closest('.scheduler__navigation-button--next-week')) {
-                        Store.data.session.activeDay.setDate(
-                            Store.data.session.activeDay.getDate() + Store.data.weeksInViewport * 7
-                        );
-                    }
-                    if (e.target.closest('.scheduler__navigation-button--prev-month')) {
-                        Store.data.session.activeDay.setDate(
-                            Store.data.session.activeDay.getDate() - Store.data.weeksInViewport * 7 * 4
-                        );
-                    }
-                    if (e.target.closest('.scheduler__navigation-button--next-month')) {
-                        Store.data.session.activeDay.setDate(
-                            Store.data.session.activeDay.getDate() + Store.data.weeksInViewport * 7 * 4
+                if (
+                    e.target.closest('.scheduler__navigation-button') ||
+                    e.target.closest('.scheduler__navigation-daylink')
+                ) {
+                    if (e.target.closest('.scheduler__navigation-button')) {
+                        if (e.target.closest('.scheduler__navigation-button--today')) {
+                            Store.data.session.activeDay = new Date();
+                        } else if (e.target.closest('.scheduler__navigation-button--prev-day')) {
+                            Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() - 1);
+                        } else if (e.target.closest('.scheduler__navigation-button--next-day')) {
+                            Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() + 1);
+                        } else if (e.target.closest('.scheduler__navigation-button--prev-week')) {
+                            Store.data.session.activeDay.setDate(
+                                Store.data.session.activeDay.getDate() - Store.data.weeksInViewport * 7
+                            );
+                        } else if (e.target.closest('.scheduler__navigation-button--next-week')) {
+                            Store.data.session.activeDay.setDate(
+                                Store.data.session.activeDay.getDate() + Store.data.weeksInViewport * 7
+                            );
+                        } else if (e.target.closest('.scheduler__navigation-button--prev-month')) {
+                            Store.data.session.activeDay.setDate(
+                                Store.data.session.activeDay.getDate() - Store.data.weeksInViewport * 7 * 4
+                            );
+                        } else if (e.target.closest('.scheduler__navigation-button--next-month')) {
+                            Store.data.session.activeDay.setDate(
+                                Store.data.session.activeDay.getDate() + Store.data.weeksInViewport * 7 * 4
+                            );
+                        }
+                    } else if (e.target.closest('.scheduler__navigation-daylink')) {
+                        Store.data.session.activeDay = new Date(
+                            e.target.closest('.scheduler__navigation-daylink').getAttribute('data-date')
                         );
                     }
                     document.querySelector('.metabar__select--filter[name="date"]').value = Dates.dateFormat(
@@ -293,9 +288,10 @@ export default class Scheduler {
                     document.querySelector('.metabar__select--sort[name="sort_1"]').value = 'priority';
                 }
 
+                Filter.doFilter();
                 Scheduler.initScheduler();
                 Quickbox.initToday();
-                Filter.doFilter();
+
                 e.preventDefault();
             }
         });
@@ -691,8 +687,24 @@ export default class Scheduler {
             Store.data.weeksInViewport = 2;
         }
         Html.setViewClass();
+
+        Filter.doFilter();
         Scheduler.initScheduler();
         Quickbox.initToday();
-        Filter.doFilter();
+    }
+
+    static generateLinkToEmptyDatesSum() {
+        let linkToEmptyDatesSum = 0;
+        Store.data.tickets.forEach((tickets__value) => {
+            if (tickets__value.date === '') {
+                linkToEmptyDatesSum += 1;
+            }
+        });
+        return (
+            (linkToEmptyDatesSum === 0 ? '✅' : '❗') +
+            linkToEmptyDatesSum +
+            'x' +
+            (linkToEmptyDatesSum === 0 ? '✅' : '❗')
+        );
     }
 }
