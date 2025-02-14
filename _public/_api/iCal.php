@@ -21,43 +21,74 @@ class iCal extends Api
 
     protected function generateICal()
     {
-        $vCalendar = new \Eluceo\iCal\Component\Calendar('ical');
+        $events = [];
         $tickets = $this::$db->fetch_all(
-            'SELECT * FROM tickets WHERE user_id = (SELECT id FROM users WHERE api_key = ?)',
+            '
+            SELECT * FROM tickets WHERE user_id = (SELECT id FROM users WHERE api_key = ?)
+            AND (INSTR(project,\'FEIERTAG\') OR STR_TO_DATE(date,\'%d.%m.%y\') > DATE_SUB(NOW(), INTERVAL 30 DAY))
+            AND (INSTR(project,\'FEIERTAG\') OR STR_TO_DATE(date,\'%d.%m.%y\') < DATE_ADD(NOW(), INTERVAL 30 DAY))
+            ',
             $this->getRequestPathSecond()
         );
         foreach ($tickets as $tickets__value) {
             $dates = $this->parseDateString($tickets__value['date']);
             foreach ($dates as $dates__value) {
-                $vEvent = new \Eluceo\iCal\Component\Event();
+                $vEvent = new \Eluceo\iCal\Domain\Entity\Event();
                 if (@$dates__value['date'] != '') {
                     if (@$dates__value['begin'] != '' && @$dates__value['end'] != '') {
-                        $vEvent->setDtStart(
-                            new \DateTime($dates__value['date'] . ' ' . $dates__value['begin'] . ':00')
+                        $vEvent->setOccurrence(
+                            new \Eluceo\iCal\Domain\ValueObject\TimeSpan(
+                                new \Eluceo\iCal\Domain\ValueObject\DateTime(
+                                    \DateTimeImmutable::createFromFormat(
+                                        'Y-m-d H:i:s',
+                                        $dates__value['date'] . ' ' . $dates__value['begin'] . ':00'
+                                    ),
+                                    true
+                                ),
+                                new \Eluceo\iCal\Domain\ValueObject\DateTime(
+                                    \DateTimeImmutable::createFromFormat(
+                                        'Y-m-d H:i:s',
+                                        $dates__value['date'] .
+                                            ' ' .
+                                            ($dates__value['end'] == '24:00' ? '23:59' : $dates__value['end']) .
+                                            ':00'
+                                    ),
+                                    true
+                                )
+                            )
                         );
-                        $vEvent->setDtEnd(new \DateTime($dates__value['date'] . ' ' . $dates__value['end'] . ':00'));
                     } else {
-                        $vEvent->setDtStart(new \DateTime($dates__value['date']));
-                        $vEvent->setDtEnd(new \DateTime($dates__value['date']));
-                        $vEvent->setNoTime(true);
+                        $vEvent->setOccurrence(
+                            new \Eluceo\iCal\Domain\ValueObject\SingleDay(
+                                new \Eluceo\iCal\Domain\ValueObject\Date(
+                                    \DateTimeImmutable::createFromFormat('Y-m-d', $dates__value['date'])
+                                )
+                            )
+                        );
                     }
                 }
                 $vEvent->setCategories(['_' . $tickets__value['status']]);
                 $vEvent->setSummary($tickets__value['project']);
                 $vEvent->setDescription($tickets__value['description']);
-                $vEvent->setDescriptionHTML(nl2br($tickets__value['description']));
-                $vCalendar->addComponent($vEvent);
+                $events[] = $vEvent;
             }
         }
         if (@$_GET['test'] == 1) {
             echo '<pre>';
-            //print_r($vCalendar);
-            echo $vCalendar->render();
-            die();
+        } else {
+            header('Content-Type: text/calendar; charset=utf-8');
+            header('Content-Disposition: attachment; filename="cal.ics"');
         }
-        header('Content-Type: text/calendar; charset=utf-8');
-        header('Content-Disposition: attachment; filename="cal.ics"');
-        echo $vCalendar->render();
+        $timezone = new \DateTimeZone('Europe/Berlin');
+        $calendar = new \Eluceo\iCal\Domain\Entity\Calendar($events);
+        $calendar->addTimeZone(
+            \Eluceo\iCal\Domain\Entity\TimeZone::createFromPhpDateTimeZone(
+                $timezone,
+                new \DateTimeImmutable('2023-05-01 00:00:00', $timezone),
+                new \DateTimeImmutable('2099-12-31 23:59:59', $timezone)
+            )
+        );
+        echo (new \Eluceo\iCal\Presentation\Factory\CalendarFactory())->createCalendar($calendar);
         die();
     }
 
