@@ -12,8 +12,8 @@ export default class Store {
             weather: null,
 
             hourBegin: 9,
-            shiftingView: !hlp.isMobile() ? true : false,
-            shiftingViewPrevDays: !hlp.isMobile() ? 1 : 0,
+            shiftingView: !hlp.isMobile() ? false : false,
+            shiftingViewPrevDays: !hlp.isMobile() ? 0 : 0,
             weeksInViewport: !hlp.isMobile() ? 2 : 1,
 
             cols: ['status', 'priority', 'date', 'time', 'project', 'description'],
