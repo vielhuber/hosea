@@ -251,11 +251,11 @@ DD%N: weekday in calendar week %N=0 (if >X specified, N -= calendar week of X)
             if ($target.closest('.validate-field--project')) {
                 if (
                     new RegExp(
-                        '^(--)?(\\p{RGI_Emoji})?[A-Z0-9\u00c4\u00d6\u00dc\u00df]{3,}(\\p{RGI_Emoji})?$',
+                        '^(--)?(\\p{RGI_Emoji})?[A-Z0-9\u00c4\u00d6\u00dc\u00df]{1,}[ A-Z0-9\u00c4\u00d6\u00dc\u00df]{3,}[^ ](\\p{RGI_Emoji})?$',
                         'v'
                     ).test($target.value) === false
                 ) {
-                    $target.setCustomValidity('wrong format1');
+                    $target.setCustomValidity('wrong format');
                 } else if (
                     (new RegExp('(\\p{RGI_Emoji}){1}$', 'v').test($target.value) === true ||
                         new RegExp('^(--)?(\\p{RGI_Emoji}){1}', 'v').test($target.value) === true) &&
@@ -263,7 +263,7 @@ DD%N: weekday in calendar week %N=0 (if >X specified, N -= calendar week of X)
                         $target.value.match(new RegExp('\\p{RGI_Emoji}', 'gv'))[0] !==
                             $target.value.match(new RegExp('\\p{RGI_Emoji}', 'gv'))[1])
                 ) {
-                    $target.setCustomValidity('wrong format2');
+                    $target.setCustomValidity('wrong format');
                 } else {
                     $target.setCustomValidity('');
                 }
