@@ -529,69 +529,6 @@ export default class Tickets {
         });
     }
 
-    static bindValidation() {
-        document.querySelector('.tickets').addEventListener('input', (e) => {
-            if (e.target.value !== '') {
-                if (e.target.closest('.tickets__textarea--date')) {
-                    if (e.target.value !== '*' && Dates.parseDateString(e.target.value, 'tickets') === false) {
-                        e.target.setCustomValidity('wrong format');
-                    } else {
-                        e.target.setCustomValidity('');
-                    }
-                }
-                if (e.target.closest('.tickets__textarea--time')) {
-                    if (
-                        !new RegExp('^[0-9]$|^[0-9],[0-9]$|^[0-9],[0-9][0-9]$').test(e.target.value) ||
-                        e.target.value < 0 ||
-                        e.target.value > 24
-                    ) {
-                        e.target.setCustomValidity('wrong format');
-                    } else {
-                        e.target.setCustomValidity('');
-                    }
-                }
-                if (e.target.closest('.tickets__textarea--project')) {
-                    if (
-                        new RegExp('^\\s+').test(e.target.value) === true ||
-                        new RegExp('\\s+$').test(e.target.value) === true
-                    ) {
-                        e.target.setCustomValidity('wrong format');
-                    } else {
-                        e.target.setCustomValidity('');
-                    }
-                }
-                if (e.target.closest('.tickets__textarea--priority')) {
-                    if (!['A', 'B', 'C', 'D'].includes(e.target.value)) {
-                        e.target.setCustomValidity('wrong format');
-                    } else {
-                        e.target.setCustomValidity('');
-                    }
-                }
-                if (e.target.closest('.tickets__textarea--status')) {
-                    if (
-                        ![
-                            'scheduled',
-                            'idle',
-                            'allday',
-                            'roaming',
-                            'fixed',
-                            'done',
-                            'billed',
-                            'recurring',
-                            'working',
-                        ].includes(e.target.value)
-                    ) {
-                        e.target.setCustomValidity('wrong format');
-                    } else {
-                        e.target.setCustomValidity('');
-                    }
-                }
-            } else {
-                e.target.setCustomValidity('');
-            }
-        });
-    }
-
     static bindAutoTime() {
         document.querySelector('.tickets').addEventListener('input', (e) => {
             if (e.target.closest('.tickets__entry [name="date"]')) {
