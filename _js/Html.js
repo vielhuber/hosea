@@ -93,6 +93,16 @@ working" class="tickets__table-tooltip">(?)</span>
                 `
                 );
             }
+            if (cols__value === 'project') {
+                document.querySelector('.tickets__table-head tr td:last-child').insertAdjacentHTML(
+                    'beforeend',
+                    `
+                    <span title="- caps only
+- use emojis at start+end
+- prefix '--' means not certain" class="tickets__table-tooltip">(?)</span>
+                `
+                );
+            }
             if (cols__value === 'date') {
                 document.querySelector('.tickets__table-head tr td:last-child').insertAdjacentHTML(
                     'beforeend',
@@ -157,9 +167,11 @@ DD%N: weekday in calendar week %N=0 (if >X specified, N -= calendar week of X)
             html +=
                 '<textarea class="tickets__textarea tickets__textarea--' +
                 cols__value +
-                '" autocorrect="off" autocapitalize="off" spellcheck="false" ' +
-                (['date', 'description'].includes(cols__value) ? ' class="autosize"' : '') +
-                ' name="' +
+                (['date', 'description'].includes(cols__value) ? ' autoheight' : '') +
+                (['priority', 'project'].includes(cols__value) ? ' autocaps' : '') +
+                ' validate-field validate-field--' +
+                cols__value +
+                '" autocorrect="off" autocapitalize="off" spellcheck="false" name="' +
                 cols__value +
                 '">' +
                 (ticket[cols__value] || '') +
@@ -206,5 +218,94 @@ DD%N: weekday in calendar week %N=0 (if >X specified, N -= calendar week of X)
         } else {
             document.querySelector('#app').classList.remove('view-mode--wide');
         }
+    }
+
+    static bindValidation() {
+        document.addEventListener('input', (e) => {
+            if (e.target.closest('.validate-field')) {
+                Html.validateField(e.target);
+            }
+        });
+    }
+
+    static validateField($target) {
+        if ($target.value !== '') {
+            if ($target.closest('.validate-field--date')) {
+                if ($target.value !== '*' && Dates.parseDateString($target.value, 'tickets') === false) {
+                    $target.setCustomValidity('wrong format');
+                } else {
+                    $target.setCustomValidity('');
+                }
+            }
+            if ($target.closest('.validate-field--time')) {
+                if (
+                    !new RegExp('^[0-9]$|^[0-9],[0-9]$|^[0-9],[0-9][0-9]$').test($target.value) ||
+                    $target.value < 0 ||
+                    $target.value > 24
+                ) {
+                    $target.setCustomValidity('wrong format');
+                } else {
+                    $target.setCustomValidity('');
+                }
+            }
+            if ($target.closest('.validate-field--project')) {
+                if (
+                    new RegExp(
+                        '^(--)?(\\p{RGI_Emoji})?[A-Z0-9\u00c4\u00d6\u00dc\u00df]{3,}(\\p{RGI_Emoji})?$',
+                        'v'
+                    ).test($target.value) === false
+                ) {
+                    $target.setCustomValidity('wrong format1');
+                } else if (
+                    (new RegExp('(\\p{RGI_Emoji}){1}$', 'v').test($target.value) === true ||
+                        new RegExp('^(--)?(\\p{RGI_Emoji}){1}', 'v').test($target.value) === true) &&
+                    ($target.value.match(new RegExp('\\p{RGI_Emoji}', 'gv')).length !== 2 ||
+                        $target.value.match(new RegExp('\\p{RGI_Emoji}', 'gv'))[0] !==
+                            $target.value.match(new RegExp('\\p{RGI_Emoji}', 'gv'))[1])
+                ) {
+                    $target.setCustomValidity('wrong format2');
+                } else {
+                    $target.setCustomValidity('');
+                }
+            }
+            if ($target.closest('.validate-field--priority')) {
+                if (!['A', 'B', 'C', 'D'].includes($target.value)) {
+                    $target.setCustomValidity('wrong format');
+                } else {
+                    $target.setCustomValidity('');
+                }
+            }
+            if ($target.closest('.validate-field--status')) {
+                if (
+                    ![
+                        'scheduled',
+                        'idle',
+                        'allday',
+                        'roaming',
+                        'fixed',
+                        'done',
+                        'billed',
+                        'recurring',
+                        'working',
+                    ].includes($target.value)
+                ) {
+                    $target.setCustomValidity('wrong format');
+                } else {
+                    $target.setCustomValidity('');
+                }
+            }
+        } else {
+            $target.setCustomValidity('');
+        }
+    }
+
+    static bindAutoCaps() {
+        document.addEventListener('input', (e) => {
+            if (e.target.closest('.autocaps')) {
+                let p = e.target.selectionStart;
+                e.target.value = e.target.value.toUpperCase();
+                e.target.setSelectionRange(p, p);
+            }
+        });
     }
 }
