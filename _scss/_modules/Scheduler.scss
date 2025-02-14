@@ -148,6 +148,10 @@
     padding-left: 0;
 }
 
+.scheduler__navigation-daylink {
+    cursor: pointer;
+}
+
 @include responsive-medium {
     .scheduler {
         display: block;
