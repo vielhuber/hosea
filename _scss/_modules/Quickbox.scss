@@ -22,6 +22,58 @@
     bottom: calc(#{$space-big} + 2 * #{$space-small});
 }
 
+.quickbox__money {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.quickbox__money-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    align-content: flex-start;
+    height: 100%;
+}
+
+.quickbox__money-stats {
+    width: 100%;
+    @include border;
+    border-left: none;
+    border-top: none;
+    border-right: none;
+}
+.quickbox__money-stats-entries {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    align-content: flex-start;
+}
+.quickbox__money-stats-entry {
+    width: 25.00%;
+    text-align: center;
+    height: calc(#{$space-big} + 2 * #{$space-small});
+    align-content: center;
+}
+.quickbox__money-stats-entry-heading {
+    opacity: 0.75;
+    display: inline;
+    padding-right: 2rem;
+}
+.quickbox__money-stats-entry-inner {
+    line-height: $font-size-big;
+}
+.quickbox__money-chart {
+    width: 100%;
+    flex-grow: 1;
+    max-height: calc(100% - #{$space-big});
+    padding: $space-medium;
+}
+.quickbox__money-chart-canvas {
+    width: 100%;
+    height: 100%;
+}
+
 .quickbox__new {
     position: absolute;
     width: 100%;
@@ -82,17 +134,31 @@
     vertical-align: top;
 }
 
+.quickbox__new-input:invalid {
+    background-image: url('../_assets/icon_warning.svg');
+    background-position: right -23rem center;
+    background-size: 20rem;
+    background-repeat: no-repeat;
+    border-right: 27rem solid transparent;
+}
+
 .quickbox__new-input--radio {
     vertical-align: top;
     height: 100%;
     margin-top: -1rem;
 }
 
-.quickbox__new-inputrow--1\/4 {
-    width: calc(25% - #{$space-small} * 3 / 4);
-}
-.quickbox__new-inputrow--1\/4:not(:nth-child(4)) {
+.quickbox__new-inputrow {
     margin-right: $space-small;
+}
+.quickbox__new-inputrow:nth-child(4) {
+    margin-right: 0;
+}
+.quickbox__new-inputrow--1\/6 {
+    width: calc((100% / 6) - (#{$space-small} * (6 - 1) / 6));
+}
+.quickbox__new-inputrow--1\/2 {
+    width: calc((100% / 2) - (#{$space-small} * (2 - 1) / 2));
 }
 
 .quickbox__new-inputrow:not(:last-child) {
@@ -155,6 +221,11 @@
     padding-right: $space-medium;
 }
 
+.quickbox__today-navitem--empty {
+    padding-left: $space-medium;
+    padding-right: $space-medium;
+}
+
 .quickbox__today-navitem--prev-day,
 .quickbox__today-navitem--next-day {
     width: calc(#{$space-big} + 2 * #{$space-small});
@@ -183,7 +254,7 @@
     margin-bottom: $space-small;
     border-width: 6rem;
     border-style: solid;
-    border-color: transparent;
+    border-color: $color-grey;
 }
 .quickbox__today-ticket:last-child {
     margin-bottom: 0;
@@ -215,13 +286,15 @@
 }
 .quickbox__today-ticket-description {
     width: 100%;
-    /*max-height: calc(3 * #{$space-big});*/
-    overflow-y: auto;
     background-color: $color-grey;
     color: $color-white;
     padding: $space-small;
     margin-bottom: $space-small;
     font-size: $font-size-small;
+    /*max-height: calc(3 * #{$space-big});*/
+    /*overflow-y: auto;*/
+    overflow-x: auto;
+    white-space: nowrap;
     @include scrollbar;
 }
 
@@ -258,6 +331,7 @@
 }
 
 .quickbox__mails,
+.quickbox__money,
 .quickbox__new,
 .quickbox__today {
     opacity: 0;
@@ -267,6 +341,7 @@
 
 .quickbox__content[data-view='week'] .quickbox__week,
 .quickbox__content[data-view='mails'] .quickbox__mails,
+.quickbox__content[data-view='money'] .quickbox__money,
 .quickbox__content[data-view='new'] .quickbox__new,
 .quickbox__content[data-view='today'] .quickbox__today {
     opacity: 1;
@@ -536,7 +611,7 @@
     width: $space-medium;
     height: $space-medium;
     line-height: $space-medium;
-    margin-left: $space-small;
+    margin-left: 1rem;
     display: inline-block;
     vertical-align: middle;
     transition: opacity 0.25s ease-in-out;
@@ -570,5 +645,12 @@
         .view-mode--wide & {
             width: 100%;
         }
+    }
+    .quickbox__money-chart {
+        padding: $space-medium;
+    }
+    .quickbox__money-stats-entry-heading {
+        display: block;
+        padding: 0;
     }
 }
