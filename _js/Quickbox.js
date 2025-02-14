@@ -7,13 +7,17 @@ import Footer from './Footer';
 import hlp from 'hlp';
 import PullToRefresh from 'pulltorefreshjs';
 import Swal from 'sweetalert2';
+import Chart from 'chart.js/auto';
 
 export default class Quickbox {
     lastScrollPos = 0;
+    moneyChart = null;
+    chartData = null;
 
     static initQuickbox() {
         Quickbox.buildHtml();
         Quickbox.initMails();
+        Quickbox.initMoney();
         Quickbox.initToday();
         Quickbox.initNew();
     }
@@ -31,6 +35,7 @@ export default class Quickbox {
             <div class="quickbox__content">
                 <div class="quickbox__week"></div>
                 <div class="quickbox__mails"></div>
+                <div class="quickbox__money"></div>
                 <div class="quickbox__today"></div>
                 <div class="quickbox__new"></div>
             </div>
@@ -42,9 +47,152 @@ export default class Quickbox {
                     !hlp.isMobile() ? ' quickbox__navitem--hidden' : ''
                 }">_today<span class="quickbox__navitem-count"></span></a>
                 <a href="#mails" class="quickbox__navitem">_mails<span class="quickbox__navitem-count"></span></a>
+                <a href="#money" class="quickbox__navitem">_money</a>
                 <a href="#new" class="quickbox__navitem">_new</a>
             </div>
         `;
+    }
+
+    static initMoney() {
+        Store.data.api
+            .fetch('_api/money', {
+                method: 'GET',
+                cache: 'no-cache',
+                headers: { 'content-type': 'application/json' },
+            })
+            .then((res) => res.json())
+            .catch(() => {})
+            .then((response) => {
+                document.querySelector('.quickbox__money').innerHTML = '';
+                document.querySelector('.quickbox__money').insertAdjacentHTML(
+                    'beforeend',
+                    `
+                    <div class="quickbox__money-container">
+                        <div class="quickbox__money-stats"></div>
+                        <div class="quickbox__money-chart"></div>
+                    </div>
+                    `
+                );
+                document.querySelector('.quickbox__money-stats').insertAdjacentHTML(
+                    'beforeend',
+                    `
+                    <ul class="quickbox__money-stats-entries">
+                        <li class="quickbox__money-stats-entry">
+                            <div class="quickbox__money-stats-entry-inner">
+                                <h3 class="quickbox__money-stats-entry-heading">budget/month:</h3>
+                                ${response.data.stats.monthly_budget.toLocaleString('de-DE', {
+                                    minimumFractionDigits: 2,
+                                })}&euro;
+                            </div>
+                        </li>
+                        <li class="quickbox__money-stats-entry">
+                            <div class="quickbox__money-stats-entry-inner">
+                                <h3 class="quickbox__money-stats-entry-heading">budget/left:</h3>
+                                ${response.data.stats.budget_left_in_month.toLocaleString('de-DE', {
+                                    minimumFractionDigits: 2,
+                                })}&euro;
+                            </div>
+                        </li>
+                        <li class="quickbox__money-stats-entry">
+                            <div class="quickbox__money-stats-entry-inner">
+                                <h3 class="quickbox__money-stats-entry-heading">budget/day:</h3>
+                                ${response.data.stats.budget_left_per_day.toLocaleString('de-DE', {
+                                    minimumFractionDigits: 2,
+                                })}&euro;
+                            </div>
+                        </li>
+                        <li class="quickbox__money-stats-entry">
+                            <div class="quickbox__money-stats-entry-inner">
+                                <h3 class="quickbox__money-stats-entry-heading">km/day:</h3>
+                                ${response.data.km_per_day.toString().replace('.', ',')}
+                            </div>
+                        </li>
+                    </ul>
+                    `
+                );
+                document
+                    .querySelector('.quickbox__money-chart')
+                    .insertAdjacentHTML('beforeend', '<canvas class="quickbox__money-chart-canvas"></canvas>');
+                this.chartData = {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(response.data.diagrams),
+                        datasets: [
+                            {
+                                label: 'Betrag in €',
+                                data: Object.values(response.data.diagrams),
+                                backgroundColor: ['#E91E63', '#FFB300', '#F44336', '#ba68c8', '#2196F3', '#4527a0'],
+                                borderColor: '#ffffff',
+                                borderWidth: 2,
+                            },
+                        ],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 250,
+                                    callback: (value) => {
+                                        return value + '€';
+                                    },
+                                    font: {
+                                        weight: 'bold', // X-Achse fett
+                                        family: 'Inconsolata, monospace',
+                                        size: 10,
+                                    },
+                                    color: '#ffffff', // Y-Achsentitel in Weiß
+                                },
+                                grid: {
+                                    display: true, // Aktiviert horizontale Linien
+                                    color: 'rgba(255, 255, 255, 0.9)', // Leichte graue Linien
+                                    lineWidth: 2,
+                                },
+                                border: {
+                                    display: false, // Versteckt die y-Achsenlinie
+                                },
+                            },
+                            x: {
+                                grid: {
+                                    display: false, // Deaktiviert vertikale Linien
+                                },
+                                ticks: {
+                                    font: {
+                                        weight: 'bold', // Y-Achse fett
+                                        family: 'Inconsolata, monospace',
+                                        size: 10,
+                                    },
+                                    color: '#ffffff', // Y-Achsentitel in Weiß
+                                },
+                            },
+                        },
+                        plugins: {
+                            legend: {
+                                display: false,
+                            },
+                            tooltip: {
+                                bodyFont: {
+                                    size: 11, // Größe des Tooltip-Texts
+                                    family: 'Inconsolata, monospace',
+                                },
+                                titleFont: {
+                                    size: 13, // Größe des Tooltip-Titels
+                                    family: 'Inconsolata, monospace',
+                                },
+                            },
+                        },
+                        animation: {
+                            duration: 3500, // Animation dauert 2 Sekunden
+                            easing: 'easeOutBounce', // Bouncy-Effekt
+                        },
+                    },
+                };
+                if (document.querySelector('.quickbox__content').getAttribute('data-view') === 'money') {
+                    this.initializeMoneyChart();
+                }
+            });
     }
 
     static initMails() {
@@ -80,9 +228,19 @@ export default class Quickbox {
             .then((response) => {
                 Store.data.busy = false;
                 Store.data.mails = [];
-                response.data.forEach((mails__value) => {
-                    Store.data.mails.push(mails__value);
-                });
+                if (response.success === true) {
+                    response.data.forEach((mails__value) => {
+                        Store.data.mails.push(mails__value);
+                    });
+                } else {
+                    Swal.fire({
+                        text: 'error syncing mails!',
+                        icon: 'error',
+                        timer: 10000,
+                        timerProgressBar: true,
+                        showConfirmButton: false,
+                    });
+                }
                 Quickbox.renderMails();
                 Quickbox.updateMailCount();
             });
@@ -379,6 +537,10 @@ export default class Quickbox {
         document.querySelectorAll('.quickbox__content > *').forEach((el2) => {
             el2.style.display = 'block';
         });
+        /* reinitialize chart to init animation */
+        if (view === 'money') {
+            this.initializeMoneyChart();
+        }
         requestAnimationFrame(() => {
             setTimeout(() => {
                 document.querySelectorAll('.quickbox__content > *:not(.quickbox__' + view + ')').forEach((el2) => {
@@ -406,14 +568,27 @@ export default class Quickbox {
         });
     }
 
+    static initializeMoneyChart() {
+        if (this.chartData === null || this.chartData === undefined) {
+            return;
+        }
+        if (this.moneyChart) {
+            this.moneyChart.destroy();
+        }
+        this.moneyChart = new Chart(document.querySelector('.quickbox__money-chart-canvas'), this.chartData);
+    }
+
     static initToday() {
         document.querySelector('.quickbox__today').innerHTML = `
             <div class="quickbox__today-nav">
                 <a class="quickbox__today-navitem quickbox__today-navitem--prev-day" href="#">&lt;</a>
-                <a class="quickbox__today-navitem quickbox__today-navitem--cur-day" href="#">${Dates.dateFormat(
-                    Dates.getActiveDate(),
-                    'd.m.y'
-                )}</a>
+                <a class="quickbox__today-navitem quickbox__today-navitem--empty" href="#">${Scheduler.generateLinkToEmptyDatesSum()}</a>
+                <a class="quickbox__today-navitem quickbox__today-navitem--cur-day" href="#">${
+                    Dates.dateFormat(Dates.getActiveDate(), 'd.m.') +
+                    '/#' +
+                    Dates.weekNumber(Dates.getActiveDate()) +
+                    ''
+                }</a>
                 <a class="quickbox__today-navitem quickbox__today-navitem--next-day" href="#">&gt;</a>
             </div>
             <ul class="quickbox__today-tickets"></ul>
@@ -473,7 +648,20 @@ export default class Quickbox {
             if (['done', 'billed'].includes(tickets__value.status)) {
                 return;
             }
-            let parsed_values = Dates.parseDateString(tickets__value.date, 'tickets');
+            if (tickets__value.visible === false) {
+                return;
+            }
+            let parsed_values;
+            if (document.querySelector('.metabar__select--filter[name="date"]').value !== '') {
+                parsed_values = Dates.parseDateString(tickets__value.date, 'tickets');
+            } else {
+                parsed_values = [
+                    {
+                        minutes_left: null,
+                    },
+                ];
+            }
+
             if (parsed_values !== false && parsed_values.length > 0) {
                 parsed_values.forEach((parsed_values__value) => {
                     document.querySelector('.quickbox__today-tickets').insertAdjacentHTML(
@@ -501,28 +689,45 @@ export default class Quickbox {
                                 <div class="quickbox__today-ticket-date">
                                     ${
                                         tickets__value.status === 'fixed'
-                                            ? (parsed_values__value.minutes_left < 8 * 60
+                                            ? (parsed_values__value.minutes_left !== null &&
+                                              parsed_values__value.minutes_left < 8 * 60
                                                   ? '<span class="quickbox__today-ticket-date-countdown">'
                                                   : '') +
-                                              (parsed_values__value.minutes_left < 0
+                                              (parsed_values__value.minutes_left !== null &&
+                                              parsed_values__value.minutes_left < 0
                                                   ? '⌛⌛⌛'
-                                                  : parsed_values__value.minutes_left < 8 * 60
+                                                  : parsed_values__value.minutes_left !== null &&
+                                                    parsed_values__value.minutes_left < 8 * 60
                                                   ? '⌛' + parsed_values__value.minutes_left + 'min⌛'
                                                   : '') +
-                                              (parsed_values__value.minutes_left < 8 * 60 ? '</span>' : '')
+                                              (parsed_values__value.minutes_left !== null &&
+                                              parsed_values__value.minutes_left < 8 * 60
+                                                  ? '</span>'
+                                                  : '')
                                             : ''
                                     }
                                     ${
-                                        tickets__value.date.indexOf(' ') > -1
-                                            ? tickets__value.date.split(' ')[1]
-                                            : tickets__value.date
+                                        parsed_values__value.begin !== null && parsed_values__value.end !== null
+                                            ? Math.floor(parsed_values__value.begin).toString().padStart(2, '0') +
+                                              ':' +
+                                              ((parsed_values__value.begin % 1) * 60).toString().padStart(2, '0') +
+                                              '–' +
+                                              Math.floor(parsed_values__value.end).toString().padStart(2, '0') +
+                                              ':' +
+                                              ((parsed_values__value.end % 1) * 60).toString().padStart(2, '0')
+                                            : ''
                                     }
                                 </div>
                                 ${
                                     tickets__value.description !== null && tickets__value.description !== ''
-                                        ? `<div class="quickbox__today-ticket-description">${hlp.nl2br(
-                                              tickets__value.description
-                                          )}</div>`
+                                        ? `<div class="quickbox__today-ticket-description">${tickets__value.description
+                                              .split('\n')
+                                              .map((description__value) =>
+                                                  hlp
+                                                      .rtrim(description__value)
+                                                      .replace(/^ +/, (match) => '&nbsp;'.repeat(match.length))
+                                              )
+                                              .join('<br/>')}</div>`
                                         : ''
                                 }
                             </li>
@@ -539,18 +744,32 @@ export default class Quickbox {
         document.addEventListener('click', (e) => {
             let el = e.target.closest('.quickbox__today-nav');
             if (el) {
-                if (e.target.closest('.quickbox__today-navitem--prev-day')) {
-                    Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() - 1);
+                if (
+                    e.target.closest('.quickbox__today-navitem--prev-day') ||
+                    e.target.closest('.quickbox__today-navitem--cur-day') ||
+                    e.target.closest('.quickbox__today-navitem--next-day')
+                ) {
+                    if (e.target.closest('.quickbox__today-navitem--prev-day')) {
+                        Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() - 1);
+                    } else if (e.target.closest('.quickbox__today-navitem--cur-day')) {
+                        Store.data.session.activeDay = new Date();
+                    } else if (e.target.closest('.quickbox__today-navitem--next-day')) {
+                        Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() + 1);
+                    }
+                    document.querySelector('.metabar__select--filter[name="date"]').value = Dates.dateFormat(
+                        Store.data.session.activeDay,
+                        'Y-m-d'
+                    );
+                    document.querySelector('.metabar__select--sort[name="sort_1"]').value = '';
+                } else if (e.target.closest('.quickbox__today-navitem--empty')) {
+                    document.querySelector('.metabar__select--filter[name="date"]').value = '';
+                    document.querySelector('.metabar__select--sort[name="sort_1"]').value = 'priority';
                 }
-                if (e.target.closest('.quickbox__today-navitem--cur-day')) {
-                    Store.data.session.activeDay = new Date();
-                }
-                if (e.target.closest('.quickbox__today-navitem--next-day')) {
-                    Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() + 1);
-                }
-                Quickbox.initToday();
-                Scheduler.initScheduler();
+
                 Filter.doFilter();
+                Scheduler.initScheduler();
+                Quickbox.initToday();
+
                 e.preventDefault();
             }
         });
@@ -583,18 +802,17 @@ export default class Quickbox {
         document.querySelector('.quickbox__new').innerHTML = `
             <form class="quickbox__new-form">
                 <ul class="quickbox__new-inputrows">
-                    <li class="quickbox__new-inputrow quickbox__new-inputrow--1/4"><label class="quickbox__new-label"><input class="quickbox__new-input quickbox__new-input--radio" type="radio" name="date" value="tonight" checked /><span class="quickbox__new-label-text">tonight</span></label></li>
-                    <li class="quickbox__new-inputrow quickbox__new-inputrow--1/4"><label class="quickbox__new-label"><input class="quickbox__new-input quickbox__new-input--radio" type="radio" name="date" value="weekend" /><span class="quickbox__new-label-text">weekend</span></label></li>
-                    <li class="quickbox__new-inputrow quickbox__new-inputrow--1/4"><label class="quickbox__new-label"><input class="quickbox__new-input quickbox__new-input--radio" type="radio" name="date" value="next" /><span class="quickbox__new-label-text">next</span></label></li>
-                    <li class="quickbox__new-inputrow quickbox__new-inputrow--1/4"><input class="quickbox__new-input quickbox__new-input--text" type="text" name="date" placeholder="date" value="" /></li>
-                    <li class="quickbox__new-inputrow"><input class="quickbox__new-input quickbox__new-input--text" type="text" required="required" name="project" placeholder="project" value="private" /></li>
+                    <li class="quickbox__new-inputrow quickbox__new-inputrow--1/6"><label class="quickbox__new-label"><input class="quickbox__new-input quickbox__new-input--radio" type="radio" name="date" value="tonight" checked /><span class="quickbox__new-label-text">tonight</span></label></li>
+                    <li class="quickbox__new-inputrow quickbox__new-inputrow--1/6"><label class="quickbox__new-label"><input class="quickbox__new-input quickbox__new-input--radio" type="radio" name="date" value="weekend" /><span class="quickbox__new-label-text">weekend</span></label></li>
+                    <li class="quickbox__new-inputrow quickbox__new-inputrow--1/6"><label class="quickbox__new-label"><input class="quickbox__new-input quickbox__new-input--radio" type="radio" name="date" value="next" /><span class="quickbox__new-label-text">next</span></label></li>
+                    <li class="quickbox__new-inputrow quickbox__new-inputrow--1/2"><input class="quickbox__new-input quickbox__new-input--text validate-field validate-field--date" type="text" name="date" placeholder="date" value="" /></li>
+                    <li class="quickbox__new-inputrow"><input class="quickbox__new-input quickbox__new-input--text validate-field validate-field--project autocaps" type="text" required="required" name="project" placeholder="project" value="PRIVATE" /></li>
                     <li class="quickbox__new-inputrow quickbox__new-inputrow--rheight">
                         <textarea
                             class="quickbox__new-input quickbox__new-input--textarea"
                             autocorrect="off"
                             autocapitalize="off"
                             spellcheck="false"
-                            required="required"
                             name="description"
                             placeholder="description"></textarea>
                     </li>
