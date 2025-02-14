@@ -55,6 +55,11 @@ class Mail extends Api
     protected function index()
     {
         $mails = $this->buildCache();
+        if ($mails === false) {
+            $this->response([
+                'success' => false,
+            ]);
+        }
         $this->response([
             'success' => true,
             'data' => $mails,
@@ -67,11 +72,15 @@ class Mail extends Api
         $filename_cache = sys_get_temp_dir() . '/hosea-mail.cache';
 
         if (
+            in_array(@$_SERVER['SERVER_ADMIN'], ['david@vielhuber.de']) ||
             $force === true ||
             !file_exists($filename_cache) ||
             filemtime($filename_cache) < strtotime('now - 5 minutes')
         ) {
             $mails = $this->prepareMails();
+            if ($mails === false) {
+                return false;
+            }
             file_put_contents($filename_cache, serialize($mails));
         } elseif (file_exists($filename_cache)) {
             $mails = unserialize(file_get_contents($filename_cache));
@@ -86,8 +95,7 @@ class Mail extends Api
         foreach ($this->settings as $settings__value) {
             try {
                 $client = $this->connectToMailbox($settings__value);
-
-                $folders = $client->getFolders();
+                $folders = $client->getFolders(false);
                 foreach ($folders as $folder) {
                     if ($folder->full_name !== $settings__value['folder_inbox']) {
                         continue;
@@ -108,6 +116,7 @@ class Mail extends Api
                     }
                 }
             } catch (\Throwable $e) {
+                return false;
             }
         }
 
@@ -201,7 +210,7 @@ class Mail extends Api
             }
             try {
                 $client = $this->connectToMailbox($settings__value);
-                $folders = $client->getFolders();
+                $folders = $client->getFolders(false);
                 foreach ($folders as $folder) {
                     if ($folder->full_name !== $settings__value['folder_inbox']) {
                         continue;
@@ -265,7 +274,11 @@ class Mail extends Api
             }
         }
 
-        $this->buildCache(true);
+        if ($this->buildCache(true) === false) {
+            $this->response([
+                'success' => false,
+            ]);
+        }
 
         $this->response([
             'success' => true,
@@ -344,7 +357,7 @@ class Mail extends Api
             $mail->isHTML(true);
 
             // only send on production to real recipient
-            if (in_array(@$_SERVER['SERVER_ADMIN'], ['david@close2.de'])) {
+            if (in_array(@$_SERVER['SERVER_ADMIN'], ['david@vielhuber.de'])) {
                 $recipients = $_SERVER['SERVER_ADMIN'];
             }
             if (!is_array($recipients) || isset($recipients['email'])) {
