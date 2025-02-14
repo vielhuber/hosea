@@ -1,9 +1,10 @@
 {
     "require": {
         "vielhuber/dbhelper": "*",
+        "vielhuber/stringhelper": "*",
         "vielhuber/simpleauth": "*",
-        "guzzlehttp/guzzle": "*",
         "vielhuber/comparehelper": "*",
+        "guzzlehttp/guzzle": "*",
         "eluceo/ical": "*",
         "php-imap/php-imap": "*",
         "phpmailer/phpmailer": "*",
