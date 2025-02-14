@@ -24,12 +24,11 @@ export default class App {
         Tickets.fetchAndRenderTicketsInterval();
         Keyboard.initKeyboardNavigation();
         Scheduler.initScheduler();
-        Quickbox.initQuickbox();
-        Quickbox.bindQuickbox();
         // currently disabled, because we use both columns independently
         //Tickets.bindAutoTime();
         Tickets.bindChangeTracking();
-        Tickets.bindValidation();
+        Html.bindAutoCaps();
+        Html.bindValidation();
         Attachments.bindUpload();
         Attachments.bindDownload();
         Attachments.bindDeleteAttachment();
@@ -49,5 +48,7 @@ export default class App {
         Scheduler.updateColors();
         Tickets.updateSum();
         Textarea.textareaAutoHeight();
+        Quickbox.initQuickbox();
+        Quickbox.bindQuickbox();
     }
 }
