@@ -84,6 +84,7 @@ class Api
         $this->User->getRequest();
         $this->Weather->getRequest();
         $this->Mail->getRequest();
+        $this->Money->getRequest();
         $this->iCal->getRequest();
         $this->Cron->getRequest();
         $this->response(
