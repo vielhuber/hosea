@@ -4,6 +4,7 @@ import Sort from './Sort';
 import Store from './Store';
 import Scheduler from './Scheduler';
 import Textarea from './Textarea';
+import hlp from 'hlp';
 
 export default class Filter {
     static initFilter() {
@@ -71,13 +72,17 @@ export default class Filter {
                 }
 
                 Store.data.tickets.forEach((tickets__value) => {
-                    // skip old projects
+                    // skip old projects (disabled)
+                    /*
                     if (columns__value === 'project') {
                         if (skip_old_dates.includes(tickets__value.date.substring(5, 8))) {
                             return;
                         }
                     }
+                    */
                     let options_value = tickets__value[columns__value];
+                    options_value = options_value.replace(/^--/, '');
+
                     if (!options.includes(options_value)) {
                         options.push(options_value);
                     }
@@ -134,7 +139,8 @@ export default class Filter {
                     return a.localeCompare(b);
                 });
                 options.forEach((options__value) => {
-                    let options__value_normalized = options__value.replace(hlp.emojiRegex(false), '');
+                    let options__value_normalized = options__value;
+                    options__value_normalized = options__value_normalized.replace(hlp.emojiRegex(false), '');
 
                     document
                         .querySelector('.metabar__select--filter[name="' + columns__value + '"]')
@@ -180,6 +186,13 @@ export default class Filter {
                     if (el.getAttribute('name') === 'date' && val_search !== '*' && val_search !== '') {
                         let parsed_values = Dates.parseDateString(val_target, 'tickets');
                         if (parsed_values !== false && parsed_values.length > 0) {
+                            visible_this = true;
+                        }
+                    }
+
+                    // project
+                    if (el.getAttribute('name') === 'project' && val_search !== '*' && val_search !== '') {
+                        if (val_target === val_search || val_target === '--' + val_search) {
                             visible_this = true;
                         }
                     }
