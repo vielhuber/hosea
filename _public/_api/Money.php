@@ -1,6 +1,8 @@
 <?php
 namespace HoseaApi;
 
+use vielhuber\stringhelper\__;
+
 class Money extends Api
 {
     public $money_stats_url = null;
@@ -32,12 +34,8 @@ class Money extends Api
 
     protected function index()
     {
-        // full error reporting
-        error_reporting(E_ALL);
-        ini_set('display_errors', '1');
-
         // add money info from external server
-        $response = __curl($this->money_stats_url);
+        $response = __::curl($this->money_stats_url);
 
         // also add car info
         $car_data = explode(

@@ -1,0 +1,47 @@
+name: CI
+
+env:
+    CI: true
+
+on: [push]
+
+jobs:
+    build-test:
+        runs-on: ${{ matrix.operating-system }}
+
+        strategy:
+            matrix:
+                operating-system: ['ubuntu-latest']
+                php-versions: ['7.4', '8.0', '8.1']
+
+        name: ${{ matrix.operating-system }} (PHP ${{ matrix.php-versions }})
+
+        services:
+            postgres:
+                image: postgres
+                env:
+                    POSTGRES_USER: postgres
+                    POSTGRES_PASSWORD: root
+                ports:
+                    - 5432:5432
+                options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+
+            - name: MySQL
+              run: |
+                  sudo systemctl start mysql.service
+
+            - name: PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '${{ matrix.php-versions }}'
+                  tools: composer, phpunit
+
+            - name: Composer
+              run: composer install --no-interaction
+
+            - name: PHPUnit
+              run: ./vendor/bin/phpunit

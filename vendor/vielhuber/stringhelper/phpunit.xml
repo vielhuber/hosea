@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  bootstrap="src/__.php"
+  colors="true"
+  stopOnFailure="true"
+  displayDetailsOnTestsThatTriggerWarnings="true"
+  xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.0/phpunit.xsd"
+  cacheDirectory=".phpunit.cache"
+>
+  <testsuites>
+    <testsuite name="testsuite">
+      <directory>tests</directory>
+    </testsuite>
+  </testsuites>
+  <php>
+    <server name="HTTPS" value="on"/>
+    <server name="HTTP_HOST" value="github.com"/>
+    <server name="REQUEST_URI" value="/vielhuber/stringhelper/test.php?foo=bar"/>
+    <server name="PHP_SELF" value="/vielhuber/stringhelper/test.php"/>
+    <server name="HTTP_REFERER" value="https://google.de/"/>
+    <server name="REMOTE_ADDR" value="192.168.178.1"/>
+  </php>
+</phpunit>

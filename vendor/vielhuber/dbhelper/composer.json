@@ -1,0 +1,17 @@
+{
+    "name": "vielhuber/dbhelper",
+    "description": "Small PHP wrapper for mysql/pgsql databases.",
+    "require": {
+        "php": ">=7.4"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "vielhuber\\dbhelper\\": "src/",
+            "Tests\\Phpunit\\": "tests/phpunit/"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9"
+    }
+}
