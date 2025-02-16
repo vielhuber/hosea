@@ -26,7 +26,7 @@ class Money extends Api
         if (
             $this->getRequestMethod() === 'GET' &&
             $this->getRequestPathFirst() === 'money' &&
-            $this->getRequestPathSecond() === null
+            $this->getRequestPathSecond() != ''
         ) {
             return $this->index();
         }
