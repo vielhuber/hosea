@@ -45,7 +45,7 @@ class Money extends Api
         $car_km = [];
         foreach ($car_data as $car_data__value) {
             $line_parts = explode(':', $car_data__value);
-            $car_km[trim($line_parts[0])] = trim($line_parts[1]);
+            $car_km[trim(str_replace('- ', '', $line_parts[0]))] = trim(str_replace('- ', '', $line_parts[1]));
         }
         $response->result->data->km_per_day = round(
             (round(

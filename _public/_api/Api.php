@@ -27,15 +27,7 @@ class Api
     protected function checkAuth()
     {
         $success = true;
-        if ($this->getRequestPathFirst() === 'cron') {
-            if (
-                $this->getRequestPathSecond() == '' ||
-                $this::$db->fetch_var('SELECT COUNT(*) FROM users WHERE api_key = ?', $this->getRequestPathSecond()) ==
-                    0
-            ) {
-                $success = false;
-            }
-        } elseif ($this->getRequestPathFirst() === 'ical') {
+        if (in_array($this->getRequestPathFirst(), ['cron', 'ical', 'money'])) {
             if (
                 $this->getRequestPathSecond() == '' ||
                 $this::$db->fetch_var('SELECT COUNT(*) FROM users WHERE api_key = ?', $this->getRequestPathSecond()) ==

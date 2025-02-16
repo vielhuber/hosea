@@ -55,7 +55,7 @@ export default class Quickbox {
 
     static initMoney() {
         Store.data.api
-            .fetch('_api/money', {
+            .fetch('_api/money/' + Store.data.user.api_key, {
                 method: 'GET',
                 cache: 'no-cache',
                 headers: { 'content-type': 'application/json' },
