@@ -32,9 +32,12 @@ class Money extends Api
 
     protected function index()
     {
+        // full error reporting
+        error_reporting(E_ALL);
+        ini_set('display_errors', '1');
+
         // add money info from external server
         $response = __curl($this->money_stats_url);
-        die('OK');
 
         // also add car info
         $car_data = explode(
