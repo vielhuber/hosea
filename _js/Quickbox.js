@@ -103,8 +103,8 @@ export default class Quickbox {
                         </li>
                         <li class="quickbox__money-stats-entry">
                             <div class="quickbox__money-stats-entry-inner">
-                                <h3 class="quickbox__money-stats-entry-heading">km/day:</h3>
-                                ${response.data.km_per_day.toString().replace('.', ',')}
+                                <h3 class="quickbox__money-stats-entry-heading">dist/day:</h3>
+                                ${response.data.km_per_day.toString().replace('.', ',')}km
                             </div>
                         </li>
                     </ul>
