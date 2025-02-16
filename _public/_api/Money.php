@@ -32,6 +32,8 @@ class Money extends Api
 
     protected function index()
     {
+        die('OK');
+
         // add money info from external server
         $response = __curl($this->money_stats_url);
 
