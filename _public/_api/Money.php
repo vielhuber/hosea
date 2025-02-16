@@ -9,9 +9,6 @@ class Money extends Api
 
     public function __construct()
     {
-        // full error reporting
-        error_reporting(E_ALL);
-        ini_set('display_errors', '1');
         $this->setupSettings();
     }
 
