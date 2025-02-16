@@ -1,7 +1,9 @@
+
 /_public/config.json
 /node_modules/
 /_backup/
 /.env
+/vendor/
 /composer.lock
 /package-lock.json
 /backup.sql
