@@ -27,7 +27,7 @@ export default class Textarea {
             });
     }
 
-    static textareaSetHeight(el) {
+    static textareaGetLines(el) {
         let min = 3,
             max = 7,
             cur = (el.value.match(/\n/g) || []).length + 1;
@@ -36,19 +36,25 @@ export default class Textarea {
         } else if (cur > max) {
             cur = max;
         }
-        let height = 15 * cur + 'rem';
-        el.style.height = height;
-        /* also set other textarea heights */
-        let parent = el.parentNode;
-        [...parent.parentNode.children]
-            .filter((child) => child !== parent)
-            .forEach((i) => {
-                if (
-                    i.querySelector('textarea') !== null &&
-                    !i.querySelector('textarea').classList.contains('autoheight')
-                ) {
-                    i.querySelector('textarea').style.height = height;
+        return cur;
+    }
+
+    static textareaSetHeight(el) {
+        // determine max height
+        let maxLines = 0,
+            parent = el.parentNode;
+        [...parent.parentNode.children].forEach((i) => {
+            if (i.querySelector('textarea') !== null) {
+                let thisLines = Textarea.textareaGetLines(i.querySelector('textarea'));
+                if (maxLines <= thisLines) {
+                    maxLines = thisLines;
                 }
-            });
+            }
+        });
+        [...parent.parentNode.children].forEach((i) => {
+            if (i.querySelector('textarea') !== null) {
+                i.querySelector('textarea').style.height = 15 * maxLines + 'rem';
+            }
+        });
     }
 }
