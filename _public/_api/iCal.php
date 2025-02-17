@@ -27,6 +27,8 @@ class iCal extends Api
             SELECT * FROM tickets WHERE user_id = (SELECT id FROM users WHERE api_key = ?)
             AND (INSTR(project,\'FEIERTAG\') OR STR_TO_DATE(date,\'%d.%m.%y\') > DATE_SUB(NOW(), INTERVAL 30 DAY))
             AND (INSTR(project,\'FEIERTAG\') OR STR_TO_DATE(date,\'%d.%m.%y\') < DATE_ADD(NOW(), INTERVAL 30 DAY))
+            AND status IN (\'fixed\')
+
             ',
             $this->getRequestPathSecond()
         );
