@@ -39,16 +39,16 @@ export default class Textarea {
         let height = 15 * cur + 'rem';
         el.style.height = height;
         /* also set other textarea heights */
-        /* disabled */
-        /*
         let parent = el.parentNode;
         [...parent.parentNode.children]
             .filter((child) => child !== parent)
             .forEach((i) => {
-                if (i.querySelector('textarea') !== null) {
+                if (
+                    i.querySelector('textarea') !== null &&
+                    !i.querySelector('textarea').classList.contains('autoheight')
+                ) {
                     i.querySelector('textarea').style.height = height;
                 }
             });
-            */
     }
 }
