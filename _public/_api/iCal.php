@@ -28,7 +28,10 @@ class iCal extends Api
             AND (INSTR(project,\'FEIERTAG\') OR STR_TO_DATE(date,\'%d.%m.%y\') > DATE_SUB(NOW(), INTERVAL 30 DAY))
             AND (INSTR(project,\'FEIERTAG\') OR STR_TO_DATE(date,\'%d.%m.%y\') < DATE_ADD(NOW(), INTERVAL 30 DAY))
             AND status IN (\'fixed\')
-
+            AND project NOT LIKE \'%Mittagessen%\'
+            AND project NOT LIKE \'%Abendessen%\'
+            AND project NOT LIKE \'%Entspannen%\'
+            AND project NOT LIKE \'%Julia%\'
             ',
             $this->getRequestPathSecond()
         );
