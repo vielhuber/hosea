@@ -363,6 +363,31 @@ export default class Dates {
         return '20' + str.substring(6, 8) + '-' + str.substring(3, 5) + '-' + str.substring(0, 2) + str.substring(9);
     }
 
+    static getWeekdayOfString(str) {
+        if (str.indexOf('MO') === 0) {
+            return 0;
+        }
+        if (str.indexOf('DI') === 0) {
+            return 1;
+        }
+        if (str.indexOf('MI') === 0) {
+            return 2;
+        }
+        if (str.indexOf('DO') === 0) {
+            return 3;
+        }
+        if (str.indexOf('FR') === 0) {
+            return 4;
+        }
+        if (str.indexOf('SA') === 0) {
+            return 5;
+        }
+        if (str.indexOf('SO') === 0) {
+            return 6;
+        }
+        return -1;
+    }
+
     static dateFormat(d, format) {
         if (format === 'D d.m.') {
             return (

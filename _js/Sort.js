@@ -1,3 +1,4 @@
+import Dates from './Dates';
 import Store from './Store';
 
 export default class Sort {
@@ -43,8 +44,16 @@ export default class Sort {
                     val_a = a.querySelector('[name="' + sort_1 + '"]').value.toLowerCase();
                     val_b = b.querySelector('[name="' + sort_1 + '"]').value.toLowerCase();
                     if (sort_1 === 'date') {
-                        val_a = Dates.germanDateTimeToEnglishString(val_a);
-                        val_b = Dates.germanDateTimeToEnglishString(val_b);
+                        if (
+                            a.querySelector('[name="status"]').value == 'recurring' &&
+                            b.querySelector('[name="status"]').value == 'recurring'
+                        ) {
+                            val_a = Dates.getWeekdayOfString(a.querySelector('[name="date"]').value);
+                            val_b = Dates.getWeekdayOfString(b.querySelector('[name="date"]').value);
+                        } else {
+                            val_a = Dates.germanDateTimeToEnglishString(val_a);
+                            val_b = Dates.germanDateTimeToEnglishString(val_b);
+                        }
                     }
                     if (val_a < val_b) {
                         return -1;
@@ -98,8 +107,8 @@ export default class Sort {
                     a.querySelector('[name="status"]').value == 'recurring' &&
                     b.querySelector('[name="status"]').value == 'recurring'
                         ? [
-                              a.querySelector('[name="date"]').value.split(' ').slice(1).join(' '),
-                              b.querySelector('[name="date"]').value.split(' ').slice(1).join(' '),
+                              Dates.getWeekdayOfString(a.querySelector('[name="date"]').value),
+                              Dates.getWeekdayOfString(b.querySelector('[name="date"]').value),
                           ]
                         : [
                               Dates.germanDateTimeToEnglishString(a.querySelector('[name="date"]').value),
