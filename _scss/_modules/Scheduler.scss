@@ -102,6 +102,10 @@
     height: calc(100% - #{$bar-height} - #{$bar-height} - #{$space-medium} * 3);
 }
 
+.scheduler__appointments:has(.scheduler__appointment:hover) .scheduler__appointment:not(:hover) {
+    opacity: 0.5 !important;
+}
+
 .scheduler__appointment {
     position: absolute;
     padding: 1rem 3rem;
@@ -114,6 +118,7 @@
     margin-bottom: 2rem;
     /* border: 1px solid $color-white; */
     box-shadow: 0px 0px 0px 1px $color-white;
+    transition: opacity 0.5s ease-in-out;
     cursor: help;
 }
 
