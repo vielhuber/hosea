@@ -39,6 +39,8 @@ export default class Textarea {
         let height = 15 * cur + 'rem';
         el.style.height = height;
         /* also set other textarea heights */
+        /* disabled */
+        /*
         let parent = el.parentNode;
         [...parent.parentNode.children]
             .filter((child) => child !== parent)
@@ -47,5 +49,6 @@ export default class Textarea {
                     i.querySelector('textarea').style.height = height;
                 }
             });
+            */
     }
 }
