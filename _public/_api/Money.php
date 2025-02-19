@@ -47,18 +47,20 @@ class Money extends Api
             $line_parts = explode(':', $car_data__value);
             $car_km[trim(str_replace('- ', '', $line_parts[0]))] = trim(str_replace('- ', '', $line_parts[1]));
         }
-        $response->result->data->km_per_day = round(
-            (round(
-                (strtotime($car_km['Leasingende']) - strtotime($car_km['Leasingbeginn'])) / (60 * 60 * 24 * 365.25)
-            ) *
-                $car_km['Kilometer / Jahr'] -
-                $car_km['Gefahrene Kilometer']) /
-                ((strtotime($car_km['Leasingende']) - strtotime($car_km['Letztes Update'])) / (60 * 60 * 24)),
-            2
-        );
-        $response->result->data->days_left = round(
-            (strtotime($car_km['Leasingende']) - strtotime($car_km['Leasingbeginn'])) / (60 * 60 * 24)
-        );
+        $response->result->data->car = (object) [
+            'km_per_day' => round(
+                (round(
+                    (strtotime($car_km['Leasingende']) - strtotime($car_km['Leasingbeginn'])) / (60 * 60 * 24 * 365.25)
+                ) *
+                    $car_km['Kilometer / Jahr'] -
+                    $car_km['Gefahrene Kilometer']) /
+                    ((strtotime($car_km['Leasingende']) - strtotime($car_km['Letztes Update'])) / (60 * 60 * 24)),
+                2
+            ),
+            'days_left' => round(
+                (strtotime($car_km['Leasingende']) - strtotime($car_km['Leasingbeginn'])) / (60 * 60 * 24)
+            ),
+        ];
 
         $this->response($response->result);
     }
