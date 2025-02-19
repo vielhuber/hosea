@@ -196,7 +196,7 @@ DD%N: weekday in calendar week %N=0 (if >X specified, N -= calendar week of X)
 
             </td>
             <td class="tickets__table-cell">
-                <a href="#" class="tickets__entry__delete">x</a>
+                <a href="#" class="tickets__entry__delete">🗑️</a>
             </td>
         </tr>
         `;

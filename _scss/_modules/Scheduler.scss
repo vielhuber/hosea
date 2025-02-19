@@ -102,10 +102,6 @@
     height: calc(100% - #{$bar-height} - #{$bar-height} - #{$space-medium} * 3);
 }
 
-.scheduler__appointments:has(.scheduler__appointment:hover) .scheduler__appointment:not(:hover) {
-    opacity: 0.5 !important;
-}
-
 .scheduler__appointment {
     position: absolute;
     padding: 1rem 3rem;
@@ -155,6 +151,12 @@
 
 .scheduler__navigation-daylink {
     cursor: pointer;
+}
+
+.scheduler:not(.scheduler--mobile-active)
+    .scheduler__appointments:has(.scheduler__appointment:hover)
+    .scheduler__appointment:not(:hover) {
+    opacity: 0.5 !important;
 }
 
 @include responsive-medium {

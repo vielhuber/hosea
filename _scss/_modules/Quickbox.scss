@@ -50,7 +50,7 @@
     align-content: flex-start;
 }
 .quickbox__money-stats-entry {
-    width: 25.00%;
+    width: 25%;
     text-align: center;
     height: calc(#{$space-big} + 2 * #{$space-small});
     align-content: center;
@@ -298,6 +298,105 @@
     @include scrollbar;
 }
 
+.quickbox__today-edit-delete-container {
+    width: 100%;
+}
+.quickbox__today-edit-delete-container-top {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    align-content: flex-start;
+}
+.quickbox__today-edit {
+    width: 50%;
+    text-align: left;
+}
+.quickbox__today-delete {
+    width: 50%;
+    text-align: right;
+}
+.quickbox__today-edit-delete-container-bottom {
+    display: none;
+    height: 0;
+    transition-property: all;
+    transition-duration: 0.42s;
+    transition-timing-function: ease-out;
+    transition-behavior: allow-discrete;
+    overflow: hidden;
+    interpolate-size: allow-keywords;
+}
+
+.quickbox__today-edit-delete-container-bottom--active {
+    @starting-style {
+        height: 0;
+    }
+    display: block;
+    height: auto;
+}
+
+.quickbox__today-edit-inputrows {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    align-content: flex-start;
+    height: 100%;
+    padding: $space-small;
+}
+
+.quickbox__today-edit-inputrow {
+    width: 100%;
+    flex: 0 0 auto;
+    background-color: $color-grey;
+    height: $space-big;
+    line-height: $space-big;
+    margin-bottom: $space-small;
+}
+
+.quickbox__today-edit-inputrow--dheight {
+    height: auto;
+}
+
+.quickbox__today-edit-submit {
+    width: 100%;
+    height: 100%;
+    line-height: calc(#{$space-big} - 2 * #{$space-small});
+    display: block;
+    padding: $space-small;
+    cursor: pointer;
+    background-color: $color-pink;
+    color: $color-white;
+}
+
+.quickbox__today-edit-input:invalid {
+    background-image: url('../_assets/icon_warning.svg');
+    background-position: right -23rem center;
+    background-size: 20rem;
+    background-repeat: no-repeat;
+    border-right: 27rem solid transparent;
+}
+
+.quickbox__today-edit-input--text {
+    width: 100%;
+    height: 100%;
+    line-height: calc(#{$space-big} - 2 * #{$space-small});
+    background-color: $color-grey;
+    color: $color-white;
+    display: block;
+    padding: $space-small;
+}
+
+.quickbox__today-edit-input--textarea {
+    width: 100%;
+    height: 100%;
+    background-color: $color-grey;
+    color: $color-white;
+    display: block;
+    padding: $space-small;
+    resize: none;
+    height: 80rem;
+    @include scrollbar;
+}
+
 .quickbox__mails {
     position: absolute;
     width: 100%;
@@ -424,6 +523,10 @@
     width: 100%;
     height: calc(100% - (6 * #{$space-small} + 2 * #{$space-medium} + 3 * #{$space-big}));
     display: none;
+}
+
+.quickbox__mail-content:hover {
+    height: calc(100% - (#{$space-big} + 2 * #{$space-small}));
 }
 
 .quickbox__mail-actions {

@@ -104,7 +104,7 @@ export default class Quickbox {
                         <li class="quickbox__money-stats-entry">
                             <div class="quickbox__money-stats-entry-inner">
                                 <h3 class="quickbox__money-stats-entry-heading">dist/day:</h3>
-                                ${response.data.km_per_day.toString().replace('.', ',')}km
+                                ${response.data.car.km_per_day.toString().replace('.', ',')}km
                             </div>
                         </li>
                     </ul>
@@ -667,7 +667,7 @@ export default class Quickbox {
                     document.querySelector('.quickbox__today-tickets').insertAdjacentHTML(
                         'beforeend',
                         `
-                            <li class="quickbox__today-ticket" style="
+                            <li data-id="${tickets__value.id}" class="quickbox__today-ticket" style="
                                     ${
                                         ['fixed'].includes(tickets__value.status) ? 'border-color' : 'border-left-color'
                                     }: ${Scheduler.getStoreProperty(
@@ -707,7 +707,12 @@ export default class Quickbox {
                                             : ''
                                     }
                                     ${
-                                        parsed_values__value.begin !== null && parsed_values__value.end !== null
+                                        parsed_values__value.begin !== undefined &&
+                                        parsed_values__value.begin !== null &&
+                                        parsed_values__value.begin !== '' &&
+                                        parsed_values__value.end !== undefined &&
+                                        parsed_values__value.end !== null &&
+                                        parsed_values__value.end !== ''
                                             ? Math.floor(parsed_values__value.begin).toString().padStart(2, '0') +
                                               ':' +
                                               ((parsed_values__value.begin % 1) * 60).toString().padStart(2, '0') +
@@ -730,6 +735,66 @@ export default class Quickbox {
                                               .join('<br/>')}</div>`
                                         : ''
                                 }
+
+                                <div class="quickbox__today-edit-delete-container">
+
+                                    <div class="quickbox__today-edit-delete-container-top">
+
+                                        <a href="#" class="quickbox__today-edit">
+                                            ✏️
+                                        </a>
+
+                                        <a href="#" class="quickbox__today-delete">
+                                            🗑️
+                                        </a>
+
+                                    </div>
+
+                                    <div class="quickbox__today-edit-delete-container-bottom">
+
+                                        <form class="quickbox__today-edit-form">
+                                            <ul class="quickbox__today-edit-inputrows">
+                                                <li class="quickbox__today-edit-inputrow">
+                                                    <input class="quickbox__today-edit-input quickbox__today-edit-input--text validate-field validate-field--date" type="text" name="date" placeholder="date" value="${
+                                                        tickets__value.date
+                                                    }" />
+                                                </li>
+                                                <li class="quickbox__today-edit-inputrow">
+                                                    <input class="quickbox__today-edit-input quickbox__today-edit-input--text validate-field validate-field--status" type="text" name="status" placeholder="status" value="${
+                                                        tickets__value.status
+                                                    }" />
+                                                </li>
+                                                <li class="quickbox__today-edit-inputrow">
+                                                    <input class="quickbox__today-edit-input quickbox__today-edit-input--text validate-field validate-field--priority" type="text" name="priority" placeholder="priority" value="${
+                                                        tickets__value.priority
+                                                    }" />
+                                                </li>
+                                                <li class="quickbox__today-edit-inputrow">
+                                                    <input class="quickbox__today-edit-input quickbox__today-edit-input--text validate-field validate-field--project" type="text" name="project" placeholder="project" value="${
+                                                        tickets__value.project
+                                                    }" />
+                                                </li>
+                                                <li class="quickbox__today-edit-inputrow quickbox__today-edit-inputrow--dheight">
+                                                    <textarea
+                                                        class="quickbox__today-edit-input quickbox__today-edit-input--textarea"
+                                                        autocorrect="off"
+                                                        autocapitalize="off"
+                                                        spellcheck="false"
+                                                        name="description"
+                                                        placeholder="description">${
+                                                            tickets__value.description
+                                                        }</textarea>
+                                                </li>
+                                                <li class="quickbox__today-edit-inputrow">
+                                                    <input class="quickbox__today-edit-submit" type="submit" value="_edit" />
+                                                </li>
+                                            </ul>
+                                        </form>
+
+                                    </div>
+
+                                </div>
+
                             </li>
                         `
                     );
@@ -770,6 +835,128 @@ export default class Quickbox {
                 Scheduler.initScheduler();
                 Quickbox.initToday();
 
+                e.preventDefault();
+            }
+        });
+
+        document.addEventListener('submit', (e) => {
+            let $form = e.target.closest('.quickbox__today-edit-form');
+            if ($form) {
+                $form.querySelector('.quickbox__today-edit-submit').disabled = true;
+
+                if ($form.querySelector('*:invalid') !== null) {
+                    Swal.fire({
+                        text: 'error creating new ticket',
+                        icon: 'error',
+                        timer: 2000,
+                        timerProgressBar: true,
+                        showConfirmButton: false,
+                    });
+                    return;
+                }
+
+                let changed = [];
+
+                let data = {};
+                Store.data.cols.forEach((cols__value) => {
+                    if ($form.querySelector('[name="' + cols__value + '"]') !== null) {
+                        data[cols__value] = $form.querySelector('[name="' + cols__value + '"]').value;
+                    }
+                });
+                data['updated_at'] = Dates.time().toString();
+                console.log(data);
+                Tickets.setTicketData($form.closest('.quickbox__today-ticket').getAttribute('data-id'), data);
+                changed.push(Tickets.getTicketData($form.closest('.quickbox__today-ticket').getAttribute('data-id')));
+
+                Store.data.busy = true;
+                Store.data.api
+                    .fetch('_api/tickets', {
+                        method: 'PUT',
+                        body: JSON.stringify({
+                            tickets: changed,
+                        }),
+                        cache: 'no-cache',
+                        headers: { 'content-type': 'application/json' },
+                    })
+                    .then((res) => res.json())
+                    .catch((err) => {
+                        console.error(err);
+                    })
+                    .then((response) => {
+                        Store.data.busy = false;
+                        Scheduler.initScheduler();
+                        Scheduler.updateColors();
+                        Quickbox.initToday();
+                        Tickets.updateSum();
+                        Filter.updateFilter();
+                        Swal.fire({
+                            text: 'successfully updated ticket',
+                            icon: 'success',
+                            timer: 2000,
+                            timerProgressBar: true,
+                            showConfirmButton: false,
+                        });
+                    });
+
+                e.preventDefault();
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            let $el = e.target.closest('.quickbox__today-delete');
+            if ($el) {
+                let result = confirm('Sind Sie sicher?');
+                if (result) {
+                    let ticket_id = $el.closest('.quickbox__today-ticket').getAttribute('data-id');
+
+                    Store.data.busy = true;
+                    Store.data.api
+                        .fetch('_api/tickets/' + ticket_id, {
+                            method: 'DELETE',
+                            cache: 'no-cache',
+                            headers: { 'content-type': 'application/json' },
+                        })
+                        .then((res) => res.json())
+                        .catch((err) => {
+                            console.error(err);
+                        })
+                        .then((response) => {
+                            Store.data.busy = false;
+                            Store.data.tickets.forEach((tickets__value, tickets__key) => {
+                                if (tickets__value.id == ticket_id) {
+                                    Store.data.tickets.splice(tickets__key, 1);
+                                }
+                            });
+                            Scheduler.initScheduler();
+                            Scheduler.updateColors();
+                            Quickbox.initToday();
+                            Tickets.updateSum();
+                            Filter.updateFilter();
+                            Swal.fire({
+                                text: 'successfully deleted ticket',
+                                icon: 'success',
+                                timer: 2000,
+                                timerProgressBar: true,
+                                showConfirmButton: false,
+                            });
+                        });
+                }
+
+                e.preventDefault();
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            let $el = e.target.closest('.quickbox__today-edit');
+            if ($el) {
+                let $container = $el
+                    .closest('.quickbox__today-ticket')
+                    .querySelector('.quickbox__today-edit-delete-container-bottom');
+                if (!$container.classList.contains('quickbox__today-edit-delete-container-bottom--active')) {
+                    $container.classList.add('quickbox__today-edit-delete-container-bottom--active');
+                } else {
+                    $container.classList.remove('quickbox__today-edit-delete-container-bottom--active');
+                }
                 e.preventDefault();
             }
         });

@@ -294,6 +294,18 @@ class Mail extends Api
             $messages__value->getHTMLBody() != ''
                 ? $messages__value->getHTMLBody()
                 : nl2br($messages__value->getTextBody());
+        // embed images
+        $attachments = $messages__value->getAttachments();
+        foreach ($attachments as $attachments__value) {
+            $content = str_replace(
+                'cid:' . $attachments__value->getId(),
+                'data:' .
+                    $attachments__value->getMimeType() .
+                    ';base64,' .
+                    base64_encode($attachments__value->getContent()),
+                $content
+            );
+        }
         // trim bad tags
         foreach (['iframe', 'script'] as $tags__value) {
             $content = preg_replace('/<' . $tags__value . '.*?>(.*)?<\/' . $tags__value . '>/ims', '', $content);
@@ -319,9 +331,11 @@ class Mail extends Api
                 ->setTimezone(date_default_timezone_get())
                 ->format('Y-m-d H:i:s'),
             'subject' => $subject,
+            /*
             'eml' => base64_encode(
                 json_decode(json_encode($messages__value->getHeader()), true)['raw'] . $messages__value->getRawBody()
             ),
+            */
             'content' => $content,
         ];
     }
