@@ -56,6 +56,9 @@ class Money extends Api
                 ((strtotime($car_km['Leasingende']) - strtotime($car_km['Letztes Update'])) / (60 * 60 * 24)),
             2
         );
+        $response->result->data->days_left = round(
+            (strtotime($car_km['Leasingende']) - strtotime($car_km['Leasingbeginn'])) / (60 * 60 * 24)
+        );
 
         $this->response($response->result);
     }
