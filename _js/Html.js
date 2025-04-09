@@ -251,7 +251,7 @@ DD%N: weekday in calendar week %N=0 (if >X specified, N -= calendar week of X)
             if ($target.closest('.validate-field--project')) {
                 if (
                     new RegExp(
-                        '^(--)?(\\p{RGI_Emoji})?[A-Z0-9\u00c4\u00d6\u00dc\u00df]{1,}[ A-Z0-9\u00c4\u00d6\u00dc\u00df]{2,}[^ ](\\p{RGI_Emoji})?$',
+                        '^(--)?(\\p{RGI_Emoji})?[A-Z0-9\u00c4\u00d6\u00dc\u00df]{1}[ A-Z0-9\u00c4\u00d6\u00dc\u00df]{1,}[A-Z0-9\u00c4\u00d6\u00dc\u00df]{1}(\\p{RGI_Emoji})?$',
                         'v'
                     ).test($target.value) === false
                 ) {
