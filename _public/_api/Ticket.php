@@ -62,7 +62,7 @@ class Ticket extends Api
         // - all irregular tickets
         if (!$this->Utils->isMobile()) {
             $interval_prev = 60; // 2 months
-            $interval_next = null;
+            $interval_next = null; // unlimited
         } else {
             $interval_prev = 15; // 1/2 month
             $interval_next = 150; // 5 months
