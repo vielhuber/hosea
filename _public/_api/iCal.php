@@ -25,8 +25,8 @@ class iCal extends Api
         $tickets = $this::$db->fetch_all(
             '
             SELECT * FROM tickets WHERE user_id = (SELECT id FROM users WHERE api_key = ?)
-            AND (INSTR(project,\'FEIERTAG\') OR STR_TO_DATE(date,\'%d.%m.%y\') > DATE_SUB(NOW(), INTERVAL 30 DAY))
-            AND (INSTR(project,\'FEIERTAG\') OR STR_TO_DATE(date,\'%d.%m.%y\') < DATE_ADD(NOW(), INTERVAL 30 DAY))
+            AND (INSTR(project,\'FEIERTAG\') OR ((LENGTH(date)-LENGTH(REPLACE(date, \'\n\', \'\'))) > 3) OR STR_TO_DATE(date,\'%d.%m.%y\') > DATE_SUB(NOW(), INTERVAL 30 DAY))
+            AND (INSTR(project,\'FEIERTAG\') OR ((LENGTH(date)-LENGTH(REPLACE(date, \'\n\', \'\'))) > 3) OR STR_TO_DATE(date,\'%d.%m.%y\') < DATE_ADD(NOW(), INTERVAL 30 DAY))
             AND status IN (\'fixed\')
             AND project NOT LIKE \'%Mittagessen%\'
             AND project NOT LIKE \'%Abendessen%\'
