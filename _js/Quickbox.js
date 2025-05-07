@@ -119,9 +119,16 @@ export default class Quickbox {
                         labels: Object.keys(response.data.diagrams),
                         datasets: [
                             {
-                                label: ' Betrag in €',
-                                data: Object.values(response.data.diagrams),
+                                label: ' nicht laufend in €',
+                                data: Object.values(response.data.diagrams).map((val) => val[0]),
                                 backgroundColor: ['#E91E63', '#FFB300', '#F44336', '#ba68c8', '#2196F3', '#4527a0'],
+                                borderColor: '#ffffff',
+                                borderWidth: 2,
+                            },
+                            {
+                                label: ' laufend in €',
+                                data: Object.values(response.data.diagrams).map((val) => val[1]),
+                                backgroundColor: '#8d8d8d',
                                 borderColor: '#ffffff',
                                 borderWidth: 2,
                             },
