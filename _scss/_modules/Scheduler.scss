@@ -44,6 +44,9 @@
     width: 100%;
     height: #{$bar-height};
     display: block;
+    #app[data-weeks-in-viewport='3'] & {
+        font-size: $font-size-small;
+    }
 }
 
 .scheduler__table-body {

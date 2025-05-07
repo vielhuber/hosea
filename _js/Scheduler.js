@@ -680,7 +680,7 @@ export default class Scheduler {
             Store.data.shiftingViewPrevDays === 0 &&
             Store.data.weeksInViewport === 1
         ) {
-            Store.data.weeksInViewport = 2;
+            Store.data.weeksInViewport = 3;
         } else {
             Store.data.shiftingView = true;
             Store.data.shiftingViewPrevDays = 1;

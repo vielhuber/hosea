@@ -14,7 +14,7 @@ export default class Store {
             hourBegin: 9,
             shiftingView: !hlp.isMobile() ? false : false,
             shiftingViewPrevDays: !hlp.isMobile() ? 0 : 0,
-            weeksInViewport: !hlp.isMobile() ? 2 : 1,
+            weeksInViewport: !hlp.isMobile() ? 3 : 1,
 
             cols: ['status', 'priority', 'date', 'time', 'project', 'description'],
             colors: {

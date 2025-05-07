@@ -218,6 +218,9 @@ DD%N: weekday in calendar week %N=0 (if >X specified, N -= calendar week of X)
         } else {
             document.querySelector('#app').classList.remove('view-mode--wide');
         }
+        document.querySelector('#app').setAttribute('data-shifting-view', Number(Store.data.shiftingView));
+        document.querySelector('#app').setAttribute('data-shifting-prev-days', Store.data.shiftingViewPrevDays);
+        document.querySelector('#app').setAttribute('data-weeks-in-viewport', Store.data.weeksInViewport);
     }
 
     static bindValidation() {
