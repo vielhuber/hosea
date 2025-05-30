@@ -97,6 +97,14 @@
     background-color: rgba($color-white, 0.4);
 }
 
+.scheduler__cell--weekend {
+    background-color: rgba($color-green, 0.3);
+}
+
+.scheduler__cell--weekend.scheduler__cell--activeday {
+    background-color: rgba($color-green, 0.35);
+}
+
 .scheduler__appointments {
     position: absolute;
     top: calc(#{$bar-height} + #{$bar-height} + #{$space-medium} * 2);

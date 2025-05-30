@@ -46,6 +46,12 @@ export default class Scheduler {
                                         ? ' scheduler__cell--activeday'
                                         : ''
                                 }
+                                ${
+                                    // SA-SO
+                                    [0, 6].includes(Dates.getDayOfActiveViewport(i + 1).getDay())
+                                        ? ' scheduler__cell--weekend'
+                                        : ''
+                                }
                             ">
                                 ${Dates.dateFormat(Dates.getDayOfActiveViewport(i + 1), 'D d.m.')}
                             </td>
@@ -74,6 +80,12 @@ export default class Scheduler {
                                         ${
                                             Dates.sameDay(Dates.getDayOfActiveViewport(i + 1), Dates.getActiveDate())
                                                 ? ' scheduler__cell--activeday'
+                                                : ''
+                                        }
+                                        ${
+                                            // SA-SO
+                                            [0, 6].includes(Dates.getDayOfActiveViewport(i + 1).getDay())
+                                                ? ' scheduler__cell--weekend'
                                                 : ''
                                         }
                                     ">
@@ -106,6 +118,12 @@ export default class Scheduler {
                                 ${
                                     Dates.sameDay(Dates.getDayOfActiveViewport(i + 1), Dates.getActiveDate())
                                         ? ' scheduler__cell--activeday'
+                                        : ''
+                                }
+                                ${
+                                    // SA-SO
+                                    [0, 6].includes(Dates.getDayOfActiveViewport(i + 1).getDay())
+                                        ? ' scheduler__cell--weekend'
                                         : ''
                                 }
                             "></td>
@@ -145,12 +163,17 @@ export default class Scheduler {
                                                 : ''
                                         }
                                         ${
+                                            // SA-SO
+                                            [0, 6].includes(Dates.getDayOfActiveViewport(i + 1).getDay())
+                                                ? ' scheduler__cell--weekend'
+                                                : ''
+                                        }
+                                        ${
                                             // MO-FR
                                             [1, 2, 3, 4, 5].includes(Dates.getDayOfActiveViewport(i + 1).getDay()) &&
                                             // 09:00-13:00, 14:00-18:00
                                             ((j >= 9 && j < 13) || (j >= 14 && j < 18))
-                                                ? Dates.getDayOfActiveViewport(i + 1).getDay() +
-                                                  ' scheduler__cell--main'
+                                                ? ' scheduler__cell--main'
                                                 : ''
                                         }
                                     ">
