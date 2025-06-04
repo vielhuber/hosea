@@ -68,6 +68,7 @@ class Ticket extends Api
             $interval_next = 150; // 5 months
         }
 
+        // prettier-ignore
         $query =
             '
             SELECT
@@ -80,64 +81,63 @@ class Ticket extends Api
                 tickets.description,
                 tickets.updated_at,
                 GROUP_CONCAT(CONCAT(attachments.id, \'SEP_COL\', attachments.name) SEPARATOR \'SEP_OBJ\') as attachments
-            FROM tickets
-            LEFT JOIN attachments ON attachments.ticket_id = tickets.id
+            FROM
+                tickets
+            LEFT JOIN
+                attachments ON attachments.ticket_id = tickets.id
             WHERE
                 user_id = ?
                 AND
                 (
-                date NOT REGEXP ?
-                OR
-                (
-                ' .
-            ($interval_prev === null
-                ? '1=1'
-                : '(
-                    INSTR(project,\'FEIERTAG\')
+                    date NOT REGEXP ?
                     OR
-                    ' .
-                    /* this considers multiline date values */ '
-                    EXISTS (
-                        SELECT 1
-                        FROM (
-                            SELECT
-                                SUBSTRING_INDEX(SUBSTRING_INDEX(tickets.date, \'\n\', n.n), \'\n\', -1) AS line
-                            FROM
-                                (SELECT 1 AS n UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION
-                                SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION
-                                SELECT 9 UNION SELECT 10 UNION SELECT 11 UNION SELECT 12) n
-                        ) AS splitted
-                        WHERE STR_TO_DATE(line, \'%d.%m.%y\') >= DATE_SUB(NOW(), INTERVAL ' .
-                    $interval_prev .
-                    ' DAY
+                    (
+                        ' .
+                        ($interval_prev === null
+                        ? '1=1'
+                        : '(
+                            INSTR(project,\'FEIERTAG\')
+                            OR
+                            ' .
+                            /* this considers multiline date values */ '
+                            (
+                                STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(date, \'\n\', 1), \'\n\', -1), \'%d.%m.%y\') >= DATE_SUB(NOW(), INTERVAL ' . $interval_prev . ' DAY)
+                                OR STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(date, \'\n\', 2), \'\n\', -1), \'%d.%m.%y\') >= DATE_SUB(NOW(), INTERVAL ' . $interval_prev . ' DAY)
+                                OR STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(date, \'\n\', 3), \'\n\', -1), \'%d.%m.%y\') >= DATE_SUB(NOW(), INTERVAL ' . $interval_prev . ' DAY)
+                                OR STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(date, \'\n\', 4), \'\n\', -1), \'%d.%m.%y\') >= DATE_SUB(NOW(), INTERVAL ' . $interval_prev . ' DAY)
+                                OR STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(date, \'\n\', 5), \'\n\', -1), \'%d.%m.%y\') >= DATE_SUB(NOW(), INTERVAL ' . $interval_prev . ' DAY)
+                                OR STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(date, \'\n\', 6), \'\n\', -1), \'%d.%m.%y\') >= DATE_SUB(NOW(), INTERVAL ' . $interval_prev . ' DAY)
+                                OR STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(date, \'\n\', 7), \'\n\', -1), \'%d.%m.%y\') >= DATE_SUB(NOW(), INTERVAL ' . $interval_prev . ' DAY)
+                                OR STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(date, \'\n\', 8), \'\n\', -1), \'%d.%m.%y\') >= DATE_SUB(NOW(), INTERVAL ' . $interval_prev . ' DAY)
+                                OR STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(date, \'\n\', 9), \'\n\', -1), \'%d.%m.%y\') >= DATE_SUB(NOW(), INTERVAL ' . $interval_prev . ' DAY)
+                            )
+                        )') .
+                        '
+                        AND
+                        ' .
+                        ($interval_next === null
+                        ? '1=1'
+                            : '(
+                            INSTR(project,\'FEIERTAG\')
+                            OR
+                            ' .
+                            /* this considers multiline date values */ '
+                            (
+                                STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(date, \'\n\', 1), \'\n\', -1), \'%d.%m.%y\') >= DATE_SUB(NOW(), INTERVAL ' . $interval_prev . ' DAY)
+                                OR STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(date, \'\n\', 2), \'\n\', -1), \'%d.%m.%y\') >= DATE_SUB(NOW(), INTERVAL ' . $interval_prev . ' DAY)
+                                OR STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(date, \'\n\', 3), \'\n\', -1), \'%d.%m.%y\') >= DATE_SUB(NOW(), INTERVAL ' . $interval_prev . ' DAY)
+                                OR STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(date, \'\n\', 4), \'\n\', -1), \'%d.%m.%y\') >= DATE_SUB(NOW(), INTERVAL ' . $interval_prev . ' DAY)
+                                OR STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(date, \'\n\', 5), \'\n\', -1), \'%d.%m.%y\') >= DATE_SUB(NOW(), INTERVAL ' . $interval_prev . ' DAY)
+                                OR STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(date, \'\n\', 6), \'\n\', -1), \'%d.%m.%y\') >= DATE_SUB(NOW(), INTERVAL ' . $interval_prev . ' DAY)
+                                OR STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(date, \'\n\', 7), \'\n\', -1), \'%d.%m.%y\') >= DATE_SUB(NOW(), INTERVAL ' . $interval_prev . ' DAY)
+                                OR STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(date, \'\n\', 8), \'\n\', -1), \'%d.%m.%y\') >= DATE_SUB(NOW(), INTERVAL ' . $interval_prev . ' DAY)
+                                OR STR_TO_DATE(SUBSTRING_INDEX(SUBSTRING_INDEX(date, \'\n\', 9), \'\n\', -1), \'%d.%m.%y\') >= DATE_SUB(NOW(), INTERVAL ' . $interval_prev . ' DAY)
+                            )
+                        )') . '
                     )
-                ))))') .
-            '
-            AND ' .
-            ($interval_next === null
-                ? '1=1'
-                : '(
-                    INSTR(project,\'FEIERTAG\')
-                    OR
-                    ' .
-                    /* this considers multiline date values */ '
-                    EXISTS (
-                        SELECT 1
-                        FROM (
-                            SELECT
-                                SUBSTRING_INDEX(SUBSTRING_INDEX(tickets.date, \'\n\', n.n), \'\n\', -1) AS line
-                            FROM
-                                (SELECT 1 AS n UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION
-                                SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION
-                                SELECT 9 UNION SELECT 10 UNION SELECT 11 UNION SELECT 12) n
-                        ) AS splitted
-                        WHERE STR_TO_DATE(line, \'%d.%m.%y\') <= DATE_SUB(NOW(), INTERVAL ' .
-                    $interval_next .
-                    ' DAY)
-                    )
-                ))))') .
-            '
-            GROUP BY tickets.id
+                )
+            GROUP BY
+                tickets.id
         ';
 
         $tickets = $this::$db->fetch_all(
