@@ -101,15 +101,11 @@ class Ticket extends Api
                         SELECT 1
                         FROM (
                             SELECT
-                                SUBSTRING_INDEX(SUBSTRING_INDEX(date, \'\n\', n.n), \'\n\', -1) AS line
+                                SUBSTRING_INDEX(SUBSTRING_INDEX(tickets.date, \'\n\', n.n), \'\n\', -1) AS line
                             FROM
-                                tickets t
-                                JOIN (
-                                    SELECT 1 AS n UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION
-                                    SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION
-                                    SELECT 9 UNION SELECT 10 UNION SELECT 11 UNION SELECT 12
-                                ) n ON CHAR_LENGTH(t.date) - CHAR_LENGTH(REPLACE(t.date, \'\n\', \'\')) >= n.n - 1
-                            WHERE t.id = tickets.id
+                                (SELECT 1 AS n UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION
+                                SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION
+                                SELECT 9 UNION SELECT 10 UNION SELECT 11 UNION SELECT 12) n
                         ) AS splitted
                         WHERE STR_TO_DATE(line, \'%d.%m.%y\') >= DATE_SUB(NOW(), INTERVAL ' .
                     $interval_prev .
@@ -129,15 +125,11 @@ class Ticket extends Api
                         SELECT 1
                         FROM (
                             SELECT
-                                SUBSTRING_INDEX(SUBSTRING_INDEX(date, \'\n\', n.n), \'\n\', -1) AS line
+                                SUBSTRING_INDEX(SUBSTRING_INDEX(tickets.date, \'\n\', n.n), \'\n\', -1) AS line
                             FROM
-                                tickets t
-                                JOIN (
-                                    SELECT 1 AS n UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION
-                                    SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION
-                                    SELECT 9 UNION SELECT 10 UNION SELECT 11 UNION SELECT 12
-                                ) n ON CHAR_LENGTH(t.date) - CHAR_LENGTH(REPLACE(t.date, \'\n\', \'\')) >= n.n - 1
-                            WHERE t.id = tickets.id
+                                (SELECT 1 AS n UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION
+                                SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION
+                                SELECT 9 UNION SELECT 10 UNION SELECT 11 UNION SELECT 12) n
                         ) AS splitted
                         WHERE STR_TO_DATE(line, \'%d.%m.%y\') <= DATE_SUB(NOW(), INTERVAL ' .
                     $interval_next .
