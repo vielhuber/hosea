@@ -21,7 +21,7 @@ hosea is a personal assistant.
 -   save login system using jwt
 -   live ical export for outlook integration
 -   light mail client included (exchange oauth2 supported)
--   stats for finance
+-   stats for your personal finance
 
 ## installation
 
