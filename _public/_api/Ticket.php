@@ -92,20 +92,59 @@ class Ticket extends Api
                 ' .
             ($interval_prev === null
                 ? '1=1'
-                : '(INSTR(project,\'FEIERTAG\') OR ((LENGTH(date)-LENGTH(REPLACE(date, \'\n\', \'\'))) > 3) OR STR_TO_DATE(date,\'%d.%m.%y\') > DATE_SUB(NOW(), INTERVAL ' .
+                : '(
+                    INSTR(project,\'FEIERTAG\')
+                    OR
+                    ' .
+                    /* this considers multiline date values */ '
+                    EXISTS (
+                        SELECT 1
+                        FROM (
+                            SELECT
+                                SUBSTRING_INDEX(SUBSTRING_INDEX(date, \'\n\', n.n), \'\n\', -1) AS line
+                            FROM
+                                tickets t
+                                JOIN (
+                                    SELECT 1 AS n UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION
+                                    SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION
+                                    SELECT 9 UNION SELECT 10 UNION SELECT 11 UNION SELECT 12
+                                ) n ON CHAR_LENGTH(t.date) - CHAR_LENGTH(REPLACE(t.date, \'\n\', \'\')) >= n.n - 1
+                            WHERE t.id = tickets.id
+                        ) AS splitted
+                        WHERE STR_TO_DATE(line, \'%d.%m.%y\') >= DATE_SUB(NOW(), INTERVAL ' .
                     $interval_prev .
-                    ' DAY))') .
+                    ' DAY
+                    )
+                ))))') .
             '
-                AND
-                ' .
+            AND ' .
             ($interval_next === null
                 ? '1=1'
-                : '(INSTR(project,\'FEIERTAG\') OR ((LENGTH(date)-LENGTH(REPLACE(date, \'\n\', \'\'))) > 3) OR STR_TO_DATE(date,\'%d.%m.%y\') < DATE_ADD(NOW(), INTERVAL ' .
+                : '(
+                    INSTR(project,\'FEIERTAG\')
+                    OR
+                    ' .
+                    /* this considers multiline date values */ '
+                    EXISTS (
+                        SELECT 1
+                        FROM (
+                            SELECT
+                                SUBSTRING_INDEX(SUBSTRING_INDEX(date, \'\n\', n.n), \'\n\', -1) AS line
+                            FROM
+                                tickets t
+                                JOIN (
+                                    SELECT 1 AS n UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION
+                                    SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION
+                                    SELECT 9 UNION SELECT 10 UNION SELECT 11 UNION SELECT 12
+                                ) n ON CHAR_LENGTH(t.date) - CHAR_LENGTH(REPLACE(t.date, \'\n\', \'\')) >= n.n - 1
+                            WHERE t.id = tickets.id
+                        ) AS splitted
+                        WHERE STR_TO_DATE(line, \'%d.%m.%y\') <= DATE_SUB(NOW(), INTERVAL ' .
                     $interval_next .
-                    ' DAY))') .
+                    ' DAY)
+                    )
+                ))))') .
             '
-                )
-                )
             GROUP BY tickets.id
         ';
 
@@ -114,6 +153,7 @@ class Ticket extends Api
             $this::$auth->getCurrentUserId(),
             '^[0-9][0-9]\.[0-9][0-9]\.[0-9][0-9]( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?'
         );
+
         foreach ($tickets as $tickets__key => $tickets__value) {
             if ($tickets__value['attachments'] == '') {
                 $tickets[$tickets__key]['attachments'] = [];
