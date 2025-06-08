@@ -15,7 +15,7 @@ export default class Scheduler {
                 <a href="#" class="scheduler__navigation-button scheduler__navigation-button--next-month" title="_next_month">&gt;&gt;&gt;</a>
                 <a href="#" class="scheduler__navigation-button scheduler__navigation-button--next-week" title="_next_week [⤴page down]">&gt;&gt;</a>
                 <a href="#" class="scheduler__navigation-button scheduler__navigation-button--next-day" title="_next_day [⤴right arrow]">&gt;</a>
-                <a href="#" class="scheduler__navigation-button scheduler__navigation-button--today" title="_next_today">_</a>
+                <a href="#" class="scheduler__navigation-button scheduler__navigation-button--today" title="_today">_</a>
                 <a href="#" class="scheduler__navigation-button scheduler__navigation-button--prev-day" title="_prev_day [⤴left arrow]">&lt;</a>
                 <a href="#" class="scheduler__navigation-button scheduler__navigation-button--prev-week" title="_prev_week [⤴page up]">&lt;&lt;</a>
                 <a href="#" class="scheduler__navigation-button scheduler__navigation-button--prev-month" title="_prev_month">&lt;&lt;&lt;</a>
@@ -305,10 +305,12 @@ export default class Scheduler {
                         'Y-m-d'
                     );
                     document.querySelector('.metabar__select--sort[name="sort_1"]').value = '';
+                    document.querySelector('.metabar__select--sort[name="sort_2"]').value = '';
                 }
                 if (e.target.closest('.scheduler__navigation-week-link-to-empty')) {
                     document.querySelector('.metabar__select--filter[name="date"]').value = '';
                     document.querySelector('.metabar__select--sort[name="sort_1"]').value = 'priority';
+                    document.querySelector('.metabar__select--sort[name="sort_2"]').value = '';
                 }
 
                 Filter.doFilter();
