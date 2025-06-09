@@ -205,6 +205,16 @@ export default class Scheduler {
         let generatedDates = Scheduler.generateDates();
 
         generatedDates.forEach((date__value) => {
+            let date__value_name = date__value.name;
+            if (hlp.emojiRegex().test(date__value_name)) {
+                let date__value_name_emoji = hlp.emojiSplit(date__value_name);
+                date__value_name =
+                    date__value_name_emoji[0] +
+                    '\n' +
+                    date__value_name_emoji.slice(1, -1).join('') +
+                    '\n' +
+                    date__value_name_emoji.at(-1);
+            }
             document.querySelector('.scheduler__appointments').insertAdjacentHTML(
                 'beforeend',
                 `
@@ -214,10 +224,11 @@ export default class Scheduler {
                         bottom:${date__value.posBottom}%;
                         background:${date__value.background};
                         animation:${date__value.animation};
+                        ${date__value.animation !== 'none' ? 'z-index:1;' : ''}
                         opacity:${date__value.opacity};
                         width:${date__value.width};
                     ">
-                        ${date__value.name}
+                        <div class="scheduler__appointment-inner">${date__value_name}</div>
                     </div>
                 `
             );

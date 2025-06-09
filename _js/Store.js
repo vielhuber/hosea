@@ -52,7 +52,10 @@ export default class Store {
                     '🎂GEBURTSTAG🎂': {
                         border: '#ba68c8',
                         background: 'linear-gradient(178deg, #cb60b3 0%, #c146a1 50%, #a80077 51%, #db36a4 100%)',
-                        animation: 'birthday-glow 1s ease-in-out infinite alternate',
+                        animation: 'glow-animation-1 1s ease-in-out infinite alternate',
+                    },
+                    '❗PRIVATE❗': {
+                        animation: 'glow-animation-2 1s ease-in-out infinite alternate',
                     },
                     MAIL: {
                         opacity: 0.75,
