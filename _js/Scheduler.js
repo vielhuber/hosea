@@ -645,7 +645,21 @@ export default class Scheduler {
     }
 
     static getStoreProperty(property, status, project = null, defValue = null) {
+        // allow wildcards
         if (
+            project !== undefined &&
+            project !== null &&
+            project !== '' &&
+            !Store.data.colors.project.hasOwnProperty(project)
+        ) {
+            let project_wildcard = hlp.emojiSplit(project);
+            project_wildcard = project_wildcard[0] + '*' + project_wildcard.at(-1);
+            if (Store.data.colors.project.hasOwnProperty(project_wildcard)) {
+                project = project_wildcard;
+            }
+        }
+        if (
+            project !== undefined &&
             project !== null &&
             project !== '' &&
             Store.data.colors.project.hasOwnProperty(project) &&
@@ -655,6 +669,7 @@ export default class Scheduler {
             return Store.data.colors.project[project][property];
         }
         if (
+            status !== undefined &&
             status !== null &&
             status !== '' &&
             Store.data.colors.status.hasOwnProperty(status) &&
