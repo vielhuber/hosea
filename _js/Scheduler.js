@@ -88,8 +88,18 @@ export default class Scheduler {
                                                 ? ' scheduler__cell--weekend'
                                                 : ''
                                         }
+                                        ${
+                                            Dates.sameDay(Dates.getDayOfActiveViewport(i + 1), Dates.getCurrentDate())
+                                                ? ' scheduler__cell--indicator-container'
+                                                : ''
+                                        }
                                     ">
                                         ${Weather.outputWeather(Dates.getDayOfActiveViewport(i + 1))}
+                                        ${
+                                            Dates.sameDay(Dates.getDayOfActiveViewport(i + 1), Dates.getCurrentDate())
+                                                ? '<div class="scheduler__cell--indicator"></div>'
+                                                : ''
+                                        }
                                     </td>
                                 `
                             )
@@ -742,6 +752,49 @@ export default class Scheduler {
         Filter.doFilter();
         Scheduler.initScheduler();
         Quickbox.initToday();
+    }
+
+    static indicatorInterval() {
+        setInterval(() => {
+            Scheduler.indicatorIntervalFn();
+        }, 1000 * 1);
+        Scheduler.indicatorIntervalFn();
+    }
+
+    static indicatorIntervalFn() {
+        let $el_indicator = document.querySelector('.scheduler__cell--indicator'),
+            $el_container = document.querySelector('.scheduler__cell--indicator-container'),
+            $el_appointments = document.querySelector('.scheduler__appointments'),
+            $el_row = document.querySelector('.scheduler__table-body .scheduler__row:first-child');
+        if ($el_indicator !== null && $el_container !== null && $el_appointments !== null && $el_row !== null) {
+            let now = new Date(),
+                hour_start = Store.data.hourBegin,
+                hour_end = 24,
+                sec_total = (hour_end - hour_start) * 60 * 60,
+                sec_cur = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds(),
+                sec_start = sec_cur - hour_start * 60 * 60,
+                percentage = 0;
+            if (sec_start <= 0) {
+                percentage = 0;
+            } else if (sec_start >= sec_total) {
+                percentage = 1;
+            } else {
+                percentage = sec_start / sec_total;
+            }
+            let h_container = $el_container.offsetHeight,
+                h_appointments = $el_appointments.offsetHeight,
+                h_row = $el_row.offsetHeight;
+            $el_indicator.style.top = h_container + h_row + percentage * (h_appointments - h_row) + 'px';
+            tippy($el_indicator, {
+                content:
+                    '⏳' +
+                    ('0' + new Date().getHours()).slice(-2) +
+                    ':' +
+                    ('0' + new Date().getMinutes()).slice(-2) +
+                    '⏳',
+                interactive: false,
+            });
+        }
     }
 
     static generateLinkToEmptyDatesSum() {

@@ -105,6 +105,24 @@
     background-color: rgba($color-green, 0.35);
 }
 
+.scheduler__cell--indicator-container {
+    overflow: visible;
+    position: relative;
+}
+
+.scheduler__cell--indicator {
+    height: 5rem;
+    transform: translateY(-50%) translateX(-10%);
+    width: 120%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    background-color: $color-pink;
+    border: 1rem solid $color-white;
+    box-shadow: 0 0 10rem 0 $color-white;
+}
+
 .scheduler__appointments {
     position: absolute;
     top: calc(#{$bar-height} + #{$bar-height} + #{$space-medium} * 2);
@@ -123,7 +141,6 @@
     margin-top: 2rem;
     margin-left: 2rem;
     margin-bottom: 2rem;
-    /* border: 1px solid $color-white; */
     box-shadow: 0px 0px 0px 1px $color-white;
     transition: opacity 0.5s ease-in-out;
     cursor: help;

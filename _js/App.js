@@ -43,6 +43,7 @@ export default class App {
         Keyboard.bindRefresh();
         Tickets.bindCreate();
         Scheduler.bindScheduler();
+        Scheduler.indicatorInterval();
         Sort.initSort();
         Filter.initFilter();
         Scheduler.updateColors();
