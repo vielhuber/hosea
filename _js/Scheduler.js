@@ -97,7 +97,9 @@ export default class Scheduler {
                                         ${Weather.outputWeather(Dates.getDayOfActiveViewport(i + 1))}
                                         ${
                                             Dates.sameDay(Dates.getDayOfActiveViewport(i + 1), Dates.getCurrentDate())
-                                                ? '<div class="scheduler__cell--indicator"></div>'
+                                                ? '<div style="top:' +
+                                                  Scheduler.indicatorIntervalValue() +
+                                                  'px;" class="scheduler__cell--indicator"></div>'
                                                 : ''
                                         }
                                     </td>
@@ -761,11 +763,12 @@ export default class Scheduler {
         Scheduler.indicatorIntervalFn();
     }
 
-    static indicatorIntervalFn() {
+    static indicatorIntervalValue() {
         let $el_indicator = document.querySelector('.scheduler__cell--indicator'),
             $el_container = document.querySelector('.scheduler__cell--indicator-container'),
             $el_appointments = document.querySelector('.scheduler__appointments'),
             $el_row = document.querySelector('.scheduler__table-body .scheduler__row:first-child');
+
         if ($el_indicator !== null && $el_container !== null && $el_appointments !== null && $el_row !== null) {
             let now = new Date(),
                 hour_start = Store.data.hourBegin,
@@ -784,17 +787,21 @@ export default class Scheduler {
             let h_container = $el_container.offsetHeight,
                 h_appointments = $el_appointments.offsetHeight,
                 h_row = $el_row.offsetHeight;
-            $el_indicator.style.top = h_container + h_row + percentage * (h_appointments - h_row) + 'px';
-            tippy($el_indicator, {
-                content:
-                    '⏳' +
-                    ('0' + new Date().getHours()).slice(-2) +
-                    ':' +
-                    ('0' + new Date().getMinutes()).slice(-2) +
-                    '⏳',
-                interactive: false,
-            });
+
+            return h_container + h_row + percentage * (h_appointments - h_row);
         }
+
+        return 0;
+    }
+
+    static indicatorIntervalFn() {
+        let $el_indicator = document.querySelector('.scheduler__cell--indicator');
+        $el_indicator.style.top = Scheduler.indicatorIntervalValue() + 'px';
+        tippy($el_indicator, {
+            content:
+                '⏳' + ('0' + new Date().getHours()).slice(-2) + ':' + ('0' + new Date().getMinutes()).slice(-2) + '⏳',
+            interactive: false,
+        });
     }
 
     static generateLinkToEmptyDatesSum() {
