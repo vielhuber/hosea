@@ -234,6 +234,7 @@ export default class Scheduler {
                         left:${date__value.posLeft}%;
                         top:${date__value.posTop}%;
                         bottom:${date__value.posBottom}%;
+                        padding:${date__value.padding};
                         background:${date__value.background};
                         animation:${date__value.animation};
                         ${date__value.animation !== 'none' ? 'z-index:1;' : ''}
@@ -501,20 +502,21 @@ export default class Scheduler {
                         : Store.data.weeksInViewport * 7) +
                         1);
             if (!('conflict' in date__value)) {
-                width = 'calc(' + fraction + '% - 4rem)';
+                width = fraction;
                 posLeft = fraction * date__value.day;
             } else {
-                width = 'calc(' + fraction / conflicts[date__value.conflict].count + '% - 4rem)';
+                width = fraction / conflicts[date__value.conflict].count;
                 posLeft =
                     fraction * date__value.day +
                     (fraction / conflicts[date__value.conflict].count) * conflicts[date__value.conflict].painted;
                 conflicts[date__value.conflict].painted++;
             }
 
-            date__value.posLeft = posLeft;
-            date__value.posTop = posTop;
-            date__value.posBottom = posBottom;
-            date__value.width = width;
+            date__value.posLeft = Math.round(posLeft * 100) / 100;
+            date__value.posTop = Math.round(posTop * 100) / 100;
+            date__value.posBottom = Math.round(posBottom * 100) / 100;
+            date__value.padding = width > 1 ? '0 3rem' : '0';
+            date__value.width = 'calc(' + Math.round(width * 100) / 100 + '% - 4rem)';
         });
 
         return generatedDates;

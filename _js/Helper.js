@@ -1,4 +1,8 @@
 export default class Helper {
+    static isProduction() {
+        return window.location.hostname.indexOf('.dev') === -1 && window.location.hostname.indexOf('.test') === -1;
+    }
+
     static prevAll(el, selector = null) {
         let prev = true;
         return [].filter

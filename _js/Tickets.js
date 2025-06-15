@@ -46,7 +46,7 @@ export default class Tickets {
         });
     }
     static fetchAndRenderTicketsInterval() {
-        if (!hlp.isMobile()) {
+        if (!hlp.isMobile() && Helper.isProduction()) {
             setInterval(() => {
                 if (Store.data.busy === true) {
                     return;
