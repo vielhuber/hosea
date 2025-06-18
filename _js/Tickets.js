@@ -108,6 +108,7 @@ export default class Tickets {
                                 store__value.updated_at != tickets__value.updated_at
                             ) {
                                 tickets__value.visible = false;
+                                tickets__value.hide_in_scheduler = false;
                                 Store.data.tickets[store__key] = tickets__value;
                                 document.querySelector(
                                     '.tickets__entry[data-id="' + tickets__value.id + '"]'
@@ -124,6 +125,7 @@ export default class Tickets {
                             }).length === 0
                         ) {
                             tickets__value.visible = false;
+                            tickets__value.hide_in_scheduler = false;
                             Store.data.tickets.push(tickets__value);
                             document
                                 .querySelector('.tickets__table-body')

@@ -173,7 +173,8 @@ export default class Filter {
 
     static doFilter() {
         Store.data.tickets.forEach((tickets__value) => {
-            let visible = true;
+            let visible = true,
+                hide_in_scheduler = false;
             document
                 .querySelector('.metabar__filter')
                 .querySelectorAll('select')
@@ -231,6 +232,10 @@ export default class Filter {
 
                     if (visible_this === false) {
                         visible = false;
+
+                        if (el.getAttribute('name') === 'project' && val_search !== '*' && val_search !== '') {
+                            hide_in_scheduler = true;
+                        }
                     }
                 });
             if (visible === false && tickets__value.visible === true) {
@@ -244,8 +249,15 @@ export default class Filter {
                     .querySelector('.tickets .tickets__entry[data-id="' + tickets__value.id + '"]')
                     .classList.add('tickets__entry--visible');
             }
+
+            if (hide_in_scheduler === false && tickets__value.hide_in_scheduler === true) {
+                tickets__value.hide_in_scheduler = false;
+            } else if (hide_in_scheduler === true && tickets__value.hide_in_scheduler === false) {
+                tickets__value.hide_in_scheduler = true;
+            }
         });
         Sort.doSort();
+        Scheduler.initScheduler();
         Scheduler.updateColors();
         Tickets.updateSum();
         Textarea.textareaSetVisibleHeights();

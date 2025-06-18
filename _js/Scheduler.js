@@ -251,7 +251,9 @@ export default class Scheduler {
         tippy('.scheduler__appointment', {
             content(reference) {
                 let title = reference.getAttribute('title');
-                title = title.split('\n').join('<br/>').split(' ').join('&nbsp;');
+                if (title !== null) {
+                    title = title.split('\n').join('<br/>').split(' ').join('&nbsp;');
+                }
                 reference.removeAttribute('title');
                 return title;
             },
@@ -363,6 +365,10 @@ export default class Scheduler {
                 tickets__value.project,
                 'none'
             );
+            let opacity = Scheduler.getStoreProperty('opacity', tickets__value.status, tickets__value.project, 1);
+            if (tickets__value.hide_in_scheduler === true) {
+                opacity = 0.1;
+            }
             if (parsed_values !== false && parsed_values.length > 0) {
                 parsed_values.forEach((parsed_values__value) => {
                     generatedDates.push({
@@ -376,12 +382,7 @@ export default class Scheduler {
                         time: parsed_values__value.time,
                         background: background,
                         animation: animation,
-                        opacity: Scheduler.getStoreProperty(
-                            'opacity',
-                            tickets__value.status,
-                            tickets__value.project,
-                            1
-                        ),
+                        opacity: opacity,
                     });
                 });
             }
@@ -761,7 +762,7 @@ export default class Scheduler {
     static indicatorInterval() {
         setInterval(() => {
             Scheduler.indicatorIntervalFn();
-        }, 1000 * 1);
+        }, 1000 * 60);
         Scheduler.indicatorIntervalFn();
     }
 
@@ -798,12 +799,18 @@ export default class Scheduler {
 
     static indicatorIntervalFn() {
         let $el_indicator = document.querySelector('.scheduler__cell--indicator');
-        $el_indicator.style.top = Scheduler.indicatorIntervalValue() + 'px';
-        tippy($el_indicator, {
-            content:
-                '⏳' + ('0' + new Date().getHours()).slice(-2) + ':' + ('0' + new Date().getMinutes()).slice(-2) + '⏳',
-            interactive: false,
-        });
+        if ($el_indicator !== null) {
+            $el_indicator.style.top = Scheduler.indicatorIntervalValue() + 'px';
+            tippy($el_indicator, {
+                content:
+                    '⏳' +
+                    ('0' + new Date().getHours()).slice(-2) +
+                    ':' +
+                    ('0' + new Date().getMinutes()).slice(-2) +
+                    '⏳',
+                interactive: false,
+            });
+        }
     }
 
     static generateLinkToEmptyDatesSum() {
