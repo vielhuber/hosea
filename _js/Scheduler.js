@@ -365,6 +365,9 @@ export default class Scheduler {
                 tickets__value.project,
                 'none'
             );
+            if (['done', 'billed'].includes(status)) {
+                animation = 'none';
+            }
             let opacity = Scheduler.getStoreProperty('opacity', tickets__value.status, tickets__value.project, 1);
             if (tickets__value.hide_in_scheduler === true) {
                 opacity = 0.1;
