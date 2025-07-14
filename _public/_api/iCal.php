@@ -26,6 +26,7 @@ class iCal extends Api
         $query = [];
 
         if (isset($_GET['projects']) && $_GET['projects'] != '') {
+            $query[] = 'status IN (\'fixed\',\'allday\')';
             $query_or = [];
             foreach (explode(',', $_GET['projects']) as $projects__value) {
                 $query_or[] = 'project LIKE \'_' . $projects__value . '_\'';
