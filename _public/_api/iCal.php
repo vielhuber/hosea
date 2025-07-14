@@ -22,16 +22,33 @@ class iCal extends Api
     protected function generateICal()
     {
         $events = [];
+
+        $query = [];
+
+        if (isset($_GET['projects']) && $_GET['projects'] != '') {
+            $query_or = [];
+            foreach (explode(',', $_GET['projects']) as $projects__value) {
+                $query_or[] = 'project LIKE \'_' . $projects__value . '_\'';
+            }
+            $query[] = '(' . implode(') OR (', $query_or) . ')';
+        } else {
+            $query[] =
+                'INSTR(project,\'FEIERTAG\') OR ((LENGTH(date)-LENGTH(REPLACE(date, \'\n\', \'\'))) > 3) OR STR_TO_DATE(date,\'%d.%m.%y\') > DATE_SUB(NOW(), INTERVAL 30 DAY)';
+            $query[] =
+                'INSTR(project,\'FEIERTAG\') OR ((LENGTH(date)-LENGTH(REPLACE(date, \'\n\', \'\'))) > 3) OR STR_TO_DATE(date,\'%d.%m.%y\') < DATE_ADD(NOW(), INTERVAL 30 DAY)';
+            $query[] = 'status IN (\'fixed\')';
+            $query[] = 'project NOT LIKE \'%Mittagessen%\'';
+            $query[] = 'project NOT LIKE \'%Abendessen%\'';
+            $query[] = 'project NOT LIKE \'%Entspannen%\'';
+            $query[] = 'project NOT LIKE \'%Julia%\'';
+        }
+
         $tickets = $this::$db->fetch_all(
             '
             SELECT * FROM tickets WHERE user_id = (SELECT id FROM users WHERE api_key = ?)
-            AND (INSTR(project,\'FEIERTAG\') OR ((LENGTH(date)-LENGTH(REPLACE(date, \'\n\', \'\'))) > 3) OR STR_TO_DATE(date,\'%d.%m.%y\') > DATE_SUB(NOW(), INTERVAL 30 DAY))
-            AND (INSTR(project,\'FEIERTAG\') OR ((LENGTH(date)-LENGTH(REPLACE(date, \'\n\', \'\'))) > 3) OR STR_TO_DATE(date,\'%d.%m.%y\') < DATE_ADD(NOW(), INTERVAL 30 DAY))
-            AND status IN (\'fixed\')
-            AND project NOT LIKE \'%Mittagessen%\'
-            AND project NOT LIKE \'%Abendessen%\'
-            AND project NOT LIKE \'%Entspannen%\'
-            AND project NOT LIKE \'%Julia%\'
+            AND (' .
+                implode(') AND (', $query) .
+                ')
             ',
             $this->getRequestPathSecond()
         );
