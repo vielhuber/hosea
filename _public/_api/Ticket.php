@@ -96,9 +96,9 @@ class Ticket extends Api
                         ($interval_prev === null
                         ? '1=1'
                         : '(
-                            INSTR(project,\'FEIERTAG\')
-                            OR
                             INSTR(project,\'FERIEN\')
+                            OR
+                            INSTR(project,\'FEIERTAG\')
                             OR
                             ' .
                             /* this considers multiline date values */ '
@@ -120,9 +120,9 @@ class Ticket extends Api
                         ($interval_next === null
                         ? '1=1'
                             : '(
-                            INSTR(project,\'FEIERTAG\')
-                            OR
                             INSTR(project,\'FERIEN\')
+                            OR
+                            INSTR(project,\'FEIERTAG\')
                             OR
                             ' .
                             /* this considers multiline date values */ '
