@@ -98,6 +98,8 @@ class Ticket extends Api
                         : '(
                             INSTR(project,\'FEIERTAG\')
                             OR
+                            INSTR(project,\'FERIEN\')
+                            OR
                             ' .
                             /* this considers multiline date values */ '
                             (
@@ -119,6 +121,8 @@ class Ticket extends Api
                         ? '1=1'
                             : '(
                             INSTR(project,\'FEIERTAG\')
+                            OR
+                            INSTR(project,\'FERIEN\')
                             OR
                             ' .
                             /* this considers multiline date values */ '
