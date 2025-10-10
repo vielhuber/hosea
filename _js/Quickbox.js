@@ -548,6 +548,13 @@ export default class Quickbox {
         if (view === 'money') {
             this.initializeMoneyChart();
         }
+        if (view === 'new') {
+            setTimeout(() => {
+                if (document.querySelector('.quickbox__new-input--focus') !== null) {
+                    document.querySelector('.quickbox__new-input--focus').focus();
+                }
+            }, 250);
+        }
         requestAnimationFrame(() => {
             setTimeout(() => {
                 document.querySelectorAll('.quickbox__content > *:not(.quickbox__' + view + ')').forEach((el2) => {
@@ -996,14 +1003,14 @@ export default class Quickbox {
         document.querySelector('.quickbox__new').innerHTML = `
             <form class="quickbox__new-form">
                 <ul class="quickbox__new-inputrows">
-                    <li class="quickbox__new-inputrow quickbox__new-inputrow--1/6"><label class="quickbox__new-label"><input class="quickbox__new-input quickbox__new-input--radio" type="radio" name="date" value="tonight" checked /><span class="quickbox__new-label-text">tonight</span></label></li>
+                    <li class="quickbox__new-inputrow quickbox__new-inputrow--1/2"><input class="quickbox__new-input quickbox__new-input--text validate-field validate-field--date" type="text" name="date" placeholder="date" value="${Quickbox.proposeNewDate()}" /></li>
+                    <li class="quickbox__new-inputrow quickbox__new-inputrow--1/6"><label class="quickbox__new-label"><input class="quickbox__new-input quickbox__new-input--radio" type="radio" name="date" value="tonight" /><span class="quickbox__new-label-text">tonight</span></label></li>
                     <li class="quickbox__new-inputrow quickbox__new-inputrow--1/6"><label class="quickbox__new-label"><input class="quickbox__new-input quickbox__new-input--radio" type="radio" name="date" value="weekend" /><span class="quickbox__new-label-text">weekend</span></label></li>
                     <li class="quickbox__new-inputrow quickbox__new-inputrow--1/6"><label class="quickbox__new-label"><input class="quickbox__new-input quickbox__new-input--radio" type="radio" name="date" value="next" /><span class="quickbox__new-label-text">next</span></label></li>
-                    <li class="quickbox__new-inputrow quickbox__new-inputrow--1/2"><input class="quickbox__new-input quickbox__new-input--text validate-field validate-field--date" type="text" name="date" placeholder="date" value="" /></li>
                     <li class="quickbox__new-inputrow"><input class="quickbox__new-input quickbox__new-input--text validate-field validate-field--project autocaps" type="text" required="required" name="project" placeholder="project" value="PRIVATE" /></li>
                     <li class="quickbox__new-inputrow quickbox__new-inputrow--rheight">
                         <textarea
-                            class="quickbox__new-input quickbox__new-input--textarea"
+                            class="quickbox__new-input quickbox__new-input--textarea quickbox__new-input--focus"
                             autocorrect="off"
                             autocapitalize="off"
                             spellcheck="false"
@@ -1082,5 +1089,14 @@ export default class Quickbox {
                 });
             e.preventDefault();
         });
+    }
+
+    static proposeNewDate() {
+        /* calculate next monday */
+        let proposedDate = new Date();
+        proposedDate.setDate(proposedDate.getDate() + ((1 + 7 - proposedDate.getDay()) % 7));
+        proposedDate = Dates.dateFormat(proposedDate, 'd.m.y');
+        proposedDate += ' 09:00-11:00';
+        return proposedDate;
     }
 }
