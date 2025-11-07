@@ -737,6 +737,22 @@ export default class Scheduler {
 
     static changeView() {
         if (
+            Store.data.shiftingView === false &&
+            Store.data.shiftingViewPrevDays === 0 &&
+            Store.data.weeksInViewport === 4
+        ) {
+            Store.data.shiftingView = false;
+            Store.data.shiftingViewPrevDays = 0;
+            Store.data.weeksInViewport = 3;
+        } else if (
+            Store.data.shiftingView === false &&
+            Store.data.shiftingViewPrevDays === 0 &&
+            Store.data.weeksInViewport === 3
+        ) {
+            Store.data.shiftingView = true;
+            Store.data.shiftingViewPrevDays = 1;
+            Store.data.weeksInViewport = 2;
+        } else if (
             Store.data.shiftingView === true &&
             Store.data.shiftingViewPrevDays === 1 &&
             Store.data.weeksInViewport === 2
@@ -749,11 +765,9 @@ export default class Scheduler {
             Store.data.shiftingViewPrevDays === 0 &&
             Store.data.weeksInViewport === 1
         ) {
-            Store.data.weeksInViewport = 3;
-        } else {
-            Store.data.shiftingView = true;
-            Store.data.shiftingViewPrevDays = 1;
-            Store.data.weeksInViewport = 2;
+            Store.data.shiftingView = false;
+            Store.data.shiftingViewPrevDays = 0;
+            Store.data.weeksInViewport = 4;
         }
         Html.setViewClass();
 
