@@ -26,6 +26,14 @@ export default class Html {
             `
         );
 
+        // performance: remove animation after some time
+        setTimeout(() => {
+            document.querySelector('.animation').style.opacity = '0';
+            setTimeout(() => {
+                document.querySelector('.animation').remove();
+            }, 5000);
+        }, 5000);
+
         document.querySelector('.footer').insertAdjacentHTML(
             'beforeend',
             `
