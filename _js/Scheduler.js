@@ -259,6 +259,7 @@ export default class Scheduler {
             },
             allowHTML: true,
             interactive: false,
+            placement: 'auto',
         });
 
         let statsSumWeekly = 0;
@@ -371,6 +372,7 @@ export default class Scheduler {
             let opacity = Scheduler.getStoreProperty('opacity', tickets__value.status, tickets__value.project, 1);
             if (tickets__value.hide_in_scheduler === true) {
                 opacity = 0.1;
+                animation = 'none';
             }
             if (parsed_values !== false && parsed_values.length > 0) {
                 parsed_values.forEach((parsed_values__value) => {

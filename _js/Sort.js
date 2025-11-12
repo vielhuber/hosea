@@ -48,8 +48,20 @@ export default class Sort {
                             a.querySelector('[name="status"]').value == 'recurring' &&
                             b.querySelector('[name="status"]').value == 'recurring'
                         ) {
-                            val_a = Dates.getWeekdayOfString(a.querySelector('[name="date"]').value);
-                            val_b = Dates.getWeekdayOfString(b.querySelector('[name="date"]').value);
+                            val_a =
+                                Dates.getWeekdayOfString(a.querySelector('[name="date"]').value) +
+                                '_' +
+                                a
+                                    .querySelector('[name="date"]')
+                                    .value.match(/[0-9][0-9]:[0-9][0-9]/g)
+                                    ?.join('');
+                            val_b =
+                                Dates.getWeekdayOfString(b.querySelector('[name="date"]').value) +
+                                '_' +
+                                b
+                                    .querySelector('[name="date"]')
+                                    .value.match(/[0-9][0-9]:[0-9][0-9]/g)
+                                    ?.join('');
                         } else {
                             val_a = Dates.germanDateTimeToEnglishString(val_a);
                             val_b = Dates.germanDateTimeToEnglishString(val_b);
@@ -107,8 +119,18 @@ export default class Sort {
                     a.querySelector('[name="status"]').value == 'recurring' &&
                     b.querySelector('[name="status"]').value == 'recurring'
                         ? [
-                              Dates.getWeekdayOfString(a.querySelector('[name="date"]').value),
-                              Dates.getWeekdayOfString(b.querySelector('[name="date"]').value),
+                              Dates.getWeekdayOfString(a.querySelector('[name="date"]').value) +
+                                  '_' +
+                                  a
+                                      .querySelector('[name="date"]')
+                                      .value.match(/[0-9][0-9]:[0-9][0-9]/g)
+                                      ?.join(''),
+                              Dates.getWeekdayOfString(b.querySelector('[name="date"]').value) +
+                                  '_' +
+                                  b
+                                      .querySelector('[name="date"]')
+                                      .value.match(/[0-9][0-9]:[0-9][0-9]/g)
+                                      ?.join(''),
                           ]
                         : [
                               Dates.germanDateTimeToEnglishString(a.querySelector('[name="date"]').value),

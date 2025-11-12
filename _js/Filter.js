@@ -81,7 +81,11 @@ export default class Filter {
                     }
                     */
                     let options_value = tickets__value[columns__value];
+
+                    // remove temp "--"
                     options_value = options_value.replace(/^--/, '');
+                    // remove emojis
+                    options_value = options_value.replaceAll(hlp.emojiRegex(), '');
 
                     if (!options.includes(options_value)) {
                         options.push(options_value);
@@ -123,10 +127,6 @@ export default class Filter {
                     a = a.toLowerCase();
                     b = b.toLowerCase();
 
-                    // remove emojis
-                    a = a.replaceAll(hlp.emojiRegex(), '');
-                    b = b.replaceAll(hlp.emojiRegex(), '');
-
                     if (a.indexOf('|') > -1 || a.indexOf('&') > -1 || a.indexOf('!') > -1) {
                         a = 'zz' + a;
                     }
@@ -139,14 +139,11 @@ export default class Filter {
                     return a.localeCompare(b);
                 });
                 options.forEach((options__value) => {
-                    let options__value_normalized = options__value;
-                    options__value_normalized = options__value_normalized.replace(hlp.emojiRegex(false), '');
-
                     document
                         .querySelector('.metabar__select--filter[name="' + columns__value + '"]')
                         .insertAdjacentHTML(
                             'beforeend',
-                            '<option value="' + options__value + '">' + options__value_normalized + '</option>'
+                            '<option value="' + options__value + '">' + options__value + '</option>'
                         );
                 });
             }
@@ -163,9 +160,9 @@ export default class Filter {
                     let date = e.target.closest('.metabar__select--filter[name="date"]');
                     if (date && date.value !== '*' && date.value !== '') {
                         Store.data.session.activeDay = new Date(date.value);
-                        Scheduler.initScheduler();
                     }
                     Filter.doFilter();
+                    Scheduler.initScheduler();
                 }
             });
         }
@@ -193,7 +190,10 @@ export default class Filter {
 
                     // project
                     if (el.getAttribute('name') === 'project' && val_search !== '*' && val_search !== '') {
-                        if (val_target === val_search || val_target === '--' + val_search) {
+                        if (
+                            val_target.replaceAll(hlp.emojiRegex(), '') === val_search ||
+                            val_target.replaceAll(hlp.emojiRegex(), '') === '--' + val_search
+                        ) {
                             visible_this = true;
                         }
                     }
@@ -257,7 +257,7 @@ export default class Filter {
             }
         });
         Sort.doSort();
-        Scheduler.initScheduler();
+        //Scheduler.initScheduler();
         Scheduler.updateColors();
         Tickets.updateSum();
         Textarea.textareaSetVisibleHeights();

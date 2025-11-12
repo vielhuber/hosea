@@ -97,7 +97,7 @@ working" class="tickets__table-tooltip">(?)</span>
                 document.querySelector('.tickets__table-head tr td:last-child').insertAdjacentHTML(
                     'beforeend',
                     `
-                    <span title="[0-24]" class="tickets__table-tooltip">(?)</span>
+                    <span title="[0-999]" class="tickets__table-tooltip">(?)</span>
                 `
                 );
             }
@@ -250,9 +250,9 @@ DD%N: weekday in calendar week %N=0 (if >X specified, N -= calendar week of X)
             }
             if ($target.closest('.validate-field--time')) {
                 if (
-                    !new RegExp('^[0-9]$|^[0-9],[0-9]$|^[0-9],[0-9][0-9]$').test($target.value) ||
+                    !new RegExp('^[0-9]{1,3}$|^[0-9]{1,3},[0-9]{1,2}$').test($target.value) ||
                     $target.value < 0 ||
-                    $target.value > 24
+                    $target.value > 999
                 ) {
                     $target.setCustomValidity('wrong format');
                 } else {
@@ -262,7 +262,7 @@ DD%N: weekday in calendar week %N=0 (if >X specified, N -= calendar week of X)
             if ($target.closest('.validate-field--project')) {
                 if (
                     new RegExp(
-                        '^(--)?(\\p{RGI_Emoji})?[A-Z0-9\u00c4\u00d6\u00dc\u00df]{1}[ A-Z0-9\u00c4\u00d6\u00dc\u00df]{1,}[A-Z0-9\u00c4\u00d6\u00dc\u00df]{1}(\\p{RGI_Emoji})?$',
+                        '^(--)?(\\p{RGI_Emoji})?[A-Z0-9\u00c4\u00d6\u00dc\u00df]{1}[ .A-Z0-9\u00c4\u00d6\u00dc\u00df]{0,}[A-Z0-9\u00c4\u00d6\u00dc\u00df]{1}(\\p{RGI_Emoji})?$',
                         'v'
                     ).test($target.value) === false
                 ) {
