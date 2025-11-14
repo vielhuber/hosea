@@ -84,9 +84,9 @@ export default class Keyboard {
 
     static bindRefresh() {
         // f5
-        document.addEventListener('keydown', (e) => {
+        document.addEventListener('keydown', async (e) => {
             if (e.keyCode === 116) {
-                Filter.doFilter();
+                await Filter.doFilter();
                 e.preventDefault();
             }
         });

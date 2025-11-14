@@ -820,7 +820,7 @@ export default class Quickbox {
     }
 
     static bindToday() {
-        document.addEventListener('click', (e) => {
+        document.addEventListener('click', async (e) => {
             let el = e.target.closest('.quickbox__today-nav');
             if (el) {
                 if (
@@ -845,8 +845,8 @@ export default class Quickbox {
                     document.querySelector('.metabar__select--sort[name="sort_1"]').value = 'priority';
                 }
 
-                Filter.doFilter();
-                Scheduler.initScheduler();
+                await Filter.doFilter();
+                await Scheduler.initScheduler();
                 Quickbox.initToday();
 
                 e.preventDefault();
@@ -896,9 +896,9 @@ export default class Quickbox {
                     .catch((err) => {
                         console.error(err);
                     })
-                    .then((response) => {
+                    .then(async (response) => {
                         Store.data.busy = false;
-                        Scheduler.initScheduler();
+                        await Scheduler.initScheduler();
                         Scheduler.updateColors();
                         Quickbox.initToday();
                         Tickets.updateSum();
@@ -934,14 +934,14 @@ export default class Quickbox {
                         .catch((err) => {
                             console.error(err);
                         })
-                        .then((response) => {
+                        .then(async (response) => {
                             Store.data.busy = false;
                             Store.data.tickets.forEach((tickets__value, tickets__key) => {
                                 if (tickets__value.id == ticket_id) {
                                     Store.data.tickets.splice(tickets__key, 1);
                                 }
                             });
-                            Scheduler.initScheduler();
+                            await Scheduler.initScheduler();
                             Scheduler.updateColors();
                             Quickbox.initToday();
                             Tickets.updateSum();

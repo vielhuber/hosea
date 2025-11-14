@@ -62,7 +62,7 @@ export default class Tickets {
 
     static async fetchAndRenderTicketsAndUpdateApp() {
         await Tickets.fetchAndRenderTickets();
-        Scheduler.initScheduler();
+        await Scheduler.initScheduler();
         Scheduler.updateColors();
         Quickbox.initToday();
         Tickets.updateSum();
@@ -219,12 +219,12 @@ export default class Tickets {
                 .catch((err) => {
                     console.error(err);
                 })
-                .then((response) => {
+                .then(async (response) => {
                     Store.data.busy = false;
                     response.data.ids.forEach((value) => {
                         Lock.unlockTicket(value);
                     });
-                    Scheduler.initScheduler();
+                    await Scheduler.initScheduler();
                     Scheduler.updateColors();
                     Quickbox.initToday();
                     Tickets.updateSum();
@@ -480,7 +480,7 @@ export default class Tickets {
             }
 
             Tickets.createTicket(data)
-                .then((ticket) => {
+                .then(async (ticket) => {
                     let next;
                     if (current !== null) {
                         current.insertAdjacentHTML('afterend', Html.createHtmlLine(ticket, true));
@@ -500,14 +500,14 @@ export default class Tickets {
                         input.select();
                         input.dispatchEvent(new Event('input', { bubbles: true }));
                     }
-                    Scheduler.initScheduler();
+                    await Scheduler.initScheduler();
                     Scheduler.updateColors();
                     Quickbox.initToday();
                     Tickets.updateSum();
                     Filter.updateFilter();
                     Textarea.textareaSetVisibleHeights();
                     if (doFilter === true) {
-                        Filter.doFilter();
+                        await Filter.doFilter();
                     }
                     if ('attachments' in data && data.attachments.length > 0) {
                         Attachments.startUploadsAndBuildHtml(ticket.id, data.attachments);
@@ -568,9 +568,9 @@ export default class Tickets {
                 let result = confirm('Sind Sie sicher?');
                 if (result) {
                     Tickets.deleteTicket(ticket_id)
-                        .then((result) => {
+                        .then(async (result) => {
                             e.target.closest('.tickets__entry').remove();
-                            Scheduler.initScheduler();
+                            await Scheduler.initScheduler();
                             Quickbox.initToday();
                             Tickets.updateSum();
                             Filter.updateFilter();

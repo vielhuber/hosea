@@ -8,7 +8,7 @@ import tippy from 'tippy.js';
 import Html from './Html';
 
 export default class Scheduler {
-    static initScheduler() {
+    static async initScheduler() {
         document.querySelector('.scheduler').innerHTML = `
             <div class="scheduler__navigation">
                 <span class="scheduler__navigation-week"></span>
@@ -216,20 +216,22 @@ export default class Scheduler {
 
         let generatedDates = Scheduler.generateDates();
 
-        generatedDates.forEach((date__value) => {
-            let date__value_name = date__value.name;
-            if (hlp.emojiRegex().test(date__value_name)) {
-                let date__value_name_emoji = hlp.emojiSplit(date__value_name);
-                date__value_name =
-                    date__value_name_emoji[0] +
-                    '\n' +
-                    date__value_name_emoji.slice(1, -1).join('') +
-                    '\n' +
-                    date__value_name_emoji.at(-1);
-            }
-            document.querySelector('.scheduler__appointments').insertAdjacentHTML(
-                'beforeend',
-                `
+        let batchSize = 50;
+        for (let i = 0; i < generatedDates.length; i += batchSize) {
+            generatedDates.slice(i, i + batchSize).forEach((date__value) => {
+                let date__value_name = date__value.name;
+                if (hlp.emojiRegex().test(date__value_name)) {
+                    let date__value_name_emoji = hlp.emojiSplit(date__value_name);
+                    date__value_name =
+                        date__value_name_emoji[0] +
+                        '\n' +
+                        date__value_name_emoji.slice(1, -1).join('') +
+                        '\n' +
+                        date__value_name_emoji.at(-1);
+                }
+                document.querySelector('.scheduler__appointments').insertAdjacentHTML(
+                    'beforeend',
+                    `
                     <div class="scheduler__appointment" title="${date__value.title}" style="
                         left:${date__value.posLeft}%;
                         top:${date__value.posTop}%;
@@ -244,8 +246,13 @@ export default class Scheduler {
                         <div class="scheduler__appointment-inner">${date__value_name}</div>
                     </div>
                 `
-            );
-        });
+                );
+            });
+            // break between batches to keep ui responsive
+            if (i + batchSize < generatedDates.length) {
+                await new Promise((resolve) => setTimeout(resolve, 0));
+            }
+        }
 
         // custom tooltips instead of basic titles
         tippy('.scheduler__appointment', {
@@ -288,7 +295,7 @@ export default class Scheduler {
     }
 
     static bindScheduler() {
-        document.querySelector('.scheduler').addEventListener('click', (e) => {
+        document.querySelector('.scheduler').addEventListener('click', async (e) => {
             if (
                 e.target.closest('.scheduler__navigation-button') ||
                 e.target.closest('.scheduler__navigation-daylink') ||
@@ -340,8 +347,8 @@ export default class Scheduler {
                     document.querySelector('.metabar__select--sort[name="sort_2"]').value = '';
                 }
 
-                Filter.doFilter();
-                Scheduler.initScheduler();
+                await Filter.doFilter();
+                await Scheduler.initScheduler();
                 Quickbox.initToday();
 
                 e.preventDefault();
@@ -737,7 +744,7 @@ export default class Scheduler {
         });
     }
 
-    static changeView() {
+    static async changeView() {
         if (
             Store.data.shiftingView === false &&
             Store.data.shiftingViewPrevDays === 0 &&
@@ -773,8 +780,8 @@ export default class Scheduler {
         }
         Html.setViewClass();
 
-        Filter.doFilter();
-        Scheduler.initScheduler();
+        await Filter.doFilter();
+        await Scheduler.initScheduler();
         Quickbox.initToday();
     }
 

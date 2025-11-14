@@ -23,7 +23,7 @@ export default class App {
         await Weather.fetchWeather();
         Tickets.fetchAndRenderTicketsInterval();
         Keyboard.initKeyboardNavigation();
-        Scheduler.initScheduler();
+        await Scheduler.initScheduler();
         // currently disabled, because we use both columns independently
         //Tickets.bindAutoTime();
         Tickets.bindChangeTracking();

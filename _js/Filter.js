@@ -15,7 +15,7 @@ export default class Filter {
         Filter.initUpdateFilter(true);
     }
 
-    static initUpdateFilter(update) {
+    static async initUpdateFilter(update) {
         let selected = {};
         if (update === true) {
             document
@@ -154,21 +154,21 @@ export default class Filter {
                 document.querySelector('.metabar__filter [name="' + selected__key + '"]').value = selected__value;
             });
         } else {
-            Filter.doFilter();
-            document.querySelector('.metabar').addEventListener('change', (e) => {
+            await Filter.doFilter();
+            document.querySelector('.metabar').addEventListener('change', async (e) => {
                 if (e.target.closest('.metabar__select--filter')) {
                     let date = e.target.closest('.metabar__select--filter[name="date"]');
                     if (date && date.value !== '*' && date.value !== '') {
                         Store.data.session.activeDay = new Date(date.value);
                     }
-                    Filter.doFilter();
-                    Scheduler.initScheduler();
+                    await Filter.doFilter();
+                    await Scheduler.initScheduler();
                 }
             });
         }
     }
 
-    static doFilter() {
+    static async doFilter() {
         Store.data.tickets.forEach((tickets__value) => {
             let visible = true,
                 hide_in_scheduler = false;
@@ -257,7 +257,7 @@ export default class Filter {
             }
         });
         Sort.doSort();
-        //Scheduler.initScheduler();
+        //await Scheduler.initScheduler();
         Scheduler.updateColors();
         Tickets.updateSum();
         Textarea.textareaSetVisibleHeights();
