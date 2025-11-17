@@ -1,3 +1,5 @@
+@use "../_config/vars";
+
 @mixin shadow {
     box-shadow: 0rem 30rem 80rem 0rem rgba(0, 0, 0, 0.5);
     @include responsive-medium {
@@ -7,12 +9,12 @@
 
 @mixin input {
     background-color: transparent;
-    color: $color-white;
+    color: vars.$color-white;
     padding: 0;
 }
 
 @mixin select {
-    background-color: $color-black;
+    background-color: vars.$color-black;
     appearance: menulist-button;
     padding: 0 20rem 0 4rem;
     cursor: pointer;
@@ -23,7 +25,7 @@
 }
 
 @mixin border {
-    border: 2rem solid $color-white;
+    border: 2rem solid vars.$color-white;
     @include responsive-medium {
         border-width: 1rem;
     }
@@ -42,8 +44,8 @@
         background-color: transparent;
     }
     &::-webkit-scrollbar-thumb {
-        background-color: $color-white;
-        box-shadow: -1rem 0 0 0 $color-white;
+        background-color: vars.$color-white;
+        box-shadow: -1rem 0 0 0 vars.$color-white;
     }
     @include responsive-medium {
         &::-webkit-scrollbar {
@@ -54,19 +56,19 @@
 }
 
 @mixin responsive-big {
-    @media screen and (max-width: $breakpoint-big) {
+    @media screen and (max-width: vars.$breakpoint-big) {
         @content;
     }
 }
 
 @mixin responsive-medium {
-    @media screen and (max-width: $breakpoint-medium) {
+    @media screen and (max-width: vars.$breakpoint-medium) {
         @content;
     }
 }
 
 @mixin responsive-small {
-    @media screen and (max-width: $breakpoint-small) {
+    @media screen and (max-width: vars.$breakpoint-small) {
         @content;
     }
 }

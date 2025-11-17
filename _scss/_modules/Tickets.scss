@@ -1,20 +1,23 @@
+@use "../_assorted/common";
+@use "../_config/vars";
+
 .tickets {
-    width: calc(#{$container-width-big} - 2 * #{$space-big});
-    bottom: calc(#{$space-big} + #{$footer-height});
-    left: $space-big;
-    top: $space-big;
-    color: $color-white;
-    background-color: $color-black-transparent;
+    width: calc(#{vars.$container-width-big} - 2 * #{vars.$space-big});
+    bottom: calc(#{vars.$space-big} + #{vars.$footer-height});
+    left: vars.$space-big;
+    top: vars.$space-big;
+    color: vars.$color-white;
+    background-color: vars.$color-black-transparent;
     position: absolute;
-    @include border;
-    @include shadow;
+    @include common.border;
+    @include common.shadow;
     .view-mode--wide & {
-        width: calc(#{$container-width-small} - 2 * #{$space-big});
+        width: calc(#{vars.$container-width-small} - 2 * #{vars.$space-big});
     }
 }
 
 .tickets__table-container {
-    @include scrollbar;
+    @include common.scrollbar;
 }
 
 .tickets__textarea {
@@ -24,11 +27,11 @@
     resize: none;
     overflow-x: hidden;
     overflow-y: auto;
-    height: $space-medium;
-    line-height: $space-medium;
+    height: vars.$space-medium;
+    line-height: vars.$space-medium;
     vertical-align: top; // fixes annoying unknown padding bug
-    @include input;
-    @include scrollbar;
+    @include common.input;
+    @include common.scrollbar;
 }
 
 .tickets__textarea:invalid {
@@ -41,10 +44,10 @@
 
 .tickets__table-container {
     position: absolute;
-    top: calc(#{$space-medium} + #{$bar-height} + #{$space-medium});
-    left: $space-medium;
-    bottom: $space-medium;
-    right: $space-medium;
+    top: calc(#{vars.$space-medium} + #{vars.$bar-height} + #{vars.$space-medium});
+    left: vars.$space-medium;
+    bottom: vars.$space-medium;
+    right: vars.$space-medium;
     overflow-y: scroll;
     overflow-x: hidden;
 }
@@ -62,7 +65,7 @@
     vertical-align: top;
     overflow: hidden;
     padding: 0 0 0 4rem;
-    @include border;
+    @include common.border;
 }
 
 .tickets__table-cell:nth-child(1) {
@@ -99,7 +102,7 @@
 
 .tickets__entry {
     display: none;
-    border-left: $space-medium solid transparent;
+    border-left: vars.$space-medium solid transparent;
 }
 
 .tickets__entry--visible {
@@ -107,11 +110,11 @@
 }
 
 .tickets__entry--changed {
-    box-shadow: 0 0 0 3rem $color-orange inset, 7rem 0 0 3rem $color-orange inset;
+    box-shadow: 0 0 0 3rem vars.$color-orange inset, 7rem 0 0 3rem vars.$color-orange inset;
 }
 
 .tickets__entry--locked {
-    box-shadow: 0 0 0 3rem $color-pink inset, 7rem 0 0 3rem $color-pink inset;
+    box-shadow: 0 0 0 3rem vars.$color-pink inset, 7rem 0 0 3rem vars.$color-pink inset;
 }
 
 .tickets__attachment {
@@ -157,7 +160,7 @@
     display: none;
 }
 
-@include responsive-medium {
+@include common.responsive-medium {
     .tickets {
         display: none;
     }

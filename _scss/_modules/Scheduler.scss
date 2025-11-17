@@ -1,29 +1,32 @@
+@use "../_assorted/common";
+@use "../_config/vars";
+
 .scheduler {
-    width: calc((100% - #{$container-width-big}) - #{$space-big});
+    width: calc((100% - #{vars.$container-width-big}) - #{vars.$space-big});
     bottom: calc(
-        #{$footer-height} + #{$space-big} + ((100% - (2 * #{$space-big}) - #{$footer-height}) / 3) +
-            (0.5 * #{$space-big})
+        #{vars.$footer-height} + #{vars.$space-big} + ((100% - (2 * #{vars.$space-big}) - #{vars.$footer-height}) / 3) +
+            (0.5 * #{vars.$space-big})
     );
-    right: $space-big;
-    top: $space-big;
+    right: vars.$space-big;
+    top: vars.$space-big;
     position: absolute;
-    background-color: $color-black-transparent;
-    color: $color-white;
+    background-color: vars.$color-black-transparent;
+    color: vars.$color-white;
     overflow: hidden;
-    @include border;
-    @include shadow;
+    @include common.border;
+    @include common.shadow;
     .view-mode--wide & {
-        width: calc((100% - #{$container-width-small}) - #{$space-big});
+        width: calc((100% - #{vars.$container-width-small}) - #{vars.$space-big});
     }
 }
 
 .scheduler__navigation {
     position: absolute;
-    top: $space-medium;
-    left: $space-medium;
-    right: $space-medium;
-    height: $bar-height;
-    color: $color-white;
+    top: vars.$space-medium;
+    left: vars.$space-medium;
+    right: vars.$space-medium;
+    height: vars.$bar-height;
+    color: vars.$color-white;
 }
 
 /* tables are bad for pixel perfect adjustments */
@@ -31,27 +34,27 @@
 
 .scheduler__table {
     position: absolute;
-    top: calc(#{$bar-height} + #{$space-medium} * 2);
-    left: $space-medium;
-    right: $space-medium;
-    width: calc(100% - #{$space-medium} * 2); /* needed because of table */
-    height: calc(100% - #{$bar-height} - #{$space-medium} * 3);
+    top: calc(#{vars.$bar-height} + #{vars.$space-medium} * 2);
+    left: vars.$space-medium;
+    right: vars.$space-medium;
+    width: calc(100% - #{vars.$space-medium} * 2); /* needed because of table */
+    height: calc(100% - #{vars.$bar-height} - #{vars.$space-medium} * 3);
     display: block;
-    box-shadow: 0px 0px 0px 2px $color-grey;
+    box-shadow: 0px 0px 0px 2px vars.$color-grey;
 }
 
 .scheduler__table-head {
     width: 100%;
-    height: #{$bar-height};
+    height: #{vars.$bar-height};
     display: block;
     #app[data-weeks-in-viewport='3'] & {
-        font-size: $font-size-small;
+        font-size: vars.$font-size-small;
     }
 }
 
 .scheduler__table-body {
     width: 100%;
-    height: calc(100% - #{$bar-height});
+    height: calc(100% - #{vars.$bar-height});
     display: block;
 }
 
@@ -65,44 +68,44 @@
 
 .scheduler__cell {
     height: 100%;
-    padding: 0 $space-small;
+    padding: 0 vars.$space-small;
     float: left;
-    box-shadow: 0px 0px 0px 1px $color-grey;
+    box-shadow: 0px 0px 0px 1px vars.$color-grey;
     white-space: nowrap;
     overflow: hidden;
     .scheduler__table-head & {
         text-align: center;
-        line-height: calc(#{$bar-height} / 2);
+        line-height: calc(#{vars.$bar-height} / 2);
         padding: 0;
     }
 }
 
 .scheduler__cell--main {
-    background-color: rgba($color-white, 0.1);
+    background-color: rgba(vars.$color-white, 0.1);
 }
 
 .scheduler__cell--curday {
-    background-color: rgba($color-white, 0.2);
+    background-color: rgba(vars.$color-white, 0.2);
 }
 
 .scheduler__cell--curday.scheduler__cell--main {
-    background-color: rgba($color-white, 0.3);
+    background-color: rgba(vars.$color-white, 0.3);
 }
 
 .scheduler__cell--activeday {
-    background-color: rgba($color-pink, 0.2);
+    background-color: rgba(vars.$color-pink, 0.2);
 }
 
 .scheduler__cell--activeday.scheduler__cell--main {
-    background-color: rgba($color-white, 0.4);
+    background-color: rgba(vars.$color-white, 0.4);
 }
 
 .scheduler__cell--weekend {
-    background-color: rgba($color-green, 0.3);
+    background-color: rgba(vars.$color-green, 0.3);
 }
 
 .scheduler__cell--weekend.scheduler__cell--activeday {
-    background-color: rgba($color-green, 0.35);
+    background-color: rgba(vars.$color-green, 0.55);
 }
 
 .scheduler__cell--indicator-container {
@@ -117,23 +120,23 @@
     position: absolute;
     left: 0;
     z-index: 2;
-    background-color: $color-pink;
-    border: 1rem solid $color-white;
-    box-shadow: 0 0 10rem 0 $color-white;
+    background-color: vars.$color-pink;
+    border: 1rem solid vars.$color-white;
+    box-shadow: 0 0 10rem 0 vars.$color-white;
 }
 
 .scheduler__appointments {
     position: absolute;
-    top: calc(#{$bar-height} + #{$bar-height} + #{$space-medium} * 2);
-    left: $space-medium;
-    right: $space-medium;
-    height: calc(100% - #{$bar-height} - #{$bar-height} - #{$space-medium} * 3);
+    top: calc(#{vars.$bar-height} + #{vars.$bar-height} + #{vars.$space-medium} * 2);
+    left: vars.$space-medium;
+    right: vars.$space-medium;
+    height: calc(100% - #{vars.$bar-height} - #{vars.$bar-height} - #{vars.$space-medium} * 3);
 }
 
 .scheduler__appointment {
     position: absolute;
     padding: 0rem 3rem;
-    font-size: $font-size-medium;
+    font-size: vars.$font-size-medium;
     line-height: 11rem;
     text-align: center;
     overflow: hidden;
@@ -141,7 +144,7 @@
     margin-top: 2rem;
     margin-left: 2rem;
     margin-bottom: 2rem;
-    box-shadow: 0px 0px 0px 1px $color-white;
+    box-shadow: 0px 0px 0px 1px vars.$color-white;
     transition: opacity 0.5s ease-in-out;
     cursor: help;
 }
@@ -153,7 +156,7 @@
 
 .scheduler__navigation-week,
 .scheduler__navigation-button {
-    line-height: $bar-height;
+    line-height: vars.$bar-height;
     display: block;
 }
 
@@ -192,7 +195,7 @@
     opacity: 0.5 !important;
 }
 
-@include responsive-medium {
+@include common.responsive-medium {
     .scheduler {
         display: block;
         width: 100%;
@@ -200,7 +203,7 @@
         top: 0;
         left: 0;
         right: 0;
-        bottom: calc(#{$space-big} + 2 * #{$space-small});
+        bottom: calc(#{vars.$space-big} + 2 * #{vars.$space-small});
         z-index: 1;
         transition: opacity 0.25s ease-in-out;
         opacity: 0;
@@ -210,11 +213,11 @@
         }
     }
     .scheduler__appointment {
-        font-size: $font-size-small;
+        font-size: vars.$font-size-small;
         line-height: 7rem;
     }
     .scheduler__cell {
-        font-size: $font-size-small;
+        font-size: vars.$font-size-small;
     }
     .scheduler--mobile-active {
         opacity: 1;
@@ -230,7 +233,7 @@
         flex-direction: row-reverse;
     }
     .scheduler__navigation-button {
-        border: 2rem solid $color-white;
+        border: 2rem solid vars.$color-white;
         padding-left: 10rem;
         padding-right: 10rem;
         flex: 1 1 auto;

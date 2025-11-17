@@ -1,14 +1,17 @@
+@use "../_assorted/common";
+@use "../_config/vars";
+
 .metabar {
     position: absolute;
-    top: $space-medium;
-    left: $space-medium;
-    right: $space-medium;
-    height: $bar-height;
+    top: vars.$space-medium;
+    left: vars.$space-medium;
+    right: vars.$space-medium;
+    height: vars.$bar-height;
 }
 
 .metabar__filter,
 .metabar__sort {
-    line-height: $bar-height;
+    line-height: vars.$bar-height;
 }
 
 .metabar__filter {
@@ -17,19 +20,19 @@
 
 .metabar__select {
     float: left;
-    height: $bar-height;
-    @include input;
-    @include select;
+    height: vars.$bar-height;
+    @include common.input;
+    @include common.select;
 }
 
 .metabar__select--filter {
-    margin-right: $space-small;
+    margin-right: vars.$space-small;
     &:last-child {
         margin-right: 0;
     }
 }
 .metabar__select--sort {
-    margin-left: $space-small;
+    margin-left: vars.$space-small;
     &:first-child {
         margin-left: 0;
     }

@@ -1,3 +1,5 @@
+@use "../_config/vars";
+
 *,
 *:before,
 *:after {
@@ -7,7 +9,7 @@
 html,
 body {
     width: 100%;
-    background-color: $color-white;
+    background-color: vars.$color-white;
     overflow: hidden;
 }
 
@@ -38,7 +40,7 @@ button,
 input,
 select,
 textarea {
-    color: $color-white;
+    color: vars.$color-white;
     font-weight: normal;
     line-height: 1.4;
 }
@@ -46,7 +48,7 @@ textarea {
 input,
 select,
 textarea {
-    color: $color-black;
+    color: vars.$color-black;
 }
 
 textarea {
@@ -73,8 +75,8 @@ input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:active,
 input:-webkit-autofill:focus {
-    -webkit-box-shadow: 0 0 0 100px $color-white inset !important;
-    -webkit-text-fill-color: $color-black !important;
+    -webkit-box-shadow: 0 0 0 100px vars.$color-white inset !important;
+    -webkit-text-fill-color: vars.$color-black !important;
 }
 
 input[type='submit'],
@@ -95,7 +97,7 @@ select {
 }
 
 select {
-    background-color: $color-white;
+    background-color: vars.$color-white;
 }
 
 select::-ms-expand {
@@ -109,18 +111,18 @@ a {
 }
 
 ::selection {
-    background: $color-pink;
-    color: $color-white;
+    background: vars.$color-pink;
+    color: vars.$color-white;
 }
 
 ::-moz-selection {
-    background: $color-pink;
-    color: $color-white;
+    background: vars.$color-pink;
+    color: vars.$color-white;
 }
 
 ::-webkit-selection {
-    background: $color-pink;
-    color: $color-white;
+    background: vars.$color-pink;
+    color: vars.$color-white;
 }
 
 :invalid {

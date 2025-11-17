@@ -1,10 +1,12 @@
-@import './../../node_modules/tippy.js/dist/tippy';
+@use '../../node_modules/tippy.js/dist/tippy';
+@use "../_config/vars";
+
 .tippy-box {
     font-size: 10rem;
     font-weight: normal;
-    background-color: $color-black;
-    color: $color-white;
-    box-shadow: 0rem 0rem 0rem 3rem $color-white;
+    background-color: vars.$color-black;
+    color: vars.$color-white;
+    box-shadow: 0rem 0rem 0rem 3rem vars.$color-white;
     border-radius: 0;
 }
 .tippy-content {

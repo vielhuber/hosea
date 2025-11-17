@@ -9,6 +9,57 @@ import Html from './Html';
 
 export default class Scheduler {
     static async initScheduler() {
+        document.querySelector('.scheduler').style.opacity = 0.5;
+
+        let width =
+            Math.floor(
+                (100 /
+                    ((Store.data.shiftingView
+                        ? Store.data.shiftingViewPrevDays + Store.data.weeksInViewport * 7
+                        : Store.data.weeksInViewport * 7) +
+                        1)) *
+                    100
+            ) /
+                100 +
+            '%';
+
+        let html = '',
+            generatedDates = Scheduler.generateDates(),
+            batchSize = 50;
+        for (let i = 0; i < generatedDates.length; i += batchSize) {
+            generatedDates.slice(i, i + batchSize).forEach((date__value) => {
+                let date__value_name = date__value.name;
+                if (hlp.emojiRegex().test(date__value_name)) {
+                    let date__value_name_emoji = hlp.emojiSplit(date__value_name);
+                    date__value_name =
+                        date__value_name_emoji[0] +
+                        '\n' +
+                        date__value_name_emoji.slice(1, -1).join('') +
+                        '\n' +
+                        date__value_name_emoji.at(-1);
+                }
+                html += `
+                    <div class="scheduler__appointment" title="${date__value.title}" style="
+                        left:${date__value.posLeft}%;
+                        top:${date__value.posTop}%;
+                        bottom:${date__value.posBottom}%;
+                        padding:${date__value.padding};
+                        background:${date__value.background};
+                        animation:${date__value.animation};
+                        ${date__value.animation !== 'none' ? 'z-index:1;' : ''}
+                        opacity:${date__value.opacity};
+                        width:${date__value.width};
+                    ">
+                        <div class="scheduler__appointment-inner">${date__value_name}</div>
+                    </div>
+                `;
+            });
+            // break between batches to keep ui responsive
+            if (i + batchSize < generatedDates.length) {
+                await new Promise((resolve) => setTimeout(resolve, 0));
+            }
+        }
+
         document.querySelector('.scheduler').innerHTML = `
             <div class="scheduler__navigation">
                 <span class="scheduler__navigation-week"></span>
@@ -24,7 +75,7 @@ export default class Scheduler {
             <table class="scheduler__table">
                 <thead class="scheduler__table-head">
                     <tr class="scheduler__row">
-                        <td class="scheduler__cell"></td>
+                        <td class="scheduler__cell" style="width: ${width};"></td>
                         ${Array(
                             Store.data.shiftingView
                                 ? Store.data.shiftingViewPrevDays + Store.data.weeksInViewport * 7
@@ -52,7 +103,7 @@ export default class Scheduler {
                                         ? ' scheduler__cell--weekend'
                                         : ''
                                 }
-                            ">
+                            " style="width: ${width};">
                                 ${Dates.dateFormat(Dates.getDayOfActiveViewport(i + 1), 'D d.m.')}
                             </td>
                         `
@@ -60,7 +111,7 @@ export default class Scheduler {
                             .join('')}
                     </tr>
                     <tr class="scheduler__row">
-                        <td class="scheduler__cell"></td>
+                        <td class="scheduler__cell" style="width: ${width};"></td>
                         ${Array(
                             Store.data.shiftingView
                                 ? Store.data.shiftingViewPrevDays + Store.data.weeksInViewport * 7
@@ -93,7 +144,7 @@ export default class Scheduler {
                                                 ? ' scheduler__cell--indicator-container'
                                                 : ''
                                         }
-                                    ">
+                                    " style="width: ${width};">
                                         ${Weather.outputWeather(Dates.getDayOfActiveViewport(i + 1))}
                                         ${
                                             Dates.sameDay(Dates.getDayOfActiveViewport(i + 1), Dates.getCurrentDate())
@@ -110,7 +161,7 @@ export default class Scheduler {
                 </thead>
                 <tbody class="scheduler__table-body">
                     <tr class="scheduler__row">
-                        <td class="scheduler__cell"></td>
+                        <td class="scheduler__cell" style="width: ${width};"></td>
                         ${Array(
                             Store.data.shiftingView
                                 ? Store.data.shiftingViewPrevDays + Store.data.weeksInViewport * 7
@@ -138,7 +189,7 @@ export default class Scheduler {
                                         ? ' scheduler__cell--weekend'
                                         : ''
                                 }
-                            "></td>
+                            " style="width: ${width};"></td>
                         `
                             )
                             .join('')}
@@ -150,9 +201,10 @@ export default class Scheduler {
                             j = j + Store.data.hourBegin;
                             return `
                             <tr class="scheduler__row">
-                                <td class="scheduler__cell">${('0' + j).slice(-2)}&ndash;${('0' + (j + 1)).slice(
-                                -2
-                            )}</td>
+                                <td class="scheduler__cell" style="width: ${width};">${('0' + j).slice(-2)}&ndash;${(
+                                '0' +
+                                (j + 1)
+                            ).slice(-2)}</td>
                                 ${Array(
                                     Store.data.shiftingView
                                         ? Store.data.shiftingViewPrevDays + Store.data.weeksInViewport * 7
@@ -188,7 +240,7 @@ export default class Scheduler {
                                                 ? ' scheduler__cell--main'
                                                 : ''
                                         }
-                                    ">
+                                    " style="width: ${width};">
                                     </td>
                                 `
                                     )
@@ -201,58 +253,11 @@ export default class Scheduler {
             </table>
 
             <div class="scheduler__appointments">
+                ${html}
             </div>
         `;
 
-        document.querySelectorAll('.scheduler__cell').forEach(($el) => {
-            $el.style.width =
-                100 /
-                    ((Store.data.shiftingView
-                        ? Store.data.shiftingViewPrevDays + Store.data.weeksInViewport * 7
-                        : Store.data.weeksInViewport * 7) +
-                        1) +
-                '%';
-        });
-
-        let generatedDates = Scheduler.generateDates();
-
-        let batchSize = 50;
-        for (let i = 0; i < generatedDates.length; i += batchSize) {
-            generatedDates.slice(i, i + batchSize).forEach((date__value) => {
-                let date__value_name = date__value.name;
-                if (hlp.emojiRegex().test(date__value_name)) {
-                    let date__value_name_emoji = hlp.emojiSplit(date__value_name);
-                    date__value_name =
-                        date__value_name_emoji[0] +
-                        '\n' +
-                        date__value_name_emoji.slice(1, -1).join('') +
-                        '\n' +
-                        date__value_name_emoji.at(-1);
-                }
-                document.querySelector('.scheduler__appointments').insertAdjacentHTML(
-                    'beforeend',
-                    `
-                    <div class="scheduler__appointment" title="${date__value.title}" style="
-                        left:${date__value.posLeft}%;
-                        top:${date__value.posTop}%;
-                        bottom:${date__value.posBottom}%;
-                        padding:${date__value.padding};
-                        background:${date__value.background};
-                        animation:${date__value.animation};
-                        ${date__value.animation !== 'none' ? 'z-index:1;' : ''}
-                        opacity:${date__value.opacity};
-                        width:${date__value.width};
-                    ">
-                        <div class="scheduler__appointment-inner">${date__value_name}</div>
-                    </div>
-                `
-                );
-            });
-            // break between batches to keep ui responsive
-            if (i + batchSize < generatedDates.length) {
-                await new Promise((resolve) => setTimeout(resolve, 0));
-            }
-        }
+        document.querySelector('.scheduler').style.opacity = 1;
 
         // custom tooltips instead of basic titles
         tippy('.scheduler__appointment', {
@@ -301,6 +306,8 @@ export default class Scheduler {
                 e.target.closest('.scheduler__navigation-daylink') ||
                 e.target.closest('.scheduler__navigation-week-link-to-empty')
             ) {
+                e.preventDefault();
+
                 if (
                     e.target.closest('.scheduler__navigation-button') ||
                     e.target.closest('.scheduler__navigation-daylink')
@@ -347,11 +354,9 @@ export default class Scheduler {
                     document.querySelector('.metabar__select--sort[name="sort_2"]').value = '';
                 }
 
-                await Filter.doFilter();
+                Filter.doFilter();
                 await Scheduler.initScheduler();
                 Quickbox.initToday();
-
-                e.preventDefault();
             }
         });
     }
@@ -780,7 +785,7 @@ export default class Scheduler {
         }
         Html.setViewClass();
 
-        await Filter.doFilter();
+        Filter.doFilter();
         await Scheduler.initScheduler();
         Quickbox.initToday();
     }

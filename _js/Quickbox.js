@@ -845,7 +845,7 @@ export default class Quickbox {
                     document.querySelector('.metabar__select--sort[name="sort_1"]').value = 'priority';
                 }
 
-                await Filter.doFilter();
+                Filter.doFilter();
                 await Scheduler.initScheduler();
                 Quickbox.initToday();
 

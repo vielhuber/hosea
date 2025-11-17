@@ -1,15 +1,18 @@
+@use "../_assorted/common";
+@use "../_config/vars";
+
 .footer {
     position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
-    height: $footer-height;
-    line-height: $footer-height;
-    background-color: $color-black-transparent;
-    color: $color-white;
-    padding: 0 $space-big;
-    @include shadow;
-    @include border;
+    height: vars.$footer-height;
+    line-height: vars.$footer-height;
+    background-color: vars.$color-black-transparent;
+    color: vars.$color-white;
+    padding: 0 vars.$space-big;
+    @include common.shadow;
+    @include common.border;
     border-left-width: 0;
     border-right-width: 0;
     border-bottom-width: 0;
@@ -32,23 +35,23 @@
     z-index: -1;
     transition: all 0.75s ease-in-out;
     border-radius: 50%;
-    box-shadow: 0 0 10rem 10rem $color-white;
-    background-color: $color-white;
+    box-shadow: 0 0 10rem 10rem vars.$color-white;
+    background-color: vars.$color-white;
     opacity: 0.15;
 }
 .footer__status--success:after {
-    box-shadow: 0 0 30rem 30rem $color-green;
-    background-color: $color-green;
+    box-shadow: 0 0 30rem 30rem vars.$color-green;
+    background-color: vars.$color-green;
     opacity: 0.5;
 }
 .footer__status--warning:after {
-    box-shadow: 0 0 30rem 30rem $color-orange;
-    background-color: $color-orange;
+    box-shadow: 0 0 30rem 30rem vars.$color-orange;
+    background-color: vars.$color-orange;
     opacity: 0.5;
 }
 .footer__status--error:after {
-    box-shadow: 0 0 30rem 30rem $color-pink;
-    background-color: $color-pink;
+    box-shadow: 0 0 30rem 30rem vars.$color-pink;
+    background-color: vars.$color-pink;
     opacity: 0.75;
 }
 
@@ -58,7 +61,7 @@
     text-align: right;
 }
 
-@include responsive-medium {
+@include common.responsive-medium {
     .footer {
         display: none;
     }

@@ -1,17 +1,20 @@
+@use "../_assorted/common";
+@use "../_config/vars";
+
 html.jwtbutler-login-form-visible {
     .login-form {
-        font-size: $font-size-big;
+        font-size: vars.$font-size-big;
         position: fixed;
         top: 50%;
         left: 50%;
         width: auto;
         height: auto;
-        padding: $space-medium;
+        padding: vars.$space-medium;
         transform: translateY(-50%) translateX(-50%);
-        background-color: $color-green;
+        background-color: vars.$color-green;
         z-index: 2147483638;
-        @include border;
-        @include shadow;
+        @include common.border;
+        @include common.shadow;
     }
 
     .login-form__label {
@@ -20,23 +23,23 @@ html.jwtbutler-login-form-visible {
 
     .login-form__input {
         width: 200rem;
-        padding: $space-small;
-        margin-bottom: $space-small;
+        padding: vars.$space-small;
+        margin-bottom: vars.$space-small;
     }
 
     .login-form__submit {
         width: 100%;
-        background-color: $color-black;
-        color: $color-white;
-        padding: $space-small;
+        background-color: vars.$color-black;
+        color: vars.$color-white;
+        padding: vars.$space-small;
         cursor: pointer;
     }
 
     .login-form__error {
-        background-color: $color-pink;
-        color: $color-white;
-        margin-bottom: $space-small;
-        padding: $space-small;
+        background-color: vars.$color-pink;
+        color: vars.$color-white;
+        margin-bottom: vars.$space-small;
+        padding: vars.$space-small;
         text-align: center;
     }
 }

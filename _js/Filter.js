@@ -161,7 +161,7 @@ export default class Filter {
                     if (date && date.value !== '*' && date.value !== '') {
                         Store.data.session.activeDay = new Date(date.value);
                     }
-                    await Filter.doFilter();
+                    Filter.doFilter();
                     await Scheduler.initScheduler();
                 }
             });
@@ -169,97 +169,109 @@ export default class Filter {
     }
 
     static async doFilter() {
-        Store.data.tickets.forEach((tickets__value) => {
-            let visible = true,
-                hide_in_scheduler = false;
-            document
-                .querySelector('.metabar__filter')
-                .querySelectorAll('select')
-                .forEach((el) => {
-                    let val_search = el.value,
-                        val_target = tickets__value[el.getAttribute('name')],
-                        visible_this = false;
+        document.querySelector('.tickets__table-body').style.display = 'none';
 
-                    // date
-                    if (el.getAttribute('name') === 'date' && val_search !== '*' && val_search !== '') {
-                        let parsed_values = Dates.parseDateString(val_target, 'tickets');
-                        if (parsed_values !== false && parsed_values.length > 0) {
-                            visible_this = true;
-                        }
-                    }
+        let tickets = Store.data.tickets;
+        let batchSize = 50;
+        for (let i = 0; i < tickets.length; i += batchSize) {
+            tickets.slice(i, i + batchSize).forEach((tickets__value) => {
+                let visible = true,
+                    hide_in_scheduler = false;
+                document
+                    .querySelector('.metabar__filter')
+                    .querySelectorAll('select')
+                    .forEach((el) => {
+                        let val_search = el.value,
+                            val_target = tickets__value[el.getAttribute('name')],
+                            visible_this = false;
 
-                    // project
-                    if (el.getAttribute('name') === 'project' && val_search !== '*' && val_search !== '') {
-                        if (
-                            val_target.replaceAll(hlp.emojiRegex(), '') === val_search ||
-                            val_target.replaceAll(hlp.emojiRegex(), '') === '--' + val_search
-                        ) {
-                            visible_this = true;
-                        }
-                    }
-
-                    // all others
-                    else if (val_search === '*' || val_target === val_search) {
-                        visible_this = true;
-                    } else if (val_search.indexOf('|') > -1) {
-                        if (val_search.split('|').includes(val_target)) {
-                            visible_this = true;
-                        }
-                    } else if (val_search.indexOf('&') > -1) {
-                        visible_this = true;
-                        val_search.split('&').forEach((val_search__val) => {
-                            if (val_search__val.indexOf('!') === 0) {
-                                if (val_search__val.split('!').join('') === val_target) {
-                                    visible_this = false;
-                                }
-                            } else {
-                                if (val_search__val !== val_target) {
-                                    visible_this = false;
-                                }
+                        // date
+                        if (el.getAttribute('name') === 'date' && val_search !== '*' && val_search !== '') {
+                            let parsed_values = Dates.parseDateString(val_target, 'tickets');
+                            if (parsed_values !== false && parsed_values.length > 0) {
+                                visible_this = true;
                             }
-                        });
-                    }
-
-                    /* special behaviour: hide billed in overview */
-                    if (
-                        el.getAttribute('name') == 'status' &&
-                        val_search === '*' &&
-                        val_target === 'billed' &&
-                        document.querySelector('.metabar__select--filter[name="date"]').value === '*'
-                    ) {
-                        visible_this = false;
-                    }
-
-                    if (visible_this === false) {
-                        visible = false;
-
-                        if (el.getAttribute('name') === 'project' && val_search !== '*' && val_search !== '') {
-                            hide_in_scheduler = true;
                         }
-                    }
-                });
-            if (visible === false && tickets__value.visible === true) {
-                tickets__value.visible = false;
-                document
-                    .querySelector('.tickets .tickets__entry[data-id="' + tickets__value.id + '"]')
-                    .classList.remove('tickets__entry--visible');
-            } else if (visible === true && tickets__value.visible === false) {
-                tickets__value.visible = true;
-                document
-                    .querySelector('.tickets .tickets__entry[data-id="' + tickets__value.id + '"]')
-                    .classList.add('tickets__entry--visible');
-            }
 
-            if (hide_in_scheduler === false && tickets__value.hide_in_scheduler === true) {
-                tickets__value.hide_in_scheduler = false;
-            } else if (hide_in_scheduler === true && tickets__value.hide_in_scheduler === false) {
-                tickets__value.hide_in_scheduler = true;
+                        // project
+                        if (el.getAttribute('name') === 'project' && val_search !== '*' && val_search !== '') {
+                            if (
+                                val_target.replaceAll(hlp.emojiRegex(), '') === val_search ||
+                                val_target.replaceAll(hlp.emojiRegex(), '') === '--' + val_search
+                            ) {
+                                visible_this = true;
+                            }
+                        }
+
+                        // all others
+                        else if (val_search === '*' || val_target === val_search) {
+                            visible_this = true;
+                        } else if (val_search.indexOf('|') > -1) {
+                            if (val_search.split('|').includes(val_target)) {
+                                visible_this = true;
+                            }
+                        } else if (val_search.indexOf('&') > -1) {
+                            visible_this = true;
+                            val_search.split('&').forEach((val_search__val) => {
+                                if (val_search__val.indexOf('!') === 0) {
+                                    if (val_search__val.split('!').join('') === val_target) {
+                                        visible_this = false;
+                                    }
+                                } else {
+                                    if (val_search__val !== val_target) {
+                                        visible_this = false;
+                                    }
+                                }
+                            });
+                        }
+
+                        /* special behaviour: hide billed in overview */
+                        if (
+                            el.getAttribute('name') == 'status' &&
+                            val_search === '*' &&
+                            val_target === 'billed' &&
+                            document.querySelector('.metabar__select--filter[name="date"]').value === '*'
+                        ) {
+                            visible_this = false;
+                        }
+
+                        if (visible_this === false) {
+                            visible = false;
+
+                            if (el.getAttribute('name') === 'project' && val_search !== '*' && val_search !== '') {
+                                hide_in_scheduler = true;
+                            }
+                        }
+                    });
+                if (visible === false && tickets__value.visible === true) {
+                    tickets__value.visible = false;
+                    let $el = document.querySelector('.tickets .tickets__entry[data-id="' + tickets__value.id + '"]');
+                    $el.classList.remove('tickets__entry--visible');
+                } else if (visible === true && tickets__value.visible === false) {
+                    tickets__value.visible = true;
+                    let $el = document.querySelector('.tickets .tickets__entry[data-id="' + tickets__value.id + '"]');
+                    $el.classList.add('tickets__entry--visible');
+                }
+
+                if (hide_in_scheduler === false && tickets__value.hide_in_scheduler === true) {
+                    tickets__value.hide_in_scheduler = false;
+                } else if (hide_in_scheduler === true && tickets__value.hide_in_scheduler === false) {
+                    tickets__value.hide_in_scheduler = true;
+                }
+            });
+
+            // break between batches
+            if (i + batchSize < tickets.length) {
+                await new Promise((resolve) => setTimeout(resolve, 0));
             }
-        });
+        }
+
         Sort.doSort();
         //await Scheduler.initScheduler();
         Scheduler.updateColors();
         Tickets.updateSum();
         Textarea.textareaSetVisibleHeights();
+
+        document.querySelector('.tickets__table-body').style.display = 'table-row-group';
     }
 }

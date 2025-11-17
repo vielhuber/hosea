@@ -1,3 +1,5 @@
+@use "../_config/vars";
+
 /*
 inspired by https://zellwk.com/blog/viewport-based-typography/
 */
@@ -32,5 +34,5 @@ html {
 
 /* set the base font size to e.g. 16rem */
 body {
-    font-size: $font-size-medium;
+    font-size: vars.$font-size-medium;
 }

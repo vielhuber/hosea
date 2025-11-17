@@ -1,16 +1,19 @@
+@use "../_assorted/common";
+@use "../_config/vars";
+
 .quickbox {
-    width: calc((100% - #{$container-width-big}) - #{$space-big});
-    bottom: calc(#{$footer-height} + #{$space-big});
-    right: $space-big;
-    top: calc(#{$space-big} + ((100% - (2 * #{$space-big}) - #{$footer-height}) / 1.5) + (0.5 * #{$space-big}));
+    width: calc((100% - #{vars.$container-width-big}) - #{vars.$space-big});
+    bottom: calc(#{vars.$footer-height} + #{vars.$space-big});
+    right: vars.$space-big;
+    top: calc(#{vars.$space-big} + ((100% - (2 * #{vars.$space-big}) - #{vars.$footer-height}) / 1.5) + (0.5 * #{vars.$space-big}));
     position: absolute;
-    background-color: $color-black-transparent;
-    color: $color-white;
+    background-color: vars.$color-black-transparent;
+    color: vars.$color-white;
     overflow: hidden;
-    @include border;
-    @include shadow;
+    @include common.border;
+    @include common.shadow;
     .view-mode--wide & {
-        width: calc((100% - #{$container-width-small}) - #{$space-big});
+        width: calc((100% - #{vars.$container-width-small}) - #{vars.$space-big});
     }
 }
 
@@ -19,7 +22,7 @@
     left: 0;
     top: 0;
     right: 0;
-    bottom: calc(#{$space-big} + 2 * #{$space-small});
+    bottom: calc(#{vars.$space-big} + 2 * #{vars.$space-small});
 }
 
 .quickbox__money {
@@ -38,7 +41,7 @@
 
 .quickbox__money-stats {
     width: 100%;
-    @include border;
+    @include common.border;
     border-left: none;
     border-top: none;
     border-right: none;
@@ -52,7 +55,7 @@
 .quickbox__money-stats-entry {
     width: 25%;
     text-align: center;
-    height: calc(#{$space-big} + 2 * #{$space-small});
+    height: calc(#{vars.$space-big} + 2 * #{vars.$space-small});
     align-content: center;
 }
 .quickbox__money-stats-entry-heading {
@@ -61,13 +64,13 @@
     padding-right: 2rem;
 }
 .quickbox__money-stats-entry-inner {
-    line-height: $font-size-big;
+    line-height: vars.$font-size-big;
 }
 .quickbox__money-chart {
     width: 100%;
     flex-grow: 1;
-    max-height: calc(100% - #{$space-big});
-    padding: $space-medium;
+    max-height: calc(100% - #{vars.$space-big});
+    padding: vars.$space-medium;
 }
 .quickbox__money-chart-canvas {
     width: 100%;
@@ -81,7 +84,7 @@
 }
 
 .quickbox__new-form {
-    padding: $space-small;
+    padding: vars.$space-small;
     height: 100%;
 }
 
@@ -96,24 +99,24 @@
 .quickbox__new-inputrow {
     width: 100%;
     flex: 0 0 auto;
-    background-color: $color-grey;
-    height: $space-big;
-    line-height: $space-big;
+    background-color: vars.$color-grey;
+    height: vars.$space-big;
+    line-height: vars.$space-big;
 }
 
 .quickbox__new-inputrow--rheight {
-    height: calc(100% - (3 * #{$space-big} + 3 * #{$space-small}));
+    height: calc(100% - (3 * #{vars.$space-big} + 3 * #{vars.$space-small}));
 }
 
 .quickbox__new-submit {
     width: 100%;
     height: 100%;
-    line-height: calc(#{$space-big} - 2 * #{$space-small});
+    line-height: calc(#{vars.$space-big} - 2 * #{vars.$space-small});
     display: block;
-    padding: $space-small;
+    padding: vars.$space-small;
     cursor: pointer;
-    background-color: $color-pink;
-    color: $color-white;
+    background-color: vars.$color-pink;
+    color: vars.$color-white;
 }
 
 .quickbox__new-label {
@@ -121,16 +124,16 @@
     height: 100%;
     display: block;
     cursor: pointer;
-    padding: $space-small;
+    padding: vars.$space-small;
     white-space: nowrap;
     overflow: hidden;
 }
 
 .quickbox__new-label-text {
     height: 100%;
-    line-height: calc(#{$space-big} - 2 * #{$space-small});
+    line-height: calc(#{vars.$space-big} - 2 * #{vars.$space-small});
     display: inline-block;
-    margin-left: $space-small;
+    margin-left: vars.$space-small;
     vertical-align: top;
 }
 
@@ -149,41 +152,41 @@
 }
 
 .quickbox__new-inputrow {
-    margin-right: $space-small;
+    margin-right: vars.$space-small;
 }
 .quickbox__new-inputrow:nth-child(4) {
     margin-right: 0;
 }
 .quickbox__new-inputrow--1\/6 {
-    width: calc((100% / 6) - (#{$space-small} * (6 - 1) / 6));
+    width: calc((100% / 6) - (#{vars.$space-small} * (6 - 1) / 6));
 }
 .quickbox__new-inputrow--1\/2 {
-    width: calc((100% / 2) - (#{$space-small} * (2 - 1) / 2));
+    width: calc((100% / 2) - (#{vars.$space-small} * (2 - 1) / 2));
 }
 
 .quickbox__new-inputrow:not(:last-child) {
-    margin-bottom: $space-small;
+    margin-bottom: vars.$space-small;
 }
 
 .quickbox__new-input--text {
     width: 100%;
     height: 100%;
-    line-height: calc(#{$space-big} - 2 * #{$space-small});
-    background-color: $color-grey;
-    color: $color-white;
+    line-height: calc(#{vars.$space-big} - 2 * #{vars.$space-small});
+    background-color: vars.$color-grey;
+    color: vars.$color-white;
     display: block;
-    padding: $space-small;
+    padding: vars.$space-small;
 }
 
 .quickbox__new-input--textarea {
     width: 100%;
     height: 100%;
-    background-color: $color-grey;
-    color: $color-white;
+    background-color: vars.$color-grey;
+    color: vars.$color-white;
     display: block;
-    padding: $space-small;
+    padding: vars.$space-small;
     resize: none;
-    @include scrollbar;
+    @include common.scrollbar;
 }
 
 .quickbox__week {
@@ -199,44 +202,44 @@
 }
 
 .quickbox__today-nav {
-    height: calc(#{$space-big} + 2 * #{$space-small});
+    height: calc(#{vars.$space-big} + 2 * #{vars.$space-small});
     display: flex;
     justify-content: space-between;
-    @include border;
+    @include common.border;
     border-left: none;
     border-top: none;
     border-right: none;
 }
 
 .quickbox__today-navitem {
-    height: calc(#{$space-big} + 2 * #{$space-small});
-    line-height: calc(#{$space-big} + 2 * #{$space-small});
-    font-size: $font-size-medium;
+    height: calc(#{vars.$space-big} + 2 * #{vars.$space-small});
+    line-height: calc(#{vars.$space-big} + 2 * #{vars.$space-small});
+    font-size: vars.$font-size-medium;
     text-align: center;
-    box-shadow: 0 0 0 2rem inset $color-white;
+    box-shadow: 0 0 0 2rem inset vars.$color-white;
 }
 
 .quickbox__today-navitem--cur-day {
-    padding-left: $space-medium;
-    padding-right: $space-medium;
+    padding-left: vars.$space-medium;
+    padding-right: vars.$space-medium;
 }
 
 .quickbox__today-navitem--empty {
-    padding-left: $space-medium;
-    padding-right: $space-medium;
+    padding-left: vars.$space-medium;
+    padding-right: vars.$space-medium;
 }
 
 .quickbox__today-navitem--prev-day,
 .quickbox__today-navitem--next-day {
-    width: calc(#{$space-big} + 2 * #{$space-small});
+    width: calc(#{vars.$space-big} + 2 * #{vars.$space-small});
 }
 
 .quickbox__today-tickets {
-    padding: $space-small;
-    height: calc(100% - #{$space-big} - 2 * #{$space-small});
+    padding: vars.$space-small;
+    height: calc(100% - #{vars.$space-big} - 2 * #{vars.$space-small});
     overflow-x: hidden;
     overflow-y: auto;
-    @include scrollbar;
+    @include common.scrollbar;
 }
 .quickbox__today-tickets:empty {
     background-image: url('../_assets/finished.gif');
@@ -251,10 +254,10 @@
     flex-wrap: wrap;
     align-items: flex-start;
     align-content: flex-start;
-    margin-bottom: $space-small;
+    margin-bottom: vars.$space-small;
     border-width: 6rem;
     border-style: solid;
-    border-color: $color-grey;
+    border-color: vars.$color-grey;
 }
 .quickbox__today-ticket:last-child {
     margin-bottom: 0;
@@ -263,39 +266,39 @@
 .quickbox__today-ticket-date,
 .quickbox__today-ticket-description {
     flex: 0 1 auto;
-    padding: $space-small;
+    padding: vars.$space-small;
 }
 .quickbox__today-ticket-project {
     width: 50%;
 }
 .quickbox__today-ticket-project-status {
     margin-left: 10rem;
-    font-size: $font-size-small;
+    font-size: vars.$font-size-small;
 }
 .quickbox__today-ticket-date {
     text-align: right;
     width: 50%;
 }
 .quickbox__today-ticket-date-countdown {
-    font-size: $font-size-small;
-    background-color: $color-pink;
-    color: $color-white;
+    font-size: vars.$font-size-small;
+    background-color: vars.$color-pink;
+    color: vars.$color-white;
     font-weight: bold;
     margin-right: 5rem;
     padding: 2rem 4rem;
 }
 .quickbox__today-ticket-description {
     width: 100%;
-    background-color: $color-grey;
-    color: $color-white;
-    padding: $space-small;
-    margin-bottom: $space-small;
-    font-size: $font-size-small;
-    /*max-height: calc(3 * #{$space-big});*/
+    background-color: vars.$color-grey;
+    color: vars.$color-white;
+    padding: vars.$space-small;
+    margin-bottom: vars.$space-small;
+    font-size: vars.$font-size-small;
+    /*max-height: calc(3 * #{vars.$space-big});*/
     /*overflow-y: auto;*/
     overflow-x: auto;
     white-space: nowrap;
-    @include scrollbar;
+    @include common.scrollbar;
 }
 
 .quickbox__today-edit-delete-container {
@@ -340,16 +343,16 @@
     align-items: flex-start;
     align-content: flex-start;
     height: 100%;
-    padding: $space-small;
+    padding: vars.$space-small;
 }
 
 .quickbox__today-edit-inputrow {
     width: 100%;
     flex: 0 0 auto;
-    background-color: $color-grey;
-    height: $space-big;
-    line-height: $space-big;
-    margin-bottom: $space-small;
+    background-color: vars.$color-grey;
+    height: vars.$space-big;
+    line-height: vars.$space-big;
+    margin-bottom: vars.$space-small;
 }
 
 .quickbox__today-edit-inputrow--dheight {
@@ -359,12 +362,12 @@
 .quickbox__today-edit-submit {
     width: 100%;
     height: 100%;
-    line-height: calc(#{$space-big} - 2 * #{$space-small});
+    line-height: calc(#{vars.$space-big} - 2 * #{vars.$space-small});
     display: block;
-    padding: $space-small;
+    padding: vars.$space-small;
     cursor: pointer;
-    background-color: $color-pink;
-    color: $color-white;
+    background-color: vars.$color-pink;
+    color: vars.$color-white;
 }
 
 .quickbox__today-edit-input:invalid {
@@ -378,23 +381,23 @@
 .quickbox__today-edit-input--text {
     width: 100%;
     height: 100%;
-    line-height: calc(#{$space-big} - 2 * #{$space-small});
-    background-color: $color-grey;
-    color: $color-white;
+    line-height: calc(#{vars.$space-big} - 2 * #{vars.$space-small});
+    background-color: vars.$color-grey;
+    color: vars.$color-white;
     display: block;
-    padding: $space-small;
+    padding: vars.$space-small;
 }
 
 .quickbox__today-edit-input--textarea {
     width: 100%;
     height: 100%;
-    background-color: $color-grey;
-    color: $color-white;
+    background-color: vars.$color-grey;
+    color: vars.$color-white;
     display: block;
-    padding: $space-small;
+    padding: vars.$space-small;
     resize: none;
     height: 80rem;
-    @include scrollbar;
+    @include common.scrollbar;
 }
 
 .quickbox__mails {
@@ -406,7 +409,7 @@
     background-position: center;
     overflow-x: hidden;
     overflow-y: auto;
-    @include scrollbar;
+    @include common.scrollbar;
 }
 
 .quickbox__pull-to-refresh--text {
@@ -450,7 +453,7 @@
 .quickbox__mail {
     width: 100%;
     height: auto;
-    @include border;
+    @include common.border;
     border-left: none;
     border-right: none;
     border-top: none;
@@ -465,7 +468,7 @@
     height: 100%;
     border-bottom: 0;
     z-index: 1;
-    background-color: $color-black;
+    background-color: vars.$color-black;
 }
 
 .quickbox__mail:not(.quickbox__mail--unread):not(.quickbox__mail--expanded) {
@@ -486,7 +489,7 @@
 }
 
 .quickbox__mail-toggle {
-    padding: $space-small;
+    padding: vars.$space-small;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
@@ -495,8 +498,8 @@
 }
 
 .quickbox__mail-meta {
-    line-height: $space-medium;
-    height: $space-medium;
+    line-height: vars.$space-medium;
+    height: vars.$space-medium;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -513,36 +516,36 @@
 
 .quickbox__mail-meta--subject {
     width: 100%;
-    font-size: $font-size-small;
+    font-size: vars.$font-size-small;
 }
 
 .quickbox__mail-content {
-    @include border;
-    padding: $space-medium;
+    @include common.border;
+    padding: vars.$space-medium;
     filter: grayscale(100%);
     width: 100%;
-    height: calc(100% - (6 * #{$space-small} + 2 * #{$space-medium} + 3 * #{$space-big}));
+    height: calc(100% - (6 * #{vars.$space-small} + 2 * #{vars.$space-medium} + 3 * #{vars.$space-big}));
     display: none;
 }
 
 .quickbox__mail-content:hover {
-    height: calc(100% - (#{$space-big} + 2 * #{$space-small}));
+    height: calc(100% - (#{vars.$space-big} + 2 * #{vars.$space-small}));
 }
 
 .quickbox__mail-actions {
     display: none;
-    padding: $space-small;
+    padding: vars.$space-small;
 }
 
 .quickbox__mail-submit {
     width: 100%;
     height: 100%;
-    line-height: calc(#{$space-big} - 2 * #{$space-small});
+    line-height: calc(#{vars.$space-big} - 2 * #{vars.$space-small});
     display: block;
-    padding: $space-small;
+    padding: vars.$space-small;
     cursor: pointer;
-    background-color: $color-pink;
-    color: $color-white;
+    background-color: vars.$color-pink;
+    color: vars.$color-white;
 }
 
 .quickbox__mail-inputrows {
@@ -553,16 +556,16 @@
 }
 
 .quickbox__mail-inputrow {
-    margin-right: $space-small;
+    margin-right: vars.$space-small;
     flex: 0 0 auto;
-    margin-bottom: $space-small;
-    background-color: $color-grey;
-    height: $space-big;
-    line-height: $space-big;
+    margin-bottom: vars.$space-small;
+    background-color: vars.$color-grey;
+    height: vars.$space-big;
+    line-height: vars.$space-big;
 }
 
 .quickbox__mail-inputrow--1\/1 {
-    width: calc(100% / 1 - #{$space-small} / 1 * 0);
+    width: calc(100% / 1 - #{vars.$space-small} / 1 * 0);
 }
 .quickbox__mail-inputrow--1\/1 {
     margin-right: 0;
@@ -572,7 +575,7 @@
 }
 
 .quickbox__mail-inputrow--1\/2 {
-    width: calc(100% / 2 - #{$space-small} / 2 * 1);
+    width: calc(100% / 2 - #{vars.$space-small} / 2 * 1);
 }
 .quickbox__mail-inputrow--1\/2 + .quickbox__mail-inputrow--1\/2 {
     margin-right: 0;
@@ -582,7 +585,7 @@
 }
 
 .quickbox__mail-inputrow--1\/3 {
-    width: calc(100% / 3 - #{$space-small} / 3 * 2);
+    width: calc(100% / 3 - #{vars.$space-small} / 3 * 2);
 }
 .quickbox__mail-inputrow--1\/3 + .quickbox__mail-inputrow--1\/3 + .quickbox__mail-inputrow--1\/3 {
     margin-right: 0;
@@ -592,7 +595,7 @@
 }
 
 .quickbox__mail-inputrow--1\/4 {
-    width: calc(100% / 4 - #{$space-small} / 4 * 3);
+    width: calc(100% / 4 - #{vars.$space-small} / 4 * 3);
 }
 .quickbox__mail-inputrow--1\/4
     + .quickbox__mail-inputrow--1\/4
@@ -605,7 +608,7 @@
 }
 
 .quickbox__mail-inputrow--1\/5 {
-    width: calc(100% / 5 - #{$space-small} / 5 * 4);
+    width: calc(100% / 5 - #{vars.$space-small} / 5 * 4);
 }
 .quickbox__mail-inputrow--1\/5
     + .quickbox__mail-inputrow--1\/5
@@ -619,7 +622,7 @@
 }
 
 .quickbox__mail-inputrow--1\/6 {
-    width: calc(100% / 3 - #{$space-small} / 6 * 5);
+    width: calc(100% / 3 - #{vars.$space-small} / 6 * 5);
 }
 .quickbox__mail-inputrow--1\/6
     + .quickbox__mail-inputrow--1\/6
@@ -636,11 +639,11 @@
 .quickbox__mail-input--text {
     width: 100%;
     height: 100%;
-    line-height: calc(#{$space-big} - 2 * #{$space-small});
-    background-color: $color-grey;
-    color: $color-white;
+    line-height: calc(#{vars.$space-big} - 2 * #{vars.$space-small});
+    background-color: vars.$color-grey;
+    color: vars.$color-white;
     display: block;
-    padding: $space-small;
+    padding: vars.$space-small;
 }
 
 .quickbox__mail-label {
@@ -648,16 +651,16 @@
     height: 100%;
     display: block;
     cursor: pointer;
-    padding: $space-small;
+    padding: vars.$space-small;
     white-space: nowrap;
     overflow: hidden;
 }
 
 .quickbox__mail-label-text {
     height: 100%;
-    line-height: calc(#{$space-big} - 2 * #{$space-small});
+    line-height: calc(#{vars.$space-big} - 2 * #{vars.$space-small});
     display: inline-block;
-    margin-left: $space-small;
+    margin-left: vars.$space-small;
     vertical-align: top;
 }
 
@@ -669,7 +672,7 @@
 }
 
 .quickbox__nav {
-    @include border;
+    @include common.border;
     border-left: none;
     border-right: none;
     border-bottom: none;
@@ -677,7 +680,7 @@
     bottom: 0;
     left: 0;
     right: 0;
-    height: calc(#{$space-big} + 2 * #{$space-small});
+    height: calc(#{vars.$space-big} + 2 * #{vars.$space-small});
     display: flex;
     align-items: flex-start;
     align-content: flex-start;
@@ -685,7 +688,7 @@
 
 .quickbox__navitem {
     height: 100%;
-    line-height: calc(#{$space-big} + 2 * #{$space-small});
+    line-height: calc(#{vars.$space-big} + 2 * #{vars.$space-small});
     display: block;
     text-align: center;
     flex: 0 1 auto;
@@ -709,11 +712,11 @@
 
 .quickbox__navitem-count {
     border-radius: 50%;
-    background-color: $color-pink;
-    color: $color-white;
-    width: $space-medium;
-    height: $space-medium;
-    line-height: $space-medium;
+    background-color: vars.$color-pink;
+    color: vars.$color-white;
+    width: vars.$space-medium;
+    height: vars.$space-medium;
+    line-height: vars.$space-medium;
     margin-left: 1rem;
     display: inline-block;
     vertical-align: middle;
@@ -724,21 +727,21 @@
 }
 
 .quickbox__navitem--active {
-    background-color: $color-white;
-    color: $color-black;
+    background-color: vars.$color-white;
+    color: vars.$color-black;
 }
 
 .quickbox__navitem--hidden {
     display: none;
 }
 
-@media screen and (min-width: $breakpoint-medium) and (max-height: 850px) {
+@media screen and (min-width: vars.$breakpoint-medium) and (max-height: 850px) {
     .quickbox__mail-content {
         padding: 0;
     }
 }
 
-@include responsive-medium {
+@include common.responsive-medium {
     .quickbox {
         border: none;
         width: 100%;
@@ -750,7 +753,7 @@
         }
     }
     .quickbox__money-chart {
-        padding: $space-medium;
+        padding: vars.$space-medium;
     }
     .quickbox__money-stats-entry-heading {
         display: block;
