@@ -9,7 +9,7 @@ import Html from './Html';
 
 export default class Scheduler {
     static async initScheduler() {
-        document.querySelector('.scheduler').style.opacity = 0.5;
+        document.querySelector('.scheduler').classList.add('scheduler--loading');
 
         let width =
             Math.floor(
@@ -202,9 +202,9 @@ export default class Scheduler {
                             return `
                             <tr class="scheduler__row">
                                 <td class="scheduler__cell" style="width: ${width};">${('0' + j).slice(-2)}&ndash;${(
-                                '0' +
-                                (j + 1)
-                            ).slice(-2)}</td>
+                                    '0' +
+                                    (j + 1)
+                                ).slice(-2)}</td>
                                 ${Array(
                                     Store.data.shiftingView
                                         ? Store.data.shiftingViewPrevDays + Store.data.weeksInViewport * 7
@@ -257,7 +257,7 @@ export default class Scheduler {
             </div>
         `;
 
-        document.querySelector('.scheduler').style.opacity = 1;
+        document.querySelector('.scheduler').classList.remove('scheduler--loading');
 
         // custom tooltips instead of basic titles
         tippy('.scheduler__appointment', {
@@ -286,14 +286,14 @@ export default class Scheduler {
 
         document.querySelector('.scheduler__navigation-week').innerHTML = `
             ${Dates.dateFormat(Dates.getDayOfActiveViewport(1), 'd.m.')} &ndash; ${Dates.dateFormat(
-            Dates.getDayOfActiveViewport(7),
-            'd.m.Y'
-        )} /// _kw ${
-            Dates.weekNumber(Dates.getDayOfActiveViewport(1)) +
-            (Store.data.weeksInViewport > 1
-                ? '–' + Dates.weekNumber(Dates.getDayOfActiveViewport(Store.data.weeksInViewport * 7))
-                : '')
-        } /// ${statsSumWeekly}h /// <a href="#" class="scheduler__navigation-week-link-to-empty">
+                Dates.getDayOfActiveViewport(7),
+                'd.m.Y'
+            )} /// _kw ${
+                Dates.weekNumber(Dates.getDayOfActiveViewport(1)) +
+                (Store.data.weeksInViewport > 1
+                    ? '–' + Dates.weekNumber(Dates.getDayOfActiveViewport(Store.data.weeksInViewport * 7))
+                    : '')
+            } /// ${statsSumWeekly}h /// <a href="#" class="scheduler__navigation-week-link-to-empty">
             ${Scheduler.generateLinkToEmptyDatesSum()}
         </a>
         `;

@@ -1,5 +1,5 @@
-@use "../_assorted/common";
-@use "../_config/vars";
+@use '../_assorted/common';
+@use '../_config/vars';
 
 .scheduler {
     width: calc((100% - #{vars.$container-width-big}) - #{vars.$space-big});
@@ -18,6 +18,10 @@
     .view-mode--wide & {
         width: calc((100% - #{vars.$container-width-small}) - #{vars.$space-big});
     }
+}
+
+.scheduler--loading {
+    opacity: 0.5;
 }
 
 .scheduler__navigation {
@@ -93,7 +97,7 @@
 }
 
 .scheduler__cell--activeday {
-    background-color: rgba(vars.$color-pink, 0.2);
+    background-color: rgba(vars.$color-pink, 0.3);
 }
 
 .scheduler__cell--activeday.scheduler__cell--main {
@@ -247,8 +251,15 @@
 }
 
 .scheduler__appointment[style*='glow-animation-1'] {
-    box-shadow: inset 0 0 10px whitesmoke, inset 20px 0 10px #f0f, inset -20px 0 10px #0ff, inset 20px 0 100px #f0f,
-        inset -20px 0 100px #0ff, 0 0 10px #fff, -10px 0 10px #f0f, 10px 0 10px #0ff;
+    box-shadow:
+        inset 0 0 10px whitesmoke,
+        inset 20px 0 10px #f0f,
+        inset -20px 0 10px #0ff,
+        inset 20px 0 100px #f0f,
+        inset -20px 0 100px #0ff,
+        0 0 10px #fff,
+        -10px 0 10px #f0f,
+        10px 0 10px #0ff;
 }
 
 .scheduler__appointment[style*='glow-animation-2'] {
