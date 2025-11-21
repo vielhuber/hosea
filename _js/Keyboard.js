@@ -12,7 +12,11 @@ export default class Keyboard {
         // therefore we save the previous cursor pointer here
         let selectionEndBefore = 1;
         document.querySelector('.tickets').addEventListener('keyup', (e) => {
-            if (!e.target || (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA')) {
+            if (
+                !e.target ||
+                (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') ||
+                e.target.closest('.metabar') !== null
+            ) {
                 return;
             }
             let left = e.target.closest('td').previousElementSibling,

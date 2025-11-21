@@ -41,13 +41,13 @@ export default class Filter {
                 document
                     .querySelector('.metabar__select--filter[name="date"]')
                     .insertAdjacentHTML('beforeend', '<option value=""></option>');
-                let firstDay = new Date('2018-01-01 00:00:00');
-                let curDay = new Date();
+                let firstDay = new Date(parseInt(new Date().getFullYear()) - 1 + '-01-01 00:00:00'),
+                    curDay = new Date();
                 curDay.setHours(0);
                 curDay.setMinutes(0);
                 curDay.setSeconds(0);
-                let lastDay = new Date(parseInt(new Date().getFullYear()) + 1 + '-12-31 00:00:00');
-                while (firstDay < lastDay) {
+                let lastDay = new Date(parseInt(new Date().getFullYear()) + 2 + '-12-31 00:00:00');
+                while (firstDay <= lastDay) {
                     document
                         .querySelector('.metabar__select--filter[name="date"]')
                         .insertAdjacentHTML(
@@ -149,6 +149,13 @@ export default class Filter {
             }
         });
 
+        document
+            .querySelector('.metabar__filter')
+            .insertAdjacentHTML(
+                'beforeend',
+                '<input type="text" placeholder="foo &quot;bar baz&quot;" class="metabar__select metabar__select--filter" name="search" />'
+            );
+
         if (update === true) {
             Object.entries(selected).forEach(([selected__key, selected__value]) => {
                 document.querySelector('.metabar__filter [name="' + selected__key + '"]').value = selected__value;
@@ -161,7 +168,7 @@ export default class Filter {
                     if (date && date.value !== '*' && date.value !== '') {
                         Store.data.session.activeDay = new Date(date.value);
                     }
-                    Filter.doFilter();
+                    await Filter.doFilter();
                     await Scheduler.initScheduler();
                 }
             });
@@ -177,6 +184,7 @@ export default class Filter {
             tickets.slice(i, i + batchSize).forEach((tickets__value) => {
                 let visible = true,
                     hide_in_scheduler = false;
+
                 document
                     .querySelector('.metabar__filter')
                     .querySelectorAll('select')
@@ -243,6 +251,38 @@ export default class Filter {
                             }
                         }
                     });
+
+                let search_query = document.querySelector('.metabar__filter').querySelector('input[type="text"').value;
+                if (search_query !== '') {
+                    visible = true;
+                    // split up search query. for example:
+                    //   fix bug => ["fix", "bug"]
+                    //   "fix this" bug => ["fix this", "bug"]
+                    let search_terms = [],
+                        search_regex = /"([^"]+)"|\S+/g,
+                        search_match;
+                    while ((search_match = search_regex.exec(search_query)) !== null) {
+                        if (search_match[1]) {
+                            search_terms.push(search_match[1]);
+                        } else {
+                            search_terms.push(search_match[0]);
+                        }
+                    }
+                    search_terms.forEach((search_terms__value) => {
+                        let visible_this = false;
+                        ['date', 'project', 'description'].forEach((fields__value) => {
+                            if (
+                                tickets__value[fields__value].toLowerCase().includes(search_terms__value.toLowerCase())
+                            ) {
+                                visible_this = true;
+                            }
+                        });
+                        if (visible_this === false) {
+                            visible = false;
+                        }
+                    });
+                }
+
                 if (visible === false && tickets__value.visible === true) {
                     tickets__value.visible = false;
                     let $el = document.querySelector('.tickets .tickets__entry[data-id="' + tickets__value.id + '"]');
