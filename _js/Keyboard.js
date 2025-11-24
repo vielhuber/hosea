@@ -90,8 +90,8 @@ export default class Keyboard {
         // f5...
         document.addEventListener('keydown', async (e) => {
             if (e.keyCode === 116) {
-                await Filter.doFilter();
                 e.preventDefault();
+                await Filter.doFilter();
             }
         });
     }
