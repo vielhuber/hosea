@@ -259,6 +259,8 @@ export default class Scheduler {
 
         document.querySelector('.scheduler').classList.remove('scheduler--loading');
 
+        Scheduler.indicatorIntervalFn();
+
         // custom tooltips instead of basic titles
         tippy('.scheduler__appointment', {
             content(reference) {
@@ -802,6 +804,8 @@ export default class Scheduler {
             $el_container = document.querySelector('.scheduler__cell--indicator-container'),
             $el_appointments = document.querySelector('.scheduler__appointments'),
             $el_row = document.querySelector('.scheduler__table-body .scheduler__row:first-child');
+
+        console.log([$el_indicator, $el_container, $el_appointments, $el_row]);
 
         if ($el_indicator !== null && $el_container !== null && $el_appointments !== null && $el_row !== null) {
             let now = new Date(),
