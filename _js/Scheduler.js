@@ -349,11 +349,13 @@ export default class Scheduler {
                     );
                     document.querySelector('.metabar__select--sort[name="sort_1"]').value = '';
                     document.querySelector('.metabar__select--sort[name="sort_2"]').value = '';
+                    document.querySelector('.metabar__select--filter[name="search"]').value = '';
                 }
                 if (e.target.closest('.scheduler__navigation-week-link-to-empty')) {
                     document.querySelector('.metabar__select--filter[name="date"]').value = '';
                     document.querySelector('.metabar__select--sort[name="sort_1"]').value = 'priority';
                     document.querySelector('.metabar__select--sort[name="sort_2"]').value = '';
+                    document.querySelector('.metabar__select--filter[name="search"]').value = '';
                 }
 
                 Filter.doFilter();
