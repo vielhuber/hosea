@@ -30,6 +30,7 @@ class iCal extends Api
             $query_or = [];
             foreach (explode(',', $_GET['projects']) as $projects__value) {
                 $query_or[] = 'project LIKE \'_' . $projects__value . '_\'';
+                $query_or[] = 'project LIKE \'_--' . $projects__value . '_\'';
             }
             $query[] = '(' . implode(') OR (', $query_or) . ')';
         } else {
