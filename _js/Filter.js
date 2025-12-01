@@ -7,12 +7,12 @@ import Textarea from './Textarea';
 import hlp from 'hlp';
 
 export default class Filter {
-    static initFilter() {
-        Filter.initUpdateFilter(false);
+    static async initFilter() {
+        await Filter.initUpdateFilter(false);
     }
 
-    static updateFilter() {
-        Filter.initUpdateFilter(true);
+    static async updateFilter() {
+        await Filter.initUpdateFilter(true);
     }
 
     static async initUpdateFilter(update) {

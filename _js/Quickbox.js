@@ -393,6 +393,7 @@ export default class Quickbox {
         document.addEventListener('click', (e) => {
             let el = e.target.closest('.quickbox__mail-toggle');
             if (el) {
+                e.preventDefault();
                 if (el.closest('.quickbox__mail').classList.contains('quickbox__mail--expanded')) {
                     el.closest('.quickbox__mails').style.overflowY = 'auto';
                     el.closest('.quickbox__mail').classList.remove('quickbox__mail--expanded');
@@ -406,13 +407,13 @@ export default class Quickbox {
                     el.closest('.quickbox__mails').style.overflowY = 'hidden';
                     el.closest('.quickbox__mail').classList.add('quickbox__mail--expanded');
                 }
-                e.preventDefault();
             }
         });
 
         document.addEventListener('click', (e) => {
             let el = e.target.closest('.quickbox__mail-submit');
             if (el) {
+                e.preventDefault();
                 let form = el.closest('.quickbox__mail-form'),
                     id = form.closest('.quickbox__mail').getAttribute('data-id'),
                     mail = Store.data.mails.filter((mails__value) => mails__value.id === id)[0],
@@ -459,7 +460,6 @@ export default class Quickbox {
                     .then((response) => {
                         Store.data.busy = false;
                     });
-                e.preventDefault();
 
                 setTimeout(() => {
                     Store.data.mails = Store.data.mails.filter(
@@ -526,10 +526,10 @@ export default class Quickbox {
         document.addEventListener('click', (e) => {
             let el = e.target.closest('.quickbox__navitem');
             if (el) {
+                e.preventDefault();
                 if (!el.classList.contains('quickbox__navitem--active')) {
                     this.bindNavToggle(el.getAttribute('href').replace('#', ''));
                 }
-                e.preventDefault();
             }
         });
     }
@@ -685,21 +685,21 @@ export default class Quickbox {
                                     ${
                                         ['fixed'].includes(tickets__value.status) ? 'border-color' : 'border-left-color'
                                     }: ${Scheduler.getStoreProperty(
-                            'border',
-                            tickets__value.status,
-                            tickets__value.project,
-                            'transparent'
-                        )}; opacity: ${Scheduler.getStoreProperty(
-                            'opacity',
-                            tickets__value.status,
-                            tickets__value.project,
-                            1
-                        )}; ${['fixed'].includes(tickets__value.status) ? 'border-width: 5rem;' : ''}">
+                                        'border',
+                                        tickets__value.status,
+                                        tickets__value.project,
+                                        'transparent'
+                                    )}; opacity: ${Scheduler.getStoreProperty(
+                                        'opacity',
+                                        tickets__value.status,
+                                        tickets__value.project,
+                                        1
+                                    )}; ${['fixed'].includes(tickets__value.status) ? 'border-width: 5rem;' : ''}">
                                 <div class="quickbox__today-ticket-project">${
                                     tickets__value.project
                                 }<small class="quickbox__today-ticket-project-status">[${
-                            tickets__value.status
-                        }]</small></div>
+                                    tickets__value.status
+                                }]</small></div>
                                 <div class="quickbox__today-ticket-date">
                                     ${
                                         tickets__value.status === 'fixed'
@@ -711,9 +711,9 @@ export default class Quickbox {
                                               parsed_values__value.minutes_left < 0
                                                   ? '⌛⌛⌛'
                                                   : parsed_values__value.minutes_left !== null &&
-                                                    parsed_values__value.minutes_left < 8 * 60
-                                                  ? '⌛' + parsed_values__value.minutes_left + 'min⌛'
-                                                  : '') +
+                                                      parsed_values__value.minutes_left < 8 * 60
+                                                    ? '⌛' + parsed_values__value.minutes_left + 'min⌛'
+                                                    : '') +
                                               (parsed_values__value.minutes_left !== null &&
                                               parsed_values__value.minutes_left < 8 * 60
                                                   ? '</span>'
@@ -823,6 +823,8 @@ export default class Quickbox {
         document.addEventListener('click', async (e) => {
             let el = e.target.closest('.quickbox__today-nav');
             if (el) {
+                e.preventDefault();
+
                 if (
                     e.target.closest('.quickbox__today-navitem--prev-day') ||
                     e.target.closest('.quickbox__today-navitem--cur-day') ||
@@ -845,17 +847,17 @@ export default class Quickbox {
                     document.querySelector('.metabar__select--sort[name="sort_1"]').value = 'priority';
                 }
 
-                Filter.doFilter();
+                await Filter.doFilter();
                 await Scheduler.initScheduler();
                 Quickbox.initToday();
-
-                e.preventDefault();
             }
         });
 
         document.addEventListener('submit', (e) => {
             let $form = e.target.closest('.quickbox__today-edit-form');
             if ($form) {
+                e.preventDefault();
+
                 $form.querySelector('.quickbox__today-edit-submit').disabled = true;
 
                 if ($form.querySelector('*:invalid') !== null) {
@@ -878,7 +880,6 @@ export default class Quickbox {
                     }
                 });
                 data['updated_at'] = Dates.time().toString();
-                console.log(data);
                 Tickets.setTicketData($form.closest('.quickbox__today-ticket').getAttribute('data-id'), data);
                 changed.push(Tickets.getTicketData($form.closest('.quickbox__today-ticket').getAttribute('data-id')));
 
@@ -911,14 +912,13 @@ export default class Quickbox {
                             showConfirmButton: false,
                         });
                     });
-
-                e.preventDefault();
             }
         });
 
         document.addEventListener('click', (e) => {
             let $el = e.target.closest('.quickbox__today-delete');
             if ($el) {
+                e.preventDefault();
                 let result = confirm('Sind Sie sicher?');
                 if (result) {
                     let ticket_id = $el.closest('.quickbox__today-ticket').getAttribute('data-id');
@@ -955,14 +955,13 @@ export default class Quickbox {
                             });
                         });
                 }
-
-                e.preventDefault();
             }
         });
 
         document.addEventListener('click', (e) => {
             let $el = e.target.closest('.quickbox__today-edit');
             if ($el) {
+                e.preventDefault();
                 let $container = $el
                     .closest('.quickbox__today-ticket')
                     .querySelector('.quickbox__today-edit-delete-container-bottom');
@@ -971,7 +970,6 @@ export default class Quickbox {
                 } else {
                     $container.classList.remove('quickbox__today-edit-delete-container-bottom--active');
                 }
-                e.preventDefault();
             }
         });
 
@@ -1040,6 +1038,7 @@ export default class Quickbox {
             });
         });
         document.querySelector('.quickbox__new-form').addEventListener('submit', (e) => {
+            e.preventDefault();
             document.querySelector('.quickbox__new-submit').disabled = true;
             Tickets.createAndAppendTicket(
                 {
@@ -1087,7 +1086,6 @@ export default class Quickbox {
                         });
                     }
                 });
-            e.preventDefault();
         });
     }
 

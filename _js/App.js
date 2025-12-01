@@ -45,7 +45,7 @@ export default class App {
         Scheduler.bindScheduler();
         Scheduler.indicatorInterval();
         Sort.initSort();
-        Filter.initFilter();
+        await Filter.initFilter();
         Scheduler.updateColors();
         Tickets.updateSum();
         Textarea.textareaAutoHeight();
