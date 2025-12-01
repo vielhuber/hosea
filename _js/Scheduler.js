@@ -816,7 +816,7 @@ export default class Scheduler {
                 sec_start = sec_cur - hour_start * 60 * 60,
                 percentage = 0;
             if (sec_start <= 0) {
-                percentage = 0;
+                percentage = sec_start / sec_total;
             } else if (sec_start >= sec_total) {
                 percentage = 1;
             } else {
