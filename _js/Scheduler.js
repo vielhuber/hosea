@@ -287,13 +287,18 @@ export default class Scheduler {
         statsSumWeekly = (Math.round(statsSumWeekly * 100) / 100).toString().replace('.', ',');
 
         document.querySelector('.scheduler__navigation-week').innerHTML = `
-            ${Dates.dateFormat(Dates.getDayOfActiveViewport(1), 'd.m.')} &ndash; ${Dates.dateFormat(
-                Dates.getDayOfActiveViewport(7),
+            ${Dates.dateFormat(Dates.getDayOfActiveViewport(1), 'd.m.')}&ndash;${Dates.dateFormat(
+                Dates.getDayOfActiveViewport(Store.data.weeksInViewport * 7 + Store.data.shiftingViewPrevDays),
                 'd.m.Y'
             )} /// _kw ${
-                Dates.weekNumber(Dates.getDayOfActiveViewport(1)) +
+                Dates.weekNumber(Dates.getDayOfActiveViewport(1)).toString().padStart(2, '0') +
                 (Store.data.weeksInViewport > 1
-                    ? '–' + Dates.weekNumber(Dates.getDayOfActiveViewport(Store.data.weeksInViewport * 7))
+                    ? '–' +
+                      Dates.weekNumber(
+                          Dates.getDayOfActiveViewport(Store.data.weeksInViewport * 7 + Store.data.shiftingViewPrevDays)
+                      )
+                          .toString()
+                          .padStart(2, '0')
                     : '')
             } /// ${statsSumWeekly}h /// <a href="#" class="scheduler__navigation-week-link-to-empty">
             ${Scheduler.generateLinkToEmptyDatesSum()}
