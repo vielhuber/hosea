@@ -593,6 +593,9 @@ export default class Quickbox {
     }
 
     static initToday() {
+        if (!hlp.isMobile()) {
+            return;
+        }
         document.querySelector('.quickbox__today').innerHTML = `
             <div class="quickbox__today-nav">
                 <a class="quickbox__today-navitem quickbox__today-navitem--prev-day" href="#">&lt;</a>
@@ -768,10 +771,14 @@ export default class Quickbox {
 
                                         <form class="quickbox__today-edit-form">
                                             <ul class="quickbox__today-edit-inputrows">
-                                                <li class="quickbox__today-edit-inputrow">
-                                                    <input class="quickbox__today-edit-input quickbox__today-edit-input--text validate-field validate-field--date" type="text" name="date" placeholder="date" value="${
-                                                        tickets__value.date
-                                                    }" />
+                                                <li class="quickbox__today-edit-inputrow quickbox__today-edit-inputrow--dheight">
+                                                    <textarea
+                                                        class="quickbox__today-edit-input quickbox__today-edit-input--textarea validate-field validate-field--date"
+                                                        autocorrect="off"
+                                                        autocapitalize="off"
+                                                        spellcheck="false"
+                                                        name="date"
+                                                        placeholder="date">${tickets__value.date}</textarea>
                                                 </li>
                                                 <li class="quickbox__today-edit-inputrow">
                                                     <input class="quickbox__today-edit-input quickbox__today-edit-input--text validate-field validate-field--status" type="text" name="status" placeholder="status" value="${

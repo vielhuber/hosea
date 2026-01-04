@@ -363,9 +363,10 @@ export default class Scheduler {
                     document.querySelector('.metabar__select--filter[name="search"]').value = '';
                 }
 
-                Filter.doFilter();
+                Filter.doFilter().then(() => {
+                    Quickbox.initToday();
+                });
                 await Scheduler.initScheduler();
-                Quickbox.initToday();
             }
         });
     }
@@ -794,9 +795,10 @@ export default class Scheduler {
         }
         Html.setViewClass();
 
-        Filter.doFilter();
+        Filter.doFilter().then(() => {
+            Quickbox.initToday();
+        });
         await Scheduler.initScheduler();
-        Quickbox.initToday();
     }
 
     static indicatorInterval() {

@@ -1,11 +1,14 @@
-@use "../_assorted/common";
-@use "../_config/vars";
+@use '../_assorted/common';
+@use '../_config/vars';
 
 .quickbox {
     width: calc((100% - #{vars.$container-width-big}) - #{vars.$space-big});
     bottom: calc(#{vars.$footer-height} + #{vars.$space-big});
     right: vars.$space-big;
-    top: calc(#{vars.$space-big} + ((100% - (2 * #{vars.$space-big}) - #{vars.$footer-height}) / 1.5) + (0.5 * #{vars.$space-big}));
+    top: calc(
+        #{vars.$space-big} + ((100% - (2 * #{vars.$space-big}) - #{vars.$footer-height}) / 1.5) +
+            (0.5 * #{vars.$space-big})
+    );
     position: absolute;
     background-color: vars.$color-black-transparent;
     color: vars.$color-white;
@@ -319,8 +322,8 @@
     text-align: right;
 }
 .quickbox__today-edit-delete-container-bottom {
-    display: none;
     height: 0;
+    pointer-events: none;
     transition-property: all;
     transition-duration: 0.42s;
     transition-timing-function: ease-out;
@@ -333,7 +336,7 @@
     @starting-style {
         height: 0;
     }
-    display: block;
+    pointer-events: auto;
     height: auto;
 }
 
@@ -457,7 +460,9 @@
     border-left: none;
     border-right: none;
     border-top: none;
-    transition: transform 0.25s ease-in-out, opacity 0.25s ease-in-out;
+    transition:
+        transform 0.25s ease-in-out,
+        opacity 0.25s ease-in-out;
 }
 
 .quickbox__mail--expanded {
