@@ -71,7 +71,7 @@ export default class Quickbox {
                         <div class="quickbox__money-stats"></div>
                         <div class="quickbox__money-chart"></div>
                     </div>
-                    `
+                    `,
                 );
                 document.querySelector('.quickbox__money-stats').insertAdjacentHTML(
                     'beforeend',
@@ -108,7 +108,7 @@ export default class Quickbox {
                             </div>
                         </li>
                     </ul>
-                    `
+                    `,
                 );
                 document
                     .querySelector('.quickbox__money-chart')
@@ -305,7 +305,7 @@ export default class Quickbox {
                                             <li class="quickbox__mail-inputrow quickbox__mail-inputrow--1/${
                                                 mails__value.editors.length + 2
                                             }"><label class="quickbox__mail-label"><input type="checkbox" class="quickbox__mail-input quickbox__mail-input--checkbox" name="action_send[]" value="${editors__value}" /><span class="quickbox__mail-label-text">${editors__value}</span></label></li>
-                                        `
+                                        `,
                                     )
                                     .join('')}
                                     <li class="quickbox__mail-inputrow quickbox__mail-inputrow--1/${
@@ -331,10 +331,10 @@ export default class Quickbox {
         	                </form>
                         </div>
                     </div>
-                `
+                `,
                 );
                 let iframe = document.querySelector(
-                    '.quickbox__mail[data-id="' + mails__value.id + '"] .quickbox__mail-content'
+                    '.quickbox__mail[data-id="' + mails__value.id + '"] .quickbox__mail-content',
                 );
                 iframe.onload = () => {
                     let style = document.createElement('style');
@@ -420,7 +420,7 @@ export default class Quickbox {
                     action = el.classList.contains('quickbox__mail-submit--create') ? 'create' : 'discard';
 
                 form.closest('.quickbox__mail').classList.add(
-                    'quickbox__mail--move-' + (action === 'discard' ? 'left' : 'right')
+                    'quickbox__mail--move-' + (action === 'discard' ? 'left' : 'right'),
                 );
                 document.querySelector('.quickbox__mails').style.overflowY = 'auto';
                 document.querySelector('.quickbox__mails').scrollTop = this.lastScrollPos;
@@ -443,7 +443,7 @@ export default class Quickbox {
                         null,
                         1,
                         false,
-                        true
+                        true,
                     );
                 }
 
@@ -463,7 +463,7 @@ export default class Quickbox {
 
                 setTimeout(() => {
                     Store.data.mails = Store.data.mails.filter(
-                        (mails__value) => mails__value.id != form.closest('.quickbox__mail').getAttribute('data-id')
+                        (mails__value) => mails__value.id != form.closest('.quickbox__mail').getAttribute('data-id'),
                     );
                     Quickbox.renderMails();
                     Quickbox.updateMailCount();
@@ -691,12 +691,12 @@ export default class Quickbox {
                                         'border',
                                         tickets__value.status,
                                         tickets__value.project,
-                                        'transparent'
+                                        'transparent',
                                     )}; opacity: ${Scheduler.getStoreProperty(
                                         'opacity',
                                         tickets__value.status,
                                         tickets__value.project,
-                                        1
+                                        1,
                                     )}; ${['fixed'].includes(tickets__value.status) ? 'border-width: 5rem;' : ''}">
                                 <div class="quickbox__today-ticket-project">${
                                     tickets__value.project
@@ -747,7 +747,7 @@ export default class Quickbox {
                                               .map((description__value) =>
                                                   hlp
                                                       .rtrim(description__value)
-                                                      .replace(/^ +/, (match) => '&nbsp;'.repeat(match.length))
+                                                      .replace(/^ +/, (match) => '&nbsp;'.repeat(match.length)),
                                               )
                                               .join('<br/>')}</div>`
                                         : ''
@@ -817,7 +817,7 @@ export default class Quickbox {
                                 </div>
 
                             </li>
-                        `
+                        `,
                     );
                 });
                 count++;
@@ -846,7 +846,7 @@ export default class Quickbox {
                     }
                     document.querySelector('.metabar__select--filter[name="date"]').value = Dates.dateFormat(
                         Store.data.session.activeDay,
-                        'Y-m-d'
+                        'Y-m-d',
                     );
                     document.querySelector('.metabar__select--sort[name="sort_1"]').value = '';
                 } else if (e.target.closest('.quickbox__today-navitem--empty')) {
@@ -1063,7 +1063,7 @@ export default class Quickbox {
                 null,
                 1,
                 false,
-                true
+                true,
             )
                 .then((response) => {
                     return response;
@@ -1101,7 +1101,7 @@ export default class Quickbox {
         let proposedDate = new Date();
         proposedDate.setDate(proposedDate.getDate() + ((1 + 7 - proposedDate.getDay()) % 7));
         proposedDate = Dates.dateFormat(proposedDate, 'd.m.y');
-        proposedDate += ' 09:00-11:00';
+        proposedDate += ' 09:00-10:00';
         return proposedDate;
     }
 }
