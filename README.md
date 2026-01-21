@@ -2,7 +2,7 @@
 
 hosea is a personal assistant.
 
-![](https://github.com/vielhuber/hosea/raw/master/screenshot.png)
+![](https://github.com/vielhuber/hosea/raw/main/screenshot.png)
 
 ## features
 
