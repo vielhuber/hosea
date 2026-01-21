@@ -191,6 +191,9 @@
 
 .scheduler__navigation-daylink {
     cursor: pointer;
+    z-index: 1;
+    background-color: vars.$color-black-transparent;
+    position: relative;
 }
 
 .scheduler:not(.scheduler--mobile-active)
