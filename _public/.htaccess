@@ -1,2 +1,0 @@
-# disable df cache
-Header set Cache-Control "max-age=0, no-cache, no-store, must-revalidate"
