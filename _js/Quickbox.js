@@ -58,11 +58,11 @@ export default class Quickbox {
             .fetch('_api/money/' + Store.data.user.api_key, {
                 method: 'GET',
                 cache: 'no-cache',
-                headers: { 'content-type': 'application/json' },
+                headers: { 'content-type': 'application/json' }
             })
-            .then((res) => res.json())
+            .then(res => res.json())
             .catch(() => {})
-            .then((response) => {
+            .then(response => {
                 document.querySelector('.quickbox__money').innerHTML = '';
                 document.querySelector('.quickbox__money').insertAdjacentHTML(
                     'beforeend',
@@ -71,7 +71,7 @@ export default class Quickbox {
                         <div class="quickbox__money-stats"></div>
                         <div class="quickbox__money-chart"></div>
                     </div>
-                    `,
+                    `
                 );
                 document.querySelector('.quickbox__money-stats').insertAdjacentHTML(
                     'beforeend',
@@ -81,7 +81,7 @@ export default class Quickbox {
                             <div class="quickbox__money-stats-entry-inner">
                                 <h3 class="quickbox__money-stats-entry-heading">budget/month:</h3>
                                 ${response.data.stats.monthly_budget.toLocaleString('de-DE', {
-                                    minimumFractionDigits: 2,
+                                    minimumFractionDigits: 2
                                 })}&euro;
                             </div>
                         </li>
@@ -89,7 +89,7 @@ export default class Quickbox {
                             <div class="quickbox__money-stats-entry-inner">
                                 <h3 class="quickbox__money-stats-entry-heading">budget/left:</h3>
                                 ${response.data.stats.budget_left_in_month.toLocaleString('de-DE', {
-                                    minimumFractionDigits: 2,
+                                    minimumFractionDigits: 2
                                 })}&euro;
                             </div>
                         </li>
@@ -97,7 +97,7 @@ export default class Quickbox {
                             <div class="quickbox__money-stats-entry-inner">
                                 <h3 class="quickbox__money-stats-entry-heading">budget/day:</h3>
                                 ${response.data.stats.budget_left_per_day.toLocaleString('de-DE', {
-                                    minimumFractionDigits: 2,
+                                    minimumFractionDigits: 2
                                 })}&euro;
                             </div>
                         </li>
@@ -108,7 +108,7 @@ export default class Quickbox {
                             </div>
                         </li>
                     </ul>
-                    `,
+                    `
                 );
                 document
                     .querySelector('.quickbox__money-chart')
@@ -120,19 +120,19 @@ export default class Quickbox {
                         datasets: [
                             {
                                 label: ' einmalig in €',
-                                data: Object.values(response.data.diagrams).map((val) => val[0]),
+                                data: Object.values(response.data.diagrams).map(val => val[0]),
                                 backgroundColor: ['#E91E63', '#FFB300', '#F44336', '#ba68c8', '#2196F3', '#4527a0'],
                                 borderColor: '#ffffff',
-                                borderWidth: 2,
+                                borderWidth: 2
                             },
                             {
                                 label: ' laufend in €',
-                                data: Object.values(response.data.diagrams).map((val) => val[1]),
+                                data: Object.values(response.data.diagrams).map(val => val[1]),
                                 backgroundColor: '#8d8d8d',
                                 borderColor: '#ffffff',
-                                borderWidth: 2,
-                            },
-                        ],
+                                borderWidth: 2
+                            }
+                        ]
                     },
                     options: {
                         responsive: true,
@@ -142,59 +142,59 @@ export default class Quickbox {
                                 beginAtZero: true,
                                 ticks: {
                                     stepSize: 250,
-                                    callback: (value) => {
+                                    callback: value => {
                                         return value + '€';
                                     },
                                     font: {
                                         weight: 'bold', // X-Achse fett
                                         family: 'Inconsolata, monospace',
-                                        size: 10,
+                                        size: 10
                                     },
-                                    color: '#ffffff', // Y-Achsentitel in Weiß
+                                    color: '#ffffff' // Y-Achsentitel in Weiß
                                 },
                                 grid: {
                                     display: true, // Aktiviert horizontale Linien
                                     color: 'rgba(255, 255, 255, 0.9)', // Leichte graue Linien
-                                    lineWidth: 2,
+                                    lineWidth: 2
                                 },
                                 border: {
-                                    display: false, // Versteckt die y-Achsenlinie
-                                },
+                                    display: false // Versteckt die y-Achsenlinie
+                                }
                             },
                             x: {
                                 grid: {
-                                    display: false, // Deaktiviert vertikale Linien
+                                    display: false // Deaktiviert vertikale Linien
                                 },
                                 ticks: {
                                     font: {
                                         weight: 'bold', // Y-Achse fett
                                         family: 'Inconsolata, monospace',
-                                        size: 10,
+                                        size: 10
                                     },
-                                    color: '#ffffff', // Y-Achsentitel in Weiß
-                                },
-                            },
+                                    color: '#ffffff' // Y-Achsentitel in Weiß
+                                }
+                            }
                         },
                         plugins: {
                             legend: {
-                                display: false,
+                                display: false
                             },
                             tooltip: {
                                 bodyFont: {
                                     size: 11, // Größe des Tooltip-Texts
-                                    family: 'Inconsolata, monospace',
+                                    family: 'Inconsolata, monospace'
                                 },
                                 titleFont: {
                                     size: 13, // Größe des Tooltip-Titels
-                                    family: 'Inconsolata, monospace',
-                                },
-                            },
+                                    family: 'Inconsolata, monospace'
+                                }
+                            }
                         },
                         animation: {
                             duration: 3500, // Animation dauert 2 Sekunden
-                            easing: 'easeOutBounce', // Bouncy-Effekt
-                        },
-                    },
+                            easing: 'easeOutBounce' // Bouncy-Effekt
+                        }
+                    }
                 };
                 if (document.querySelector('.quickbox__content').getAttribute('data-view') === 'money') {
                     this.initializeMoneyChart();
@@ -228,15 +228,15 @@ export default class Quickbox {
             .fetch('_api/mails', {
                 method: 'GET',
                 cache: 'no-cache',
-                headers: { 'content-type': 'application/json' },
+                headers: { 'content-type': 'application/json' }
             })
-            .then((res) => res.json())
+            .then(res => res.json())
             .catch(() => {})
-            .then((response) => {
+            .then(response => {
                 Store.data.busy = false;
                 Store.data.mails = [];
                 if (response.success === true) {
-                    response.data.forEach((mails__value) => {
+                    response.data.forEach(mails__value => {
                         Store.data.mails.push(mails__value);
                     });
                 } else {
@@ -245,7 +245,7 @@ export default class Quickbox {
                         icon: 'error',
                         timer: 10000,
                         timerProgressBar: true,
-                        showConfirmButton: false,
+                        showConfirmButton: false
                     });
                 }
                 Quickbox.renderMails();
@@ -260,7 +260,7 @@ export default class Quickbox {
 
     static renderMails() {
         // add new
-        Store.data.mails.forEach((mails__value) => {
+        Store.data.mails.forEach(mails__value => {
             if (document.querySelector('.quickbox__mail[data-id="' + mails__value.id + '"]') === null) {
                 let content = mails__value.content;
                 document.querySelector('.quickbox__mails').insertAdjacentHTML(
@@ -298,14 +298,14 @@ export default class Quickbox {
                                     <li class="quickbox__mail-inputrow quickbox__mail-inputrow--1/3"><label class="quickbox__mail-label"><input class="quickbox__mail-input quickbox__mail-input--radio" type="radio" name="action_ticket_time" value="next" uncheckable /><span class="quickbox__mail-label-text">next</span></label></li>
                                     <li class="quickbox__mail-inputrow quickbox__mail-inputrow--1/${
                                         mails__value.editors.length + 2
-                                    }"><label class="quickbox__mail-label"><input type="checkbox" class="quickbox__mail-input quickbox__mail-input--checkbox" name="action_send[]" value="sender" /><span class="quickbox__mail-label-text">sender</span></label></li>
+                                    }"><label class="quickbox__mail-label"><input type="checkbox" class="quickbox__mail-input quickbox__mail-input--checkbox" name="action_send[]" value="sender" /><span class="quickbox__mail-label-text">send to sender</span></label></li>
                                 ${mails__value.editors
                                     .map(
-                                        (editors__value) => `
+                                        editors__value => `
                                             <li class="quickbox__mail-inputrow quickbox__mail-inputrow--1/${
                                                 mails__value.editors.length + 2
                                             }"><label class="quickbox__mail-label"><input type="checkbox" class="quickbox__mail-input quickbox__mail-input--checkbox" name="action_send[]" value="${editors__value}" /><span class="quickbox__mail-label-text">${editors__value}</span></label></li>
-                                        `,
+                                        `
                                     )
                                     .join('')}
                                     <li class="quickbox__mail-inputrow quickbox__mail-inputrow--1/${
@@ -331,10 +331,10 @@ export default class Quickbox {
         	                </form>
                         </div>
                     </div>
-                `,
+                `
                 );
                 let iframe = document.querySelector(
-                    '.quickbox__mail[data-id="' + mails__value.id + '"] .quickbox__mail-content',
+                    '.quickbox__mail[data-id="' + mails__value.id + '"] .quickbox__mail-content'
                 );
                 iframe.onload = () => {
                     let style = document.createElement('style');
@@ -358,7 +358,7 @@ export default class Quickbox {
                     `;
                     iframe.contentDocument.head.appendChild(style);
                     if (iframe.contentDocument.querySelector('a') !== null) {
-                        iframe.contentDocument.querySelectorAll('a').forEach((el) => {
+                        iframe.contentDocument.querySelectorAll('a').forEach(el => {
                             el.setAttribute('target', '_blank');
                         });
                     }
@@ -369,10 +369,9 @@ export default class Quickbox {
 
         // remove existing
         if (document.querySelector('.quickbox__mail') !== null) {
-            document.querySelectorAll('.quickbox__mail').forEach((el) => {
+            document.querySelectorAll('.quickbox__mail').forEach(el => {
                 if (
-                    Store.data.mails.filter((mails__value) => mails__value.id === el.getAttribute('data-id')).length ===
-                    0
+                    Store.data.mails.filter(mails__value => mails__value.id === el.getAttribute('data-id')).length === 0
                 ) {
                     el.remove();
                 }
@@ -390,7 +389,7 @@ export default class Quickbox {
     }
 
     static bindMails() {
-        document.addEventListener('click', (e) => {
+        document.addEventListener('click', e => {
             let el = e.target.closest('.quickbox__mail-toggle');
             if (el) {
                 e.preventDefault();
@@ -410,17 +409,17 @@ export default class Quickbox {
             }
         });
 
-        document.addEventListener('click', (e) => {
+        document.addEventListener('click', e => {
             let el = e.target.closest('.quickbox__mail-submit');
             if (el) {
                 e.preventDefault();
                 let form = el.closest('.quickbox__mail-form'),
                     id = form.closest('.quickbox__mail').getAttribute('data-id'),
-                    mail = Store.data.mails.filter((mails__value) => mails__value.id === id)[0],
+                    mail = Store.data.mails.filter(mails__value => mails__value.id === id)[0],
                     action = el.classList.contains('quickbox__mail-submit--create') ? 'create' : 'discard';
 
                 form.closest('.quickbox__mail').classList.add(
-                    'quickbox__mail--move-' + (action === 'discard' ? 'left' : 'right'),
+                    'quickbox__mail--move-' + (action === 'discard' ? 'left' : 'right')
                 );
                 document.querySelector('.quickbox__mails').style.overflowY = 'auto';
                 document.querySelector('.quickbox__mails').scrollTop = this.lastScrollPos;
@@ -435,15 +434,12 @@ export default class Quickbox {
                             project: 'mail',
                             status: 'scheduled',
                             time: '0,50',
-                            visible: true,
-                            attachments: [
-                                hlp.base64tofile(mail.eml, null, hlp.slugify(mail.subject + ' ' + mail.date) + '.eml'),
-                            ],
+                            visible: true
                         },
                         null,
                         1,
                         false,
-                        true,
+                        true
                     );
                 }
 
@@ -453,17 +449,17 @@ export default class Quickbox {
                         method: 'PUT',
                         body: new URLSearchParams(new FormData(form)),
                         cache: 'no-cache',
-                        headers: { 'content-type': 'application/json' },
+                        headers: { 'content-type': 'application/json' }
                     })
-                    .then((res) => res.json())
+                    .then(res => res.json())
                     .catch(() => {})
-                    .then((response) => {
+                    .then(response => {
                         Store.data.busy = false;
                     });
 
                 setTimeout(() => {
                     Store.data.mails = Store.data.mails.filter(
-                        (mails__value) => mails__value.id != form.closest('.quickbox__mail').getAttribute('data-id'),
+                        mails__value => mails__value.id != form.closest('.quickbox__mail').getAttribute('data-id')
                     );
                     Quickbox.renderMails();
                     Quickbox.updateMailCount();
@@ -494,13 +490,13 @@ export default class Quickbox {
                         return;
                     }
                     Quickbox.fetchMails(false);
-                },
+                }
             });
         }
     }
 
     static allowUnselectRadio() {
-        document.addEventListener('click', (e) => {
+        document.addEventListener('click', e => {
             let el = e.target.closest('input[type="radio"][uncheckable]');
             if (el) {
                 if (el.hasAttribute('data-checked')) {
@@ -509,7 +505,7 @@ export default class Quickbox {
                 } else {
                     el.checked = true;
                     if (document.querySelector('input[type="radio"][uncheckable][data-checked]') !== null) {
-                        document.querySelectorAll('input[type="radio"][uncheckable][data-checked]').forEach((el) => {
+                        document.querySelectorAll('input[type="radio"][uncheckable][data-checked]').forEach(el => {
                             el.removeAttribute('data-checked');
                         });
                     }
@@ -523,7 +519,7 @@ export default class Quickbox {
         if (document.querySelector('.quickbox__content') !== null) {
             this.bindNavToggle(!hlp.isMobile() ? 'mails' : 'week');
         }
-        document.addEventListener('click', (e) => {
+        document.addEventListener('click', e => {
             let el = e.target.closest('.quickbox__navitem');
             if (el) {
                 e.preventDefault();
@@ -541,7 +537,7 @@ export default class Quickbox {
         document.querySelector('.quickbox__content').classList.add('quickbox__content--disabled');
         /* in chrome we want ctrl+f to not find hidden elements (so we must apply display:none) */
         /* the following lines ensure to do exactly that */
-        document.querySelectorAll('.quickbox__content > *').forEach((el2) => {
+        document.querySelectorAll('.quickbox__content > *').forEach(el2 => {
             el2.style.display = 'block';
         });
         /* reinitialize chart to init animation */
@@ -557,7 +553,7 @@ export default class Quickbox {
         }
         requestAnimationFrame(() => {
             setTimeout(() => {
-                document.querySelectorAll('.quickbox__content > *:not(.quickbox__' + view + ')').forEach((el2) => {
+                document.querySelectorAll('.quickbox__content > *:not(.quickbox__' + view + ')').forEach(el2 => {
                     el2.style.display = 'none';
                 });
                 document.querySelector('.quickbox__content').classList.remove('quickbox__content--disabled');
@@ -572,7 +568,7 @@ export default class Quickbox {
             }
 
             if (document.querySelector('.quickbox__navitem--active') !== null) {
-                document.querySelectorAll('.quickbox__navitem--active').forEach((navitem__value) => {
+                document.querySelectorAll('.quickbox__navitem--active').forEach(navitem__value => {
                     navitem__value.classList.remove('quickbox__navitem--active');
                 });
             }
@@ -616,7 +612,7 @@ export default class Quickbox {
             let sort_list = [
                     'allday',
                     'working',
-                    'fixed',
+                    'fixed'
                     /*
                     'scheduled',
                     'fixed',
@@ -650,7 +646,7 @@ export default class Quickbox {
                 [a.priority, b.priority],
                 [a.project, b.project],
                 //[a.description, b.description],
-                [a.id, b.id],
+                [a.id, b.id]
             ]) {
                 if (val_a < val_b) {
                     return -1;
@@ -661,7 +657,7 @@ export default class Quickbox {
             }
             return 0;
         });
-        tickets.forEach((tickets__value) => {
+        tickets.forEach(tickets__value => {
             if (['done', 'billed'].includes(tickets__value.status)) {
                 return;
             }
@@ -674,13 +670,13 @@ export default class Quickbox {
             } else {
                 parsed_values = [
                     {
-                        minutes_left: null,
-                    },
+                        minutes_left: null
+                    }
                 ];
             }
 
             if (parsed_values !== false && parsed_values.length > 0) {
-                parsed_values.forEach((parsed_values__value) => {
+                parsed_values.forEach(parsed_values__value => {
                     document.querySelector('.quickbox__today-tickets').insertAdjacentHTML(
                         'beforeend',
                         `
@@ -691,12 +687,12 @@ export default class Quickbox {
                                         'border',
                                         tickets__value.status,
                                         tickets__value.project,
-                                        'transparent',
+                                        'transparent'
                                     )}; opacity: ${Scheduler.getStoreProperty(
                                         'opacity',
                                         tickets__value.status,
                                         tickets__value.project,
-                                        1,
+                                        1
                                     )}; ${['fixed'].includes(tickets__value.status) ? 'border-width: 5rem;' : ''}">
                                 <div class="quickbox__today-ticket-project">${
                                     tickets__value.project
@@ -744,10 +740,10 @@ export default class Quickbox {
                                     tickets__value.description !== null && tickets__value.description !== ''
                                         ? `<div class="quickbox__today-ticket-description">${tickets__value.description
                                               .split('\n')
-                                              .map((description__value) =>
+                                              .map(description__value =>
                                                   hlp
                                                       .rtrim(description__value)
-                                                      .replace(/^ +/, (match) => '&nbsp;'.repeat(match.length)),
+                                                      .replace(/^ +/, match => '&nbsp;'.repeat(match.length))
                                               )
                                               .join('<br/>')}</div>`
                                         : ''
@@ -817,7 +813,7 @@ export default class Quickbox {
                                 </div>
 
                             </li>
-                        `,
+                        `
                     );
                 });
                 count++;
@@ -827,7 +823,7 @@ export default class Quickbox {
     }
 
     static bindToday() {
-        document.addEventListener('click', async (e) => {
+        document.addEventListener('click', async e => {
             let el = e.target.closest('.quickbox__today-nav');
             if (el) {
                 e.preventDefault();
@@ -846,7 +842,7 @@ export default class Quickbox {
                     }
                     document.querySelector('.metabar__select--filter[name="date"]').value = Dates.dateFormat(
                         Store.data.session.activeDay,
-                        'Y-m-d',
+                        'Y-m-d'
                     );
                     document.querySelector('.metabar__select--sort[name="sort_1"]').value = '';
                 } else if (e.target.closest('.quickbox__today-navitem--empty')) {
@@ -860,7 +856,7 @@ export default class Quickbox {
             }
         });
 
-        document.addEventListener('submit', (e) => {
+        document.addEventListener('submit', e => {
             let $form = e.target.closest('.quickbox__today-edit-form');
             if ($form) {
                 e.preventDefault();
@@ -873,7 +869,7 @@ export default class Quickbox {
                         icon: 'error',
                         timer: 2000,
                         timerProgressBar: true,
-                        showConfirmButton: false,
+                        showConfirmButton: false
                     });
                     return;
                 }
@@ -881,7 +877,7 @@ export default class Quickbox {
                 let changed = [];
 
                 let data = {};
-                Store.data.cols.forEach((cols__value) => {
+                Store.data.cols.forEach(cols__value => {
                     if ($form.querySelector('[name="' + cols__value + '"]') !== null) {
                         data[cols__value] = $form.querySelector('[name="' + cols__value + '"]').value;
                     }
@@ -895,16 +891,16 @@ export default class Quickbox {
                     .fetch('_api/tickets', {
                         method: 'PUT',
                         body: JSON.stringify({
-                            tickets: changed,
+                            tickets: changed
                         }),
                         cache: 'no-cache',
-                        headers: { 'content-type': 'application/json' },
+                        headers: { 'content-type': 'application/json' }
                     })
-                    .then((res) => res.json())
-                    .catch((err) => {
+                    .then(res => res.json())
+                    .catch(err => {
                         console.error(err);
                     })
-                    .then(async (response) => {
+                    .then(async response => {
                         Store.data.busy = false;
                         await Scheduler.initScheduler();
                         Scheduler.updateColors();
@@ -916,13 +912,13 @@ export default class Quickbox {
                             icon: 'success',
                             timer: 2000,
                             timerProgressBar: true,
-                            showConfirmButton: false,
+                            showConfirmButton: false
                         });
                     });
             }
         });
 
-        document.addEventListener('click', (e) => {
+        document.addEventListener('click', e => {
             let $el = e.target.closest('.quickbox__today-delete');
             if ($el) {
                 e.preventDefault();
@@ -935,13 +931,13 @@ export default class Quickbox {
                         .fetch('_api/tickets/' + ticket_id, {
                             method: 'DELETE',
                             cache: 'no-cache',
-                            headers: { 'content-type': 'application/json' },
+                            headers: { 'content-type': 'application/json' }
                         })
-                        .then((res) => res.json())
-                        .catch((err) => {
+                        .then(res => res.json())
+                        .catch(err => {
                             console.error(err);
                         })
-                        .then(async (response) => {
+                        .then(async response => {
                             Store.data.busy = false;
                             Store.data.tickets.forEach((tickets__value, tickets__key) => {
                                 if (tickets__value.id == ticket_id) {
@@ -958,14 +954,14 @@ export default class Quickbox {
                                 icon: 'success',
                                 timer: 2000,
                                 timerProgressBar: true,
-                                showConfirmButton: false,
+                                showConfirmButton: false
                             });
                         });
                 }
             }
         });
 
-        document.addEventListener('click', (e) => {
+        document.addEventListener('click', e => {
             let $el = e.target.closest('.quickbox__today-edit');
             if ($el) {
                 e.preventDefault();
@@ -999,7 +995,7 @@ export default class Quickbox {
                 },
                 onRefresh() {
                     Tickets.fetchAndRenderTicketsAndUpdateApp();
-                },
+                }
             });
         }
     }
@@ -1029,7 +1025,7 @@ export default class Quickbox {
     }
 
     static bindNew() {
-        document.querySelector('.quickbox__new-form [name="date"][type="text"]').addEventListener('keyup', (e) => {
+        document.querySelector('.quickbox__new-form [name="date"][type="text"]').addEventListener('keyup', e => {
             if (
                 e.target.value != '' &&
                 document.querySelector('.quickbox__new-form [name="date"][type="radio"]:checked') !== null
@@ -1037,14 +1033,14 @@ export default class Quickbox {
                 document.querySelector('.quickbox__new-form [name="date"][type="radio"]:checked').checked = false;
             }
         });
-        document.querySelectorAll('.quickbox__new-form [name="date"][type="radio"]').forEach((el) => {
-            el.addEventListener('change', (e) => {
+        document.querySelectorAll('.quickbox__new-form [name="date"][type="radio"]').forEach(el => {
+            el.addEventListener('change', e => {
                 if (e.target.checked === true) {
                     document.querySelector('.quickbox__new-form [name="date"][type="text"]').value = '';
                 }
             });
         });
-        document.querySelector('.quickbox__new-form').addEventListener('submit', (e) => {
+        document.querySelector('.quickbox__new-form').addEventListener('submit', e => {
             e.preventDefault();
             document.querySelector('.quickbox__new-submit').disabled = true;
             Tickets.createAndAppendTicket(
@@ -1058,20 +1054,20 @@ export default class Quickbox {
                     project: document.querySelector('.quickbox__new-form [name="project"]').value,
                     status: 'scheduled',
                     time: '0,50',
-                    visible: true,
+                    visible: true
                 },
                 null,
                 1,
                 false,
-                true,
+                true
             )
-                .then((response) => {
+                .then(response => {
                     return response;
                 })
-                .catch((error) => {
+                .catch(error => {
                     return error;
                 })
-                .then((response) => {
+                .then(response => {
                     document.querySelector('.quickbox__new-submit').disabled = false;
                     if (response.success === true) {
                         Swal.fire({
@@ -1079,7 +1075,7 @@ export default class Quickbox {
                             icon: 'success',
                             timer: 2000,
                             timerProgressBar: true,
-                            showConfirmButton: false,
+                            showConfirmButton: false
                         });
                         document.querySelector('.quickbox__new-form').reset();
                         document.querySelector('.quickbox__navitem[href="#today"]').click();
@@ -1089,7 +1085,7 @@ export default class Quickbox {
                             icon: 'error',
                             timer: 2000,
                             timerProgressBar: true,
-                            showConfirmButton: false,
+                            showConfirmButton: false
                         });
                     }
                 });

@@ -4,6 +4,7 @@
         "vielhuber/stringhelper": "*",
         "vielhuber/simpleauth": "*",
         "vielhuber/comparehelper": "*",
+        "vielhuber/mailhelper": "*",
         "guzzlehttp/guzzle": "*",
         "eluceo/ical": "*",
         "php-imap/php-imap": "*",

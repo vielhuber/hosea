@@ -3,6 +3,7 @@
 /node_modules/
 /_backup/
 /.env
+/config.json
 /vendor/
 /composer.lock
 /package-lock.json
