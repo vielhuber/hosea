@@ -1093,7 +1093,45 @@ export default class Quickbox {
     }
 
     static proposeNewDate() {
-        /* calculate next monday */
+        // find next consecutive group of 3+ tickets with identical begin/end time where end hasn't passed yet
+        let dateTimeRegex = /^(\d{2}\.\d{2}\.\d{2}) (\d{2}:\d{2}-\d{2}:\d{2})$/,
+            now = new Date(),
+            parsedTickets = [];
+        Store.data.tickets.forEach(tickets__value => {
+            if (!tickets__value.date) {
+                return;
+            }
+            let firstLine = tickets__value.date.split('\n')[0].trim(),
+                match = firstLine.match(dateTimeRegex);
+            if (!match) {
+                return;
+            }
+            let [, datePart, timePart] = match,
+                dateStr =
+                    '20' + datePart.substring(6, 8) + '-' + datePart.substring(3, 5) + '-' + datePart.substring(0, 2),
+                [endHH, endMM] = timePart.split('-')[1].split(':').map(Number),
+                endDateTime = new Date(dateStr);
+            endDateTime.setHours(endHH, endMM, 0, 0);
+            parsedTickets.push({ datePart, timePart, endDateTime });
+        });
+        parsedTickets.sort((a, b) => a.endDateTime - b.endDateTime);
+        let i = 0;
+        while (i < parsedTickets.length) {
+            let j = i + 1;
+            while (j < parsedTickets.length && parsedTickets[j].timePart === parsedTickets[i].timePart) {
+                j++;
+            }
+            if (j - i >= 3 && parsedTickets[j - 1].endDateTime > now) {
+                for (let k = i; k < j; k++) {
+                    if (parsedTickets[k].endDateTime > now) {
+                        return parsedTickets[k].datePart + ' ' + parsedTickets[k].timePart;
+                    }
+                }
+            }
+            i = j;
+        }
+
+        // fallback: calculate next monday
         let proposedDate = new Date();
         proposedDate.setDate(proposedDate.getDate() + ((1 + 7 - proposedDate.getDay()) % 7));
         proposedDate = Dates.dateFormat(proposedDate, 'd.m.y');

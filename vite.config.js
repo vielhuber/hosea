@@ -7,12 +7,11 @@ export default defineConfig({
             input: './_js/script.js',
             output: {
                 entryFileNames: 'bundle.js',
-                format: 'iife',
-                inlineDynamicImports: true,
-            },
+                format: 'iife'
+            }
         },
         sourcemap: true,
         minify: false,
-        emptyOutDir: false,
-    },
+        emptyOutDir: false
+    }
 });
