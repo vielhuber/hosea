@@ -4,7 +4,7 @@ export default defineConfig({
     build: {
         outDir: '_public/_build',
         rollupOptions: {
-            input: './_js/script.js',
+            input: './_js/script.ts',
             output: {
                 entryFileNames: 'bundle.js',
                 format: 'iife'
