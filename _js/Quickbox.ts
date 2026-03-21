@@ -10,9 +10,9 @@ import Swal from 'sweetalert2';
 import Chart from 'chart.js/auto';
 
 export default class Quickbox {
-    lastScrollPos = 0;
-    moneyChart = null;
-    chartData = null;
+    static lastScrollPos: any = 0;
+    static moneyChart: any = null;
+    static chartData: any = null;
 
     static initQuickbox() {
         Quickbox.buildHtml();
@@ -254,8 +254,9 @@ export default class Quickbox {
     }
 
     static updateMailCount() {
-        document.querySelector('.quickbox__navitem[href="#mails"] .quickbox__navitem-count').innerText =
-            Store.data.mails.length;
+        (
+            document.querySelector('.quickbox__navitem[href="#mails"] .quickbox__navitem-count') as HTMLElement
+        ).innerText = Store.data.mails.length;
     }
 
     static renderMails() {
@@ -335,7 +336,7 @@ export default class Quickbox {
                 );
                 let iframe = document.querySelector(
                     '.quickbox__mail[data-id="' + mails__value.id + '"] .quickbox__mail-content'
-                );
+                ) as HTMLIFrameElement;
                 iframe.onload = () => {
                     let style = document.createElement('style');
                     style.textContent = `
@@ -390,11 +391,11 @@ export default class Quickbox {
 
     static bindMails() {
         document.addEventListener('click', e => {
-            let el = e.target.closest('.quickbox__mail-toggle');
+            let el = (e.target as Element).closest('.quickbox__mail-toggle');
             if (el) {
                 e.preventDefault();
                 if (el.closest('.quickbox__mail').classList.contains('quickbox__mail--expanded')) {
-                    el.closest('.quickbox__mails').style.overflowY = 'auto';
+                    (el.closest('.quickbox__mails') as HTMLElement).style.overflowY = 'auto';
                     el.closest('.quickbox__mail').classList.remove('quickbox__mail--expanded');
                     el.closest('.quickbox__mails').scrollTop = this.lastScrollPos;
                 } else {
@@ -403,14 +404,14 @@ export default class Quickbox {
                     }
                     this.lastScrollPos = el.closest('.quickbox__mails').scrollTop;
                     el.closest('.quickbox__mails').scrollTop = 0;
-                    el.closest('.quickbox__mails').style.overflowY = 'hidden';
+                    (el.closest('.quickbox__mails') as HTMLElement).style.overflowY = 'hidden';
                     el.closest('.quickbox__mail').classList.add('quickbox__mail--expanded');
                 }
             }
         });
 
         document.addEventListener('click', e => {
-            let el = e.target.closest('.quickbox__mail-submit');
+            let el = (e.target as Element).closest('.quickbox__mail-submit');
             if (el) {
                 e.preventDefault();
                 let form = el.closest('.quickbox__mail-form'),
@@ -421,11 +422,11 @@ export default class Quickbox {
                 form.closest('.quickbox__mail').classList.add(
                     'quickbox__mail--move-' + (action === 'discard' ? 'left' : 'right')
                 );
-                document.querySelector('.quickbox__mails').style.overflowY = 'auto';
+                (document.querySelector('.quickbox__mails') as HTMLElement).style.overflowY = 'auto';
                 document.querySelector('.quickbox__mails').scrollTop = this.lastScrollPos;
 
                 if (action === 'create' && form.querySelector('[name="action_ticket_time"]:checked') !== null) {
-                    let date = form.querySelector('[name="action_ticket_time"]:checked').value;
+                    let date = (form.querySelector('[name="action_ticket_time"]:checked') as HTMLInputElement).value;
                     Tickets.createAndAppendTicket(
                         {
                             date: date,
@@ -447,7 +448,7 @@ export default class Quickbox {
                 Store.data.api
                     .fetch('_api/mails', {
                         method: 'PUT',
-                        body: new URLSearchParams(new FormData(form)),
+                        body: new URLSearchParams(new FormData(form as HTMLFormElement) as any),
                         cache: 'no-cache',
                         headers: { 'content-type': 'application/json' }
                     })
@@ -497,7 +498,7 @@ export default class Quickbox {
 
     static allowUnselectRadio() {
         document.addEventListener('click', e => {
-            let el = e.target.closest('input[type="radio"][uncheckable]');
+            let el = (e.target as Element).closest<HTMLInputElement>('input[type="radio"][uncheckable]');
             if (el) {
                 if (el.hasAttribute('data-checked')) {
                     el.removeAttribute('data-checked');
@@ -520,7 +521,7 @@ export default class Quickbox {
             this.bindNavToggle(!hlp.isMobile() ? 'mails' : 'week');
         }
         document.addEventListener('click', e => {
-            let el = e.target.closest('.quickbox__navitem');
+            let el = (e.target as Element).closest('.quickbox__navitem');
             if (el) {
                 e.preventDefault();
                 if (!el.classList.contains('quickbox__navitem--active')) {
@@ -537,7 +538,7 @@ export default class Quickbox {
         document.querySelector('.quickbox__content').classList.add('quickbox__content--disabled');
         /* in chrome we want ctrl+f to not find hidden elements (so we must apply display:none) */
         /* the following lines ensure to do exactly that */
-        document.querySelectorAll('.quickbox__content > *').forEach(el2 => {
+        document.querySelectorAll<HTMLElement>('.quickbox__content > *').forEach(el2 => {
             el2.style.display = 'block';
         });
         /* reinitialize chart to init animation */
@@ -547,15 +548,17 @@ export default class Quickbox {
         if (view === 'new') {
             setTimeout(() => {
                 if (document.querySelector('.quickbox__new-input--focus') !== null) {
-                    document.querySelector('.quickbox__new-input--focus').focus();
+                    (document.querySelector('.quickbox__new-input--focus') as HTMLElement).focus();
                 }
             }, 250);
         }
         requestAnimationFrame(() => {
             setTimeout(() => {
-                document.querySelectorAll('.quickbox__content > *:not(.quickbox__' + view + ')').forEach(el2 => {
-                    el2.style.display = 'none';
-                });
+                document
+                    .querySelectorAll<HTMLElement>('.quickbox__content > *:not(.quickbox__' + view + ')')
+                    .forEach(el2 => {
+                        el2.style.display = 'none';
+                    });
                 document.querySelector('.quickbox__content').classList.remove('quickbox__content--disabled');
             }, 250);
 
@@ -585,7 +588,10 @@ export default class Quickbox {
         if (this.moneyChart) {
             this.moneyChart.destroy();
         }
-        this.moneyChart = new Chart(document.querySelector('.quickbox__money-chart-canvas'), this.chartData);
+        this.moneyChart = new Chart(
+            document.querySelector('.quickbox__money-chart-canvas') as HTMLCanvasElement,
+            this.chartData
+        );
     }
 
     static initToday() {
@@ -665,7 +671,7 @@ export default class Quickbox {
                 return;
             }
             let parsed_values;
-            if (document.querySelector('.metabar__select--filter[name="date"]').value !== '') {
+            if ((document.querySelector('.metabar__select--filter[name="date"]') as HTMLInputElement).value !== '') {
                 parsed_values = Dates.parseDateString(tickets__value.date, 'tickets');
             } else {
                 parsed_values = [
@@ -819,35 +825,37 @@ export default class Quickbox {
                 count++;
             }
         });
-        document.querySelector('.quickbox__navitem[href="#today"] .quickbox__navitem-count').innerText = count;
+        (
+            document.querySelector('.quickbox__navitem[href="#today"] .quickbox__navitem-count') as HTMLElement
+        ).innerText = String(count);
     }
 
     static bindToday() {
         document.addEventListener('click', async e => {
-            let el = e.target.closest('.quickbox__today-nav');
+            const target = e.target as Element;
+            let el = target.closest('.quickbox__today-nav');
             if (el) {
                 e.preventDefault();
 
                 if (
-                    e.target.closest('.quickbox__today-navitem--prev-day') ||
-                    e.target.closest('.quickbox__today-navitem--cur-day') ||
-                    e.target.closest('.quickbox__today-navitem--next-day')
+                    target.closest('.quickbox__today-navitem--prev-day') ||
+                    target.closest('.quickbox__today-navitem--cur-day') ||
+                    target.closest('.quickbox__today-navitem--next-day')
                 ) {
-                    if (e.target.closest('.quickbox__today-navitem--prev-day')) {
+                    if (target.closest('.quickbox__today-navitem--prev-day')) {
                         Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() - 1);
-                    } else if (e.target.closest('.quickbox__today-navitem--cur-day')) {
+                    } else if (target.closest('.quickbox__today-navitem--cur-day')) {
                         Store.data.session.activeDay = new Date();
-                    } else if (e.target.closest('.quickbox__today-navitem--next-day')) {
+                    } else if (target.closest('.quickbox__today-navitem--next-day')) {
                         Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() + 1);
                     }
-                    document.querySelector('.metabar__select--filter[name="date"]').value = Dates.dateFormat(
-                        Store.data.session.activeDay,
-                        'Y-m-d'
-                    );
-                    document.querySelector('.metabar__select--sort[name="sort_1"]').value = '';
-                } else if (e.target.closest('.quickbox__today-navitem--empty')) {
-                    document.querySelector('.metabar__select--filter[name="date"]').value = '';
-                    document.querySelector('.metabar__select--sort[name="sort_1"]').value = 'priority';
+                    (document.querySelector('.metabar__select--filter[name="date"]') as HTMLInputElement).value =
+                        Dates.dateFormat(Store.data.session.activeDay, 'Y-m-d');
+                    (document.querySelector('.metabar__select--sort[name="sort_1"]') as HTMLInputElement).value = '';
+                } else if (target.closest('.quickbox__today-navitem--empty')) {
+                    (document.querySelector('.metabar__select--filter[name="date"]') as HTMLInputElement).value = '';
+                    (document.querySelector('.metabar__select--sort[name="sort_1"]') as HTMLInputElement).value =
+                        'priority';
                 }
 
                 await Filter.doFilter();
@@ -857,11 +865,11 @@ export default class Quickbox {
         });
 
         document.addEventListener('submit', e => {
-            let $form = e.target.closest('.quickbox__today-edit-form');
+            let $form = (e.target as Element).closest('.quickbox__today-edit-form');
             if ($form) {
                 e.preventDefault();
 
-                $form.querySelector('.quickbox__today-edit-submit').disabled = true;
+                ($form.querySelector('.quickbox__today-edit-submit') as HTMLInputElement).disabled = true;
 
                 if ($form.querySelector('*:invalid') !== null) {
                     Swal.fire({
@@ -879,7 +887,9 @@ export default class Quickbox {
                 let data = {};
                 Store.data.cols.forEach(cols__value => {
                     if ($form.querySelector('[name="' + cols__value + '"]') !== null) {
-                        data[cols__value] = $form.querySelector('[name="' + cols__value + '"]').value;
+                        data[cols__value] = (
+                            $form.querySelector('[name="' + cols__value + '"]') as HTMLInputElement
+                        ).value;
                     }
                 });
                 data['updated_at'] = Dates.time().toString();
@@ -919,7 +929,7 @@ export default class Quickbox {
         });
 
         document.addEventListener('click', e => {
-            let $el = e.target.closest('.quickbox__today-delete');
+            let $el = (e.target as Element).closest('.quickbox__today-delete');
             if ($el) {
                 e.preventDefault();
                 let result = confirm('Sind Sie sicher?');
@@ -962,7 +972,7 @@ export default class Quickbox {
         });
 
         document.addEventListener('click', e => {
-            let $el = e.target.closest('.quickbox__today-edit');
+            let $el = (e.target as Element).closest('.quickbox__today-edit');
             if ($el) {
                 e.preventDefault();
                 let $container = $el
@@ -1027,31 +1037,47 @@ export default class Quickbox {
     static bindNew() {
         document.querySelector('.quickbox__new-form [name="date"][type="text"]').addEventListener('keyup', e => {
             if (
-                e.target.value != '' &&
+                (e.target as HTMLInputElement).value != '' &&
                 document.querySelector('.quickbox__new-form [name="date"][type="radio"]:checked') !== null
             ) {
-                document.querySelector('.quickbox__new-form [name="date"][type="radio"]:checked').checked = false;
+                (
+                    document.querySelector(
+                        '.quickbox__new-form [name="date"][type="radio"]:checked'
+                    ) as HTMLInputElement
+                ).checked = false;
             }
         });
         document.querySelectorAll('.quickbox__new-form [name="date"][type="radio"]').forEach(el => {
             el.addEventListener('change', e => {
-                if (e.target.checked === true) {
-                    document.querySelector('.quickbox__new-form [name="date"][type="text"]').value = '';
+                if ((e.target as HTMLInputElement).checked === true) {
+                    (
+                        document.querySelector('.quickbox__new-form [name="date"][type="text"]') as HTMLInputElement
+                    ).value = '';
                 }
             });
         });
         document.querySelector('.quickbox__new-form').addEventListener('submit', e => {
             e.preventDefault();
-            document.querySelector('.quickbox__new-submit').disabled = true;
+            (document.querySelector('.quickbox__new-submit') as HTMLInputElement).disabled = true;
             Tickets.createAndAppendTicket(
                 {
                     date:
                         document.querySelector('.quickbox__new-form [type="radio"][name="date"]:checked') !== null
-                            ? document.querySelector('.quickbox__new-form [type="radio"][name="date"]:checked').value
-                            : document.querySelector('.quickbox__new-form [type="text"][name="date"]').value,
-                    description: document.querySelector('.quickbox__new-form [name="description"]').value,
+                            ? (
+                                  document.querySelector(
+                                      '.quickbox__new-form [type="radio"][name="date"]:checked'
+                                  ) as HTMLInputElement
+                              ).value
+                            : (
+                                  document.querySelector(
+                                      '.quickbox__new-form [type="text"][name="date"]'
+                                  ) as HTMLInputElement
+                              ).value,
+                    description: (
+                        document.querySelector('.quickbox__new-form [name="description"]') as HTMLInputElement
+                    ).value,
                     priority: 'A',
-                    project: document.querySelector('.quickbox__new-form [name="project"]').value,
+                    project: (document.querySelector('.quickbox__new-form [name="project"]') as HTMLInputElement).value,
                     status: 'scheduled',
                     time: '0,50',
                     visible: true
@@ -1068,8 +1094,8 @@ export default class Quickbox {
                     return error;
                 })
                 .then(response => {
-                    document.querySelector('.quickbox__new-submit').disabled = false;
-                    if (response.success === true) {
+                    (document.querySelector('.quickbox__new-submit') as HTMLInputElement).disabled = false;
+                    if ((response as any).success === true) {
                         Swal.fire({
                             text: 'successfully created new ticket',
                             icon: 'success',
@@ -1077,8 +1103,8 @@ export default class Quickbox {
                             timerProgressBar: true,
                             showConfirmButton: false
                         });
-                        document.querySelector('.quickbox__new-form').reset();
-                        document.querySelector('.quickbox__navitem[href="#today"]').click();
+                        (document.querySelector('.quickbox__new-form') as HTMLFormElement).reset();
+                        (document.querySelector('.quickbox__navitem[href="#today"]') as HTMLElement).click();
                     } else {
                         Swal.fire({
                             text: 'error creating new ticket',
@@ -1132,7 +1158,7 @@ export default class Quickbox {
         }
 
         // fallback: calculate next monday
-        let proposedDate = new Date();
+        let proposedDate: any = new Date();
         proposedDate.setDate(proposedDate.getDate() + ((1 + 7 - proposedDate.getDay()) % 7));
         proposedDate = Dates.dateFormat(proposedDate, 'd.m.y');
         proposedDate += ' 09:00-10:00';

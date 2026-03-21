@@ -57,10 +57,10 @@ export default class Dates {
         }
 
         let ret = [],
-            error = false,
+            error = false as boolean,
             d;
 
-        string.split('\n').forEach((string__value) => {
+        string.split('\n').forEach(string__value => {
             // 01.01.18
             // 01.01.18 09:00-10:00
             if (
@@ -121,7 +121,7 @@ export default class Dates {
                         begin: begin,
                         end: end,
                         time: end - begin,
-                        minutes_left: Dates.dateDiffInMinutes(d, new Date()),
+                        minutes_left: Dates.dateDiffInMinutes(d, new Date())
                     });
                 }
             }
@@ -255,7 +255,7 @@ export default class Dates {
                             begin: begin,
                             end: end,
                             time: end - begin,
-                            minutes_left: Dates.dateDiffInMinutes(d, new Date()),
+                            minutes_left: Dates.dateDiffInMinutes(d, new Date())
                         });
                     }
                 }
@@ -339,7 +339,7 @@ export default class Dates {
                         begin: begin,
                         end: end,
                         time: end - begin,
-                        minutes_left: Dates.dateDiffInMinutes(d, new Date()),
+                        minutes_left: Dates.dateDiffInMinutes(d, new Date())
                     });
                 }
             } else {
@@ -415,7 +415,7 @@ export default class Dates {
                     'September',
                     'Oktober',
                     'November',
-                    'Dezember',
+                    'Dezember'
                 ][d.getMonth()] +
                 ' ' +
                 d.getFullYear()
@@ -611,7 +611,7 @@ export default class Dates {
         let weekNumber1 = Dates.weekNumber(d1),
             weekNumber2 = Dates.weekNumber(d2),
             year1 = d1.getFullYear(),
-            year2 = d1.getFullYear();
+            year2 = d2.getFullYear();
         if (year1 > year2) {
             weekNumber1 += 52;
         }
@@ -631,11 +631,11 @@ export default class Dates {
         let dayNum = d.getUTCDay() || 7;
         d.setUTCDate(d.getUTCDate() + 4 - dayNum);
         let yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-        return Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
+        return Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
     }
 
     static isDate(string) {
-        return new Date(string) !== 'Invalid Date' && !isNaN(new Date(string));
+        return !isNaN(new Date(string).getTime());
     }
 
     static getDayFromString(string) {
@@ -643,12 +643,12 @@ export default class Dates {
     }
 
     static getStringFromDay(day) {
-        return { 1: MO, 2: DI, 3: MI, 4: DO, 5: FR, 6: SA, 7: SO }[day];
+        return { 1: 'MO', 2: 'DI', 3: 'MI', 4: 'DO', 5: 'FR', 6: 'SA', 7: 'SO' }[day];
     }
 
     static dateIsExcluded(d, str) {
         let ret = false;
-        str.split(' ').forEach((value) => {
+        str.split(' ').forEach(value => {
             let excludedDate = new Date(Dates.germanToEnglishString(value.substring(1)));
             if (value.indexOf('-') === 0) {
                 if (Dates.sameDay(excludedDate, d)) {
@@ -698,7 +698,7 @@ export default class Dates {
             let match = date__value.match(new RegExp('>[0-9][0-9].[0-9][0-9].[1-3][0-9]', 'g')),
                 isObsolete = false;
             if (match !== null) {
-                match.forEach((match__value) => {
+                match.forEach(match__value => {
                     let curBound = new Date(Dates.germanToEnglishString(match__value.substring(1)));
                     if (Dates.compareDates(lowerBound, curBound) === 1) {
                         date__value = date__value.split(match__value).join('');
@@ -724,4 +724,4 @@ export default class Dates {
 }
 
 /* debug */
-window.Dates = Dates;
+(window as any).Dates = Dates;

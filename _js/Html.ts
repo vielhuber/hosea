@@ -1,4 +1,5 @@
 import Store from './Store';
+import Dates from './Dates';
 
 export default class Html {
     static buildHtml() {
@@ -28,7 +29,7 @@ export default class Html {
 
         // performance: remove animation after some time
         setTimeout(() => {
-            document.querySelector('.animation').style.opacity = '0';
+            (document.querySelector('.animation') as HTMLElement).style.opacity = '0';
             setTimeout(() => {
                 document.querySelector('.animation').remove();
             }, 5000);
@@ -65,7 +66,7 @@ export default class Html {
             </div>
         `
         );
-        Store.data.cols.forEach((cols__value) => {
+        Store.data.cols.forEach(cols__value => {
             document
                 .querySelector('.tickets__table-head tr')
                 .insertAdjacentHTML('beforeend', '<td class="tickets__table-cell">' + cols__value + '</td>');
@@ -170,7 +171,7 @@ DD%N: weekday in calendar week %N=0 (if >X specified, N -= calendar week of X)
             ticket.id +
             '">';
 
-        Store.data.cols.forEach((cols__value) => {
+        Store.data.cols.forEach(cols__value => {
             html += '<td class="tickets__table-cell">';
             html +=
                 '<textarea class="tickets__textarea tickets__textarea--' +
@@ -221,20 +222,28 @@ DD%N: weekday in calendar week %N=0 (if >X specified, N -= calendar week of X)
     }
 
     static setViewClass() {
-        if (Store.data.weeksInViewport > 1) {
-            document.querySelector('#app').classList.add('view-mode--wide');
+        if (Store.data.weeksInViewport >= 8) {
+            document.querySelector('#app').classList.add('view-mode--small');
+            document.querySelector('#app').classList.remove('view-mode--medium');
+            document.querySelector('#app').classList.remove('view-mode--large');
+        } else if (Store.data.weeksInViewport >= 4) {
+            document.querySelector('#app').classList.remove('view-mode--small');
+            document.querySelector('#app').classList.add('view-mode--medium');
+            document.querySelector('#app').classList.remove('view-mode--large');
         } else {
-            document.querySelector('#app').classList.remove('view-mode--wide');
+            document.querySelector('#app').classList.remove('view-mode--small');
+            document.querySelector('#app').classList.remove('view-mode--medium');
+            document.querySelector('#app').classList.add('view-mode--large');
         }
-        document.querySelector('#app').setAttribute('data-shifting-view', Number(Store.data.shiftingView));
+        document.querySelector('#app').setAttribute('data-shifting-view', String(Number(Store.data.shiftingView)));
         document.querySelector('#app').setAttribute('data-shifting-prev-days', Store.data.shiftingViewPrevDays);
         document.querySelector('#app').setAttribute('data-weeks-in-viewport', Store.data.weeksInViewport);
     }
 
     static bindValidation() {
-        document.addEventListener('input', (e) => {
-            if (e.target.closest('.validate-field')) {
-                Html.validateField(e.target);
+        document.addEventListener('input', e => {
+            if ((e.target as Element).closest('.validate-field')) {
+                Html.validateField(e.target as HTMLInputElement);
             }
         });
     }
@@ -297,7 +306,7 @@ DD%N: weekday in calendar week %N=0 (if >X specified, N -= calendar week of X)
                         'done',
                         'billed',
                         'recurring',
-                        'working',
+                        'working'
                     ].includes($target.value)
                 ) {
                     $target.setCustomValidity('wrong format');
@@ -311,11 +320,12 @@ DD%N: weekday in calendar week %N=0 (if >X specified, N -= calendar week of X)
     }
 
     static bindAutoCaps() {
-        document.addEventListener('input', (e) => {
-            if (e.target.closest('.autocaps')) {
-                let p = e.target.selectionStart;
-                e.target.value = e.target.value.toUpperCase();
-                e.target.setSelectionRange(p, p);
+        document.addEventListener('input', e => {
+            const target = e.target as HTMLInputElement;
+            if (target.closest('.autocaps')) {
+                let p = target.selectionStart;
+                target.value = target.value.toUpperCase();
+                target.setSelectionRange(p, p);
             }
         });
     }

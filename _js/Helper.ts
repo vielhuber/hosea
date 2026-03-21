@@ -6,7 +6,7 @@ export default class Helper {
     static prevAll(el, selector = null) {
         let prev = true;
         return [].filter
-            .call(el.parentNode.children, (htmlElement) => {
+            .call(el.parentNode.children, htmlElement => {
                 if (htmlElement === el) {
                     prev = false;
                     return false;
@@ -21,7 +21,7 @@ export default class Helper {
 
     static nextAll(el, selector = null) {
         let next = false;
-        return [].filter.call(el.parentNode.children, (htmlElement) => {
+        return [].filter.call(el.parentNode.children, htmlElement => {
             if (htmlElement === el) {
                 next = true;
                 return false;
@@ -38,19 +38,19 @@ export default class Helper {
     }
 
     static isInteger(value) {
-        return !isNaN(value) && parseInt(Number(value)) == value && !isNaN(parseInt(value, 10));
+        return !isNaN(value) && parseInt(Number(value).toString()) == value && !isNaN(parseInt(value, 10));
     }
 
     static fileToBase64(file) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result.split(',')[1]);
-            reader.onerror = (error) => reject(error);
+            reader.onload = () => resolve((reader.result as string).split(',')[1]);
+            reader.onerror = error => reject(error);
         });
     }
 
-    static debounce(func, wait, immediate) {
+    static debounce(func, wait, immediate = false) {
         var timeout;
         return function () {
             var context = this,

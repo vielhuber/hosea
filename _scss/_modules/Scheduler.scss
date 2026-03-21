@@ -2,7 +2,6 @@
 @use "../_config/vars";
 
 .scheduler {
-    width: calc((100% - #{vars.$container-width-big}) - #{vars.$space-big});
     bottom: calc(
         #{vars.$footer-height} + #{vars.$space-big} + ((100% - (2 * #{vars.$space-big}) - #{vars.$footer-height}) / 3) +
             (0.5 * #{vars.$space-big})
@@ -15,8 +14,16 @@
     overflow: hidden;
     @include common.border;
     @include common.shadow;
-    .view-mode--wide & {
+
+    width: calc((100% - #{vars.$container-width-medium}) - #{vars.$space-big});
+    .view-mode--small & {
         width: calc((100% - #{vars.$container-width-small}) - #{vars.$space-big});
+    }
+    .view-mode--medium & {
+        width: calc((100% - #{vars.$container-width-medium}) - #{vars.$space-big});
+    }
+    .view-mode--large & {
+        width: calc((100% - #{vars.$container-width-large}) - #{vars.$space-big});
     }
 }
 
@@ -212,7 +219,9 @@
         transition: opacity 0.25s ease-in-out;
         opacity: 0;
         pointer-events: none;
-        .view-mode--wide & {
+        .view-mode--small &,
+        .view-mode--medium &,
+        .view-mode--large & {
             width: 100%;
         }
     }

@@ -16,19 +16,19 @@ export default class Filter {
     }
 
     static async initUpdateFilter(update) {
-        let selected = {};
+        let selected: any = {};
         if (update === true) {
             document
                 .querySelector('.metabar__filter')
-                .querySelectorAll('.metabar__select--filter')
-                .forEach((el) => {
+                .querySelectorAll<HTMLInputElement>('.metabar__select--filter')
+                .forEach(el => {
                     selected[el.getAttribute('name')] = el.value;
                 });
             document.querySelector('.metabar__filter').remove();
         }
 
         document.querySelector('.metabar').insertAdjacentHTML('beforeend', '<div class="metabar__filter"></div>');
-        ['status', 'priority', 'date', 'project'].forEach((columns__value) => {
+        ['status', 'priority', 'date', 'project'].forEach(columns__value => {
             document.querySelector('.metabar__filter').insertAdjacentHTML(
                 'beforeend',
                 `
@@ -41,12 +41,12 @@ export default class Filter {
                 document
                     .querySelector('.metabar__select--filter[name="date"]')
                     .insertAdjacentHTML('beforeend', '<option value=""></option>');
-                let firstDay = new Date(parseInt(new Date().getFullYear()) - 1 + '-01-01 00:00:00'),
+                let firstDay = new Date(new Date().getFullYear() - 1 + '-01-01 00:00:00'),
                     curDay = new Date();
                 curDay.setHours(0);
                 curDay.setMinutes(0);
                 curDay.setSeconds(0);
-                let lastDay = new Date(parseInt(new Date().getFullYear()) + 2 + '-12-31 00:00:00');
+                let lastDay = new Date(new Date().getFullYear() + 2 + '-12-31 00:00:00');
                 while (firstDay <= lastDay) {
                     document
                         .querySelector('.metabar__select--filter[name="date"]')
@@ -71,7 +71,7 @@ export default class Filter {
                     skip_old_dates.push('.' + skip_year);
                 }
 
-                Store.data.tickets.forEach((tickets__value) => {
+                Store.data.tickets.forEach(tickets__value => {
                     // skip old projects (disabled)
                     /*
                     if (columns__value === 'project') {
@@ -93,26 +93,24 @@ export default class Filter {
                 });
                 // combined filter
                 if (columns__value === 'status') {
-                    if (
-                        options.filter((options__value) => !['done', 'recurring'].includes(options__value)).length > 0
-                    ) {
+                    if (options.filter(options__value => !['done', 'recurring'].includes(options__value)).length > 0) {
                         options.push('!done&!recurring');
                     }
                     if (
-                        options.filter((options__value) => ['done', 'scheduled', 'working'].includes(options__value))
+                        options.filter(options__value => ['done', 'scheduled', 'working'].includes(options__value))
                             .length > 0
                     ) {
                         options.push('done|scheduled|working');
                     }
                     if (
-                        options.filter((options__value) => ['scheduled', 'working'].includes(options__value)).length > 0
+                        options.filter(options__value => ['scheduled', 'working'].includes(options__value)).length > 0
                     ) {
                         options.push('scheduled|working');
                     }
-                    if (options.filter((options__value) => ['idle', 'working'].includes(options__value)).length > 0) {
+                    if (options.filter(options__value => ['idle', 'working'].includes(options__value)).length > 0) {
                         options.push('idle|working');
                     }
-                    if (options.filter((options__value) => ['fixed', 'working'].includes(options__value)).length > 0) {
+                    if (options.filter(options__value => ['fixed', 'working'].includes(options__value)).length > 0) {
                         options.push('fixed|working');
                     }
                 }
@@ -138,7 +136,7 @@ export default class Filter {
 
                     return a.localeCompare(b);
                 });
-                options.forEach((options__value) => {
+                options.forEach(options__value => {
                     document
                         .querySelector('.metabar__select--filter[name="' + columns__value + '"]')
                         .insertAdjacentHTML(
@@ -158,13 +156,16 @@ export default class Filter {
 
         if (update === true) {
             Object.entries(selected).forEach(([selected__key, selected__value]) => {
-                document.querySelector('.metabar__filter [name="' + selected__key + '"]').value = selected__value;
+                (document.querySelector('.metabar__filter [name="' + selected__key + '"]') as HTMLInputElement).value =
+                    selected__value as string;
             });
         } else {
             await Filter.doFilter();
-            document.querySelector('.metabar').addEventListener('change', async (e) => {
-                if (e.target.closest('.metabar__select--filter')) {
-                    let date = e.target.closest('.metabar__select--filter[name="date"]');
+            document.querySelector('.metabar').addEventListener('change', async e => {
+                if ((e.target as Element).closest('.metabar__select--filter')) {
+                    let date = (e.target as Element).closest(
+                        '.metabar__select--filter[name="date"]'
+                    ) as HTMLInputElement;
                     if (date && date.value !== '*' && date.value !== '') {
                         Store.data.session.activeDay = new Date(date.value);
                     }
@@ -176,19 +177,19 @@ export default class Filter {
     }
 
     static async doFilter() {
-        document.querySelector('.tickets__table-body').style.display = 'none';
+        (document.querySelector('.tickets__table-body') as HTMLElement).style.display = 'none';
 
         let tickets = Store.data.tickets;
         let batchSize = 50;
         for (let i = 0; i < tickets.length; i += batchSize) {
-            tickets.slice(i, i + batchSize).forEach((tickets__value) => {
-                let visible = true,
-                    hide_in_scheduler = false;
+            tickets.slice(i, i + batchSize).forEach(tickets__value => {
+                let visible: boolean = true,
+                    hide_in_scheduler: boolean = false;
 
                 document
                     .querySelector('.metabar__filter')
                     .querySelectorAll('select')
-                    .forEach((el) => {
+                    .forEach(el => {
                         let val_search = el.value,
                             val_target = tickets__value[el.getAttribute('name')],
                             visible_this = false;
@@ -220,7 +221,7 @@ export default class Filter {
                             }
                         } else if (val_search.indexOf('&') > -1) {
                             visible_this = true;
-                            val_search.split('&').forEach((val_search__val) => {
+                            val_search.split('&').forEach(val_search__val => {
                                 if (val_search__val.indexOf('!') === 0) {
                                     if (val_search__val.split('!').join('') === val_target) {
                                         visible_this = false;
@@ -238,7 +239,8 @@ export default class Filter {
                             el.getAttribute('name') == 'status' &&
                             val_search === '*' &&
                             val_target === 'billed' &&
-                            document.querySelector('.metabar__select--filter[name="date"]').value === '*'
+                            (document.querySelector('.metabar__select--filter[name="date"]') as HTMLInputElement)
+                                .value === '*'
                         ) {
                             visible_this = false;
                         }
@@ -252,7 +254,9 @@ export default class Filter {
                         }
                     });
 
-                let search_query = document.querySelector('.metabar__filter').querySelector('input[type="text"').value;
+                let search_query = (
+                    document.querySelector('.metabar__filter').querySelector('input[type="text"') as HTMLInputElement
+                ).value;
                 if (search_query !== '') {
                     visible = true;
                     // split up search query. for example:
@@ -268,9 +272,9 @@ export default class Filter {
                             search_terms.push(search_match[0]);
                         }
                     }
-                    search_terms.forEach((search_terms__value) => {
+                    search_terms.forEach(search_terms__value => {
                         let visible_this = false;
-                        ['date', 'project', 'description'].forEach((fields__value) => {
+                        ['date', 'project', 'description'].forEach(fields__value => {
                             if (
                                 tickets__value[fields__value].toLowerCase().includes(search_terms__value.toLowerCase())
                             ) {
@@ -283,11 +287,11 @@ export default class Filter {
                     });
                 }
 
-                if (visible === false && tickets__value.visible === true) {
+                if (!visible && tickets__value.visible === true) {
                     tickets__value.visible = false;
                     let $el = document.querySelector('.tickets .tickets__entry[data-id="' + tickets__value.id + '"]');
                     $el.classList.remove('tickets__entry--visible');
-                } else if (visible === true && tickets__value.visible === false) {
+                } else if (visible && tickets__value.visible === false) {
                     tickets__value.visible = true;
                     let $el = document.querySelector('.tickets .tickets__entry[data-id="' + tickets__value.id + '"]');
                     $el.classList.add('tickets__entry--visible');
@@ -295,14 +299,14 @@ export default class Filter {
 
                 if (hide_in_scheduler === false && tickets__value.hide_in_scheduler === true) {
                     tickets__value.hide_in_scheduler = false;
-                } else if (hide_in_scheduler === true && tickets__value.hide_in_scheduler === false) {
+                } else if ((hide_in_scheduler as boolean) && tickets__value.hide_in_scheduler === false) {
                     tickets__value.hide_in_scheduler = true;
                 }
             });
 
             // break between batches
             if (i + batchSize < tickets.length) {
-                await new Promise((resolve) => setTimeout(resolve, 0));
+                await new Promise(resolve => setTimeout(resolve, 0));
             }
         }
 
@@ -312,6 +316,6 @@ export default class Filter {
         Tickets.updateSum();
         Textarea.textareaSetVisibleHeights();
 
-        document.querySelector('.tickets__table-body').style.display = 'table-row-group';
+        (document.querySelector('.tickets__table-body') as HTMLElement).style.display = 'table-row-group';
     }
 }

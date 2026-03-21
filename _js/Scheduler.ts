@@ -27,7 +27,7 @@ export default class Scheduler {
             generatedDates = Scheduler.generateDates(),
             batchSize = 50;
         for (let i = 0; i < generatedDates.length; i += batchSize) {
-            generatedDates.slice(i, i + batchSize).forEach((date__value) => {
+            generatedDates.slice(i, i + batchSize).forEach(date__value => {
                 let date__value_name = date__value.name;
                 if (hlp.emojiRegex().test(date__value_name)) {
                     let date__value_name_emoji = hlp.emojiSplit(date__value_name);
@@ -56,7 +56,7 @@ export default class Scheduler {
             });
             // break between batches to keep ui responsive
             if (i + batchSize < generatedDates.length) {
-                await new Promise((resolve) => setTimeout(resolve, 0));
+                await new Promise(resolve => setTimeout(resolve, 0));
             }
         }
 
@@ -81,8 +81,8 @@ export default class Scheduler {
                                 ? Store.data.shiftingViewPrevDays + Store.data.weeksInViewport * 7
                                 : Store.data.weeksInViewport * 7
                         )
-                            .join(0)
-                            .split(0)
+                            .join('0')
+                            .split('0')
                             .map(
                                 (item, i) => `
                             <td data-date="${Dates.dateFormat(Dates.getDayOfActiveViewport(i + 1), 'Y-m-d')}" class="
@@ -117,8 +117,8 @@ export default class Scheduler {
                                 ? Store.data.shiftingViewPrevDays + Store.data.weeksInViewport * 7
                                 : Store.data.weeksInViewport * 7
                         )
-                            .join(0)
-                            .split(0)
+                            .join('0')
+                            .split('0')
                             .map(
                                 (item, i) => `
                                     <td class="
@@ -167,8 +167,8 @@ export default class Scheduler {
                                 ? Store.data.shiftingViewPrevDays + Store.data.weeksInViewport * 7
                                 : Store.data.weeksInViewport * 7
                         )
-                            .join(0)
-                            .split(0)
+                            .join('0')
+                            .split('0')
                             .map(
                                 (item, i) => `
                             <td class="
@@ -195,8 +195,8 @@ export default class Scheduler {
                             .join('')}
                     </tr>
                     ${Array(24 - Store.data.hourBegin)
-                        .join(0)
-                        .split(0)
+                        .join('0')
+                        .split('0')
                         .map((item, j) => {
                             j = j + Store.data.hourBegin;
                             return `
@@ -210,8 +210,8 @@ export default class Scheduler {
                                         ? Store.data.shiftingViewPrevDays + Store.data.weeksInViewport * 7
                                         : Store.data.weeksInViewport * 7
                                 )
-                                    .join(0)
-                                    .split(0)
+                                    .join('0')
+                                    .split('0')
                                     .map(
                                         (item, i) => `
                                     <td class="
@@ -273,11 +273,11 @@ export default class Scheduler {
             },
             allowHTML: true,
             interactive: false,
-            placement: 'auto',
+            placement: 'auto'
         });
 
-        let statsSumWeekly = 0;
-        generatedDates.forEach((date__value) => {
+        let statsSumWeekly: any = 0;
+        generatedDates.forEach(date__value => {
             if (date__value.status !== 'allday') {
                 if (date__value.begin !== null && date__value.end !== null) {
                     statsSumWeekly += date__value.end - date__value.begin;
@@ -307,60 +307,60 @@ export default class Scheduler {
     }
 
     static bindScheduler() {
-        document.querySelector('.scheduler').addEventListener('click', async (e) => {
+        document.querySelector('.scheduler').addEventListener('click', async e => {
+            const target = e.target as Element;
             if (
-                e.target.closest('.scheduler__navigation-button') ||
-                e.target.closest('.scheduler__navigation-daylink') ||
-                e.target.closest('.scheduler__navigation-week-link-to-empty')
+                target.closest('.scheduler__navigation-button') ||
+                target.closest('.scheduler__navigation-daylink') ||
+                target.closest('.scheduler__navigation-week-link-to-empty')
             ) {
                 e.preventDefault();
 
                 if (
-                    e.target.closest('.scheduler__navigation-button') ||
-                    e.target.closest('.scheduler__navigation-daylink')
+                    target.closest('.scheduler__navigation-button') ||
+                    target.closest('.scheduler__navigation-daylink')
                 ) {
-                    if (e.target.closest('.scheduler__navigation-button')) {
-                        if (e.target.closest('.scheduler__navigation-button--today')) {
+                    if (target.closest('.scheduler__navigation-button')) {
+                        if (target.closest('.scheduler__navigation-button--today')) {
                             Store.data.session.activeDay = new Date();
-                        } else if (e.target.closest('.scheduler__navigation-button--prev-day')) {
+                        } else if (target.closest('.scheduler__navigation-button--prev-day')) {
                             Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() - 1);
-                        } else if (e.target.closest('.scheduler__navigation-button--next-day')) {
+                        } else if (target.closest('.scheduler__navigation-button--next-day')) {
                             Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() + 1);
-                        } else if (e.target.closest('.scheduler__navigation-button--prev-week')) {
+                        } else if (target.closest('.scheduler__navigation-button--prev-week')) {
                             Store.data.session.activeDay.setDate(
                                 Store.data.session.activeDay.getDate() - Store.data.weeksInViewport * 7
                             );
-                        } else if (e.target.closest('.scheduler__navigation-button--next-week')) {
+                        } else if (target.closest('.scheduler__navigation-button--next-week')) {
                             Store.data.session.activeDay.setDate(
                                 Store.data.session.activeDay.getDate() + Store.data.weeksInViewport * 7
                             );
-                        } else if (e.target.closest('.scheduler__navigation-button--prev-month')) {
+                        } else if (target.closest('.scheduler__navigation-button--prev-month')) {
                             Store.data.session.activeDay.setDate(
                                 Store.data.session.activeDay.getDate() - Store.data.weeksInViewport * 7 * 4
                             );
-                        } else if (e.target.closest('.scheduler__navigation-button--next-month')) {
+                        } else if (target.closest('.scheduler__navigation-button--next-month')) {
                             Store.data.session.activeDay.setDate(
                                 Store.data.session.activeDay.getDate() + Store.data.weeksInViewport * 7 * 4
                             );
                         }
-                    } else if (e.target.closest('.scheduler__navigation-daylink')) {
+                    } else if (target.closest('.scheduler__navigation-daylink')) {
                         Store.data.session.activeDay = new Date(
-                            e.target.closest('.scheduler__navigation-daylink').getAttribute('data-date')
+                            target.closest('.scheduler__navigation-daylink').getAttribute('data-date')
                         );
                     }
-                    document.querySelector('.metabar__select--filter[name="date"]').value = Dates.dateFormat(
-                        Store.data.session.activeDay,
-                        'Y-m-d'
-                    );
-                    document.querySelector('.metabar__select--sort[name="sort_1"]').value = '';
-                    document.querySelector('.metabar__select--sort[name="sort_2"]').value = '';
-                    document.querySelector('.metabar__select--filter[name="search"]').value = '';
+                    (document.querySelector('.metabar__select--filter[name="date"]') as HTMLInputElement).value =
+                        Dates.dateFormat(Store.data.session.activeDay, 'Y-m-d');
+                    (document.querySelector('.metabar__select--sort[name="sort_1"]') as HTMLInputElement).value = '';
+                    (document.querySelector('.metabar__select--sort[name="sort_2"]') as HTMLInputElement).value = '';
+                    (document.querySelector('.metabar__select--filter[name="search"]') as HTMLInputElement).value = '';
                 }
-                if (e.target.closest('.scheduler__navigation-week-link-to-empty')) {
-                    document.querySelector('.metabar__select--filter[name="date"]').value = '';
-                    document.querySelector('.metabar__select--sort[name="sort_1"]').value = 'priority';
-                    document.querySelector('.metabar__select--sort[name="sort_2"]').value = '';
-                    document.querySelector('.metabar__select--filter[name="search"]').value = '';
+                if (target.closest('.scheduler__navigation-week-link-to-empty')) {
+                    (document.querySelector('.metabar__select--filter[name="date"]') as HTMLInputElement).value = '';
+                    (document.querySelector('.metabar__select--sort[name="sort_1"]') as HTMLInputElement).value =
+                        'priority';
+                    (document.querySelector('.metabar__select--sort[name="sort_2"]') as HTMLInputElement).value = '';
+                    (document.querySelector('.metabar__select--filter[name="search"]') as HTMLInputElement).value = '';
                 }
 
                 Filter.doFilter().then(() => {
@@ -373,7 +373,7 @@ export default class Scheduler {
 
     static generateDates() {
         let generatedDates = [];
-        Store.data.tickets.forEach((tickets__value) => {
+        Store.data.tickets.forEach(tickets__value => {
             let name = tickets__value.project,
                 title = hlp.htmlEncode(tickets__value.project + '\n' + (tickets__value.description || '')),
                 project = tickets__value.project,
@@ -397,7 +397,7 @@ export default class Scheduler {
                 animation = 'none';
             }
             if (parsed_values !== false && parsed_values.length > 0) {
-                parsed_values.forEach((parsed_values__value) => {
+                parsed_values.forEach(parsed_values__value => {
                     generatedDates.push({
                         day: parsed_values__value.day,
                         begin: parsed_values__value.begin,
@@ -409,7 +409,7 @@ export default class Scheduler {
                         time: parsed_values__value.time,
                         background: background,
                         animation: animation,
-                        opacity: opacity,
+                        opacity: opacity
                     });
                 });
             }
@@ -418,7 +418,7 @@ export default class Scheduler {
         /* visual compression of all day events */
         let generatedDatesUndefinedMax = [],
             generatedDatesUndefinedCur = [];
-        generatedDates.forEach((generatedDates__value) => {
+        generatedDates.forEach(generatedDates__value => {
             if (generatedDates__value.begin === null) {
                 if (!(generatedDates__value.day in generatedDatesUndefinedMax)) {
                     generatedDatesUndefinedMax[generatedDates__value.day] = 0;
@@ -503,7 +503,7 @@ export default class Scheduler {
         });
 
         /* finalize */
-        generatedDates.forEach((date__value) => {
+        generatedDates.forEach(date__value => {
             let posTop,
                 posBottom,
                 heightFrac = 100 / (24 + 1 - Store.data.hourBegin);
@@ -553,14 +553,14 @@ export default class Scheduler {
     static determineNextFreeSlot(str) {
         let d = Dates.parseDateString(str, 'scheduler')[0],
             dates = [];
-        Store.data.tickets.forEach((tickets__value) => {
+        Store.data.tickets.forEach(tickets__value => {
             let parsed_values = Dates.parseDateString(tickets__value.date, 'scheduler');
             if (parsed_values !== false && parsed_values.length > 0) {
-                parsed_values.forEach((parsed_values__value) => {
+                parsed_values.forEach(parsed_values__value => {
                     dates.push({
                         date: parsed_values__value.date,
                         begin: parsed_values__value.begin,
-                        end: parsed_values__value.end,
+                        end: parsed_values__value.end
                     });
                 });
             }
@@ -568,7 +568,7 @@ export default class Scheduler {
         let conflict = true;
         while (conflict === true) {
             conflict = false;
-            dates.forEach((dates__value) => {
+            dates.forEach(dates__value => {
                 if (dates__value.begin === null || dates__value.end === null || d.begin === null || d.end === null) {
                     return;
                 }
@@ -635,21 +635,21 @@ export default class Scheduler {
             // we have to calculate the dates in the context of this day
             let dates = [];
             Store.data.session.activeDay = d.date;
-            Store.data.tickets.forEach((tickets__value) => {
+            Store.data.tickets.forEach(tickets__value => {
                 let parsed_values = Dates.parseDateString(tickets__value.date, 'tickets');
                 if (parsed_values !== false && parsed_values.length > 0) {
-                    parsed_values.forEach((parsed_values__value) => {
+                    parsed_values.forEach(parsed_values__value => {
                         dates.push({
                             project: tickets__value.project,
                             description: tickets__value.description,
                             date: parsed_values__value.date,
                             begin: parsed_values__value.begin,
-                            end: parsed_values__value.end,
+                            end: parsed_values__value.end
                         });
                     });
                 }
             });
-            dates.forEach((dates__value) => {
+            dates.forEach(dates__value => {
                 if (conflict === true) {
                     return;
                 }
@@ -724,7 +724,7 @@ export default class Scheduler {
     }
 
     static updateColors() {
-        Store.data.tickets.forEach((tickets__value) => {
+        Store.data.tickets.forEach(tickets__value => {
             if (tickets__value.visible === true) {
                 let borderColor = Scheduler.getStoreProperty(
                         'border',
@@ -739,7 +739,9 @@ export default class Scheduler {
                         null
                     ),
                     opacity = Scheduler.getStoreProperty('opacity', tickets__value.status, tickets__value.project, 1),
-                    el = document.querySelector('.tickets .tickets__entry[data-id="' + tickets__value.id + '"]');
+                    el = document.querySelector(
+                        '.tickets .tickets__entry[data-id="' + tickets__value.id + '"]'
+                    ) as HTMLElement;
                 if (borderColor) {
                     el.style.borderLeftColor = borderColor;
                 } else {
@@ -753,7 +755,7 @@ export default class Scheduler {
                 if (opacity) {
                     el.style.opacity = opacity;
                 } else {
-                    el.style.opacity = 1;
+                    el.style.opacity = '1';
                 }
             }
         });
@@ -761,6 +763,14 @@ export default class Scheduler {
 
     static async changeView() {
         if (
+            Store.data.shiftingView === false &&
+            Store.data.shiftingViewPrevDays === 0 &&
+            Store.data.weeksInViewport === 8
+        ) {
+            Store.data.shiftingView = false;
+            Store.data.shiftingViewPrevDays = 0;
+            Store.data.weeksInViewport = 4;
+        } else if (
             Store.data.shiftingView === false &&
             Store.data.shiftingViewPrevDays === 0 &&
             Store.data.weeksInViewport === 4
@@ -791,7 +801,7 @@ export default class Scheduler {
         ) {
             Store.data.shiftingView = false;
             Store.data.shiftingViewPrevDays = 0;
-            Store.data.weeksInViewport = 4;
+            Store.data.weeksInViewport = 8;
         }
         Html.setViewClass();
 
@@ -809,10 +819,10 @@ export default class Scheduler {
     }
 
     static indicatorIntervalValue() {
-        let $el_indicator = document.querySelector('.scheduler__cell--indicator'),
-            $el_container = document.querySelector('.scheduler__cell--indicator-container'),
-            $el_appointments = document.querySelector('.scheduler__appointments'),
-            $el_row = document.querySelector('.scheduler__table-body .scheduler__row:first-child');
+        let $el_indicator = document.querySelector('.scheduler__cell--indicator') as HTMLElement,
+            $el_container = document.querySelector('.scheduler__cell--indicator-container') as HTMLElement,
+            $el_appointments = document.querySelector('.scheduler__appointments') as HTMLElement,
+            $el_row = document.querySelector('.scheduler__table-body .scheduler__row:first-child') as HTMLElement;
 
         if ($el_indicator !== null && $el_container !== null && $el_appointments !== null && $el_row !== null) {
             let now = new Date(),
@@ -840,7 +850,7 @@ export default class Scheduler {
     }
 
     static indicatorIntervalFn() {
-        let $el_indicator = document.querySelector('.scheduler__cell--indicator');
+        let $el_indicator = document.querySelector('.scheduler__cell--indicator') as HTMLElement;
         if ($el_indicator !== null) {
             $el_indicator.style.top = Scheduler.indicatorIntervalValue() + 'px';
             tippy($el_indicator, {
@@ -850,14 +860,14 @@ export default class Scheduler {
                     ':' +
                     ('0' + new Date().getMinutes()).slice(-2) +
                     '⏳',
-                interactive: false,
+                interactive: false
             });
         }
     }
 
     static generateLinkToEmptyDatesSum() {
         let linkToEmptyDatesSum = 0;
-        Store.data.tickets.forEach((tickets__value) => {
+        Store.data.tickets.forEach(tickets__value => {
             if (tickets__value.date === '') {
                 linkToEmptyDatesSum += 1;
             }

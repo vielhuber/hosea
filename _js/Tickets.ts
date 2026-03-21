@@ -13,19 +13,19 @@ import hlp from 'hlp';
 
 export default class Tickets {
     static updateLocalTicket(ticket_id) {
-        return new Promise((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
             Store.data.busy = true;
             Store.data.api
                 .fetch('_api/tickets/' + ticket_id, {
                     method: 'GET',
                     cache: 'no-cache',
-                    headers: { 'content-type': 'application/json' },
+                    headers: { 'content-type': 'application/json' }
                 })
-                .then((res) => res.json())
-                .catch((err) => {
+                .then(res => res.json())
+                .catch(err => {
                     reject(err);
                 })
-                .then((response) => {
+                .then(response => {
                     Store.data.busy = false;
                     Tickets.setTicketData(ticket_id, response.data);
                     resolve();
@@ -33,7 +33,7 @@ export default class Tickets {
         });
     }
     static setTicketData(ticket_id, property, value = null) {
-        Store.data.tickets.forEach((tickets__value) => {
+        Store.data.tickets.forEach(tickets__value => {
             if (tickets__value.id == ticket_id) {
                 if (Helper.isObject(property)) {
                     Object.entries(property).forEach(([property__key, property__value]) => {
@@ -47,16 +47,19 @@ export default class Tickets {
     }
     static fetchAndRenderTicketsInterval() {
         if (!hlp.isMobile() && Helper.isProduction()) {
-            setInterval(() => {
-                if (Store.data.busy === true) {
-                    return;
-                }
-                if (document.querySelector(':focus') !== null) {
-                    return;
-                }
-                Tickets.fetchAndRenderTicketsAndUpdateApp();
-                Footer.updateStatus('successfully synced tasks.', 'success');
-            }, 1 * 60 * 1000);
+            setInterval(
+                () => {
+                    if (Store.data.busy === true) {
+                        return;
+                    }
+                    if (document.querySelector(':focus') !== null) {
+                        return;
+                    }
+                    Tickets.fetchAndRenderTicketsAndUpdateApp();
+                    Footer.updateStatus('successfully synced tasks.', 'success');
+                },
+                1 * 60 * 1000
+            );
         }
     }
 
@@ -70,28 +73,28 @@ export default class Tickets {
     }
 
     static fetchAndRenderTickets() {
-        return new Promise((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
             Store.data.busy = true;
             Store.data.api
                 .fetch('_api/tickets', {
                     method: 'GET',
                     cache: 'no-cache',
-                    headers: { 'content-type': 'application/json' },
+                    headers: { 'content-type': 'application/json' }
                 })
-                .then((res) => res.json())
-                .catch((err) => {
+                .then(res => res.json())
+                .catch(err => {
                     reject(err);
                 })
-                .then((response) => {
+                .then(response => {
                     Store.data.busy = false;
                     if (Store.data.tickets === null) {
                         Store.data.tickets = [];
                     }
 
                     // remove
-                    Store.data.tickets = Store.data.tickets.filter((tickets__value) => {
+                    Store.data.tickets = Store.data.tickets.filter(tickets__value => {
                         let exists =
-                            response.data.filter((el) => {
+                            response.data.filter(el => {
                                 return el.id == tickets__value.id;
                             }).length > 0;
                         if (exists === false) {
@@ -101,7 +104,7 @@ export default class Tickets {
                     });
 
                     // edit
-                    response.data.forEach((tickets__value) => {
+                    response.data.forEach(tickets__value => {
                         Store.data.tickets.forEach((store__value, store__key) => {
                             if (
                                 store__value.id == tickets__value.id &&
@@ -118,9 +121,9 @@ export default class Tickets {
                     });
 
                     // add
-                    response.data.forEach((tickets__value) => {
+                    response.data.forEach(tickets__value => {
                         if (
-                            Store.data.tickets.filter((el) => {
+                            Store.data.tickets.filter(el => {
                                 return el.id == tickets__value.id;
                             }).length === 0
                         ) {
@@ -140,7 +143,7 @@ export default class Tickets {
 
     static getTicketData(ticket_id) {
         let data = null;
-        Store.data.tickets.forEach((tickets__value) => {
+        Store.data.tickets.forEach(tickets__value => {
             if (tickets__value.id == ticket_id) {
                 data = tickets__value;
             }
@@ -149,19 +152,19 @@ export default class Tickets {
     }
 
     static deleteTicket(ticket_id) {
-        return new Promise((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
             Store.data.busy = true;
             Store.data.api
                 .fetch('_api/tickets/' + ticket_id, {
                     method: 'DELETE',
                     cache: 'no-cache',
-                    headers: { 'content-type': 'application/json' },
+                    headers: { 'content-type': 'application/json' }
                 })
-                .then((res) => res.json())
-                .catch((err) => {
+                .then(res => res.json())
+                .catch(err => {
                     console.error(err);
                 })
-                .then((response) => {
+                .then(response => {
                     Store.data.busy = false;
                     Store.data.tickets.forEach((tickets__value, tickets__key) => {
                         if (tickets__value.id == ticket_id) {
@@ -174,7 +177,7 @@ export default class Tickets {
     }
 
     static saveTickets() {
-        return new Promise((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
             if (
                 document.querySelector('.tickets .tickets__table-body').querySelector('.tickets__textarea:invalid') !==
                 null
@@ -188,17 +191,19 @@ export default class Tickets {
             document
                 .querySelector('.tickets .tickets__table-body')
                 .querySelectorAll('.tickets__entry--changed')
-                .forEach((el) => {
+                .forEach(el => {
                     let data = {};
-                    Store.data.cols.forEach((cols__value) => {
-                        data[cols__value] = el.querySelector('[name="' + cols__value + '"]').value;
+                    Store.data.cols.forEach(cols__value => {
+                        data[cols__value] = (
+                            el.querySelector('[name="' + cols__value + '"]') as HTMLInputElement
+                        ).value;
                     });
                     data['updated_at'] = Dates.time().toString();
                     // auto update date
                     if (data['date'] == '*') {
                         Tickets.setTicketData(el.getAttribute('data-id'), data);
                         data['date'] = Scheduler.determineNextFreeSlotAdvanced(data['priority'], data['time']);
-                        el.querySelector('[name="date"]').value = data['date'];
+                        (el.querySelector('[name="date"]') as HTMLInputElement).value = data['date'];
                     }
                     Tickets.setTicketData(el.getAttribute('data-id'), data);
                     Lock.lockTicket(el.getAttribute('data-id'));
@@ -210,18 +215,18 @@ export default class Tickets {
                 .fetch('_api/tickets', {
                     method: 'PUT',
                     body: JSON.stringify({
-                        tickets: changed,
+                        tickets: changed
                     }),
                     cache: 'no-cache',
-                    headers: { 'content-type': 'application/json' },
+                    headers: { 'content-type': 'application/json' }
                 })
-                .then((res) => res.json())
-                .catch((err) => {
+                .then(res => res.json())
+                .catch(err => {
                     console.error(err);
                 })
-                .then(async (response) => {
+                .then(async response => {
                     Store.data.busy = false;
-                    response.data.ids.forEach((value) => {
+                    response.data.ids.forEach(value => {
                         Lock.unlockTicket(value);
                     });
                     await Scheduler.initScheduler();
@@ -235,9 +240,9 @@ export default class Tickets {
     }
 
     static createTicket(data = {}) {
-        return new Promise((resolve, reject) => {
-            let ticket = {};
-            Store.data.cols.forEach((cols__value) => {
+        return new Promise<any>((resolve, reject) => {
+            let ticket: any = {};
+            Store.data.cols.forEach(cols__value => {
                 ticket[cols__value] = cols__value in data ? data[cols__value] : '';
             });
             ticket['updated_at'] = Dates.time().toString();
@@ -247,9 +252,9 @@ export default class Tickets {
                     method: 'POST',
                     body: JSON.stringify(ticket),
                     cache: 'no-cache',
-                    headers: { 'content-type': 'application/json' },
+                    headers: { 'content-type': 'application/json' }
                 })
-                .then((response) => {
+                .then(response => {
                     let data = response.json(),
                         status = response.status;
                     if (status == 200 || status == 304) {
@@ -257,10 +262,10 @@ export default class Tickets {
                     }
                     return { success: false, message: status };
                 })
-                .catch((error) => {
+                .catch(error => {
                     return { success: false, message: error };
                 })
-                .then((response) => {
+                .then(response => {
                     Store.data.busy = false;
                     if (response.success === false) {
                         reject(response.message);
@@ -277,7 +282,7 @@ export default class Tickets {
 
     static bindSave() {
         // ctrl+s
-        document.addEventListener('keydown', (event) => {
+        document.addEventListener('keydown', event => {
             let focus = document.activeElement;
             if (event.ctrlKey || event.metaKey) {
                 if (String.fromCharCode(event.which).toLowerCase() === 's') {
@@ -286,10 +291,10 @@ export default class Tickets {
                         .then(() => {
                             Footer.updateStatus('saved!', 'success');
                             if (focus !== null) {
-                                focus.focus();
+                                (focus as HTMLElement).focus();
                             }
                         })
-                        .catch((error) => {
+                        .catch(error => {
                             Footer.updateStatus(error, 'error');
                         });
                     event.preventDefault();
@@ -300,7 +305,7 @@ export default class Tickets {
 
     static bindCreate() {
         // ctrl+d
-        document.addEventListener('keydown', (event) => {
+        document.addEventListener('keydown', event => {
             if (event.ctrlKey || event.metaKey) {
                 if (String.fromCharCode(event.which).toLowerCase() === 'd') {
                     Tickets.prepareCreateTicket();
@@ -324,7 +329,7 @@ export default class Tickets {
 
         // determine copyBulkRecurring
         if (visibleAll.length > 0) {
-            visibleAll.forEach(($el) => {
+            visibleAll.forEach($el => {
                 let status = Tickets.getTicketData($el.getAttribute('data-id')).status;
                 if (status !== 'allday' && status !== 'birthday') {
                     if (status !== 'recurring') {
@@ -350,18 +355,18 @@ export default class Tickets {
             ticketDataToCopy.push({
                 current: null,
                 currentCol: 1,
-                duplicateData: {},
+                duplicateData: {}
             });
         } else if (copyBulkRecurring === true) {
             copyType = 'bulk';
-            visibleAll.forEach(($el) => {
+            visibleAll.forEach($el => {
                 let duplicateData = Tickets.getTicketData($el.getAttribute('data-id'));
                 if (duplicateData.status !== 'allday' && duplicateData.status !== 'birthday') {
                     delete duplicateData['attachments'];
                     ticketDataToCopy.push({
                         current: $el,
                         currentCol: 1,
-                        duplicateData: duplicateData,
+                        duplicateData: duplicateData
                     });
                 }
             });
@@ -382,11 +387,11 @@ export default class Tickets {
             ticketDataToCopy.push({
                 current: current,
                 currentCol: currentCol,
-                duplicateData: duplicateData,
+                duplicateData: duplicateData
             });
         }
 
-        ticketDataToCopy.forEach((ticketDataToCopy__value) => {
+        ticketDataToCopy.forEach(ticketDataToCopy__value => {
             /* if source is a recurring ticket, do some magic */
             if (
                 ticketDataToCopy__value.current !== null &&
@@ -405,10 +410,10 @@ export default class Tickets {
                 ) {
                     askCounter++;
                     let newDates = [];
-                    ticketDataToCopy__value.duplicateData.date.split('\n').forEach((duplicateData__value) => {
+                    ticketDataToCopy__value.duplicateData.date.split('\n').forEach(duplicateData__value => {
                         // only add relevant
                         let parsed = Dates.parseDateString(duplicateData__value, 'tickets');
-                        if (parsed.length === 0) {
+                        if (parsed !== false && parsed.length === 0) {
                             return;
                         }
                         let newDate = Dates.dateFormat(Dates.getActiveDate(), 'd.m.y'),
@@ -480,7 +485,7 @@ export default class Tickets {
             }
 
             Tickets.createTicket(data)
-                .then(async (ticket) => {
+                .then(async ticket => {
                     let next;
                     if (current !== null) {
                         current.insertAdjacentHTML('afterend', Html.createHtmlLine(ticket, true));
@@ -521,24 +526,26 @@ export default class Tickets {
     }
 
     static bindChangeTracking() {
-        document.querySelector('.tickets').addEventListener('input', (e) => {
-            if (e.target.closest('.tickets__entry input, .tickets__entry textarea')) {
-                if (e.target.hasAttribute('type') && e.target.getAttribute('type') === 'file') {
+        document.querySelector('.tickets').addEventListener('input', e => {
+            const target = e.target as HTMLElement;
+            if (target.closest('.tickets__entry input, .tickets__entry textarea')) {
+                if (target.hasAttribute('type') && target.getAttribute('type') === 'file') {
                     return;
                 }
-                e.target.closest('.tickets__entry').classList.add('tickets__entry--changed');
+                target.closest('.tickets__entry').classList.add('tickets__entry--changed');
             }
         });
     }
 
     static bindAutoTime() {
-        document.querySelector('.tickets').addEventListener('input', (e) => {
-            if (e.target.closest('.tickets__entry [name="date"]')) {
-                if (e.target.value != '') {
-                    let parsed_values = Dates.parseDateString(e.target.value, 'all');
+        document.querySelector('.tickets').addEventListener('input', e => {
+            const target = e.target as HTMLInputElement;
+            if (target.closest('.tickets__entry [name="date"]')) {
+                if (target.value != '') {
+                    let parsed_values = Dates.parseDateString(target.value, 'all');
                     if (parsed_values !== false) {
-                        let time = 0;
-                        parsed_values.forEach((parses_values__value) => {
+                        let time: any = 0;
+                        parsed_values.forEach(parses_values__value => {
                             if (parses_values__value.begin !== undefined && parses_values__value.end !== undefined) {
                                 time += Math.abs(parses_values__value.end - parses_values__value.begin);
                             }
@@ -547,11 +554,16 @@ export default class Tickets {
                             time = time.toFixed(2);
                         }
                         time = time.toString().replace('.', ',');
-                        e.target.closest('.tickets__entry').querySelector('.tickets__textarea--time').value = time;
-                        e.target
-                            .closest('.tickets__entry')
-                            .querySelector('.tickets__textarea--time')
-                            .setCustomValidity('');
+                        (
+                            target
+                                .closest('.tickets__entry')
+                                .querySelector('.tickets__textarea--time') as HTMLInputElement
+                        ).value = time;
+                        (
+                            target
+                                .closest('.tickets__entry')
+                                .querySelector('.tickets__textarea--time') as HTMLInputElement
+                        ).setCustomValidity('');
                     }
                 }
             }
@@ -559,23 +571,24 @@ export default class Tickets {
     }
 
     static bindDelete() {
-        document.querySelector('.tickets').addEventListener('click', (e) => {
-            if (e.target.closest('.tickets__entry__delete')) {
-                let ticket_id = e.target.closest('.tickets__entry').getAttribute('data-id');
+        document.querySelector('.tickets').addEventListener('click', e => {
+            const target = e.target as Element;
+            if (target.closest('.tickets__entry__delete')) {
+                let ticket_id = target.closest('.tickets__entry').getAttribute('data-id');
                 if (Lock.ticketIsLocked(ticket_id)) {
                     e.preventDefault();
                 }
                 let result = confirm('Sind Sie sicher?');
                 if (result) {
                     Tickets.deleteTicket(ticket_id)
-                        .then(async (result) => {
-                            e.target.closest('.tickets__entry').remove();
+                        .then(async result => {
+                            target.closest('.tickets__entry').remove();
                             await Scheduler.initScheduler();
                             Quickbox.initToday();
                             Tickets.updateSum();
                             Filter.updateFilter();
                         })
-                        .catch((error) => {});
+                        .catch(error => {});
                     e.preventDefault();
                 }
                 e.preventDefault();
@@ -584,8 +597,8 @@ export default class Tickets {
     }
 
     static updateSum() {
-        let sum = 0;
-        Store.data.tickets.forEach((tickets__value) => {
+        let sum: any = 0;
+        Store.data.tickets.forEach(tickets__value => {
             if (
                 tickets__value.visible !== false &&
                 tickets__value.time !== null &&

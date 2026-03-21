@@ -2,14 +2,15 @@ import Helper from './Helper';
 
 export default class Textarea {
     static textareaAutoHeight() {
-        let debounce = Helper.debounce((e) => {
+        let debounce: any = Helper.debounce((e: InputEvent) => {
             Textarea.textareaSetHeight(e.target);
         }, 100);
-        document.querySelector('.tickets .tickets__table-body').addEventListener('input', (e) => {
-            if (e.target && e.target.tagName === 'TEXTAREA' && e.target.classList.contains('autoheight')) {
+        document.querySelector('.tickets .tickets__table-body').addEventListener('input', e => {
+            const target = e.target as Element;
+            if (target && target.tagName === 'TEXTAREA' && target.classList.contains('autoheight')) {
                 /* immediately change height if enter is pressed */
-                if (e.inputType === 'insertLineBreak') {
-                    Textarea.textareaSetHeight(e.target);
+                if ((e as InputEvent).inputType === 'insertLineBreak') {
+                    Textarea.textareaSetHeight(target);
                 } else {
                     /* otherwise debounce */
                     debounce(e);
@@ -43,7 +44,7 @@ export default class Textarea {
         // determine max height
         let maxLines = 0,
             parent = el.parentNode;
-        [...parent.parentNode.children].forEach((i) => {
+        [...parent.parentNode.children].forEach(i => {
             if (i.querySelector('textarea') !== null) {
                 let thisLines = Textarea.textareaGetLines(i.querySelector('textarea'));
                 if (maxLines <= thisLines) {
@@ -51,7 +52,7 @@ export default class Textarea {
                 }
             }
         });
-        [...parent.parentNode.children].forEach((i) => {
+        [...parent.parentNode.children].forEach(i => {
             if (i.querySelector('textarea') !== null) {
                 i.querySelector('textarea').style.height = 15 * maxLines + 'rem';
             }

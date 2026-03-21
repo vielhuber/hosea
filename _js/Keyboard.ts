@@ -11,39 +11,40 @@ export default class Keyboard {
         // one more keyboard event is needed (so that jumps are not too early)
         // therefore we save the previous cursor pointer here
         let selectionEndBefore = 1;
-        document.querySelector('.tickets').addEventListener('keyup', (e) => {
+        (document.querySelector('.tickets') as HTMLElement).addEventListener('keyup', (e: KeyboardEvent) => {
+            const target = e.target as HTMLInputElement;
             if (
-                !e.target ||
-                (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') ||
-                e.target.closest('.metabar') !== null
+                !target ||
+                (target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA') ||
+                target.closest('.metabar') !== null
             ) {
                 return;
             }
-            let left = e.target.closest('td').previousElementSibling,
-                right = e.target.closest('td').nextElementSibling,
-                top = Helper.prevAll(e.target.closest('tr'), '.tickets__entry--visible')[0],
-                down = Helper.nextAll(e.target.closest('tr'), '.tickets__entry--visible')[0],
-                index = Helper.prevAll(e.target.closest('td')).length + 1;
+            let left = target.closest('td').previousElementSibling,
+                right = target.closest('td').nextElementSibling,
+                top = Helper.prevAll(target.closest('tr'), '.tickets__entry--visible')[0],
+                down = Helper.nextAll(target.closest('tr'), '.tickets__entry--visible')[0],
+                index = Helper.prevAll(target.closest('td')).length + 1;
 
             // arrow right (switch)
             if (
                 e.keyCode === 39 &&
                 right !== null &&
-                e.target.selectionEnd >= e.target.value.length &&
-                selectionEndBefore >= e.target.value.length
+                target.selectionEnd >= target.value.length &&
+                selectionEndBefore >= target.value.length
             ) {
-                right.querySelector('input, textarea').select();
+                (right.querySelector('input, textarea') as HTMLInputElement).select();
                 selectionEndBefore = 1;
                 e.preventDefault();
             }
             // arrow left (switch)
-            else if (e.keyCode === 37 && left !== null && e.target.selectionEnd <= 0 && selectionEndBefore <= 0) {
-                left.querySelector('input, textarea').select();
+            else if (e.keyCode === 37 && left !== null && target.selectionEnd <= 0 && selectionEndBefore <= 0) {
+                (left.querySelector('input, textarea') as HTMLInputElement).select();
                 selectionEndBefore = 1;
                 e.preventDefault();
             }
             // arrow top (switch)
-            else if (e.keyCode === 38 && top !== undefined && e.target.selectionEnd <= 0 && selectionEndBefore <= 0) {
+            else if (e.keyCode === 38 && top !== undefined && target.selectionEnd <= 0 && selectionEndBefore <= 0) {
                 top.querySelector('td:nth-child(' + index + ')')
                     .querySelector('input, textarea')
                     .select();
@@ -54,8 +55,8 @@ export default class Keyboard {
             else if (
                 e.keyCode === 40 &&
                 down !== undefined &&
-                e.target.selectionEnd >= e.target.value.length &&
-                selectionEndBefore >= e.target.value.length
+                target.selectionEnd >= target.value.length &&
+                selectionEndBefore >= target.value.length
             ) {
                 down.querySelector('td:nth-child(' + index + ')')
                     .querySelector('input, textarea')
@@ -63,13 +64,13 @@ export default class Keyboard {
                 selectionEndBefore = 1;
                 e.preventDefault();
             } else {
-                selectionEndBefore = e.target.selectionEnd;
+                selectionEndBefore = target.selectionEnd;
             }
         });
     }
 
     static initKeyboardNavigationScheduler() {
-        document.addEventListener('keydown', (e) => {
+        document.addEventListener('keydown', e => {
             if (e.target !== document.body) {
                 return;
             }
@@ -77,10 +78,12 @@ export default class Keyboard {
                 37: 'prev-day', // arrow left
                 39: 'next-day', // arrow right
                 33: 'prev-week', // page up
-                34: 'next-week', // page down
+                34: 'next-week' // page down
             };
             if (Object.keys(assignedKeys).includes(e.keyCode.toString())) {
-                document.querySelector('.scheduler__navigation-button--' + assignedKeys[e.keyCode]).click();
+                (
+                    document.querySelector('.scheduler__navigation-button--' + assignedKeys[e.keyCode]) as HTMLElement
+                ).click();
                 e.preventDefault();
             }
         });
@@ -88,7 +91,7 @@ export default class Keyboard {
 
     static bindRefresh() {
         // f5...
-        document.addEventListener('keydown', async (e) => {
+        document.addEventListener('keydown', async e => {
             if (e.keyCode === 116) {
                 e.preventDefault();
                 await Filter.doFilter();

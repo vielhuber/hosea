@@ -3,19 +3,19 @@ import Dates from './Dates';
 
 export default class Weather {
     static fetchWeather() {
-        return new Promise((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
             Store.data.busy = true;
             Store.data.api
                 .fetch('_api/weather', {
                     method: 'GET',
                     cache: 'no-cache',
-                    headers: { 'content-type': 'application/json' },
+                    headers: { 'content-type': 'application/json' }
                 })
-                .then((res) => res.json())
-                .catch((err) => {
+                .then(res => res.json())
+                .catch(err => {
                     reject(err);
                 })
-                .then((response) => {
+                .then(response => {
                     Store.data.busy = false;
                     Store.data.weather = response.data;
                     resolve();

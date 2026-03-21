@@ -4,7 +4,7 @@ import Store from './Store';
 export default class Sort {
     static initSort() {
         document.querySelector('.metabar').insertAdjacentHTML('beforeend', '<div class="metabar__sort"></div>');
-        [1, 2].forEach((step) => {
+        [1, 2].forEach(step => {
             document
                 .querySelector('.metabar__sort')
                 .insertAdjacentHTML(
@@ -15,7 +15,7 @@ export default class Sort {
                         step +
                         '</option></select>'
                 );
-            Store.data.cols.forEach((columns__value) => {
+            Store.data.cols.forEach(columns__value => {
                 document
                     .querySelector('.metabar__select--sort[name="sort_' + step + '"]')
                     .insertAdjacentHTML(
@@ -25,19 +25,19 @@ export default class Sort {
             });
         });
 
-        document.querySelector('.metabar').addEventListener('change', (e) => {
-            if (e.target.closest('.metabar__select--sort')) {
+        document.querySelector('.metabar').addEventListener('change', e => {
+            if ((e.target as Element).closest('.metabar__select--sort')) {
                 Sort.doSort();
             }
         });
     }
 
     static doSort() {
-        let sort_1 = document.querySelector('.metabar__select--sort[name="sort_1"]').value,
-            sort_2 = document.querySelector('.metabar__select--sort[name="sort_2"]').value,
+        let sort_1 = (document.querySelector('.metabar__select--sort[name="sort_1"]') as HTMLSelectElement).value,
+            sort_2 = (document.querySelector('.metabar__select--sort[name="sort_2"]') as HTMLSelectElement).value,
             sorted = [
-                ...document.querySelector('.tickets .tickets__table-body').querySelectorAll('.tickets__entry--visible'),
-            ].sort((a, b) => {
+                ...document.querySelector('.tickets .tickets__table-body').querySelectorAll('.tickets__entry--visible')
+            ].sort((a: any, b: any) => {
                 let val_a, val_b;
 
                 if (sort_1 != '') {
@@ -88,7 +88,7 @@ export default class Sort {
                             'scheduled',
                             'idle',
                             'recurring',
-                            'roaming',
+                            'roaming'
                         ]) {
                             if (val_a === status__value) {
                                 return -1;
@@ -130,16 +130,16 @@ export default class Sort {
                                   b
                                       .querySelector('[name="date"]')
                                       .value.match(/[0-9][0-9]:[0-9][0-9]/g)
-                                      ?.join(''),
+                                      ?.join('')
                           ]
                         : [
                               Dates.germanDateTimeToEnglishString(a.querySelector('[name="date"]').value),
-                              Dates.germanDateTimeToEnglishString(b.querySelector('[name="date"]').value),
+                              Dates.germanDateTimeToEnglishString(b.querySelector('[name="date"]').value)
                           ],
                     [a.querySelector('[name="priority"]').value, b.querySelector('[name="priority"]').value],
                     [a.querySelector('[name="project"]').value, b.querySelector('[name="project"]').value],
                     [a.querySelector('[name="description"]').value, b.querySelector('[name="description"]').value],
-                    [a.getAttribute('data-id'), b.getAttribute('data-id')],
+                    [a.getAttribute('data-id'), b.getAttribute('data-id')]
                 ]) {
                     if (val_a < val_b) {
                         return -1;
@@ -153,13 +153,13 @@ export default class Sort {
             });
         for (let i = 0; i < sorted.length; i++) {
             // save scroll positions
-            sorted[i].querySelectorAll('textarea').forEach((el) => {
-                el.scrollTopBackup = el.scrollTop;
+            sorted[i].querySelectorAll('textarea').forEach(el => {
+                (el as any).scrollTopBackup = el.scrollTop;
             });
             sorted[i].parentNode.appendChild(sorted[i]);
             // restore scroll positions
-            sorted[i].querySelectorAll('textarea').forEach((el) => {
-                el.scrollTop = el.scrollTopBackup;
+            sorted[i].querySelectorAll('textarea').forEach(el => {
+                el.scrollTop = (el as any).scrollTopBackup;
             });
         }
     }

@@ -1,3 +1,4 @@
+import hlp from 'hlp';
 import Helper from './Helper';
 import Html from './Html';
 import Lock from './Lock';
@@ -8,9 +9,10 @@ import Dates from './Dates';
 
 export default class Attachments {
     static bindDownload() {
-        document.querySelector('.tickets').addEventListener('click', (e) => {
-            if (e.target.closest('.tickets__attachment-download')) {
-                Attachments.startDownload(e.target.closest('.tickets__attachment').getAttribute('data-id'));
+        document.querySelector('.tickets').addEventListener('click', e => {
+            const target = e.target as Element;
+            if (target.closest('.tickets__attachment-download')) {
+                Attachments.startDownload(target.closest('.tickets__attachment').getAttribute('data-id'));
                 e.preventDefault();
             }
         });
@@ -22,13 +24,13 @@ export default class Attachments {
             .fetch('_api/attachments/' + attachment_id, {
                 method: 'GET',
                 cache: 'no-cache',
-                headers: { 'content-type': 'application/json' },
+                headers: { 'content-type': 'application/json' }
             })
-            .then((res) => res.json())
-            .catch((err) => {
+            .then(res => res.json())
+            .catch(err => {
                 console.error(err);
             })
-            .then((response) => {
+            .then(response => {
                 Store.data.busy = false;
                 let base64 = response.data.data,
                     filename = response.data.name,
@@ -46,11 +48,12 @@ export default class Attachments {
     }
 
     static bindUpload() {
-        document.querySelector('.tickets').addEventListener('change', (e) => {
-            if (e.target.closest('.tickets__entry input[type="file"]')) {
+        document.querySelector('.tickets').addEventListener('change', e => {
+            const target = e.target as HTMLInputElement;
+            if (target.closest('.tickets__entry input[type="file"]')) {
                 Attachments.startUploadsAndBuildHtml(
-                    e.target.closest('.tickets__entry').getAttribute('data-id'),
-                    e.target.files
+                    target.closest('.tickets__entry').getAttribute('data-id'),
+                    target.files
                 );
             }
         });
@@ -58,18 +61,18 @@ export default class Attachments {
 
     static startUploadsAndBuildHtml(ticket_id, files) {
         Attachments.startUploads(ticket_id, files)
-            .then((attachments) => {
+            .then(attachments => {
                 let el = document.querySelector(
                     '.tickets .tickets__entry[data-id="' + ticket_id + '"] input[type="file"]'
                 );
-                el.value = '';
-                attachments.forEach((attachments__value) => {
+                (el as HTMLInputElement).value = '';
+                attachments.forEach(attachments__value => {
                     el.closest('.tickets__entry')
                         .querySelector('.tickets__attachments')
                         .insertAdjacentHTML('beforeend', Html.createHtmlDownloadLine(attachments__value));
                 });
             })
-            .catch((error) => {
+            .catch(error => {
                 console.error(error);
             });
     }
@@ -99,7 +102,7 @@ export default class Attachments {
                 resolve(null);
                 return;
             }
-            Helper.fileToBase64(file).then((base64) => {
+            Helper.fileToBase64(file).then(base64 => {
                 Store.data.busy = true;
                 Store.data.api
                     .fetch('_api/attachments', {
@@ -107,16 +110,16 @@ export default class Attachments {
                         body: JSON.stringify({
                             name: file.name,
                             data: base64,
-                            ticket_id: ticket_id,
+                            ticket_id: ticket_id
                         }),
                         cache: 'no-cache',
-                        headers: { 'content-type': 'application/json' },
+                        headers: { 'content-type': 'application/json' }
                     })
-                    .then((res) => res.json())
-                    .catch((err) => {
+                    .then(res => res.json())
+                    .catch(err => {
                         console.error(err);
                     })
-                    .then((response) => {
+                    .then(response => {
                         Store.data.busy = false;
                         let updated_at = Dates.time().toString();
                         Tickets.setTicketData(ticket_id, 'updated_at', updated_at);
@@ -125,16 +128,16 @@ export default class Attachments {
                             .fetch('_api/tickets/' + ticket_id, {
                                 method: 'PUT',
                                 body: JSON.stringify({
-                                    updated_at: updated_at,
+                                    updated_at: updated_at
                                 }),
                                 cache: 'no-cache',
-                                headers: { 'content-type': 'application/json' },
+                                headers: { 'content-type': 'application/json' }
                             })
-                            .then((res) => res.json())
-                            .catch((err) => {
+                            .then(res => res.json())
+                            .catch(err => {
                                 console.error(err);
                             })
-                            .then((response) => {
+                            .then(response => {
                                 Store.data.busy = false;
                             });
 
@@ -145,25 +148,26 @@ export default class Attachments {
     }
 
     static bindDeleteAttachment() {
-        document.querySelector('.tickets').addEventListener('click', (e) => {
-            if (e.target.closest('.tickets__attachment-delete')) {
-                let ticket_id = e.target.closest('.tickets__entry').getAttribute('data-id');
+        document.querySelector('.tickets').addEventListener('click', e => {
+            const target = e.target as Element;
+            if (target.closest('.tickets__attachment-delete')) {
+                let ticket_id = target.closest('.tickets__entry').getAttribute('data-id');
                 if (Lock.ticketIsLocked(ticket_id)) {
                     e.preventDefault();
                 }
-                let attachment_id = e.target.closest('.tickets__attachment').getAttribute('data-id');
+                let attachment_id = target.closest('.tickets__attachment').getAttribute('data-id');
                 Store.data.busy = true;
                 Store.data.api
                     .fetch('_api/attachments/' + attachment_id, {
                         method: 'DELETE',
                         cache: 'no-cache',
-                        headers: { 'content-type': 'application/json' },
+                        headers: { 'content-type': 'application/json' }
                     })
-                    .then((res) => res.json())
-                    .catch((err) => {
+                    .then(res => res.json())
+                    .catch(err => {
                         console.error(err);
                     })
-                    .then((response) => {
+                    .then(response => {
                         Store.data.busy = false;
                         let updated_at = Dates.time().toString();
                         Tickets.setTicketData(ticket_id, 'updated_at', updated_at);
@@ -172,20 +176,20 @@ export default class Attachments {
                             .fetch('_api/tickets/' + ticket_id, {
                                 method: 'PUT',
                                 body: JSON.stringify({
-                                    updated_at: updated_at,
+                                    updated_at: updated_at
                                 }),
                                 cache: 'no-cache',
-                                headers: { 'content-type': 'application/json' },
+                                headers: { 'content-type': 'application/json' }
                             })
-                            .then((res) => res.json())
-                            .catch((err) => {
+                            .then(res => res.json())
+                            .catch(err => {
                                 console.error(err);
                             })
-                            .then((response) => {
+                            .then(response => {
                                 Store.data.busy = false;
                             });
 
-                        e.target.closest('.tickets__attachment').remove();
+                        target.closest('.tickets__attachment').remove();
                     });
                 e.preventDefault();
             }

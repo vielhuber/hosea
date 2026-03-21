@@ -1,8 +1,7 @@
-@use '../_assorted/common';
-@use '../_config/vars';
+@use "../_assorted/common";
+@use "../_config/vars";
 
 .quickbox {
-    width: calc((100% - #{vars.$container-width-big}) - #{vars.$space-big});
     bottom: calc(#{vars.$footer-height} + #{vars.$space-big});
     right: vars.$space-big;
     top: calc(
@@ -15,8 +14,16 @@
     overflow: hidden;
     @include common.border;
     @include common.shadow;
-    .view-mode--wide & {
+
+    width: calc((100% - #{vars.$container-width-medium}) - #{vars.$space-big});
+    .view-mode--small & {
         width: calc((100% - #{vars.$container-width-small}) - #{vars.$space-big});
+    }
+    .view-mode--medium & {
+        width: calc((100% - #{vars.$container-width-medium}) - #{vars.$space-big});
+    }
+    .view-mode--large & {
+        width: calc((100% - #{vars.$container-width-large}) - #{vars.$space-big});
     }
 }
 
@@ -141,7 +148,7 @@
 }
 
 .quickbox__new-input:invalid {
-    background-image: url('../_assets/icon_warning.svg');
+    background-image: url("../_assets/icon_warning.svg");
     background-position: right -23rem center;
     background-size: 20rem;
     background-repeat: no-repeat;
@@ -245,7 +252,7 @@
     @include common.scrollbar;
 }
 .quickbox__today-tickets:empty {
-    background-image: url('../_assets/finished.gif');
+    background-image: url("../_assets/finished.gif");
     background-position: center;
     background-repeat: no-repeat;
     background-size: contain;
@@ -374,7 +381,7 @@
 }
 
 .quickbox__today-edit-input:invalid {
-    background-image: url('../_assets/icon_warning.svg');
+    background-image: url("../_assets/icon_warning.svg");
     background-position: right -23rem center;
     background-size: 20rem;
     background-repeat: no-repeat;
@@ -423,7 +430,7 @@
 }
 
 .quickbox__mails--loading {
-    background-image: url('../_assets/loading.gif');
+    background-image: url("../_assets/loading.gif");
     pointer-events: none !important;
 }
 
@@ -432,7 +439,7 @@
 }
 
 .quickbox__mails--finished {
-    background-image: url('../_assets/finished.gif');
+    background-image: url("../_assets/finished.gif");
 }
 
 .quickbox__mails,
@@ -444,11 +451,11 @@
     transition: opacity 0.25s ease-in-out;
 }
 
-.quickbox__content[data-view='week'] .quickbox__week,
-.quickbox__content[data-view='mails'] .quickbox__mails,
-.quickbox__content[data-view='money'] .quickbox__money,
-.quickbox__content[data-view='new'] .quickbox__new,
-.quickbox__content[data-view='today'] .quickbox__today {
+.quickbox__content[data-view="week"] .quickbox__week,
+.quickbox__content[data-view="mails"] .quickbox__mails,
+.quickbox__content[data-view="money"] .quickbox__money,
+.quickbox__content[data-view="new"] .quickbox__new,
+.quickbox__content[data-view="today"] .quickbox__today {
     opacity: 1;
     pointer-events: auto;
 }
@@ -753,7 +760,9 @@
         bottom: 0;
         right: 0;
         top: 0;
-        .view-mode--wide & {
+        .view-mode--small &,
+        .view-mode--medium &,
+        .view-mode--large & {
             width: 100%;
         }
     }

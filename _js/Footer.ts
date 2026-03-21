@@ -1,6 +1,7 @@
 import Tickets from './Tickets';
 import Auth from './Auth';
 import Scheduler from './Scheduler';
+import Store from './Store';
 
 export default class Footer {
     static blockStatusUpdate = false;
@@ -42,14 +43,14 @@ export default class Footer {
         }, Footer.showTime);
     }
     static bindSave() {
-        document.querySelector('.footer').addEventListener('click', (e) => {
-            if (e.target.closest('.footer__save')) {
+        document.querySelector('.footer').addEventListener('click', e => {
+            if ((e.target as Element).closest('.footer__save')) {
                 Footer.updateStatus('saving...', 'warning');
                 Tickets.saveTickets()
                     .then(() => {
                         Footer.updateStatus('saved!', 'success');
                     })
-                    .catch((error) => {
+                    .catch(error => {
                         Footer.updateStatus(error, 'error');
                     });
                 e.preventDefault();
@@ -57,30 +58,30 @@ export default class Footer {
         });
     }
     static bindCreate() {
-        document.querySelector('.footer').addEventListener('click', (e) => {
-            if (e.target.closest('.footer__create')) {
+        document.querySelector('.footer').addEventListener('click', e => {
+            if ((e.target as Element).closest('.footer__create')) {
                 Tickets.prepareCreateTicket();
                 e.preventDefault();
             }
         });
     }
     static bindView() {
-        document.querySelector('.footer').addEventListener('click', (e) => {
-            if (e.target.closest('.footer__view')) {
+        document.querySelector('.footer').addEventListener('click', e => {
+            if ((e.target as Element).closest('.footer__view')) {
                 Scheduler.changeView();
                 e.preventDefault();
             }
         });
     }
     static bindLogout() {
-        document.querySelector('.footer').addEventListener('click', (e) => {
-            if (e.target.closest('.footer__logout')) {
+        document.querySelector('.footer').addEventListener('click', e => {
+            if ((e.target as Element).closest('.footer__logout')) {
                 Auth.logout()
                     .then(() => {
                         // we simply overcome the issue of deleting event listeners on document by simply refreshing the app
                         location.reload();
                     })
-                    .catch((error) => {
+                    .catch(error => {
                         console.error(error);
                     });
                 e.preventDefault();
