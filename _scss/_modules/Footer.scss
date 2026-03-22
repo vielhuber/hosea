@@ -10,7 +10,7 @@
     line-height: vars.$footer-height;
     background-color: vars.$color-black-transparent;
     color: vars.$color-white;
-    padding: 0 vars.$space-big;
+    padding: 0 calc(2 * #{vars.$space-big});
     @include common.shadow;
     @include common.border;
     border-left-width: 0;
@@ -25,7 +25,7 @@
     z-index: 1;
 }
 .footer__status:after {
-    content: '';
+    content: "";
     position: absolute;
     width: 15%;
     height: 1px;

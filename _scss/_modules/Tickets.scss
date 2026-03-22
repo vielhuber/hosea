@@ -35,7 +35,7 @@
     overflow-x: hidden;
     overflow-y: auto;
     height: vars.$space-medium;
-    line-height: vars.$space-medium;
+    line-height: 1.3;
     vertical-align: top; // fixes annoying unknown padding bug
     @include common.input;
     @include common.scrollbar;
@@ -55,7 +55,7 @@
     left: vars.$space-medium;
     bottom: vars.$space-medium;
     right: vars.$space-medium;
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
 }
 
@@ -80,23 +80,23 @@
 }
 
 .tickets__table-cell:nth-child(1) {
-    width: 7%;
+    width: 60rem;
 }
 
 .tickets__table-cell:nth-child(2) {
-    width: 7%;
+    width: 40rem;
 }
 
 .tickets__table-cell:nth-child(3) {
-    width: 12%;
+    width: 115rem;
 }
 
 .tickets__table-cell:nth-child(4) {
-    width: 6%;
+    width: 40rem;
 }
 
 .tickets__table-cell:nth-child(5) {
-    width: 10%;
+    width: 90rem;
 }
 
 .tickets__table-cell:nth-child(6) {
@@ -104,11 +104,11 @@
 }
 
 .tickets__table-cell:nth-child(7) {
-    width: 7%;
+    width: 40rem;
 }
 
 .tickets__table-cell:nth-child(8) {
-    width: 7%;
+    width: 40rem;
 }
 
 .tickets__entry {

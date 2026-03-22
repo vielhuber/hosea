@@ -1,6 +1,9 @@
 @use "../_assorted/common";
 @use "../_config/vars";
 
+// define new var
+$quickbox-height: calc(#{vars.$footer-height});
+
 .quickbox {
     bottom: calc(#{vars.$footer-height} + #{vars.$space-big});
     right: vars.$space-big;
@@ -32,7 +35,7 @@
     left: 0;
     top: 0;
     right: 0;
-    bottom: calc(#{vars.$space-big} + 2 * #{vars.$space-small});
+    bottom: $quickbox-height;
 }
 
 .quickbox__money {
@@ -65,7 +68,7 @@
 .quickbox__money-stats-entry {
     width: 25%;
     text-align: center;
-    height: calc(#{vars.$space-big} + 2 * #{vars.$space-small});
+    height: $quickbox-height;
     align-content: center;
 }
 .quickbox__money-stats-entry-heading {
@@ -79,7 +82,7 @@
 .quickbox__money-chart {
     width: 100%;
     flex-grow: 1;
-    max-height: calc(100% - #{vars.$space-big});
+    max-height: calc(100% - #{vars.$footer-height});
     padding: vars.$space-medium;
 }
 .quickbox__money-chart-canvas {
@@ -110,18 +113,18 @@
     width: 100%;
     flex: 0 0 auto;
     background-color: vars.$color-grey;
-    height: vars.$space-big;
-    line-height: vars.$space-big;
+    height: vars.$footer-height;
+    line-height: vars.$footer-height;
 }
 
 .quickbox__new-inputrow--rheight {
-    height: calc(100% - (3 * #{vars.$space-big} + 3 * #{vars.$space-small}));
+    height: calc(100% - (3 * #{vars.$footer-height} + 3 * #{vars.$space-small}));
 }
 
 .quickbox__new-submit {
     width: 100%;
     height: 100%;
-    line-height: calc(#{vars.$space-big} - 2 * #{vars.$space-small});
+    line-height: calc(#{vars.$footer-height} - 2 * #{vars.$space-small});
     display: block;
     padding: vars.$space-small;
     cursor: pointer;
@@ -141,7 +144,7 @@
 
 .quickbox__new-label-text {
     height: 100%;
-    line-height: calc(#{vars.$space-big} - 2 * #{vars.$space-small});
+    line-height: calc(#{vars.$footer-height} - 2 * #{vars.$space-small});
     display: inline-block;
     margin-left: vars.$space-small;
     vertical-align: top;
@@ -181,7 +184,7 @@
 .quickbox__new-input--text {
     width: 100%;
     height: 100%;
-    line-height: calc(#{vars.$space-big} - 2 * #{vars.$space-small});
+    line-height: calc(#{vars.$footer-height} - 2 * #{vars.$space-small});
     background-color: vars.$color-grey;
     color: vars.$color-white;
     display: block;
@@ -212,7 +215,7 @@
 }
 
 .quickbox__today-nav {
-    height: calc(#{vars.$space-big} + 2 * #{vars.$space-small});
+    height: $quickbox-height;
     display: flex;
     justify-content: space-between;
     @include common.border;
@@ -222,8 +225,8 @@
 }
 
 .quickbox__today-navitem {
-    height: calc(#{vars.$space-big} + 2 * #{vars.$space-small});
-    line-height: calc(#{vars.$space-big} + 2 * #{vars.$space-small});
+    height: $quickbox-height;
+    line-height: $quickbox-height;
     font-size: vars.$font-size-medium;
     text-align: center;
     box-shadow: 0 0 0 2rem inset vars.$color-white;
@@ -241,12 +244,12 @@
 
 .quickbox__today-navitem--prev-day,
 .quickbox__today-navitem--next-day {
-    width: calc(#{vars.$space-big} + 2 * #{vars.$space-small});
+    width: $quickbox-height;
 }
 
 .quickbox__today-tickets {
     padding: vars.$space-small;
-    height: calc(100% - #{vars.$space-big} - 2 * #{vars.$space-small});
+    height: calc(100% - #{vars.$footer-height} - 2 * #{vars.$space-small});
     overflow-x: hidden;
     overflow-y: auto;
     @include common.scrollbar;
@@ -360,8 +363,8 @@
     width: 100%;
     flex: 0 0 auto;
     background-color: vars.$color-grey;
-    height: vars.$space-big;
-    line-height: vars.$space-big;
+    height: vars.$footer-height;
+    line-height: vars.$footer-height;
     margin-bottom: vars.$space-small;
 }
 
@@ -372,7 +375,7 @@
 .quickbox__today-edit-submit {
     width: 100%;
     height: 100%;
-    line-height: calc(#{vars.$space-big} - 2 * #{vars.$space-small});
+    line-height: calc(#{vars.$footer-height} - 2 * #{vars.$space-small});
     display: block;
     padding: vars.$space-small;
     cursor: pointer;
@@ -391,7 +394,7 @@
 .quickbox__today-edit-input--text {
     width: 100%;
     height: 100%;
-    line-height: calc(#{vars.$space-big} - 2 * #{vars.$space-small});
+    line-height: calc(#{vars.$footer-height} - 2 * #{vars.$space-small});
     background-color: vars.$color-grey;
     color: vars.$color-white;
     display: block;
@@ -541,7 +544,7 @@
 }
 
 .quickbox__mail-content:hover {
-    height: calc(100% - (#{vars.$space-big} + 2 * #{vars.$space-small}));
+    height: calc(100% - $quickbox-height);
 }
 
 .quickbox__mail-actions {
@@ -552,7 +555,7 @@
 .quickbox__mail-submit {
     width: 100%;
     height: 100%;
-    line-height: calc(#{vars.$space-big} - 2 * #{vars.$space-small});
+    line-height: calc(#{vars.$footer-height} - 2 * #{vars.$space-small});
     display: block;
     padding: vars.$space-small;
     cursor: pointer;
@@ -572,8 +575,8 @@
     flex: 0 0 auto;
     margin-bottom: vars.$space-small;
     background-color: vars.$color-grey;
-    height: vars.$space-big;
-    line-height: vars.$space-big;
+    height: vars.$footer-height;
+    line-height: vars.$footer-height;
 }
 
 .quickbox__mail-inputrow--1\/1 {
@@ -651,7 +654,7 @@
 .quickbox__mail-input--text {
     width: 100%;
     height: 100%;
-    line-height: calc(#{vars.$space-big} - 2 * #{vars.$space-small});
+    line-height: calc(#{vars.$footer-height} - 2 * #{vars.$space-small});
     background-color: vars.$color-grey;
     color: vars.$color-white;
     display: block;
@@ -670,7 +673,7 @@
 
 .quickbox__mail-label-text {
     height: 100%;
-    line-height: calc(#{vars.$space-big} - 2 * #{vars.$space-small});
+    line-height: calc(#{vars.$footer-height} - 2 * #{vars.$space-small});
     display: inline-block;
     margin-left: vars.$space-small;
     vertical-align: top;
@@ -692,7 +695,7 @@
     bottom: 0;
     left: 0;
     right: 0;
-    height: calc(#{vars.$space-big} + 2 * #{vars.$space-small});
+    height: $quickbox-height;
     display: flex;
     align-items: flex-start;
     align-content: flex-start;
@@ -700,7 +703,7 @@
 
 .quickbox__navitem {
     height: 100%;
-    line-height: calc(#{vars.$space-big} + 2 * #{vars.$space-small});
+    line-height: $quickbox-height;
     display: block;
     text-align: center;
     flex: 0 1 auto;
