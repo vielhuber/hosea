@@ -113,7 +113,7 @@
 
 .tickets__entry {
     display: none;
-    border-left: vars.$space-medium solid transparent;
+    border-left: vars.$space-big solid transparent;
 }
 
 .tickets__entry--visible {
@@ -123,13 +123,13 @@
 .tickets__entry--changed {
     box-shadow:
         0 0 0 3rem vars.$color-orange inset,
-        7rem 0 0 3rem vars.$color-orange inset;
+        3rem 0 0 3rem vars.$color-orange inset;
 }
 
 .tickets__entry--locked {
     box-shadow:
         0 0 0 3rem vars.$color-pink inset,
-        7rem 0 0 3rem vars.$color-pink inset;
+        3rem 0 0 3rem vars.$color-pink inset;
 }
 
 .tickets__attachment {

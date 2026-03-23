@@ -214,7 +214,7 @@
         top: 0;
         left: 0;
         right: 0;
-        bottom: calc(#{vars.$space-big} + 2 * #{vars.$space-small});
+        bottom: vars.$footer-height;
         z-index: 1;
         transition: opacity 0.25s ease-in-out;
         opacity: 0;
@@ -256,6 +256,9 @@
     .scheduler__navigation-button--next-day,
     .scheduler__navigation-button--next-month {
         display: none;
+    }
+    .scheduler__navigation-button--prev-week {
+        margin-left: 0;
     }
 }
 
