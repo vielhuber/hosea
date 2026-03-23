@@ -20,7 +20,7 @@
 
 .metabar__select {
     float: left;
-    width: 90rem;
+    width: 85rem;
     height: vars.$bar-height;
     @include common.input;
     @include common.select;
