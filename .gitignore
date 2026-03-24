@@ -1,11 +1,11 @@
-
 /_public/config.json
 /node_modules/
 /_backup/
-/.env
 /config.json
 /vendor/
 /composer.lock
 /package-lock.json
 /backup.sql
 /_public/_build/*tmp*
+.env
+*.log

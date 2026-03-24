@@ -1,0 +1,13 @@
+# forward Authorization header
+
+RewriteEngine on
+RewriteBase /
+CGIPassAuth On
+RewriteCond %{HTTP:Authorization} ^(._)
+RewriteRule ._ - [e=HTTP_AUTHORIZATION:%1]
+
+# block public access to .env
+
+<Files ".env">
+Require all denied
+</Files>

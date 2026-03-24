@@ -10,7 +10,8 @@
         "php-imap/php-imap": "*",
         "phpmailer/phpmailer": "*",
         "vlucas/phpdotenv": "*",
-        "webklex/php-imap": "*"
+        "webklex/php-imap": "*",
+        "vielhuber/simplemcp": "^1.0"
     },
     "autoload": {
         "psr-4": {
