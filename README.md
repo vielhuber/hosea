@@ -22,6 +22,7 @@ hosea is a personal assistant.
 - live ical export for outlook integration
 - light mail client included (exchange oauth2 supported)
 - stats for your personal finance
+- mcp server support
 
 ## installation
 
@@ -53,3 +54,9 @@ hosea is a personal assistant.
 
 - to speed up caching and improve garbage collecting, point a recurring cronjob running every 5 minutes that calls https://tld.com/_api/cron/%API_KEY%
 - you can find this link in the bottom right ("\_cron") of the gui
+
+### mcp
+
+- `cp _public/_mcp/.env.example _public/_mcp/.env`
+- `vi _public/_mcp/.env`
+- connect any mcp client to `https://hosea.vielhuber.dev/_mcp/mcp-server.php` with an `Authorization: Bearer %MCP_TOKEN%` header
