@@ -59,4 +59,4 @@ hosea is a personal assistant.
 
 - `cp _public/_mcp/.env.example _public/_mcp/.env`
 - `vi _public/_mcp/.env`
-- connect any mcp client to `https://hosea.vielhuber.dev/_mcp/mcp-server.php` with an `Authorization: Bearer %MCP_TOKEN%` header
+- connect any mcp client to `https://tld.com/_mcp/mcp-server.php` with an `Authorization: Bearer %MCP_TOKEN%` header
