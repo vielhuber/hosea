@@ -38,6 +38,8 @@
     right: vars.$space-medium;
     height: vars.$bar-height;
     color: vars.$color-white;
+    padding-left: vars.$space-medium;
+    padding-right: vars.$space-medium;
 }
 
 /* tables are bad for pixel perfect adjustments */
@@ -244,6 +246,8 @@
         align-items: flex-start;
         align-content: flex-start;
         flex-direction: row-reverse;
+        padding-left: 0;
+        padding-right: 0;
     }
     .scheduler__navigation-button {
         border: 2rem solid vars.$color-white;

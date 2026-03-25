@@ -103,8 +103,8 @@ export default class Scheduler {
                                         ? ' scheduler__cell--weekend'
                                         : ''
                                 }
-                            " style="width: ${width};">
-                                ${Dates.dateFormat(Dates.getDayOfActiveViewport(i + 1), 'D d.m.')}
+                            " style="width: ${width};" title="${Dates.dateFormat(Dates.getDayOfActiveViewport(i + 1), 'D d.m.')}">
+                                ${Dates.dateFormat(Dates.getDayOfActiveViewport(i + 1), 'dd')}
                             </td>
                         `
                             )
