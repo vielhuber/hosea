@@ -734,11 +734,15 @@ export default class Quickbox {
                                         parsed_values__value.end !== ''
                                             ? Math.floor(parsed_values__value.begin).toString().padStart(2, '0') +
                                               ':' +
-                                              ((parsed_values__value.begin % 1) * 60).toString().padStart(2, '0') +
+                                              Math.round((parsed_values__value.begin % 1) * 60)
+                                                  .toString()
+                                                  .padStart(2, '0') +
                                               '–' +
                                               Math.floor(parsed_values__value.end).toString().padStart(2, '0') +
                                               ':' +
-                                              ((parsed_values__value.end % 1) * 60).toString().padStart(2, '0')
+                                              Math.round((parsed_values__value.end % 1) * 60)
+                                                  .toString()
+                                                  .padStart(2, '0')
                                             : ''
                                     }
                                 </div>
