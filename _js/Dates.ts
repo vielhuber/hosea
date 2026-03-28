@@ -389,14 +389,13 @@ export default class Dates {
     }
 
     static dateFormat(d, format) {
-        if (format === 'D d.m.') {
+        if (format === 'D d.m') {
             return (
                 ['SO', 'MO', 'DI', 'MI', 'DO', 'FR', 'SA'][d.getDay()] +
                 ' ' +
                 ('0' + d.getDate()).slice(-2) +
                 '.' +
-                ('0' + (d.getMonth() + 1)).slice(-2) +
-                '.'
+                ('0' + (d.getMonth() + 1)).slice(-2)
             );
         }
         if (format === 'dd') {
