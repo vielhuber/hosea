@@ -63,6 +63,5 @@
     "version": "1.3.3",
     "description": "",
     "main": "_public/_build/bundle.js",
-    "author": "David <david@vielhuber.de> (https://vielhuber.de)",
-    "license": "UNLICENSED"
+    "author": "David <david@vielhuber.de> (https://vielhuber.de)"
 }

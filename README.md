@@ -1,3 +1,8 @@
+[![GitHub Tag](https://img.shields.io/github/v/tag/vielhuber/hosea)](https://github.com/vielhuber/hosea/tags)
+[![Code Style](https://img.shields.io/badge/code_style-psr--12-ff69b4.svg)](https://www.php-fig.org/psr/psr-12/)
+[![License](https://img.shields.io/github/license/vielhuber/hosea)](https://github.com/vielhuber/hosea/blob/main/LICENSE.md)
+[![Last Commit](https://img.shields.io/github/last-commit/vielhuber/hosea)](https://github.com/vielhuber/hosea/commits)
+
 # ☕ hosea ☕
 
 hosea is a personal assistant.

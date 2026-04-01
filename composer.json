@@ -17,5 +17,6 @@
         "psr-4": {
             "HoseaApi\\": "_public/_api/"
         }
-    }
+    },
+    "license": "MIT"
 }
