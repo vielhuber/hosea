@@ -71,10 +71,11 @@ class MCP
 
     /**
      * Read appointments, optionally filtered by date range or search term.
+     * The response includes a `count` field with the exact number of appointments — use this authoritative value instead of manually counting the data array.
      *
      * @return string
      */
-    #[McpTool(description: 'Read appointments. Optionally filter by date_from/date_to (YYYY-MM-DD) or a search term.')]
+    #[McpTool(description: 'Read appointments. Optionally filter by date_from/date_to (YYYY-MM-DD) or a search term. Response contains a count field with the exact number of appointments.')]
     public function readAppointments(
         #[Schema(type: 'string', description: 'Optional start date filter YYYY-MM-DD.')] string $dateFrom = '',
         #[Schema(type: 'string', description: 'Optional end date filter YYYY-MM-DD.')] string $dateTo = '',
@@ -125,7 +126,7 @@ class MCP
             ];
         }
 
-        return json_encode(['success' => true, 'data' => $result]);
+        return json_encode(['success' => true, 'count' => count($result), 'data' => $result]);
     }
 
     /**
