@@ -357,22 +357,26 @@ export default class Quickbox {
                         }
                     `;
                     iframe.contentDocument.head.appendChild(style);
-                    iframe.contentDocument.querySelectorAll('a').forEach(el => {
-                        el.setAttribute('target', '_blank');
-                    });
+                    if (iframe.contentDocument.querySelector('a') !== null) {
+                        iframe.contentDocument.querySelectorAll('a').forEach(el => {
+                            el.setAttribute('target', '_blank');
+                        });
+                    }
                 };
                 iframe.setAttribute('srcdoc', content);
             }
         });
 
         // remove existing
-        document.querySelectorAll('.quickbox__mail').forEach(el => {
-            if (
-                Store.data.mails.filter(mails__value => mails__value.id === el.getAttribute('data-id')).length === 0
-            ) {
-                el.remove();
-            }
-        });
+        if (document.querySelector('.quickbox__mail') !== null) {
+            document.querySelectorAll('.quickbox__mail').forEach(el => {
+                if (
+                    Store.data.mails.filter(mails__value => mails__value.id === el.getAttribute('data-id')).length === 0
+                ) {
+                    el.remove();
+                }
+            });
+        }
 
         if (document.querySelector('.quickbox__mails--loading') !== null) {
             document.querySelector('.quickbox__mails--loading').classList.remove('quickbox__mails--loading');
@@ -500,9 +504,11 @@ export default class Quickbox {
                     el.checked = false;
                 } else {
                     el.checked = true;
-                    document.querySelectorAll('input[type="radio"][uncheckable][data-checked]').forEach(el => {
-                        el.removeAttribute('data-checked');
-                    });
+                    if (document.querySelector('input[type="radio"][uncheckable][data-checked]') !== null) {
+                        document.querySelectorAll('input[type="radio"][uncheckable][data-checked]').forEach(el => {
+                            el.removeAttribute('data-checked');
+                        });
+                    }
                     el.setAttribute('data-checked', '');
                 }
             }
@@ -561,9 +567,11 @@ export default class Quickbox {
                 document.querySelector('.scheduler').classList.remove('scheduler--mobile-active');
             }
 
-            document.querySelectorAll('.quickbox__navitem--active').forEach(navitem__value => {
-                navitem__value.classList.remove('quickbox__navitem--active');
-            });
+            if (document.querySelector('.quickbox__navitem--active') !== null) {
+                document.querySelectorAll('.quickbox__navitem--active').forEach(navitem__value => {
+                    navitem__value.classList.remove('quickbox__navitem--active');
+                });
+            }
             document
                 .querySelector('.quickbox__navitem[href="#' + view + '"]')
                 .classList.add('quickbox__navitem--active');
