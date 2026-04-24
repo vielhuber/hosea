@@ -20,7 +20,7 @@ export default class Filter {
         if (update === true) {
             document
                 .querySelector('.metabar__filter')
-                .querySelectorAll<HTMLInputElement>('.metabar__select--filter')
+                .querySelectorAll('.metabar__select--filter')
                 .forEach(el => {
                     selected[el.getAttribute('name')] = el.value;
                 });
@@ -156,7 +156,7 @@ export default class Filter {
 
         if (update === true) {
             Object.entries(selected).forEach(([selected__key, selected__value]) => {
-                (document.querySelector('.metabar__filter [name="' + selected__key + '"]') as HTMLInputElement).value =
+                document.querySelector('.metabar__filter [name="' + selected__key + '"]').value =
                     selected__value as string;
             });
         } else {
@@ -177,7 +177,7 @@ export default class Filter {
     }
 
     static async doFilter() {
-        (document.querySelector('.tickets__table-body') as HTMLElement).style.display = 'none';
+        document.querySelector('.tickets__table-body').style.display = 'none';
 
         let tickets = Store.data.tickets;
         let batchSize = 50;
@@ -239,8 +239,7 @@ export default class Filter {
                             el.getAttribute('name') == 'status' &&
                             val_search === '*' &&
                             val_target === 'billed' &&
-                            (document.querySelector('.metabar__select--filter[name="date"]') as HTMLInputElement)
-                                .value === '*'
+                            document.querySelector('.metabar__select--filter[name="date"]').value === '*'
                         ) {
                             visible_this = false;
                         }
@@ -254,9 +253,9 @@ export default class Filter {
                         }
                     });
 
-                let search_query = (
-                    document.querySelector('.metabar__filter').querySelector('input[type="text"') as HTMLInputElement
-                ).value;
+                let search_query = document
+                    .querySelector('.metabar__filter')
+                    .querySelector('input[type="text"').value;
                 if (search_query !== '') {
                     visible = true;
                     // split up search query. for example:
@@ -316,6 +315,6 @@ export default class Filter {
         Tickets.updateSum();
         Textarea.textareaSetVisibleHeights();
 
-        (document.querySelector('.tickets__table-body') as HTMLElement).style.display = 'table-row-group';
+        document.querySelector('.tickets__table-body').style.display = 'table-row-group';
     }
 }

@@ -194,16 +194,14 @@ export default class Tickets {
                 .forEach(el => {
                     let data = {};
                     Store.data.cols.forEach(cols__value => {
-                        data[cols__value] = (
-                            el.querySelector('[name="' + cols__value + '"]') as HTMLInputElement
-                        ).value;
+                        data[cols__value] = el.querySelector('[name="' + cols__value + '"]').value;
                     });
                     data['updated_at'] = Dates.time().toString();
                     // auto update date
                     if (data['date'] == '*') {
                         Tickets.setTicketData(el.getAttribute('data-id'), data);
                         data['date'] = Scheduler.determineNextFreeSlotAdvanced(data['priority'], data['time']);
-                        (el.querySelector('[name="date"]') as HTMLInputElement).value = data['date'];
+                        el.querySelector('[name="date"]').value = data['date'];
                     }
                     Tickets.setTicketData(el.getAttribute('data-id'), data);
                     Lock.lockTicket(el.getAttribute('data-id'));
@@ -554,16 +552,11 @@ export default class Tickets {
                             time = time.toFixed(2);
                         }
                         time = time.toString().replace('.', ',');
-                        (
-                            target
-                                .closest('.tickets__entry')
-                                .querySelector('.tickets__textarea--time') as HTMLInputElement
-                        ).value = time;
-                        (
-                            target
-                                .closest('.tickets__entry')
-                                .querySelector('.tickets__textarea--time') as HTMLInputElement
-                        ).setCustomValidity('');
+                        target.closest('.tickets__entry').querySelector('.tickets__textarea--time').value = time;
+                        target
+                            .closest('.tickets__entry')
+                            .querySelector('.tickets__textarea--time')
+                            .setCustomValidity('');
                     }
                 }
             }

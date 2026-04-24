@@ -11,7 +11,7 @@ export default class Keyboard {
         // one more keyboard event is needed (so that jumps are not too early)
         // therefore we save the previous cursor pointer here
         let selectionEndBefore = 1;
-        (document.querySelector('.tickets') as HTMLElement).addEventListener('keyup', (e: KeyboardEvent) => {
+        document.querySelector('.tickets').addEventListener('keyup', (e: KeyboardEvent) => {
             const target = e.target as HTMLInputElement;
             if (
                 !target ||
@@ -33,13 +33,13 @@ export default class Keyboard {
                 target.selectionEnd >= target.value.length &&
                 selectionEndBefore >= target.value.length
             ) {
-                (right.querySelector('input, textarea') as HTMLInputElement).select();
+                right.querySelector('input, textarea').select();
                 selectionEndBefore = 1;
                 e.preventDefault();
             }
             // arrow left (switch)
             else if (e.keyCode === 37 && left !== null && target.selectionEnd <= 0 && selectionEndBefore <= 0) {
-                (left.querySelector('input, textarea') as HTMLInputElement).select();
+                left.querySelector('input, textarea').select();
                 selectionEndBefore = 1;
                 e.preventDefault();
             }
@@ -81,9 +81,7 @@ export default class Keyboard {
                 34: 'next-week' // page down
             };
             if (Object.keys(assignedKeys).includes(e.keyCode.toString())) {
-                (
-                    document.querySelector('.scheduler__navigation-button--' + assignedKeys[e.keyCode]) as HTMLElement
-                ).click();
+                document.querySelector('.scheduler__navigation-button--' + assignedKeys[e.keyCode]).click();
                 e.preventDefault();
             }
         });

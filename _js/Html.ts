@@ -29,7 +29,7 @@ export default class Html {
 
         // performance: remove animation after some time
         setTimeout(() => {
-            (document.querySelector('.animation') as HTMLElement).style.opacity = '0';
+            document.querySelector('.animation').style.opacity = '0';
             setTimeout(() => {
                 document.querySelector('.animation').remove();
             }, 5000);

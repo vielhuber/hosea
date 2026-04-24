@@ -65,7 +65,7 @@ export default class Attachments {
                 let el = document.querySelector(
                     '.tickets .tickets__entry[data-id="' + ticket_id + '"] input[type="file"]'
                 );
-                (el as HTMLInputElement).value = '';
+                el.value = '';
                 attachments.forEach(attachments__value => {
                     el.closest('.tickets__entry')
                         .querySelector('.tickets__attachments')

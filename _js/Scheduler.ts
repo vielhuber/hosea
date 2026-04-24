@@ -349,18 +349,19 @@ export default class Scheduler {
                             target.closest('.scheduler__navigation-daylink').getAttribute('data-date')
                         );
                     }
-                    (document.querySelector('.metabar__select--filter[name="date"]') as HTMLInputElement).value =
-                        Dates.dateFormat(Store.data.session.activeDay, 'Y-m-d');
-                    (document.querySelector('.metabar__select--sort[name="sort_1"]') as HTMLInputElement).value = '';
-                    (document.querySelector('.metabar__select--sort[name="sort_2"]') as HTMLInputElement).value = '';
-                    (document.querySelector('.metabar__select--filter[name="search"]') as HTMLInputElement).value = '';
+                    document.querySelector('.metabar__select--filter[name="date"]').value = Dates.dateFormat(
+                        Store.data.session.activeDay,
+                        'Y-m-d'
+                    );
+                    document.querySelector('.metabar__select--sort[name="sort_1"]').value = '';
+                    document.querySelector('.metabar__select--sort[name="sort_2"]').value = '';
+                    document.querySelector('.metabar__select--filter[name="search"]').value = '';
                 }
                 if (target.closest('.scheduler__navigation-week-link-to-empty')) {
-                    (document.querySelector('.metabar__select--filter[name="date"]') as HTMLInputElement).value = '';
-                    (document.querySelector('.metabar__select--sort[name="sort_1"]') as HTMLInputElement).value =
-                        'priority';
-                    (document.querySelector('.metabar__select--sort[name="sort_2"]') as HTMLInputElement).value = '';
-                    (document.querySelector('.metabar__select--filter[name="search"]') as HTMLInputElement).value = '';
+                    document.querySelector('.metabar__select--filter[name="date"]').value = '';
+                    document.querySelector('.metabar__select--sort[name="sort_1"]').value = 'priority';
+                    document.querySelector('.metabar__select--sort[name="sort_2"]').value = '';
+                    document.querySelector('.metabar__select--filter[name="search"]').value = '';
                 }
 
                 Filter.doFilter().then(() => {
@@ -739,9 +740,7 @@ export default class Scheduler {
                         null
                     ),
                     opacity = Scheduler.getStoreProperty('opacity', tickets__value.status, tickets__value.project, 1),
-                    el = document.querySelector(
-                        '.tickets .tickets__entry[data-id="' + tickets__value.id + '"]'
-                    ) as HTMLElement;
+                    el = document.querySelector('.tickets .tickets__entry[data-id="' + tickets__value.id + '"]');
                 if (borderColor) {
                     el.style.borderLeftColor = borderColor;
                 } else {
@@ -819,10 +818,10 @@ export default class Scheduler {
     }
 
     static indicatorIntervalValue() {
-        let $el_indicator = document.querySelector('.scheduler__cell--indicator') as HTMLElement,
-            $el_container = document.querySelector('.scheduler__cell--indicator-container') as HTMLElement,
-            $el_appointments = document.querySelector('.scheduler__appointments') as HTMLElement,
-            $el_row = document.querySelector('.scheduler__table-body .scheduler__row:first-child') as HTMLElement;
+        let $el_indicator = document.querySelector('.scheduler__cell--indicator'),
+            $el_container = document.querySelector('.scheduler__cell--indicator-container'),
+            $el_appointments = document.querySelector('.scheduler__appointments'),
+            $el_row = document.querySelector('.scheduler__table-body .scheduler__row:first-child');
 
         if ($el_indicator !== null && $el_container !== null && $el_appointments !== null && $el_row !== null) {
             let now = new Date(),
@@ -850,7 +849,7 @@ export default class Scheduler {
     }
 
     static indicatorIntervalFn() {
-        let $el_indicator = document.querySelector('.scheduler__cell--indicator') as HTMLElement;
+        let $el_indicator = document.querySelector('.scheduler__cell--indicator');
         if ($el_indicator !== null) {
             $el_indicator.style.top = Scheduler.indicatorIntervalValue() + 'px';
             tippy($el_indicator, {

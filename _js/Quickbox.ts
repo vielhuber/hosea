@@ -254,9 +254,8 @@ export default class Quickbox {
     }
 
     static updateMailCount() {
-        (
-            document.querySelector('.quickbox__navitem[href="#mails"] .quickbox__navitem-count') as HTMLElement
-        ).innerText = Store.data.mails.length;
+        document.querySelector('.quickbox__navitem[href="#mails"] .quickbox__navitem-count').innerText =
+            Store.data.mails.length;
     }
 
     static renderMails() {
@@ -336,7 +335,7 @@ export default class Quickbox {
                 );
                 let iframe = document.querySelector(
                     '.quickbox__mail[data-id="' + mails__value.id + '"] .quickbox__mail-content'
-                ) as HTMLIFrameElement;
+                );
                 iframe.onload = () => {
                     let style = document.createElement('style');
                     style.textContent = `
@@ -358,26 +357,22 @@ export default class Quickbox {
                         }
                     `;
                     iframe.contentDocument.head.appendChild(style);
-                    if (iframe.contentDocument.querySelector('a') !== null) {
-                        iframe.contentDocument.querySelectorAll('a').forEach(el => {
-                            el.setAttribute('target', '_blank');
-                        });
-                    }
+                    iframe.contentDocument.querySelectorAll('a').forEach(el => {
+                        el.setAttribute('target', '_blank');
+                    });
                 };
                 iframe.setAttribute('srcdoc', content);
             }
         });
 
         // remove existing
-        if (document.querySelector('.quickbox__mail') !== null) {
-            document.querySelectorAll('.quickbox__mail').forEach(el => {
-                if (
-                    Store.data.mails.filter(mails__value => mails__value.id === el.getAttribute('data-id')).length === 0
-                ) {
-                    el.remove();
-                }
-            });
-        }
+        document.querySelectorAll('.quickbox__mail').forEach(el => {
+            if (
+                Store.data.mails.filter(mails__value => mails__value.id === el.getAttribute('data-id')).length === 0
+            ) {
+                el.remove();
+            }
+        });
 
         if (document.querySelector('.quickbox__mails--loading') !== null) {
             document.querySelector('.quickbox__mails--loading').classList.remove('quickbox__mails--loading');
@@ -422,11 +417,11 @@ export default class Quickbox {
                 form.closest('.quickbox__mail').classList.add(
                     'quickbox__mail--move-' + (action === 'discard' ? 'left' : 'right')
                 );
-                (document.querySelector('.quickbox__mails') as HTMLElement).style.overflowY = 'auto';
+                document.querySelector('.quickbox__mails').style.overflowY = 'auto';
                 document.querySelector('.quickbox__mails').scrollTop = this.lastScrollPos;
 
                 if (action === 'create' && form.querySelector('[name="action_ticket_time"]:checked') !== null) {
-                    let date = (form.querySelector('[name="action_ticket_time"]:checked') as HTMLInputElement).value;
+                    let date = form.querySelector('[name="action_ticket_time"]:checked').value;
                     Tickets.createAndAppendTicket(
                         {
                             date: date,
@@ -505,11 +500,9 @@ export default class Quickbox {
                     el.checked = false;
                 } else {
                     el.checked = true;
-                    if (document.querySelector('input[type="radio"][uncheckable][data-checked]') !== null) {
-                        document.querySelectorAll('input[type="radio"][uncheckable][data-checked]').forEach(el => {
-                            el.removeAttribute('data-checked');
-                        });
-                    }
+                    document.querySelectorAll('input[type="radio"][uncheckable][data-checked]').forEach(el => {
+                        el.removeAttribute('data-checked');
+                    });
                     el.setAttribute('data-checked', '');
                 }
             }
@@ -538,7 +531,7 @@ export default class Quickbox {
         document.querySelector('.quickbox__content').classList.add('quickbox__content--disabled');
         /* in chrome we want ctrl+f to not find hidden elements (so we must apply display:none) */
         /* the following lines ensure to do exactly that */
-        document.querySelectorAll<HTMLElement>('.quickbox__content > *').forEach(el2 => {
+        document.querySelectorAll('.quickbox__content > *').forEach(el2 => {
             el2.style.display = 'block';
         });
         /* reinitialize chart to init animation */
@@ -548,17 +541,15 @@ export default class Quickbox {
         if (view === 'new') {
             setTimeout(() => {
                 if (document.querySelector('.quickbox__new-input--focus') !== null) {
-                    (document.querySelector('.quickbox__new-input--focus') as HTMLElement).focus();
+                    document.querySelector('.quickbox__new-input--focus').focus();
                 }
             }, 250);
         }
         requestAnimationFrame(() => {
             setTimeout(() => {
-                document
-                    .querySelectorAll<HTMLElement>('.quickbox__content > *:not(.quickbox__' + view + ')')
-                    .forEach(el2 => {
-                        el2.style.display = 'none';
-                    });
+                document.querySelectorAll('.quickbox__content > *:not(.quickbox__' + view + ')').forEach(el2 => {
+                    el2.style.display = 'none';
+                });
                 document.querySelector('.quickbox__content').classList.remove('quickbox__content--disabled');
             }, 250);
 
@@ -570,11 +561,9 @@ export default class Quickbox {
                 document.querySelector('.scheduler').classList.remove('scheduler--mobile-active');
             }
 
-            if (document.querySelector('.quickbox__navitem--active') !== null) {
-                document.querySelectorAll('.quickbox__navitem--active').forEach(navitem__value => {
-                    navitem__value.classList.remove('quickbox__navitem--active');
-                });
-            }
+            document.querySelectorAll('.quickbox__navitem--active').forEach(navitem__value => {
+                navitem__value.classList.remove('quickbox__navitem--active');
+            });
             document
                 .querySelector('.quickbox__navitem[href="#' + view + '"]')
                 .classList.add('quickbox__navitem--active');
@@ -588,10 +577,7 @@ export default class Quickbox {
         if (this.moneyChart) {
             this.moneyChart.destroy();
         }
-        this.moneyChart = new Chart(
-            document.querySelector('.quickbox__money-chart-canvas') as HTMLCanvasElement,
-            this.chartData
-        );
+        this.moneyChart = new Chart(document.querySelector('.quickbox__money-chart-canvas'), this.chartData);
     }
 
     static initToday() {
@@ -671,7 +657,7 @@ export default class Quickbox {
                 return;
             }
             let parsed_values;
-            if ((document.querySelector('.metabar__select--filter[name="date"]') as HTMLInputElement).value !== '') {
+            if (document.querySelector('.metabar__select--filter[name="date"]').value !== '') {
                 parsed_values = Dates.parseDateString(tickets__value.date, 'tickets');
             } else {
                 parsed_values = [
@@ -829,9 +815,7 @@ export default class Quickbox {
                 count++;
             }
         });
-        (
-            document.querySelector('.quickbox__navitem[href="#today"] .quickbox__navitem-count') as HTMLElement
-        ).innerText = String(count);
+        document.querySelector('.quickbox__navitem[href="#today"] .quickbox__navitem-count').innerText = String(count);
     }
 
     static bindToday() {
@@ -853,13 +837,14 @@ export default class Quickbox {
                     } else if (target.closest('.quickbox__today-navitem--next-day')) {
                         Store.data.session.activeDay.setDate(Store.data.session.activeDay.getDate() + 1);
                     }
-                    (document.querySelector('.metabar__select--filter[name="date"]') as HTMLInputElement).value =
-                        Dates.dateFormat(Store.data.session.activeDay, 'Y-m-d');
-                    (document.querySelector('.metabar__select--sort[name="sort_1"]') as HTMLInputElement).value = '';
+                    document.querySelector('.metabar__select--filter[name="date"]').value = Dates.dateFormat(
+                        Store.data.session.activeDay,
+                        'Y-m-d'
+                    );
+                    document.querySelector('.metabar__select--sort[name="sort_1"]').value = '';
                 } else if (target.closest('.quickbox__today-navitem--empty')) {
-                    (document.querySelector('.metabar__select--filter[name="date"]') as HTMLInputElement).value = '';
-                    (document.querySelector('.metabar__select--sort[name="sort_1"]') as HTMLInputElement).value =
-                        'priority';
+                    document.querySelector('.metabar__select--filter[name="date"]').value = '';
+                    document.querySelector('.metabar__select--sort[name="sort_1"]').value = 'priority';
                 }
 
                 await Filter.doFilter();
@@ -873,7 +858,7 @@ export default class Quickbox {
             if ($form) {
                 e.preventDefault();
 
-                ($form.querySelector('.quickbox__today-edit-submit') as HTMLInputElement).disabled = true;
+                $form.querySelector('.quickbox__today-edit-submit').disabled = true;
 
                 if ($form.querySelector('*:invalid') !== null) {
                     Swal.fire({
@@ -891,9 +876,7 @@ export default class Quickbox {
                 let data = {};
                 Store.data.cols.forEach(cols__value => {
                     if ($form.querySelector('[name="' + cols__value + '"]') !== null) {
-                        data[cols__value] = (
-                            $form.querySelector('[name="' + cols__value + '"]') as HTMLInputElement
-                        ).value;
+                        data[cols__value] = $form.querySelector('[name="' + cols__value + '"]').value;
                     }
                 });
                 data['updated_at'] = Dates.time().toString();
@@ -1044,44 +1027,28 @@ export default class Quickbox {
                 (e.target as HTMLInputElement).value != '' &&
                 document.querySelector('.quickbox__new-form [name="date"][type="radio"]:checked') !== null
             ) {
-                (
-                    document.querySelector(
-                        '.quickbox__new-form [name="date"][type="radio"]:checked'
-                    ) as HTMLInputElement
-                ).checked = false;
+                document.querySelector('.quickbox__new-form [name="date"][type="radio"]:checked').checked = false;
             }
         });
         document.querySelectorAll('.quickbox__new-form [name="date"][type="radio"]').forEach(el => {
             el.addEventListener('change', e => {
                 if ((e.target as HTMLInputElement).checked === true) {
-                    (
-                        document.querySelector('.quickbox__new-form [name="date"][type="text"]') as HTMLInputElement
-                    ).value = '';
+                    document.querySelector('.quickbox__new-form [name="date"][type="text"]').value = '';
                 }
             });
         });
         document.querySelector('.quickbox__new-form').addEventListener('submit', e => {
             e.preventDefault();
-            (document.querySelector('.quickbox__new-submit') as HTMLInputElement).disabled = true;
+            document.querySelector('.quickbox__new-submit').disabled = true;
             Tickets.createAndAppendTicket(
                 {
                     date:
                         document.querySelector('.quickbox__new-form [type="radio"][name="date"]:checked') !== null
-                            ? (
-                                  document.querySelector(
-                                      '.quickbox__new-form [type="radio"][name="date"]:checked'
-                                  ) as HTMLInputElement
-                              ).value
-                            : (
-                                  document.querySelector(
-                                      '.quickbox__new-form [type="text"][name="date"]'
-                                  ) as HTMLInputElement
-                              ).value,
-                    description: (
-                        document.querySelector('.quickbox__new-form [name="description"]') as HTMLInputElement
-                    ).value,
+                            ? document.querySelector('.quickbox__new-form [type="radio"][name="date"]:checked').value
+                            : document.querySelector('.quickbox__new-form [type="text"][name="date"]').value,
+                    description: document.querySelector('.quickbox__new-form [name="description"]').value,
                     priority: 'A',
-                    project: (document.querySelector('.quickbox__new-form [name="project"]') as HTMLInputElement).value,
+                    project: document.querySelector('.quickbox__new-form [name="project"]').value,
                     status: 'scheduled',
                     time: '0,50',
                     visible: true
@@ -1098,7 +1065,7 @@ export default class Quickbox {
                     return error;
                 })
                 .then(response => {
-                    (document.querySelector('.quickbox__new-submit') as HTMLInputElement).disabled = false;
+                    document.querySelector('.quickbox__new-submit').disabled = false;
                     if ((response as any).success === true) {
                         Swal.fire({
                             text: 'successfully created new ticket',
@@ -1107,8 +1074,8 @@ export default class Quickbox {
                             timerProgressBar: true,
                             showConfirmButton: false
                         });
-                        (document.querySelector('.quickbox__new-form') as HTMLFormElement).reset();
-                        (document.querySelector('.quickbox__navitem[href="#today"]') as HTMLElement).click();
+                        document.querySelector('.quickbox__new-form').reset();
+                        document.querySelector('.quickbox__navitem[href="#today"]').click();
                     } else {
                         Swal.fire({
                             text: 'error creating new ticket',

@@ -33,8 +33,8 @@ export default class Sort {
     }
 
     static doSort() {
-        let sort_1 = (document.querySelector('.metabar__select--sort[name="sort_1"]') as HTMLSelectElement).value,
-            sort_2 = (document.querySelector('.metabar__select--sort[name="sort_2"]') as HTMLSelectElement).value,
+        let sort_1 = document.querySelector('.metabar__select--sort[name="sort_1"]').value,
+            sort_2 = document.querySelector('.metabar__select--sort[name="sort_2"]').value,
             sorted = [
                 ...document.querySelector('.tickets .tickets__table-body').querySelectorAll('.tickets__entry--visible')
             ].sort((a: any, b: any) => {
