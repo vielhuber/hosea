@@ -401,6 +401,9 @@ export default class Dates {
         if (format === 'dd') {
             return ['S', 'M', 'D', 'M', 'D', 'F', 'S'][d.getDay()] + '' + ('0' + d.getDate()).slice(-2);
         }
+        if (format === 'm') {
+            return ('0' + (d.getMonth() + 1)).slice(-2);
+        }
         if (format === 'd. F Y') {
             return (
                 ('0' + d.getDate()).slice(-2) +

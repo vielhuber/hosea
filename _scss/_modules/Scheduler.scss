@@ -135,6 +135,13 @@
     box-shadow: 0 0 10rem 0 vars.$color-white;
 }
 
+.scheduler__cell-day-label {
+    display: block;
+}
+.scheduler__cell-day-label--extended {
+    display: none;
+}
+
 .scheduler__appointments {
     position: absolute;
     top: calc(#{vars.$bar-height} + #{vars.$bar-height} + #{vars.$space-medium} * 2);
@@ -233,6 +240,14 @@
     }
     .scheduler__cell {
         font-size: vars.$font-size-small;
+    }
+    .scheduler__table-head .scheduler__cell {
+        display: flex;
+        justify-content: center;
+        overflow: hidden;
+    }
+    .scheduler__cell-day-label--extended {
+        display: block;
     }
     .scheduler--mobile-active {
         opacity: 1;

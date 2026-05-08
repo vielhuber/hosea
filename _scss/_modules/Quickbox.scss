@@ -319,16 +319,16 @@ $quickbox-height: calc(#{vars.$footer-height});
 }
 .quickbox__today-edit-delete-container-top {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: flex-start;
     align-content: flex-start;
 }
 .quickbox__today-edit {
-    width: 50%;
+    width: 20rem;
     text-align: left;
 }
 .quickbox__today-delete {
-    width: 50%;
+    width: 20rem;
     text-align: right;
 }
 .quickbox__today-edit-delete-container-bottom {
