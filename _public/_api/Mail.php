@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace HoseaApi;
 use vielhuber\mailhelper\mailhelper;
 
@@ -82,7 +84,7 @@ class Mail extends Api
             }
             try {
                 $mailhelper = new mailhelper($config);
-                $folders = $mailhelper->getFolders(mailbox: $config__key);
+                $folders = $mailhelper->getFolders(mailbox: $config__key)['items'];
                 foreach ($folders as $folders__value) {
                     if ($folders__value !== $config__value['imap']['folder_inbox']) {
                         continue;
@@ -90,7 +92,7 @@ class Mail extends Api
                     $messages = $mailhelper->fetchMails(
                         mailbox: $config__key,
                         folder: $config__value['imap']['folder_inbox']
-                    );
+                    )['items'];
                     $runtime_start = microtime(true);
                     foreach ($messages as $messages__value) {
                         $mail_data = $mailhelper->viewMail(
