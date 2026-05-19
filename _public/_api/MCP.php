@@ -75,12 +75,27 @@ class MCP
      *
      * @return string
      */
-    #[McpTool(description: 'Read appointments. Optionally filter by date_from/date_to (YYYY-MM-DD) or a search term. Response contains a count field with the exact number of appointments.')]
+    #[McpTool(description: 'Read appointments. Filter by dateFrom/dateTo (YYYY-MM-DD) or search term. Without any filters defaults to a window from 7 days ago to 30 days ahead so the response stays under a few KB instead of dumping ~30k historical tickets. Response contains a count field and a total field (matches before limit).')]
     public function readAppointments(
         #[Schema(type: 'string', description: 'Optional start date filter YYYY-MM-DD.')] string $dateFrom = '',
         #[Schema(type: 'string', description: 'Optional end date filter YYYY-MM-DD.')] string $dateTo = '',
-        #[Schema(type: 'string', description: 'Optional search string for project or description.')] string $search = ''
+        #[Schema(type: 'string', description: 'Optional search string for project or description.')] string $search = '',
+        #[Schema(type: 'integer', description: 'Max number of entries to return (default 200). Hard cap to keep responses small. Combine with dateFrom/dateTo for older data.')] int $limit = 200
     ): string {
+        // sensible default window when caller passes no filters at all — DB has
+        // ~30k historical tickets and an unfiltered dump is ~27 MB which times
+        // out downstream (fastmcp → aihelper → tokenization)
+        if ($dateFrom === '' && $dateTo === '' && $search === '') {
+            $dateFrom = date('Y-m-d', strtotime('-7 days'));
+            $dateTo = date('Y-m-d', strtotime('+30 days'));
+        }
+        if ($limit < 1) {
+            $limit = 1;
+        }
+        if ($limit > 2000) {
+            $limit = 2000;
+        }
+
         $tickets = $this->db->fetch_all(
             'SELECT id, status, priority, date, time, project, description, updated_at
              FROM tickets
@@ -126,7 +141,17 @@ class MCP
             ];
         }
 
-        return json_encode(['success' => true, 'count' => count($result), 'data' => $result]);
+        $total = count($result);
+        if ($total > $limit) {
+            $result = array_slice($result, 0, $limit);
+        }
+        return json_encode([
+            'success' => true,
+            'count' => count($result),
+            'total' => $total,
+            'window' => ['dateFrom' => $dateFrom, 'dateTo' => $dateTo, 'search' => $search, 'limit' => $limit],
+            'data' => $result
+        ]);
     }
 
     /**
