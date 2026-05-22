@@ -1,17 +1,17 @@
 {
     "require": {
-        "vielhuber/dbhelper": "*",
-        "vielhuber/stringhelper": "*",
-        "vielhuber/simpleauth": "*",
-        "vielhuber/comparehelper": "*",
-        "vielhuber/mailhelper": "*",
-        "guzzlehttp/guzzle": "*",
-        "eluceo/ical": "*",
+        "vielhuber/dbhelper": "^2.4.6",
+        "vielhuber/stringhelper": "^7.2.3",
+        "vielhuber/simpleauth": "^1.7.4",
+        "vielhuber/comparehelper": "^1.1.9",
+        "vielhuber/mailhelper": "^1.7.8",
+        "guzzlehttp/guzzle": "^7.10.3",
+        "eluceo/ical": "^2.16.0",
         "php-imap/php-imap": "*",
         "phpmailer/phpmailer": "*",
-        "vlucas/phpdotenv": "*",
-        "webklex/php-imap": "*",
-        "vielhuber/simplemcp": "^1.0"
+        "vlucas/phpdotenv": "^5.6.3",
+        "webklex/php-imap": "^6.2.0",
+        "vielhuber/simplemcp": "^1.1.3"
     },
     "autoload": {
         "psr-4": {
