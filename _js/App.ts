@@ -37,6 +37,7 @@ export default class App {
         Footer.bindSave();
         Footer.bindCreate();
         Footer.bindView();
+        Footer.bindBulk();
         Footer.bindLogout();
         Footer.linkApiKey();
         Footer.initStatus();

@@ -715,7 +715,7 @@ export default class Dates {
             date__value = date__value.replace(/ +(?= )/g, ''); // remove double whitespaces
             date__value = date__value.trim();
             if (isObsolete === false) {
-                date__value = date__value + ' >' + Dates.dateFormat(Dates.getActiveDate(), 'd.m.y');
+                date__value = date__value + ' >' + Dates.dateFormat(lowerBound, 'd.m.y');
             }
             date[date__key] = date__value;
         });

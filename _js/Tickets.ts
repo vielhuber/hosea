@@ -12,6 +12,8 @@ import Attachments from './Attachments';
 import hlp from 'hlp';
 
 export default class Tickets {
+    static bulkRunning = false;
+
     static updateLocalTicket(ticket_id) {
         return new Promise<void>((resolve, reject) => {
             Store.data.busy = true;
@@ -318,58 +320,16 @@ export default class Tickets {
             .querySelector('.tickets .tickets__table-body')
             .querySelectorAll('.tickets__entry--visible');
 
-        let copyBulkRecurring = null,
-            copyBulkRecurringOnly = null,
-            copyBulkRecurringCounter = 0,
-            copyType = null,
-            ticketDataToCopy = [],
-            askCounter = 0;
+        let ticketDataToCopy = [];
 
-        // determine copyBulkRecurring
-        if (visibleAll.length > 0) {
-            visibleAll.forEach($el => {
-                let status = Tickets.getTicketData($el.getAttribute('data-id')).status;
-                if (status !== 'allday' && status !== 'birthday') {
-                    if (status !== 'recurring') {
-                        copyBulkRecurringOnly = false;
-                    }
-                    if (status === 'recurring') {
-                        copyBulkRecurringCounter++;
-                        if (copyBulkRecurringOnly === null) {
-                            copyBulkRecurringOnly = true;
-                        }
-                    }
-                }
-            });
-        }
-        copyBulkRecurring =
-            copyBulkRecurringOnly === true &&
-            copyBulkRecurringCounter > 1 &&
-            document.activeElement.closest('.tickets__entry') === null;
-
-        // determine copyType and ticketDataToCopy
+        // determine ticketDataToCopy
         if (visibleAll.length === 0) {
-            copyType = 'single';
             ticketDataToCopy.push({
                 current: null,
                 currentCol: 1,
                 duplicateData: {}
             });
-        } else if (copyBulkRecurring === true) {
-            copyType = 'bulk';
-            visibleAll.forEach($el => {
-                let duplicateData = Tickets.getTicketData($el.getAttribute('data-id'));
-                if (duplicateData.status !== 'allday' && duplicateData.status !== 'birthday') {
-                    delete duplicateData['attachments'];
-                    ticketDataToCopy.push({
-                        current: $el,
-                        currentCol: 1,
-                        duplicateData: duplicateData
-                    });
-                }
-            });
         } else {
-            copyType = 'single';
             let current = null,
                 currentCol = null,
                 duplicateData = null;
@@ -395,18 +355,7 @@ export default class Tickets {
                 ticketDataToCopy__value.current !== null &&
                 ticketDataToCopy__value.duplicateData.status === 'recurring'
             ) {
-                if (
-                    (copyType !== 'bulk' &&
-                        confirm(
-                            'should the copy be a scheduled ticket and the recurring ticket automatically be postponed?'
-                        )) ||
-                    (copyType === 'bulk' &&
-                        (askCounter > 0 ||
-                            confirm(
-                                'BULK ALERT: should the copy be a scheduled ticket and the recurring ticket automatically be postponed?'
-                            )))
-                ) {
-                    askCounter++;
+                if (confirm('should the copy be a scheduled ticket and the recurring ticket automatically be postponed?')) {
                     let newDates = [];
                     ticketDataToCopy__value.duplicateData.date.split('\n').forEach(duplicateData__value => {
                         // only add relevant
@@ -426,6 +375,11 @@ export default class Tickets {
                             ticketDataToCopy__value.duplicateData.date,
                             Dates.getActiveDate()
                         );
+                    Tickets.setTicketData(
+                        ticketDataToCopy__value.current.getAttribute('data-id'),
+                        'date',
+                        ticketDataToCopy__value.current.querySelector('.tickets__textarea--date').value
+                    );
                     ticketDataToCopy__value.current
                         .querySelector('.tickets__textarea--date')
                         .dispatchEvent(new Event('input', { bubbles: true }));
@@ -444,7 +398,136 @@ export default class Tickets {
         });
     }
 
-    static createAndAppendTicket(data, current = null, currentCol = 1, withSelect = true, doFilter = false) {
+    static async bulkCreateScheduledTickets() {
+        if (Tickets.bulkRunning === true) {
+            throw 'bulk already running.';
+        }
+        Tickets.bulkRunning = true;
+
+        let ticketDataToCopy = [],
+            ticketDataToUpdate = [],
+            ticketIdsToUnlock = [],
+            viewportDays = Store.data.shiftingView
+                ? Store.data.shiftingViewPrevDays + Store.data.weeksInViewport * 7
+                : Store.data.weeksInViewport * 7,
+            firstVisibleDay = Dates.getDayOfActiveViewport(1),
+            lastVisibleDay = Dates.getDayOfActiveViewport(viewportDays);
+
+        try {
+            Store.data.tickets.forEach(tickets__value => {
+                if (tickets__value.status !== 'recurring') {
+                    return;
+                }
+
+                let parsedDates = Dates.parseDateString(tickets__value.date, 'scheduler');
+                if (parsedDates === false || parsedDates.length === 0) {
+                    return;
+                }
+                parsedDates = parsedDates.filter(parsedDates__value => {
+                    if (Dates.compareDates(parsedDates__value.date, firstVisibleDay) === -1) {
+                        return false;
+                    }
+                    if (Dates.compareDates(parsedDates__value.date, lastVisibleDay) === 1) {
+                        return false;
+                    }
+                    return true;
+                });
+                if (parsedDates.length === 0) {
+                    return;
+                }
+
+                let current = document.querySelector('.tickets__entry[data-id="' + tickets__value.id + '"]'),
+                    dateInput = current !== null ? current.querySelector('.tickets__textarea--date') : null,
+                    dateValue = Dates.includeNewLowerBoundInDate(tickets__value.date, lastVisibleDay);
+
+                if (current === null || dateInput === null) {
+                    return;
+                }
+
+                dateInput.value = dateValue;
+                Tickets.setTicketData(tickets__value.id, {
+                    date: dateValue,
+                    updated_at: Dates.time().toString()
+                });
+                Lock.lockTicket(tickets__value.id);
+                ticketIdsToUnlock.push(tickets__value.id);
+                dateInput.dispatchEvent(new Event('input', { bubbles: true }));
+                ticketDataToUpdate.push(Tickets.getTicketData(tickets__value.id));
+
+                parsedDates.forEach(parsedDates__value => {
+                    let duplicateData = Tickets.getTicketData(tickets__value.id);
+                    delete duplicateData['attachments'];
+                    duplicateData.date = Dates.dateFormat(parsedDates__value.date, 'd.m.y');
+                    if (parsedDates__value.begin !== null && parsedDates__value.end !== null) {
+                        duplicateData.date +=
+                            ' ' +
+                            Dates.timeFormat(parsedDates__value.begin) +
+                            '-' +
+                            Dates.timeFormat(parsedDates__value.end);
+                    }
+                    duplicateData.status = 'fixed';
+                    ticketDataToCopy.push({
+                        current: current,
+                        duplicateData: duplicateData
+                    });
+                });
+            });
+
+            for (let ticketDataToCopy__value of ticketDataToCopy) {
+                await Tickets.createAndAppendTicket(
+                    ticketDataToCopy__value.duplicateData,
+                    ticketDataToCopy__value.current,
+                    1,
+                    false,
+                    false,
+                    false
+                );
+            }
+
+            if (ticketDataToUpdate.length > 0) {
+                Store.data.busy = true;
+                let response = await Store.data.api
+                    .fetch('_api/tickets', {
+                        method: 'PUT',
+                        body: JSON.stringify({
+                            tickets: ticketDataToUpdate
+                        }),
+                        cache: 'no-cache',
+                        headers: { 'content-type': 'application/json' }
+                    })
+                    .then(response => response.json())
+                    .catch(error => {
+                        Store.data.busy = false;
+                        throw error;
+                    });
+                Store.data.busy = false;
+                if (response.success === false) {
+                    throw response.message;
+                }
+                response.data.ids.forEach(value => {
+                    Lock.unlockTicket(value);
+                });
+            }
+
+            await Filter.updateFilter();
+            await Filter.doFilter();
+            await Scheduler.initScheduler();
+            Scheduler.updateColors();
+            Quickbox.initToday();
+            Tickets.updateSum();
+            Textarea.textareaSetVisibleHeights();
+
+            return ticketDataToCopy.length;
+        } finally {
+            Store.data.busy = false;
+            Tickets.bulkRunning = false;
+            ticketIdsToUnlock.forEach(ticketId => {
+                Lock.unlockTicket(ticketId);
+            });
+        }
+    }
+
+    static createAndAppendTicket(data, current = null, currentCol = 1, withSelect = true, doFilter = false, updateUi = true) {
         return new Promise((resolve, reject) => {
             if (['tonight', 'weekend', 'next'].includes(data.date)) {
                 let d = new Date();
@@ -503,14 +586,16 @@ export default class Tickets {
                         input.select();
                         input.dispatchEvent(new Event('input', { bubbles: true }));
                     }
-                    await Scheduler.initScheduler();
-                    Scheduler.updateColors();
-                    Quickbox.initToday();
-                    Tickets.updateSum();
-                    Filter.updateFilter();
-                    Textarea.textareaSetVisibleHeights();
-                    if (doFilter === true) {
-                        await Filter.doFilter();
+                    if (updateUi === true) {
+                        await Scheduler.initScheduler();
+                        Scheduler.updateColors();
+                        Quickbox.initToday();
+                        Tickets.updateSum();
+                        Filter.updateFilter();
+                        Textarea.textareaSetVisibleHeights();
+                        if (doFilter === true) {
+                            await Filter.doFilter();
+                        }
                     }
                     if ('attachments' in data && data.attachments.length > 0) {
                         Attachments.startUploadsAndBuildHtml(ticket.id, data.attachments);

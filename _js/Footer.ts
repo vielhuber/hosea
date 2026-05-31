@@ -73,6 +73,25 @@ export default class Footer {
             }
         });
     }
+    static bindBulk() {
+        document.querySelector('.footer').addEventListener('click', e => {
+            if ((e.target as Element).closest('.footer__bulk')) {
+                if (!confirm('BULK ALERT: convert all visible recurring scheduler entries?')) {
+                    e.preventDefault();
+                    return;
+                }
+                Footer.updateStatus('bulk running...', 'warning');
+                Tickets.bulkCreateScheduledTickets()
+                    .then(count => {
+                        Footer.updateStatus(count > 0 ? 'bulk done: ' + count : 'nothing to bulk.', 'success');
+                    })
+                    .catch(error => {
+                        Footer.updateStatus(error, 'error');
+                    });
+                e.preventDefault();
+            }
+        });
+    }
     static bindLogout() {
         document.querySelector('.footer').addEventListener('click', e => {
             if ((e.target as Element).closest('.footer__logout')) {
