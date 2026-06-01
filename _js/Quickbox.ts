@@ -210,7 +210,6 @@ export default class Quickbox {
                     return;
                 }
                 Quickbox.fetchMails(false);
-                Footer.updateStatus('successfully synced mails.', 'success');
             }, 70 * 1000); // must be non divisible by 60 (otherwise it blocks others)
         }
     }
@@ -231,7 +230,7 @@ export default class Quickbox {
                 headers: { 'content-type': 'application/json' }
             })
             .then(res => res.json())
-            .catch(() => {})
+            .catch(() => ({ success: false }))
             .then(response => {
                 Store.data.busy = false;
                 Store.data.mails = [];
@@ -239,14 +238,9 @@ export default class Quickbox {
                     response.data.forEach(mails__value => {
                         Store.data.mails.push(mails__value);
                     });
+                    Footer.updateStatus('successfully synced mails.', 'success');
                 } else {
-                    Swal.fire({
-                        text: 'error syncing mails!',
-                        icon: 'error',
-                        timer: 10000,
-                        timerProgressBar: true,
-                        showConfirmButton: false
-                    });
+                    Footer.updateStatus('error syncing mails!', 'error');
                 }
                 Quickbox.renderMails();
                 Quickbox.updateMailCount();

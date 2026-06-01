@@ -57,13 +57,16 @@ class Mail extends Api
         $filename_cache = sys_get_temp_dir() . '/hosea-mail.cache';
 
         if (
-            in_array(@$_SERVER['SERVER_ADMIN'], ['david@vielhuber.de']) ||
+            in_array($_SERVER['SERVER_ADMIN'] ?? '', ['david@vielhuber.de'], true) ||
             $force === true ||
             !file_exists($filename_cache) ||
             filemtime($filename_cache) < strtotime('now - 5 minutes')
         ) {
             $mails = $this->prepareMails();
             if ($mails === false) {
+                if (file_exists($filename_cache)) {
+                    return unserialize(file_get_contents($filename_cache));
+                }
                 return false;
             }
             file_put_contents($filename_cache, serialize($mails));
@@ -110,6 +113,9 @@ class Mail extends Api
                     }
                 }
             } catch (\Throwable $e) {
+                error_log(
+                    sprintf('Hosea mail sync failed for mailbox "%s": %s: %s', $config__key, $e::class, $e->getMessage())
+                );
                 return false;
             }
         }
