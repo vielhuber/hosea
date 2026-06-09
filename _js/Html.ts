@@ -40,8 +40,8 @@ export default class Html {
             `
             <a href="#" class="footer__save">_save</a>
             <a href="#" class="footer__create">_create</a>
-            <a href="#" class="footer__view">_view</a>
             <a href="#" class="footer__bulk">_bulk</a>
+            <a href="#" class="footer__view">_view</a>
             <span class="footer__status"></span>
             <a href="#" class="footer__cron" target="_blank">_cron</a>
             <a href="#" class="footer__ical" target="_blank">_ical</a>
