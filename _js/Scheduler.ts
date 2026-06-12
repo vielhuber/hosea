@@ -676,13 +676,9 @@ export default class Scheduler {
             });
             if (conflict === false) {
                 let differenceInWeeks = Dates.dateDiffInWeeks(d.date, new Date());
-                if (priority !== undefined && priority !== null && priority !== '') {
-                    if (
-                        (priority === 'A' && differenceInWeeks <= -1) ||
-                        (priority === 'B' && differenceInWeeks <= 0) ||
-                        (priority === 'C' && differenceInWeeks <= 1) ||
-                        (priority === 'D' && differenceInWeeks <= 2)
-                    ) {
+                if (priority !== undefined && priority !== null && priority !== '' && /^[A-Z]$/.test(priority)) {
+                    // A => -1, B => 0, C => 1, ... Z => 24
+                    if (differenceInWeeks <= priority.charCodeAt(0) - 66) {
                         conflict = true;
                     }
                 }

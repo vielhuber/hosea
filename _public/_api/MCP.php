@@ -50,7 +50,7 @@ class MCP
             Schema(type: 'string', description: 'Status: fixed (default), allday, todo, scheduled.')
         ]
         string $status = 'fixed',
-        #[Schema(type: 'string', description: 'Priority: A, B, C or empty.')] string $priority = '',
+        #[Schema(type: 'string', description: 'Priority: A-Z or empty.')] string $priority = '',
         #[
             Schema(type: 'string', description: 'Optional duration in hours (can differ from time_from/time_to).')
         ]
@@ -168,7 +168,7 @@ class MCP
         #[Schema(type: 'string', description: 'New end time HH:MM.')] string $timeTo = '',
         #[Schema(type: 'string', description: 'New description.')] string $description = '',
         #[Schema(type: 'string', description: 'New status: fixed, allday, todo, scheduled.')] string $status = '',
-        #[Schema(type: 'string', description: 'New priority: A, B, C or empty.')] string $priority = '',
+        #[Schema(type: 'string', description: 'New priority: A-Z or empty.')] string $priority = '',
         #[
             Schema(type: 'string', description: 'New duration in hours (can differ from time_from/time_to).')
         ]

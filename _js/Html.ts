@@ -91,7 +91,7 @@ working" class="tickets__table-tooltip">(?)</span>
                 document.querySelector('.tickets__table-head tr td:last-child').insertAdjacentHTML(
                     'beforeend',
                     `
-                    <span title="[A-D]" class="tickets__table-tooltip">(?)</span>
+                    <span title="[A-Z]" class="tickets__table-tooltip">(?)</span>
                 `
                 );
             }
@@ -290,7 +290,7 @@ DD%N: weekday in calendar week %N=0 (if >X specified, N -= calendar week of X)
                 }
             }
             if ($target.closest('.validate-field--priority')) {
-                if (!['A', 'B', 'C', 'D'].includes($target.value)) {
+                if (!/^[A-Z]$/.test($target.value)) {
                     $target.setCustomValidity('wrong format');
                 } else {
                     $target.setCustomValidity('');
