@@ -25,12 +25,15 @@ class iCal extends Api
 
         $query = [];
 
+        $params = [];
         if (isset($_GET['projects']) && $_GET['projects'] != '') {
             $query[] = 'status IN (\'fixed\',\'allday\')';
             $query_or = [];
             foreach (explode(',', $_GET['projects']) as $projects__value) {
-                $query_or[] = 'project LIKE \'_' . $projects__value . '_\'';
-                $query_or[] = 'project LIKE \'--_' . $projects__value . '_\'';
+                $query_or[] = 'project LIKE ?';
+                $params[] = '_' . $projects__value . '_';
+                $query_or[] = 'project LIKE ?';
+                $params[] = '--_' . $projects__value . '_';
             }
             $query[] = '(' . implode(') OR (', $query_or) . ')';
         } else {
@@ -52,7 +55,8 @@ class iCal extends Api
                 implode(') AND (', $query) .
                 ')
             ',
-            $this->getRequestPathSecond()
+            $this->getRequestPathSecond(),
+            ...$params
         );
         foreach ($tickets as $tickets__value) {
             $dates = $this->parseDateString($tickets__value['date'] ?? '');
