@@ -541,6 +541,11 @@ export default class Quickbox {
         if (view === 'money') {
             this.initializeMoneyChart();
         }
+        if (view === 'new' && hlp.isMobile()) {
+            setTimeout(() => {
+                document.querySelector('.quickbox__new-input--focus').focus();
+            }, 250);
+        }
         requestAnimationFrame(() => {
             setTimeout(() => {
                 document.querySelectorAll('.quickbox__content > *:not(.quickbox__' + view + ')').forEach(el2 => {
