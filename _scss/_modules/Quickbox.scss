@@ -838,6 +838,7 @@ $quickbox-height: calc(#{vars.$footer-height});
     .quickbox__form--mobile-textarea-fullscreen .quickbox__new-input--textarea,
     .quickbox__form--mobile-textarea-fullscreen .quickbox__today-edit-input--textarea {
         height: 100%;
+        padding-right: calc(#{vars.$footer-height} + #{vars.$space-medium});
         white-space: pre-wrap;
     }
 }
