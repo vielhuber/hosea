@@ -10,6 +10,15 @@
     "short_name": "hosea",
     "description": "hosea",
     "orientation": "portrait",
+    "share_target": {
+        "action": "%SUBPATH%/index.html",
+        "method": "GET",
+        "params": {
+            "title": "title",
+            "text": "text",
+            "url": "url"
+        }
+    },
     "icons": [
         {
             "src": "%SUBPATH%/_pwa/icon-192x192.png",

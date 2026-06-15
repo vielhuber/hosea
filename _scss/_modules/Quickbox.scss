@@ -776,4 +776,68 @@ $quickbox-height: calc(#{vars.$footer-height});
         display: block;
         padding: 0;
     }
+    .quickbox__form--mobile-textarea-fullscreen {
+        position: fixed;
+        inset: 0;
+        height: 100dvh;
+        z-index: 10;
+        background-color: vars.$color-black;
+        padding: vars.$space-big;
+    }
+    .quickbox__form--mobile-textarea-fullscreen .quickbox__new-inputrows,
+    .quickbox__form--mobile-textarea-fullscreen .quickbox__today-edit-inputrows {
+        display: block;
+        height: 100%;
+        padding: 0;
+    }
+    .quickbox__form--mobile-textarea-fullscreen .quickbox__new-inputrow,
+    .quickbox__form--mobile-textarea-fullscreen .quickbox__today-edit-inputrow {
+        display: none;
+    }
+    .quickbox__form--mobile-textarea-fullscreen .quickbox__mobile-textarea-row--active {
+        display: block;
+        position: absolute;
+        top: vars.$space-big;
+        left: vars.$space-big;
+        right: vars.$space-big;
+        bottom: calc(#{vars.$footer-height} + 2 * #{vars.$space-big} + env(safe-area-inset-bottom));
+        width: auto;
+        height: auto;
+        margin: 0;
+        line-height: normal;
+    }
+    .quickbox__form--mobile-textarea-fullscreen .quickbox__mobile-textarea-submit {
+        display: block;
+        position: fixed;
+        left: vars.$space-big;
+        right: vars.$space-big;
+        bottom: calc(#{vars.$space-big} + env(safe-area-inset-bottom));
+        width: auto;
+        height: vars.$footer-height;
+        margin: 0;
+    }
+    .quickbox__mobile-textarea-close {
+        display: none;
+    }
+    .quickbox__form--mobile-textarea-fullscreen .quickbox__mobile-textarea-close {
+        display: block;
+        position: fixed;
+        top: vars.$space-big;
+        right: vars.$space-big;
+        z-index: 1;
+        width: 20rem;
+        height: 20rem;
+        line-height: 20rem;
+        padding: 0;
+        border: 0;
+        box-shadow: none;
+        background-color: vars.$color-black;
+        color: vars.$color-white;
+        cursor: pointer;
+    }
+    .quickbox__form--mobile-textarea-fullscreen .quickbox__new-input--textarea,
+    .quickbox__form--mobile-textarea-fullscreen .quickbox__today-edit-input--textarea {
+        height: 100%;
+        white-space: pre-wrap;
+    }
 }

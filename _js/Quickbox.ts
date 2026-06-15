@@ -13,6 +13,7 @@ export default class Quickbox {
     static lastScrollPos: any = 0;
     static moneyChart: any = null;
     static chartData: any = null;
+    static shareTargetApplied = false;
 
     static initQuickbox() {
         Quickbox.buildHtml();
@@ -26,6 +27,7 @@ export default class Quickbox {
         Quickbox.bindMails();
         Quickbox.allowUnselectRadio();
         Quickbox.bindToday();
+        Quickbox.bindMobileTextareaFullscreen();
         Quickbox.bindNav();
         Quickbox.bindNew();
     }
@@ -511,7 +513,7 @@ export default class Quickbox {
 
     static bindNav() {
         if (document.querySelector('.quickbox__content') !== null) {
-            this.bindNavToggle(!hlp.isMobile() ? 'mails' : 'week');
+            this.bindNavToggle(Quickbox.shareTargetApplied || hlp.isMobile() ? 'new' : 'mails');
         }
         document.addEventListener('click', e => {
             let el = (e.target as Element).closest('.quickbox__navitem');
@@ -528,6 +530,7 @@ export default class Quickbox {
         if (document.querySelector('.quickbox__content').classList.contains('quickbox__content--disabled')) {
             return;
         }
+        Quickbox.closeMobileTextareaFullscreen();
         document.querySelector('.quickbox__content').classList.add('quickbox__content--disabled');
         /* in chrome we want ctrl+f to not find hidden elements (so we must apply display:none) */
         /* the following lines ensure to do exactly that */
@@ -537,13 +540,6 @@ export default class Quickbox {
         /* reinitialize chart to init animation */
         if (view === 'money') {
             this.initializeMoneyChart();
-        }
-        if (view === 'new') {
-            setTimeout(() => {
-                if (document.querySelector('.quickbox__new-input--focus') !== null) {
-                    document.querySelector('.quickbox__new-input--focus').focus();
-                }
-            }, 250);
         }
         requestAnimationFrame(() => {
             setTimeout(() => {
@@ -800,7 +796,7 @@ export default class Quickbox {
                                                             tickets__value.description
                                                         }</textarea>
                                                 </li>
-                                                <li class="quickbox__today-edit-inputrow">
+                                                <li class="quickbox__today-edit-inputrow quickbox__mobile-textarea-submit">
                                                     <input class="quickbox__today-edit-submit" type="submit" value="_edit" />
                                                 </li>
                                             </ul>
@@ -818,6 +814,28 @@ export default class Quickbox {
             }
         });
         document.querySelector('.quickbox__navitem[href="#today"] .quickbox__navitem-count').innerText = String(count);
+        document.querySelectorAll('.quickbox__today-edit-form').forEach($form => {
+            let $ticket = $form.closest('.quickbox__today-ticket');
+            if ($ticket === null) {
+                return;
+            }
+            let draft = null;
+            try {
+                draft = JSON.parse(
+                    localStorage.getItem('hosea.quickbox.editDraft.' + $ticket.getAttribute('data-id')) || 'null'
+                );
+            } catch (e) {
+                localStorage.removeItem('hosea.quickbox.editDraft.' + $ticket.getAttribute('data-id'));
+            }
+            if (draft === null) {
+                return;
+            }
+            Store.data.cols.forEach(cols__value => {
+                if (draft[cols__value] !== undefined && $form.querySelector('[name="' + cols__value + '"]') !== null) {
+                    $form.querySelector('[name="' + cols__value + '"]').value = draft[cols__value];
+                }
+            });
+        });
     }
 
     static bindToday() {
@@ -863,8 +881,9 @@ export default class Quickbox {
                 $form.querySelector('.quickbox__today-edit-submit').disabled = true;
 
                 if ($form.querySelector('*:invalid') !== null) {
+                    $form.querySelector('.quickbox__today-edit-submit').disabled = false;
                     Swal.fire({
-                        text: 'error creating new ticket',
+                        text: 'error updating ticket',
                         icon: 'error',
                         timer: 2000,
                         timerProgressBar: true,
@@ -882,8 +901,9 @@ export default class Quickbox {
                     }
                 });
                 data['updated_at'] = Dates.time().toString();
-                Tickets.setTicketData($form.closest('.quickbox__today-ticket').getAttribute('data-id'), data);
-                changed.push(Tickets.getTicketData($form.closest('.quickbox__today-ticket').getAttribute('data-id')));
+                let ticketId = $form.closest('.quickbox__today-ticket').getAttribute('data-id');
+                Tickets.setTicketData(ticketId, data);
+                changed.push(Tickets.getTicketData(ticketId));
 
                 Store.data.busy = true;
                 Store.data.api
@@ -897,10 +917,25 @@ export default class Quickbox {
                     })
                     .then(res => res.json())
                     .catch(err => {
+                        Store.data.busy = false;
                         console.error(err);
+                        return { success: false };
                     })
                     .then(async response => {
                         Store.data.busy = false;
+                        if (response.success !== true) {
+                            $form.querySelector('.quickbox__today-edit-submit').disabled = false;
+                            Swal.fire({
+                                text: 'error updating ticket',
+                                icon: 'error',
+                                timer: 2000,
+                                timerProgressBar: true,
+                                showConfirmButton: false
+                            });
+                            return;
+                        }
+                        localStorage.removeItem('hosea.quickbox.editDraft.' + ticketId);
+                        Quickbox.closeMobileTextareaFullscreen($form);
                         await Scheduler.initScheduler();
                         Scheduler.updateColors();
                         Quickbox.initToday();
@@ -975,6 +1010,24 @@ export default class Quickbox {
             }
         });
 
+        document.addEventListener('input', e => {
+            let $form = (e.target as Element).closest('.quickbox__today-edit-form');
+            if (!$form) {
+                return;
+            }
+            let $ticket = $form.closest('.quickbox__today-ticket');
+            if ($ticket === null) {
+                return;
+            }
+            let draft = {};
+            Store.data.cols.forEach(cols__value => {
+                if ($form.querySelector('[name="' + cols__value + '"]') !== null) {
+                    draft[cols__value] = $form.querySelector('[name="' + cols__value + '"]').value;
+                }
+            });
+            localStorage.setItem('hosea.quickbox.editDraft.' + $ticket.getAttribute('data-id'), JSON.stringify(draft));
+        });
+
         if (hlp.isMobile()) {
             PullToRefresh.init({
                 mainElement: '.quickbox__today',
@@ -1003,10 +1056,10 @@ export default class Quickbox {
         document.querySelector('.quickbox__new').innerHTML = `
             <form class="quickbox__new-form">
                 <ul class="quickbox__new-inputrows">
-                    <li class="quickbox__new-inputrow quickbox__new-inputrow--1/2"><input class="quickbox__new-input quickbox__new-input--text validate-field validate-field--date" type="text" name="date" placeholder="date" value="${Quickbox.proposeNewDate()}" /></li>
+                    <li class="quickbox__new-inputrow quickbox__new-inputrow--1/2"><input class="quickbox__new-input quickbox__new-input--text validate-field validate-field--date" type="text" name="date" placeholder="date" value="" /></li>
                     <li class="quickbox__new-inputrow quickbox__new-inputrow--1/6"><label class="quickbox__new-label"><input class="quickbox__new-input quickbox__new-input--radio" type="radio" name="date" value="tonight" /><span class="quickbox__new-label-text">tonight</span></label></li>
                     <li class="quickbox__new-inputrow quickbox__new-inputrow--1/6"><label class="quickbox__new-label"><input class="quickbox__new-input quickbox__new-input--radio" type="radio" name="date" value="weekend" /><span class="quickbox__new-label-text">weekend</span></label></li>
-                    <li class="quickbox__new-inputrow quickbox__new-inputrow--1/6"><label class="quickbox__new-label"><input class="quickbox__new-input quickbox__new-input--radio" type="radio" name="date" value="next" /><span class="quickbox__new-label-text">next</span></label></li>
+                    <li class="quickbox__new-inputrow quickbox__new-inputrow--1/6"><label class="quickbox__new-label"><input class="quickbox__new-input quickbox__new-input--radio" type="radio" name="date" value="next" checked /><span class="quickbox__new-label-text">next</span></label></li>
                     <li class="quickbox__new-inputrow"><input class="quickbox__new-input quickbox__new-input--text validate-field validate-field--project autocaps" type="text" required="required" name="project" placeholder="project" value="PRIVATE" /></li>
                     <li class="quickbox__new-inputrow quickbox__new-inputrow--rheight">
                         <textarea
@@ -1017,10 +1070,56 @@ export default class Quickbox {
                             name="description"
                             placeholder="description"></textarea>
                     </li>
-                    <li class="quickbox__new-inputrow"><input class="quickbox__new-submit" type="submit" value="_create" /></li>
+                    <li class="quickbox__new-inputrow quickbox__mobile-textarea-submit"><input class="quickbox__new-submit" type="submit" value="_create" /></li>
                 </ul>
             </form>
         `;
+        let draft = null;
+        try {
+            draft = JSON.parse(localStorage.getItem('hosea.quickbox.newDraft') || 'null');
+        } catch (e) {
+            localStorage.removeItem('hosea.quickbox.newDraft');
+        }
+        if (draft !== null) {
+            document.querySelector('.quickbox__new-form [name="date"][type="text"]').value = draft.date || '';
+            document.querySelector('.quickbox__new-form [name="project"]').value = draft.project || '';
+            document.querySelector('.quickbox__new-form [name="description"]').value = draft.description || '';
+            document.querySelectorAll('.quickbox__new-form [name="date"][type="radio"]').forEach($radio => {
+                $radio.checked = false;
+            });
+            if (draft.datePreset !== undefined && draft.datePreset !== '') {
+                let $radio = document.querySelector(
+                    '.quickbox__new-form [name="date"][type="radio"][value="' + draft.datePreset + '"]'
+                );
+                if ($radio !== null) {
+                    $radio.checked = true;
+                    document.querySelector('.quickbox__new-form [name="date"][type="text"]').value = '';
+                }
+            }
+            if ((draft.datePreset === undefined || draft.datePreset === '') && (draft.date === undefined || draft.date === '')) {
+                document.querySelector('.quickbox__new-form [name="date"][type="radio"][value="next"]').checked = true;
+            }
+        }
+
+        let params = new URLSearchParams(window.location.search),
+            values = [];
+        ['title', 'text', 'url'].forEach(param => {
+            let value = params.get(param);
+            if (value !== null && value.trim() !== '') {
+                values.push(value.trim());
+            }
+        });
+        if (values.length > 0) {
+            document.querySelector('.quickbox__new-form [name="description"]').value = values.join('\n\n');
+            document.querySelector('.quickbox__new-form [name="date"][type="text"]').value = '';
+            document.querySelectorAll('.quickbox__new-form [name="date"][type="radio"]').forEach($radio => {
+                $radio.checked = false;
+            });
+            document.querySelector('.quickbox__new-form [name="date"][type="radio"][value="next"]').checked = true;
+            Quickbox.storeNewDraft();
+            Quickbox.shareTargetApplied = true;
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
     }
 
     static bindNew() {
@@ -1038,6 +1137,12 @@ export default class Quickbox {
                     document.querySelector('.quickbox__new-form [name="date"][type="text"]').value = '';
                 }
             });
+        });
+        document.querySelector('.quickbox__new-form').addEventListener('input', () => {
+            Quickbox.storeNewDraft();
+        });
+        document.querySelector('.quickbox__new-form').addEventListener('change', () => {
+            Quickbox.storeNewDraft();
         });
         document.querySelector('.quickbox__new-form').addEventListener('submit', e => {
             e.preventDefault();
@@ -1069,6 +1174,8 @@ export default class Quickbox {
                 .then(response => {
                     document.querySelector('.quickbox__new-submit').disabled = false;
                     if ((response as any).success === true) {
+                        localStorage.removeItem('hosea.quickbox.newDraft');
+                        Quickbox.closeMobileTextareaFullscreen(document.querySelector('.quickbox__new-form'));
                         Swal.fire({
                             text: 'successfully created new ticket',
                             icon: 'success',
@@ -1089,6 +1196,71 @@ export default class Quickbox {
                     }
                 });
         });
+    }
+
+    static bindMobileTextareaFullscreen() {
+        document.addEventListener('focusin', e => {
+            if (!hlp.isMobile()) {
+                return;
+            }
+            let $textarea = (e.target as Element).closest(
+                '.quickbox__new-input--textarea, .quickbox__today-edit-input--textarea'
+            );
+            if ($textarea === null) {
+                return;
+            }
+            let $form = $textarea.closest('form');
+            if ($form === null) {
+                return;
+            }
+            $form
+                .querySelectorAll('.quickbox__mobile-textarea-row--active')
+                .forEach($row => $row.classList.remove('quickbox__mobile-textarea-row--active'));
+            $textarea.closest('li').classList.add('quickbox__mobile-textarea-row--active');
+            if ($form.querySelector('.quickbox__mobile-textarea-close') === null) {
+                $form.insertAdjacentHTML('beforeend', '<button type="button" class="quickbox__mobile-textarea-close">x</button>');
+            }
+            $form.classList.add('quickbox__form--mobile-textarea-fullscreen');
+        });
+
+        document.addEventListener('click', e => {
+            let $close = (e.target as Element).closest('.quickbox__mobile-textarea-close');
+            if ($close === null) {
+                return;
+            }
+            e.preventDefault();
+            Quickbox.closeMobileTextareaFullscreen($close.closest('form'));
+        });
+    }
+
+    static closeMobileTextareaFullscreen($form = null) {
+        if (document.activeElement instanceof HTMLElement) {
+            document.activeElement.blur();
+        }
+        let $forms = $form !== null ? [$form] : document.querySelectorAll('.quickbox__form--mobile-textarea-fullscreen');
+        $forms.forEach($formValue => {
+            $formValue.classList.remove('quickbox__form--mobile-textarea-fullscreen');
+            $formValue
+                .querySelectorAll('.quickbox__mobile-textarea-row--active')
+                .forEach($row => $row.classList.remove('quickbox__mobile-textarea-row--active'));
+        });
+    }
+
+    static storeNewDraft() {
+        let $form = document.querySelector('.quickbox__new-form');
+        if ($form === null) {
+            return;
+        }
+        let draft = {
+            date: $form.querySelector('[name="date"][type="text"]').value,
+            datePreset:
+                $form.querySelector('[name="date"][type="radio"]:checked') !== null
+                    ? $form.querySelector('[name="date"][type="radio"]:checked').value
+                    : '',
+            project: $form.querySelector('[name="project"]').value,
+            description: $form.querySelector('[name="description"]').value
+        };
+        localStorage.setItem('hosea.quickbox.newDraft', JSON.stringify(draft));
     }
 
     static proposeNewDate() {
