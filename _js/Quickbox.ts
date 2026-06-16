@@ -520,13 +520,13 @@ export default class Quickbox {
             if (el) {
                 e.preventDefault();
                 if (!el.classList.contains('quickbox__navitem--active')) {
-                    this.bindNavToggle(el.getAttribute('href').replace('#', ''));
+                    this.bindNavToggle(el.getAttribute('href').replace('#', ''), true);
                 }
             }
         });
     }
 
-    static bindNavToggle(view) {
+    static bindNavToggle(view, focusImmediately = false) {
         if (document.querySelector('.quickbox__content').classList.contains('quickbox__content--disabled')) {
             return;
         }
@@ -542,9 +542,13 @@ export default class Quickbox {
             this.initializeMoneyChart();
         }
         if (view === 'new' && hlp.isMobile()) {
-            setTimeout(() => {
+            if (focusImmediately) {
                 document.querySelector('.quickbox__new-input--focus').focus();
-            }, 250);
+            } else {
+                setTimeout(() => {
+                    document.querySelector('.quickbox__new-input--focus').focus();
+                }, 250);
+            }
         }
         requestAnimationFrame(() => {
             setTimeout(() => {
