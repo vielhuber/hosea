@@ -520,13 +520,13 @@ export default class Quickbox {
             if (el) {
                 e.preventDefault();
                 if (!el.classList.contains('quickbox__navitem--active')) {
-                    this.bindNavToggle(el.getAttribute('href').replace('#', ''), true);
+                    this.bindNavToggle(el.getAttribute('href').replace('#', ''));
                 }
             }
         });
     }
 
-    static bindNavToggle(view, focusImmediately = false) {
+    static bindNavToggle(view) {
         if (document.querySelector('.quickbox__content').classList.contains('quickbox__content--disabled')) {
             return;
         }
@@ -542,13 +542,7 @@ export default class Quickbox {
             this.initializeMoneyChart();
         }
         if (view === 'new' && hlp.isMobile()) {
-            if (focusImmediately) {
-                document.querySelector('.quickbox__new-input--focus').focus();
-            } else {
-                setTimeout(() => {
-                    document.querySelector('.quickbox__new-input--focus').focus();
-                }, 250);
-            }
+            Quickbox.openMobileTextareaFullscreen(document.querySelector('.quickbox__new-input--focus'));
         }
         requestAnimationFrame(() => {
             setTimeout(() => {
@@ -1222,15 +1216,7 @@ export default class Quickbox {
             if ($form === null) {
                 return;
             }
-            $form
-                .querySelectorAll('.quickbox__mobile-textarea-row--active')
-                .forEach($row => $row.classList.remove('quickbox__mobile-textarea-row--active'));
-            $textarea.closest('li').classList.add('quickbox__mobile-textarea-row--active');
-            if ($form.querySelector('.quickbox__mobile-textarea-close') === null) {
-                $form.insertAdjacentHTML('beforeend', '<button type="button" class="quickbox__mobile-textarea-close">x</button>');
-            }
-            $form.classList.add('quickbox__form--mobile-textarea-fullscreen');
-            Quickbox.updateMobileTextareaFullscreenHeight();
+            Quickbox.openMobileTextareaFullscreen($textarea);
         });
 
         document.addEventListener('click', e => {
@@ -1246,6 +1232,25 @@ export default class Quickbox {
                 Quickbox.updateMobileTextareaFullscreenHeight();
             });
         }
+    }
+
+    static openMobileTextareaFullscreen($textarea) {
+        if ($textarea === null) {
+            return;
+        }
+        let $form = $textarea.closest('form');
+        if ($form === null) {
+            return;
+        }
+        $form
+            .querySelectorAll('.quickbox__mobile-textarea-row--active')
+            .forEach($row => $row.classList.remove('quickbox__mobile-textarea-row--active'));
+        $textarea.closest('li').classList.add('quickbox__mobile-textarea-row--active');
+        if ($form.querySelector('.quickbox__mobile-textarea-close') === null) {
+            $form.insertAdjacentHTML('beforeend', '<button type="button" class="quickbox__mobile-textarea-close">x</button>');
+        }
+        $form.classList.add('quickbox__form--mobile-textarea-fullscreen');
+        Quickbox.updateMobileTextareaFullscreenHeight();
     }
 
     static closeMobileTextareaFullscreen($form = null) {
