@@ -542,7 +542,11 @@ export default class Quickbox {
             this.initializeMoneyChart();
         }
         if (view === 'new' && hlp.isMobile()) {
-            Quickbox.openMobileTextareaFullscreen(document.querySelector('.quickbox__new-input--focus'));
+            let $textarea = document.querySelector('.quickbox__new-input--focus');
+            Quickbox.openMobileTextareaFullscreen($textarea);
+            if (document.activeElement === $textarea) {
+                ($textarea as HTMLElement).blur();
+            }
         }
         requestAnimationFrame(() => {
             setTimeout(() => {
