@@ -14,6 +14,7 @@ export default class Quickbox {
     static moneyChart: any = null;
     static chartData: any = null;
     static shareTargetApplied = false;
+    static mobileStartupNewOpen = false;
 
     static initQuickbox() {
         Quickbox.buildHtml();
@@ -513,6 +514,7 @@ export default class Quickbox {
 
     static bindNav() {
         if (document.querySelector('.quickbox__content') !== null) {
+            Quickbox.mobileStartupNewOpen = !Quickbox.shareTargetApplied && hlp.isMobile();
             this.bindNavToggle(Quickbox.shareTargetApplied || hlp.isMobile() ? 'new' : 'mails');
         }
         document.addEventListener('click', e => {
@@ -1063,10 +1065,10 @@ export default class Quickbox {
         document.querySelector('.quickbox__new').innerHTML = `
             <form class="quickbox__new-form">
                 <ul class="quickbox__new-inputrows">
-                    <li class="quickbox__new-inputrow quickbox__new-inputrow--1/2"><input class="quickbox__new-input quickbox__new-input--text validate-field validate-field--date" type="text" name="date" placeholder="date" value="" /></li>
+                    <li class="quickbox__new-inputrow quickbox__new-inputrow--1/2"><input class="quickbox__new-input quickbox__new-input--text validate-field validate-field--date" type="text" name="date" placeholder="date" value="${Quickbox.proposeNewDate()}" /></li>
                     <li class="quickbox__new-inputrow quickbox__new-inputrow--1/6"><label class="quickbox__new-label"><input class="quickbox__new-input quickbox__new-input--radio" type="radio" name="date" value="tonight" /><span class="quickbox__new-label-text">tonight</span></label></li>
                     <li class="quickbox__new-inputrow quickbox__new-inputrow--1/6"><label class="quickbox__new-label"><input class="quickbox__new-input quickbox__new-input--radio" type="radio" name="date" value="weekend" /><span class="quickbox__new-label-text">weekend</span></label></li>
-                    <li class="quickbox__new-inputrow quickbox__new-inputrow--1/6"><label class="quickbox__new-label"><input class="quickbox__new-input quickbox__new-input--radio" type="radio" name="date" value="next" checked /><span class="quickbox__new-label-text">next</span></label></li>
+                    <li class="quickbox__new-inputrow quickbox__new-inputrow--1/6"><label class="quickbox__new-label"><input class="quickbox__new-input quickbox__new-input--radio" type="radio" name="date" value="next" /><span class="quickbox__new-label-text">next</span></label></li>
                     <li class="quickbox__new-inputrow"><input class="quickbox__new-input quickbox__new-input--text validate-field validate-field--project autocaps" type="text" required="required" name="project" placeholder="project" value="PRIVATE" /></li>
                     <li class="quickbox__new-inputrow quickbox__new-inputrow--rheight">
                         <textarea
@@ -1104,7 +1106,7 @@ export default class Quickbox {
                 }
             }
             if ((draft.datePreset === undefined || draft.datePreset === '') && (draft.date === undefined || draft.date === '')) {
-                document.querySelector('.quickbox__new-form [name="date"][type="radio"][value="next"]').checked = true;
+                document.querySelector('.quickbox__new-form [name="date"][type="text"]').value = Quickbox.proposeNewDate();
             }
         }
 
@@ -1122,7 +1124,7 @@ export default class Quickbox {
             document.querySelectorAll('.quickbox__new-form [name="date"][type="radio"]').forEach($radio => {
                 $radio.checked = false;
             });
-            document.querySelector('.quickbox__new-form [name="date"][type="radio"][value="next"]').checked = true;
+            document.querySelector('.quickbox__new-form [name="date"][type="text"]').value = Quickbox.proposeNewDate();
             Quickbox.storeNewDraft();
             Quickbox.shareTargetApplied = true;
             window.history.replaceState({}, document.title, window.location.pathname);
@@ -1230,6 +1232,10 @@ export default class Quickbox {
             }
             e.preventDefault();
             Quickbox.closeMobileTextareaFullscreen($close.closest('form'));
+            if (Quickbox.mobileStartupNewOpen && $close.closest('.quickbox__new-form') !== null) {
+                Quickbox.mobileStartupNewOpen = false;
+                Quickbox.bindNavToggle('week');
+            }
         });
         if (window.visualViewport !== undefined) {
             window.visualViewport.addEventListener('resize', () => {
