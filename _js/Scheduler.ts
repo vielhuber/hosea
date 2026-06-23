@@ -46,7 +46,7 @@ export default class Scheduler {
                         padding:${date__value.padding};
                         background:${date__value.background};
                         animation:${date__value.animation};
-                        ${date__value.animation !== 'none' ? 'z-index:1;' : ''}
+                        z-index:${date__value.zIndex};
                         opacity:${date__value.opacity};
                         width:${date__value.width};
                     ">
@@ -418,6 +418,12 @@ export default class Scheduler {
                         time: parsed_values__value.time,
                         background: background,
                         animation: animation,
+                        zIndex: Scheduler.getStoreProperty(
+                            'zIndex',
+                            tickets__value.status,
+                            tickets__value.project,
+                            animation !== 'none' ? 1 : 'auto'
+                        ),
                         opacity: opacity
                     });
                 });
