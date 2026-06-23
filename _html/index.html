@@ -15,7 +15,18 @@
         <script>
             window.addEventListener('load', () => {
                 if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.register('_pwa/sw.js', { scope: '/' });
+                    let controlled = navigator.serviceWorker.controller !== null,
+                        refreshing = false;
+                    navigator.serviceWorker.addEventListener('controllerchange', () => {
+                        if (!controlled || refreshing) {
+                            return;
+                        }
+                        refreshing = true;
+                        window.location.reload();
+                    });
+                    navigator.serviceWorker.register('_pwa/sw.js', { scope: '/' }).then(registration => {
+                        registration.update();
+                    });
                 }
             });
         </script>
