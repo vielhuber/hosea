@@ -544,7 +544,10 @@ $quickbox-height: calc(#{vars.$footer-height});
     padding: vars.$space-medium;
     filter: grayscale(100%);
     width: 100%;
-    height: calc(100% - (6 * #{vars.$space-small} + 2 * #{vars.$space-medium} + 3 * #{vars.$space-big}));
+    height: calc(
+        100% - (#{$quickbox-height} + 2 * #{vars.$space-small}) -
+            (3 * (#{vars.$footer-height} + #{vars.$space-small}) + 2 * #{vars.$space-small})
+    );
     display: none;
 }
 
