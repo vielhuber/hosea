@@ -391,6 +391,11 @@ $quickbox-height: calc(#{vars.$footer-height});
     border-right: 27rem solid transparent;
 }
 
+.quickbox__new-input--textarea:invalid,
+.quickbox__today-edit-input--textarea:invalid {
+    background-position: right -23rem top vars.$space-small;
+}
+
 .quickbox__today-edit-input--text {
     width: 100%;
     height: 100%;
@@ -840,5 +845,10 @@ $quickbox-height: calc(#{vars.$footer-height});
         height: 100%;
         padding-right: calc(#{vars.$footer-height} + #{vars.$space-medium});
         white-space: pre-wrap;
+    }
+    // Keep the warning icon below the fixed close button.
+    .quickbox__form--mobile-textarea-fullscreen .quickbox__new-input--textarea:invalid,
+    .quickbox__form--mobile-textarea-fullscreen .quickbox__today-edit-input--textarea:invalid {
+        background-position: right -23rem top calc(#{vars.$footer-height} + #{vars.$space-medium});
     }
 }

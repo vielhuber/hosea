@@ -1195,7 +1195,9 @@ export default class Quickbox {
                             showConfirmButton: false
                         });
                         document.querySelector('.quickbox__new-form').reset();
-                        document.querySelector('.quickbox__navitem[href="#today"]').click();
+                        if (hlp.isMobile()) {
+                            document.querySelector('.quickbox__navitem[href="#today"]').click();
+                        }
                     } else {
                         Swal.fire({
                             text: 'error creating new ticket',
