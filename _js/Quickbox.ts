@@ -790,7 +790,7 @@ export default class Quickbox {
                                                     }" />
                                                 </li>
                                                 <li class="quickbox__today-edit-inputrow">
-                                                    <input class="quickbox__today-edit-input quickbox__today-edit-input--text validate-field validate-field--project" type="text" name="project" placeholder="project" value="${
+                                                    <input class="quickbox__today-edit-input quickbox__today-edit-input--text validate-field validate-field--project" type="text" required="required" name="project" placeholder="project" value="${
                                                         tickets__value.project
                                                     }" />
                                                 </li>
@@ -800,6 +800,7 @@ export default class Quickbox {
                                                         autocorrect="off"
                                                         autocapitalize="off"
                                                         spellcheck="false"
+                                                        required="required"
                                                         name="description"
                                                         placeholder="description">${
                                                             tickets__value.description

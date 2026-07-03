@@ -316,7 +316,11 @@ DD%N: weekday in calendar week %N=0 (if >X specified, N -= calendar week of X)
                 }
             }
         } else {
-            $target.setCustomValidity('');
+            if ($target.closest('.validate-field--description') || $target.closest('.validate-field--project')) {
+                $target.setCustomValidity('wrong format');
+            } else {
+                $target.setCustomValidity('');
+            }
         }
     }
 
