@@ -43,9 +43,9 @@ class MCP
     public function createAppointment(
         #[Schema(type: 'string', description: 'Title of the appointment.')] string $project,
         #[Schema(type: 'string', description: 'Date in ISO format YYYY-MM-DD.')] string $date,
+        #[Schema(type: 'string', description: 'Description or notes.')] string $description,
         #[Schema(type: 'string', description: 'Optional start time HH:MM.')] string $timeFrom = '',
         #[Schema(type: 'string', description: 'Optional end time HH:MM.')] string $timeTo = '',
-        #[Schema(type: 'string', description: 'Optional description or notes.')] string $description = '',
         #[
             Schema(type: 'string', description: 'Status: fixed (default), allday, todo, scheduled.')
         ]

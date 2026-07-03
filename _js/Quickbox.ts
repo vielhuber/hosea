@@ -1076,6 +1076,7 @@ export default class Quickbox {
                             autocorrect="off"
                             autocapitalize="off"
                             spellcheck="false"
+                            required="required"
                             name="description"
                             placeholder="description"></textarea>
                     </li>
