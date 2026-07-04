@@ -854,4 +854,10 @@ $quickbox-height: calc(#{vars.$footer-height});
     .quickbox__form--mobile-textarea-fullscreen .quickbox__today-edit-input--textarea:invalid {
         background-position: right -23rem top calc(#{vars.$footer-height} + #{vars.$space-medium});
     }
+    // No warning icon while the fullscreen textarea is still empty.
+    .quickbox__form--mobile-textarea-fullscreen .quickbox__new-input--textarea:invalid:placeholder-shown,
+    .quickbox__form--mobile-textarea-fullscreen .quickbox__today-edit-input--textarea:invalid:placeholder-shown {
+        background-image: none;
+        border-right-width: 0;
+    }
 }
