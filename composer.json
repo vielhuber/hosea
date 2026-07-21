@@ -5,7 +5,7 @@
         "vielhuber/simpleauth": "^1.9.4",
         "vielhuber/comparehelper": "^1.2.0",
         "vielhuber/mailhelper": "^1.8.1",
-        "guzzlehttp/guzzle": "^7.12.1",
+        "guzzlehttp/guzzle": "^7.15.1",
         "eluceo/ical": "^2.16.0",
         "php-imap/php-imap": "*",
         "phpmailer/phpmailer": "*",
