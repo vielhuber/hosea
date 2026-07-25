@@ -47,6 +47,50 @@ export default class Tickets {
             }
         });
     }
+    static addProjectEmojis(project, ticketId = null) {
+        if (project === '' || hlp.emojiRegex().test(project) || !Array.isArray(Store.data.tickets)) {
+            return project;
+        }
+
+        let matchingProject = project,
+            matchingDate = null,
+            now = new Date();
+        Store.data.tickets.forEach(ticket => {
+            if (
+                String(ticket.id) === String(ticketId) ||
+                typeof ticket.project !== 'string' ||
+                ticket.project.includes('❗')
+            ) {
+                return;
+            }
+            let projectWithoutPrefix = ticket.project.startsWith('--')
+                    ? ticket.project.substring(2)
+                    : ticket.project,
+                emojis = projectWithoutPrefix.match(hlp.emojiRegex());
+            if (
+                emojis === null ||
+                emojis.length !== 2 ||
+                emojis[0] !== emojis[1] ||
+                !projectWithoutPrefix.startsWith(emojis[0]) ||
+                !projectWithoutPrefix.endsWith(emojis[1]) ||
+                ticket.project.replaceAll(hlp.emojiRegex(), '') !== project
+            ) {
+                return;
+            }
+            let parsedDates = Dates.parseDateString(ticket.date, 'all');
+            if (parsedDates === false) {
+                return;
+            }
+            parsedDates.forEach(parsedDate => {
+                if (parsedDate.date >= now || (matchingDate !== null && parsedDate.date <= matchingDate)) {
+                    return;
+                }
+                matchingProject = ticket.project;
+                matchingDate = parsedDate.date;
+            });
+        });
+        return matchingProject;
+    }
     static fetchAndRenderTicketsInterval() {
         if (!hlp.isMobile() && Helper.isProduction()) {
             setInterval(
@@ -198,6 +242,8 @@ export default class Tickets {
                     Store.data.cols.forEach(cols__value => {
                         data[cols__value] = el.querySelector('[name="' + cols__value + '"]').value;
                     });
+                    data['project'] = Tickets.addProjectEmojis(data['project'], el.getAttribute('data-id'));
+                    el.querySelector('[name="project"]').value = data['project'];
                     data['updated_at'] = Dates.time().toString();
                     // auto update date
                     if (data['date'] == '*') {
@@ -245,6 +291,7 @@ export default class Tickets {
             Store.data.cols.forEach(cols__value => {
                 ticket[cols__value] = cols__value in data ? data[cols__value] : '';
             });
+            ticket['project'] = Tickets.addProjectEmojis(ticket['project']);
             ticket['updated_at'] = Dates.time().toString();
             Store.data.busy = true;
             Store.data.api

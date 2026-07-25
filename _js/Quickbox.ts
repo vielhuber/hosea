@@ -911,6 +911,8 @@ export default class Quickbox {
                 });
                 data['updated_at'] = Dates.time().toString();
                 let ticketId = $form.closest('.quickbox__today-ticket').getAttribute('data-id');
+                data['project'] = Tickets.addProjectEmojis(data['project'], ticketId);
+                $form.querySelector('[name="project"]').value = data['project'];
                 Tickets.setTicketData(ticketId, data);
                 changed.push(Tickets.getTicketData(ticketId));
 
