@@ -212,6 +212,9 @@ export default class Quickbox {
                 if (Store.data.busy === true) {
                     return;
                 }
+                if (document.hidden) {
+                    return;
+                }
                 Quickbox.fetchMails(false);
             }, 70 * 1000); // must be non divisible by 60 (otherwise it blocks others)
         }

@@ -98,6 +98,9 @@ export default class Tickets {
                     if (Store.data.busy === true) {
                         return;
                     }
+                    if (document.hidden) {
+                        return;
+                    }
                     if (document.querySelector(':focus') !== null) {
                         return;
                     }
@@ -137,50 +140,53 @@ export default class Tickets {
                         Store.data.tickets = [];
                     }
 
-                    // remove
+                    let responseIds = new Set<string>(
+                        response.data.map(tickets__value => String(tickets__value.id))
+                    );
+
                     Store.data.tickets = Store.data.tickets.filter(tickets__value => {
-                        let exists =
-                            response.data.filter(el => {
-                                return el.id == tickets__value.id;
-                            }).length > 0;
-                        if (exists === false) {
-                            document.querySelector('.tickets__entry[data-id="' + tickets__value.id + '"]').remove();
+                        if (!responseIds.has(String(tickets__value.id))) {
+                            document.querySelector('.tickets__entry[data-id="' + tickets__value.id + '"]')?.remove();
+                            return false;
                         }
-                        return exists;
+                        return true;
                     });
 
-                    // edit
+                    let storeIndexById = new Map<string, number>(
+                            Store.data.tickets.map((tickets__value, tickets__key) => [
+                                String(tickets__value.id),
+                                tickets__key
+                            ])
+                        ),
+                        addedHtml: string[] = [];
+
                     response.data.forEach(tickets__value => {
-                        Store.data.tickets.forEach((store__value, store__key) => {
-                            if (
-                                store__value.id == tickets__value.id &&
-                                store__value.updated_at != tickets__value.updated_at
-                            ) {
+                        let ticketId = String(tickets__value.id),
+                            storeIndex = storeIndexById.get(ticketId);
+
+                        if (storeIndex !== undefined) {
+                            if (Store.data.tickets[storeIndex].updated_at != tickets__value.updated_at) {
                                 tickets__value.visible = false;
                                 tickets__value.hide_in_scheduler = false;
-                                Store.data.tickets[store__key] = tickets__value;
-                                document.querySelector(
-                                    '.tickets__entry[data-id="' + tickets__value.id + '"]'
-                                ).outerHTML = Html.createHtmlLine(tickets__value, false);
+                                Store.data.tickets[storeIndex] = tickets__value;
+                                let $entry = document.querySelector('.tickets__entry[data-id="' + ticketId + '"]');
+                                if ($entry !== null) {
+                                    $entry.outerHTML = Html.createHtmlLine(tickets__value, false);
+                                }
                             }
-                        });
+                            return;
+                        }
+
+                        tickets__value.visible = false;
+                        tickets__value.hide_in_scheduler = false;
+                        storeIndexById.set(ticketId, Store.data.tickets.length);
+                        Store.data.tickets.push(tickets__value);
+                        addedHtml.push(Html.createHtmlLine(tickets__value, false));
                     });
 
-                    // add
-                    response.data.forEach(tickets__value => {
-                        if (
-                            Store.data.tickets.filter(el => {
-                                return el.id == tickets__value.id;
-                            }).length === 0
-                        ) {
-                            tickets__value.visible = false;
-                            tickets__value.hide_in_scheduler = false;
-                            Store.data.tickets.push(tickets__value);
-                            document
-                                .querySelector('.tickets__table-body')
-                                .insertAdjacentHTML('beforeend', Html.createHtmlLine(tickets__value, false));
-                        }
-                    });
+                    if (addedHtml.length > 0) {
+                        document.querySelector('.tickets__table-body').insertAdjacentHTML('beforeend', addedHtml.join(''));
+                    }
 
                     resolve();
                 });
