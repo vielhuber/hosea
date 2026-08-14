@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace HoseaApi;
 
 use vielhuber\simplemcp\Attributes\McpTool;
@@ -37,7 +39,7 @@ class MCP
      */
     #[
         McpTool(
-            description: 'Create a new appointment. Date must be YYYY-MM-DD. Optional time_from/time_to in HH:MM format.'
+            description: 'Create a new appointment. Date must be YYYY-MM-DD. Optional timeFrom/timeTo in HH:MM format.'
         )
     ]
     public function createAppointment(
@@ -52,7 +54,7 @@ class MCP
         string $status = 'fixed',
         #[Schema(type: 'string', description: 'Priority: A-Z or empty.')] string $priority = '',
         #[
-            Schema(type: 'string', description: 'Optional duration in hours (can differ from time_from/time_to).')
+            Schema(type: 'string', description: 'Optional duration in hours (can differ from timeFrom/timeTo).')
         ]
         string $time = ''
     ): string {
@@ -170,7 +172,7 @@ class MCP
         #[Schema(type: 'string', description: 'New status: fixed, allday, todo, scheduled.')] string $status = '',
         #[Schema(type: 'string', description: 'New priority: A-Z or empty.')] string $priority = '',
         #[
-            Schema(type: 'string', description: 'New duration in hours (can differ from time_from/time_to).')
+            Schema(type: 'string', description: 'New duration in hours (can differ from timeFrom/timeTo).')
         ]
         string $time = ''
     ): string {
