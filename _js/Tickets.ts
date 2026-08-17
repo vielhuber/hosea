@@ -91,6 +91,30 @@ export default class Tickets {
         });
         return matchingProject;
     }
+    static determineConvertedRecurringStatus(project) {
+        let status = 'fixed',
+            matchingDate = null;
+        Store.data.tickets.forEach(ticket => {
+            if (ticket.project !== project || ['billed', 'done', 'fixed', 'recurring'].includes(ticket.status)) {
+                return;
+            }
+            let parsedDates = Dates.parseDateString(ticket.date, 'all');
+            if (parsedDates === false) {
+                return;
+            }
+            parsedDates.forEach(parsedDate => {
+                if (
+                    !Dates.dateIsInPast(parsedDate.date) ||
+                    (matchingDate !== null && parsedDate.date <= matchingDate)
+                ) {
+                    return;
+                }
+                status = ticket.status;
+                matchingDate = parsedDate.date;
+            });
+        });
+        return status;
+    }
     static fetchAndRenderTicketsInterval() {
         if (!hlp.isMobile() && Helper.isProduction()) {
             setInterval(
@@ -437,7 +461,9 @@ export default class Tickets {
                         .querySelector('.tickets__textarea--date')
                         .dispatchEvent(new Event('input', { bubbles: true }));
                     ticketDataToCopy__value.duplicateData.date = newDates.join('\n');
-                    ticketDataToCopy__value.duplicateData.status = 'fixed';
+                    ticketDataToCopy__value.duplicateData.status = Tickets.determineConvertedRecurringStatus(
+                        ticketDataToCopy__value.duplicateData.project
+                    );
                 }
             }
 
@@ -518,7 +544,7 @@ export default class Tickets {
                             '-' +
                             Dates.timeFormat(parsedDates__value.end);
                     }
-                    duplicateData.status = 'fixed';
+                    duplicateData.status = Tickets.determineConvertedRecurringStatus(duplicateData.project);
                     ticketDataToCopy.push({
                         current: current,
                         duplicateData: duplicateData

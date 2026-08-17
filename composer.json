@@ -1,6 +1,6 @@
 {
     "require": {
-        "vielhuber/dbhelper": "^2.5.8",
+        "vielhuber/dbhelper": "^2.5.9",
         "vielhuber/stringhelper": "^7.4.2",
         "vielhuber/simpleauth": "^1.9.6",
         "vielhuber/comparehelper": "^1.2.0",

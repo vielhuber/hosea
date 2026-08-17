@@ -221,7 +221,17 @@ class MCP
         if (!$this->ticketExists($id)) {
             return json_encode(['success' => false, 'message' => 'Not found.']);
         }
-        $this->db->delete('tickets', ['id' => $id]);
+        $this->db->begin_transaction();
+        try {
+            $this->db->delete('attachments', ['ticket_id' => $id]);
+            $this->db->delete('tickets', ['id' => $id]);
+            $this->db->commit();
+        } catch (\PDOException $exception) {
+            if ($this->db->in_transaction()) {
+                $this->db->rollback();
+            }
+            throw $exception;
+        }
         return json_encode(['success' => true]);
     }
 
