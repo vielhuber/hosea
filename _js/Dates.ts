@@ -18,33 +18,18 @@ export default class Dates {
     }
 
     static getDayOfViewport(shift, date) {
-        let d = new Date(date);
+        let viewportDate = new Date(date);
         if (Store.data.shiftingView) {
-            return Dates.addDays(d, shift - 1 - Store.data.shiftingViewPrevDays);
-        } else {
-            let wNow = Dates.weekNumber(new Date());
-            let wD = Dates.weekNumber(d);
-            if (wNow < wD && Dates.compareDates(new Date(), d) === 1) {
-                wNow += 52;
-            }
-            if (wD < wNow && Dates.compareDates(d, new Date()) === 1) {
-                wD += 52;
-            }
-            let day = d.getDay(),
-                diff =
-                    d.getDate() -
-                    (day - 1) + // subtract day number (so we reach now monday)
-                    (day == 0 ? -7 : 0) - // subtract 7 days if sunday (this fixes sunday)
-                    ((wD -
-                        wNow +
-                        (wD < wNow
-                            ? Math.ceil((wNow - wD) / Store.data.weeksInViewport) * Store.data.weeksInViewport
-                            : 0)) % // correct weeks resulting in negative values
-                        Store.data.weeksInViewport) *
-                        7 + // subtract 7 days for each week in the viewport
-                    (shift - 1); // add the shift
-            return new Date(d.setDate(diff));
+            return Dates.addDays(viewportDate, shift - 1 - Store.data.shiftingViewPrevDays);
         }
+        let currentDate = new Date();
+        viewportDate = Dates.addDays(viewportDate, 0 - ((viewportDate.getDay() + 6) % 7));
+        currentDate = Dates.addDays(currentDate, 0 - ((currentDate.getDay() + 6) % 7));
+        let weekShift = Math.round(Dates.dateDiffInDays(new Date(viewportDate), new Date(currentDate)) / 7),
+            viewportWeekShift =
+                ((weekShift % Store.data.weeksInViewport) + Store.data.weeksInViewport) %
+                Store.data.weeksInViewport;
+        return Dates.addDays(viewportDate, shift - 1 - viewportWeekShift * 7);
     }
 
     static parseDateString(string, view) {
@@ -478,20 +463,8 @@ export default class Dates {
     }
 
     static shiftByDatesInViewport(d) {
-        let dW = Dates.weekNumber(d);
-        let dC = Dates.weekNumber(new Date());
-        if (dW > dC && Dates.compareDates(new Date(), d) === 1) {
-            dC += 52;
-        } else if (dC > dW && Dates.compareDates(d, new Date()) === 1) {
-            dW += 52;
-        }
-        return (
-            ((dW -
-                dC +
-                (dW < dC ? Math.ceil((dC - dW) / Store.data.weeksInViewport) * Store.data.weeksInViewport : 0)) % // correct weeks resulting in negative values
-                Store.data.weeksInViewport) *
-            7
-        );
+        let weekStart = Dates.addDays(d, 0 - ((d.getDay() + 6) % 7));
+        return Dates.dateDiffInDays(weekStart, Dates.getDayOfViewport(1, d));
     }
 
     static dateIsInActiveWeek(d) {
