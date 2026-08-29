@@ -689,12 +689,14 @@ export default class Tickets {
 
     static bindChangeTracking() {
         document.querySelector('.tickets').addEventListener('input', e => {
-            const target = e.target as HTMLElement;
+            const target = e.target as HTMLInputElement;
             if (target.closest('.tickets__entry input, .tickets__entry textarea')) {
                 if (target.hasAttribute('type') && target.getAttribute('type') === 'file') {
                     return;
                 }
-                target.closest('.tickets__entry').classList.add('tickets__entry--changed');
+                let $entry = target.closest('.tickets__entry');
+                $entry.classList.add('tickets__entry--changed');
+                Tickets.setTicketData($entry.getAttribute('data-id'), target.getAttribute('name'), target.value);
             }
         });
     }
