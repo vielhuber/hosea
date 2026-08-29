@@ -80,6 +80,21 @@ class Mail extends Api
     {
         $mails = [];
         $config = $this->getMailConfig();
+        $cached_mails = [];
+        $filename_cache = sys_get_temp_dir() . '/hosea-mail.cache';
+
+        if (file_exists($filename_cache)) {
+            $cached_mails = unserialize(file_get_contents($filename_cache));
+            $cached_mails = is_array($cached_mails) ? $cached_mails : [];
+        }
+
+        $cached_mails_by_mailbox = [];
+        foreach ($cached_mails as $cached_mail) {
+            if (!isset($cached_mail['mailbox'], $cached_mail['id'])) {
+                continue;
+            }
+            $cached_mails_by_mailbox[$cached_mail['mailbox']][$cached_mail['id']] = $cached_mail;
+        }
 
         foreach ($config as $config__key => $config__value) {
             if (!isset($config__value['imap'])) {
@@ -87,29 +102,26 @@ class Mail extends Api
             }
             try {
                 $mailhelper = new mailhelper($config);
-                $folders = $mailhelper->getFolders(mailbox: $config__key)['items'];
-                foreach ($folders as $folders__value) {
-                    if ($folders__value !== $config__value['imap']['folder_inbox']) {
-                        continue;
-                    }
-                    $messages = $mailhelper->fetchMails(
-                        mailbox: $config__key,
-                        folder: $config__value['imap']['folder_inbox']
-                    )['items'];
-                    $runtime_start = microtime(true);
-                    foreach ($messages as $messages__value) {
+                $messages = $mailhelper->fetchMails(
+                    mailbox: $config__key,
+                    folder: $config__value['imap']['folder_inbox']
+                )['items'];
+                $runtime_start = microtime(true);
+                foreach ($messages as $messages__value) {
+                    $mail_data = $cached_mails_by_mailbox[$config__key][$messages__value->id] ?? null;
+                    if ($mail_data === null) {
                         $mail_data = $mailhelper->viewMail(
                             mailbox: $config__key,
                             folder: $config__value['imap']['folder_inbox'],
                             id: $messages__value->id
                         );
                         $mail_data = $this->getMailData($mail_data);
-                        $mail_data['mailbox'] = $config__key;
-                        $mail_data['editors'] = isset($_SERVER['EDITORS']) ? explode(';', $_SERVER['EDITORS']) : [];
-                        $mails[] = $mail_data;
-                        if (microtime(true) - $runtime_start > 60) {
-                            break;
-                        }
+                    }
+                    $mail_data['mailbox'] = $config__key;
+                    $mail_data['editors'] = isset($_SERVER['EDITORS']) ? explode(';', $_SERVER['EDITORS']) : [];
+                    $mails[] = $mail_data;
+                    if (microtime(true) - $runtime_start > 60) {
+                        break;
                     }
                 }
             } catch (\Throwable $e) {
