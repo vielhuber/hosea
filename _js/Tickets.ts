@@ -670,7 +670,6 @@ export default class Tickets {
                         Scheduler.updateColors();
                         Quickbox.initToday();
                         Tickets.updateSum();
-                        Filter.updateFilter();
                         Textarea.textareaSetVisibleHeights();
                         if (doFilter === true) {
                             await Filter.doFilter();
