@@ -472,7 +472,7 @@ export default class Tickets {
                 ticketDataToCopy__value.current,
                 ticketDataToCopy__value.currentCol,
                 true,
-                false
+                true
             );
         });
     }
