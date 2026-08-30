@@ -666,14 +666,14 @@ export default class Tickets {
                         input.dispatchEvent(new Event('input', { bubbles: true }));
                     }
                     if (updateUi === true) {
+                        if (doFilter === true) {
+                            await Filter.doFilter([ticket], false);
+                        }
                         await Scheduler.initScheduler();
                         Scheduler.updateColors();
                         Quickbox.initToday();
                         Tickets.updateSum();
                         Textarea.textareaSetVisibleHeights();
-                        if (doFilter === true) {
-                            await Filter.doFilter();
-                        }
                     }
                     if ('attachments' in data && data.attachments.length > 0) {
                         Attachments.startUploadsAndBuildHtml(ticket.id, data.attachments);
