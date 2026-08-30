@@ -350,6 +350,7 @@ export default class Tickets {
                     } else {
                         ticket.id = response.data.id;
                         ticket.visible = true;
+                        ticket.hide_in_scheduler = false;
                         Store.data.tickets.push(ticket);
                         resolve(ticket);
                     }
