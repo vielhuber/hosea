@@ -176,10 +176,11 @@ export default class Filter {
         }
     }
 
-    static async doFilter() {
-        document.querySelector('.tickets__table-body').style.display = 'none';
+    static async doFilter(tickets = Store.data.tickets, updateUi = true) {
+        if (updateUi === true) {
+            document.querySelector('.tickets__table-body').style.display = 'none';
+        }
 
-        let tickets = Store.data.tickets;
         let batchSize = 50;
         for (let i = 0; i < tickets.length; i += batchSize) {
             tickets.slice(i, i + batchSize).forEach(tickets__value => {
@@ -307,6 +308,10 @@ export default class Filter {
             if (i + batchSize < tickets.length) {
                 await new Promise(resolve => setTimeout(resolve, 0));
             }
+        }
+
+        if (updateUi === false) {
+            return;
         }
 
         Sort.doSort();
