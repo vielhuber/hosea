@@ -216,7 +216,7 @@ export default class Quickbox {
                     return;
                 }
                 Quickbox.fetchMails(false);
-            }, 70 * 1000); // must be non divisible by 60 (otherwise it blocks others)
+            }, 10 * 1000);
         }
     }
 

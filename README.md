@@ -57,7 +57,8 @@ hosea is a personal assistant.
 
 ### cron
 
-- to speed up caching and improve garbage collecting, point a recurring cronjob running every 5 minutes that calls https://tld.com/_api/cron/%API_KEY%
+- to speed up caching and improve garbage collecting, point a recurring cronjob running every minute (`*/1 * * * *`) that calls https://tld.com/_api/cron/%API_KEY%
+- the desktop checks for updated mails every 10 seconds while the tab is visible and the app is not busy
 - you can find this link in the bottom right ("\_cron") of the gui
 
 ### mcp
