@@ -16,6 +16,7 @@ import Weather from './Weather';
 export default class App {
     static async init() {
         Store.initStore();
+        Html.updateTitle();
         await Auth.login();
         await User.fetchUser();
         Html.buildHtml();

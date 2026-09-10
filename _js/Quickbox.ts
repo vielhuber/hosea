@@ -4,6 +4,7 @@ import Dates from './Dates';
 import Scheduler from './Scheduler';
 import Filter from './Filter';
 import Footer from './Footer';
+import Html from './Html';
 import hlp from 'hlp';
 import PullToRefresh from 'pulltorefreshjs';
 import Swal from 'sweetalert2';
@@ -256,6 +257,7 @@ export default class Quickbox {
     static updateMailCount() {
         document.querySelector('.quickbox__navitem[href="#mails"] .quickbox__navitem-count').innerText =
             Store.data.mails.length;
+        Html.updateTitle();
     }
 
     static renderMails() {

@@ -9,6 +9,7 @@ import Html from './Html';
 
 export default class Scheduler {
     static async initScheduler() {
+        Html.updateTitle();
         document.querySelector('.scheduler').classList.add('scheduler--loading');
 
         let width =

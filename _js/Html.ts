@@ -2,6 +2,11 @@ import Store from './Store';
 import Dates from './Dates';
 
 export default class Html {
+    static updateTitle() {
+        let date = Dates.getActiveDate();
+        document.title = `hosea [${Store.data.mails?.length ?? 0} MAILS] // ${Dates.dateFormat(date, 'd.m.Y')} // KW${Dates.weekNumber(date).toString().padStart(2, '0')}`;
+    }
+
     static buildHtml() {
         document.querySelector('#app').insertAdjacentHTML(
             'beforeend',
