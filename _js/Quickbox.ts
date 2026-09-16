@@ -1324,10 +1324,11 @@ export default class Quickbox {
     }
 
     static proposeNewDate() {
-        // find next consecutive group of 3+ tickets with identical begin/end time where end hasn't passed yet
+        // find first consecutive group of 3+ tickets (done ones included) with identical begin/end time from today on
         let dateTimeRegex = /^(\d{2}\.\d{2}\.\d{2}) (\d{2}:\d{2}-\d{2}:\d{2})$/,
-            now = new Date(),
+            today = new Date(),
             parsedTickets = [];
+        today.setHours(0, 0, 0, 0);
         Store.data.tickets.forEach(tickets__value => {
             if (!tickets__value.date) {
                 return;
@@ -1343,6 +1344,9 @@ export default class Quickbox {
                 [endHH, endMM] = timePart.split('-')[1].split(':').map(Number),
                 endDateTime = new Date(dateStr);
             endDateTime.setHours(endHH, endMM, 0, 0);
+            if (endDateTime < today) {
+                return;
+            }
             parsedTickets.push({ datePart, timePart, endDateTime });
         });
         parsedTickets.sort((a, b) => a.endDateTime - b.endDateTime);
@@ -1352,12 +1356,8 @@ export default class Quickbox {
             while (j < parsedTickets.length && parsedTickets[j].timePart === parsedTickets[i].timePart) {
                 j++;
             }
-            if (j - i >= 3 && parsedTickets[j - 1].endDateTime > now) {
-                for (let k = i; k < j; k++) {
-                    if (parsedTickets[k].endDateTime > now) {
-                        return parsedTickets[k].datePart + ' ' + parsedTickets[k].timePart;
-                    }
-                }
+            if (j - i >= 3) {
+                return parsedTickets[i].datePart + ' ' + parsedTickets[i].timePart;
             }
             i = j;
         }
