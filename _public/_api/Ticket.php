@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace HoseaApi;
 
 class Ticket extends Api
@@ -225,6 +226,11 @@ class Ticket extends Api
     protected function bulkUpdate()
     {
         $tickets = $this->getInput('tickets');
+        foreach ($tickets as $ticket) {
+            if (isset($ticket['id'])) {
+                $this->checkId($ticket['id']);
+            }
+        }
         $ids = [];
         foreach ($tickets as $tickets__value) {
             $values = [];

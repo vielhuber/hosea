@@ -54,7 +54,7 @@ class Mail extends Api
     public function buildCache($force = false)
     {
         $mails = [];
-        $filename_cache = sys_get_temp_dir() . '/hosea-mail.cache';
+        $filename_cache = sys_get_temp_dir() . '/hosea-mail-' . hash('sha256', __DIR__) . '.cache';
 
         if (
             in_array($_SERVER['SERVER_ADMIN'] ?? '', ['david@vielhuber.de'], true) ||
@@ -81,7 +81,7 @@ class Mail extends Api
         $mails = [];
         $config = $this->getMailConfig();
         $cached_mails = [];
-        $filename_cache = sys_get_temp_dir() . '/hosea-mail.cache';
+        $filename_cache = sys_get_temp_dir() . '/hosea-mail-' . hash('sha256', __DIR__) . '.cache';
 
         if (file_exists($filename_cache)) {
             $cached_mails = unserialize(file_get_contents($filename_cache));

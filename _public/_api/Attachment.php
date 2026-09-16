@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace HoseaApi;
 
 class Attachment extends Api
@@ -108,7 +109,7 @@ class Attachment extends Api
             as $columns__value
         ) {
             $input = $this->getInput($columns__value);
-            if( $columns__value === 'data' )
+            if( $columns__value === 'data' && $input !== null )
             {
                 $input = base64_decode($input);
             }
