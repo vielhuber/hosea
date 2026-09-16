@@ -347,9 +347,6 @@ export default class Quickbox {
                             background-color:#fff;
                             color:#000;
                         }
-                        img {
-                            display:none !important;
-                        }
                         body::-webkit-scrollbar {
                             width: 16px;
                         }
@@ -368,13 +365,29 @@ export default class Quickbox {
                         });
                     }
                 };
-                // block all remote images (chrome local network access prompts for private hosts)
+                // strip all images before rendering (chrome local network access, csp logs every blocked attempt)
+                let mailDocument = new DOMParser().parseFromString(content, 'text/html');
+                mailDocument.querySelectorAll('img, picture, source, image, input[type="image"]').forEach(el => {
+                    el.remove();
+                });
+                mailDocument.querySelectorAll('[background], [poster]').forEach(el => {
+                    el.removeAttribute('background');
+                    el.removeAttribute('poster');
+                });
+                mailDocument.querySelectorAll('[style]').forEach(el => {
+                    el.setAttribute('style', el.getAttribute('style').replace(/url\([^)]*\)/gi, 'none'));
+                });
+                mailDocument.querySelectorAll('style').forEach(el => {
+                    el.textContent = el.textContent.replace(/url\([^)]*\)/gi, 'none');
+                });
+                let meta = mailDocument.createElement('meta');
+                meta.setAttribute('http-equiv', 'Content-Security-Policy');
+                meta.setAttribute('content', "img-src 'none'");
+                mailDocument.head.prepend(meta);
                 iframe.setAttribute(
                     'srcdoc',
-                    content.replace(
-                        /^(\s*<!doctype[^>]*>)?/i,
-                        `$1<meta http-equiv="Content-Security-Policy" content="img-src 'none'">`
-                    )
+                    (mailDocument.doctype !== null ? new XMLSerializer().serializeToString(mailDocument.doctype) : '') +
+                        mailDocument.documentElement.outerHTML
                 );
             }
         });
