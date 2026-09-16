@@ -347,6 +347,9 @@ export default class Quickbox {
                             background-color:#fff;
                             color:#000;
                         }
+                        img {
+                            display:none !important;
+                        }
                         body::-webkit-scrollbar {
                             width: 16px;
                         }
@@ -365,7 +368,14 @@ export default class Quickbox {
                         });
                     }
                 };
-                iframe.setAttribute('srcdoc', content);
+                // block all remote images (chrome local network access prompts for private hosts)
+                iframe.setAttribute(
+                    'srcdoc',
+                    content.replace(
+                        /^(\s*<!doctype[^>]*>)?/i,
+                        `$1<meta http-equiv="Content-Security-Policy" content="img-src 'none'">`
+                    )
+                );
             }
         });
 
