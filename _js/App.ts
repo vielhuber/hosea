@@ -28,6 +28,10 @@ export default class App {
         // currently disabled, because we use both columns independently
         //Tickets.bindAutoTime();
         Tickets.bindChangeTracking();
+        document.querySelector('.tickets__table-body').addEventListener('click', e => {
+            let $cell = (e.target as HTMLElement).closest('.tickets__table-cell');
+            $cell?.querySelector<HTMLTextAreaElement>('.tickets__textarea--date')?.focus();
+        });
         Html.bindAutoCaps();
         Html.bindValidation();
         Attachments.bindUpload();
