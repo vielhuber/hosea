@@ -30,15 +30,15 @@ export default class App {
         Tickets.bindChangeTracking();
         document.querySelector('.tickets__table-body').addEventListener('click', e => {
             let $cell = (e.target as HTMLElement).closest('.tickets__table-cell');
-            $cell?.querySelector<HTMLTextAreaElement>('.tickets__textarea--date')?.focus();
+            $cell?.querySelector<HTMLTextAreaElement>('.tickets__textarea')?.focus();
         });
-        let dateSelection: { $field: HTMLTextAreaElement; anchor: number; event: MouseEvent } | null = null;
-        let dateSelectionFrame = 0;
-        let updateDateSelection = () => {
-            if (dateSelection === null) {
+        let textareaSelection: { $field: HTMLTextAreaElement; anchor: number; event: MouseEvent } | null = null;
+        let textareaSelectionFrame = 0;
+        let updateTextareaSelection = () => {
+            if (textareaSelection === null) {
                 return;
             }
-            let { $field, anchor, event } = dateSelection;
+            let { $field, anchor, event } = textareaSelection;
             let bounds = $field.getBoundingClientRect();
             let scrollLeft = $field.scrollLeft;
             let scrollTop = $field.scrollTop;
@@ -46,38 +46,38 @@ export default class App {
             $field.scrollTop += Math.min(0, event.clientY - bounds.top) + Math.max(0, event.clientY - bounds.bottom);
             Textarea.textareaSelectAtPoint($field, event, anchor);
             if ($field.scrollLeft !== scrollLeft || $field.scrollTop !== scrollTop) {
-                dateSelectionFrame = requestAnimationFrame(updateDateSelection);
+                textareaSelectionFrame = requestAnimationFrame(updateTextareaSelection);
             }
         };
         document.querySelector('.tickets__table-body').addEventListener('mousedown', event => {
-            dateSelection = null;
-            cancelAnimationFrame(dateSelectionFrame);
+            textareaSelection = null;
+            cancelAnimationFrame(textareaSelectionFrame);
             if (event.button !== 0 || event.detail !== 1) {
                 return;
             }
             let $field = (event.target as HTMLElement)
                 .closest('.tickets__table-cell')
-                ?.querySelector<HTMLTextAreaElement>('.tickets__textarea--date');
+                ?.querySelector<HTMLTextAreaElement>('.tickets__textarea');
             if (!$field) {
                 return;
             }
             let anchor = Textarea.textareaSelectAtPoint($field, event);
             if (anchor !== null) {
-                dateSelection = { $field, anchor, event };
+                textareaSelection = { $field, anchor, event };
             }
         });
         document.addEventListener('mousemove', event => {
-            if (dateSelection === null || (event.buttons & 1) === 0) {
+            if (textareaSelection === null || (event.buttons & 1) === 0) {
                 return;
             }
-            dateSelection.event = event;
-            cancelAnimationFrame(dateSelectionFrame);
-            updateDateSelection();
+            textareaSelection.event = event;
+            cancelAnimationFrame(textareaSelectionFrame);
+            updateTextareaSelection();
         });
         ['mouseup', 'blur'].forEach(eventType => {
             window.addEventListener(eventType, () => {
-                dateSelection = null;
-                cancelAnimationFrame(dateSelectionFrame);
+                textareaSelection = null;
+                cancelAnimationFrame(textareaSelectionFrame);
             });
         });
         Html.bindAutoCaps();
