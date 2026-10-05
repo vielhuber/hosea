@@ -1,6 +1,45 @@
 import Helper from './Helper';
 
 export default class Textarea {
+    static textareaSelectAtPoint($field: HTMLTextAreaElement, event: MouseEvent, anchor?: number): number | null {
+        let bounds = $field.getBoundingClientRect();
+        let left = bounds.left + $field.clientLeft;
+        let top = bounds.top + $field.clientTop;
+        let right = left + $field.clientWidth - 1;
+        if (
+            anchor === undefined &&
+            event.target === $field &&
+            $field.scrollHeight > $field.clientHeight &&
+            event.clientX > right
+        ) {
+            return null;
+        }
+        let lineHeight = parseFloat(getComputedStyle($field).lineHeight);
+        // Mac/Linux hit-testing drops the horizontal position below the last text line.
+        let lastLine = top + lineHeight * ($field.value.split('\n').length - 0.5) - $field.scrollTop;
+        let position = document.caretPositionFromPoint?.(
+            Math.max(left + 1, Math.min(event.clientX, right)),
+            Math.max(top + 1, Math.min(event.clientY, lastLine, top + $field.clientHeight - 1))
+        );
+        if (position?.offsetNode !== $field) {
+            return null;
+        }
+        anchor ??=
+            event.shiftKey && document.activeElement === $field
+                ? $field.selectionDirection === 'backward'
+                    ? $field.selectionEnd
+                    : $field.selectionStart
+                : position.offset;
+        event.preventDefault();
+        $field.setSelectionRange(
+            Math.min(anchor, position.offset),
+            Math.max(anchor, position.offset),
+            position.offset < anchor ? 'backward' : 'forward'
+        );
+        $field.focus();
+        return anchor;
+    }
+
     static textareaAutoHeight() {
         let debounce: any = Helper.debounce((e: InputEvent) => {
             Textarea.textareaSetHeight(e.target);
