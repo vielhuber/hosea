@@ -52,7 +52,7 @@ export default class App {
         document.querySelector('.tickets__table-body').addEventListener('mousedown', event => {
             textareaSelection = null;
             cancelAnimationFrame(textareaSelectionFrame);
-            if (event.button !== 0 || event.detail !== 1) {
+            if (event.button !== 0 || (event.detail !== 1 && event.detail !== 2)) {
                 return;
             }
             let $field = (event.target as HTMLElement)

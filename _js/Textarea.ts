@@ -24,6 +24,27 @@ export default class Textarea {
         if (position?.offsetNode !== $field) {
             return null;
         }
+        if (anchor === undefined && event.detail === 2) {
+            let nativePosition = document.caretPositionFromPoint(event.clientX, event.clientY);
+            if (nativePosition?.offsetNode === $field && nativePosition.offset === position.offset) {
+                return null;
+            }
+            event.preventDefault();
+            $field.setSelectionRange(position.offset, position.offset);
+            $field.focus();
+            // Word navigation skips whitespace, unlike native double-click selection.
+            if (/[^\S\n]/.test($field.value[position.offset] ?? '')) {
+                $field.setSelectionRange(
+                    position.offset - $field.value.slice(0, position.offset).match(/[^\S\n]*$/)[0].length,
+                    position.offset + $field.value.slice(position.offset).match(/^[^\S\n]*/)[0].length
+                );
+                return null;
+            }
+            let selection = document.getSelection();
+            selection.modify('move', 'forward', 'word');
+            selection.modify('extend', 'backward', 'word');
+            return null;
+        }
         anchor ??=
             event.shiftKey && document.activeElement === $field
                 ? $field.selectionDirection === 'backward'
