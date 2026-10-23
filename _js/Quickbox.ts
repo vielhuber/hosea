@@ -1337,49 +1337,10 @@ export default class Quickbox {
     }
 
     static proposeNewDate() {
-        // find first consecutive group of 3+ tickets (done ones included) with identical begin/end time from today on
-        let dateTimeRegex = /^(\d{2}\.\d{2}\.\d{2}) (\d{2}:\d{2}-\d{2}:\d{2})$/,
-            today = new Date(),
-            parsedTickets = [];
-        today.setHours(0, 0, 0, 0);
-        Store.data.tickets.forEach(tickets__value => {
-            if (!tickets__value.date) {
-                return;
-            }
-            let firstLine = tickets__value.date.split('\n')[0].trim(),
-                match = firstLine.match(dateTimeRegex);
-            if (!match) {
-                return;
-            }
-            let [, datePart, timePart] = match,
-                dateStr =
-                    '20' + datePart.substring(6, 8) + '-' + datePart.substring(3, 5) + '-' + datePart.substring(0, 2),
-                [endHH, endMM] = timePart.split('-')[1].split(':').map(Number),
-                endDateTime = new Date(dateStr);
-            endDateTime.setHours(endHH, endMM, 0, 0);
-            if (endDateTime < today) {
-                return;
-            }
-            parsedTickets.push({ datePart, timePart, endDateTime });
-        });
-        parsedTickets.sort((a, b) => a.endDateTime - b.endDateTime);
-        let i = 0;
-        while (i < parsedTickets.length) {
-            let j = i + 1;
-            while (j < parsedTickets.length && parsedTickets[j].timePart === parsedTickets[i].timePart) {
-                j++;
-            }
-            if (j - i >= 3) {
-                return parsedTickets[i].datePart + ' ' + parsedTickets[i].timePart;
-            }
-            i = j;
+        let proposedDate = new Date();
+        if (proposedDate.getHours() >= 8) {
+            proposedDate = Dates.addDays(proposedDate, 1);
         }
-
-        // fallback: calculate next monday
-        let proposedDate: any = new Date();
-        proposedDate.setDate(proposedDate.getDate() + ((1 + 7 - proposedDate.getDay()) % 7));
-        proposedDate = Dates.dateFormat(proposedDate, 'd.m.y');
-        proposedDate += ' 09:00-10:00';
-        return proposedDate;
+        return `${Dates.dateFormat(proposedDate, 'd.m.y')} 08:00-09:00`;
     }
 }
