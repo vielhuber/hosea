@@ -131,12 +131,19 @@ MO#12 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
 MO~1 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
 MO~12 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
 MO%2 10:00-11:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
+MO+1.03 10:00-11:00
+MO-2.03 10:00-11:00
+SO-1.03
+SO-1.10
 01.01. [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
 01.01. 09:00-10:00 [-05.10.18 -12.10.18 >01.01.18 <01.01.19]
 
 DD#N: (N%4)th weekday in every ((N-1)/4)th month
 DD~N: weekday in calendar week N
 DD%N: weekday in calendar week %N=0 (if >X specified, N -= calendar week of X)
+DD+N.MM: Nth weekday in month MM, every year (N=1..5)
+DD-N.MM: Nth weekday counted from the end of month MM, every year (N=1..5)
+MM: 01..12; missing fifth occurrences are skipped
 
 *: magic algorithm that generates an automatic date" class="tickets__table-tooltip">(?)</span>
                 `

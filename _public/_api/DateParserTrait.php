@@ -32,7 +32,7 @@ trait DateParserTrait
                 $return[] = ['date' => $date, 'begin' => $begin, 'end' => $end];
             } elseif (
                 preg_match(
-                    '/^(MO|DI|MI|DO|FR|SA|SO)((#|~)[1-9][0-9]?)?( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?( (-|>|<)[0-9][0-9].[0-9][0-9].[1-3][0-9])*$/',
+                    '/^(MO|DI|MI|DO|FR|SA|SO)((#|~)[1-9][0-9]?|[+-][1-5]\.(0[1-9]|1[0-2]))?( [0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9])?( (-|>|<)[0-9][0-9].[0-9][0-9].[1-3][0-9])*$/',
                     $datesValue
                 )
             ) {
@@ -97,6 +97,19 @@ trait DateParserTrait
 
     private function dateIsExcluded(string $date, string $dates): bool
     {
+        if (in_array(substr($dates, offset: 2, length: 1), ['+', '-'], strict: true)) {
+            $timestamp = strtotime($date);
+            $daysFromEdge =
+                substr($dates, offset: 2, length: 1) === '+'
+                    ? (int) date('j', $timestamp) - 1
+                    : (int) date('t', $timestamp) - (int) date('j', $timestamp);
+            if (
+                (int) date('n', $timestamp) !== (int) substr($dates, offset: 5, length: 2) ||
+                (int) floor($daysFromEdge / 7) + 1 !== (int) substr($dates, offset: 3, length: 1)
+            ) {
+                return true;
+            }
+        }
         if (strpos($dates, '#') === 2) {
             $num = trim(substr($dates, 3, 2));
             if ($num % 4 != $this->nthWeekdayOfMonth($date)) {

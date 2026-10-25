@@ -37,10 +37,15 @@ class iCal extends Api
             }
             $query[] = '(' . implode(') OR (', $query_or) . ')';
         } else {
+            $monthlyWeekdayCondition = "(date LIKE '%+_.__%' OR date LIKE '%-_.__%')";
             $query[] =
-                'INSTR(project,\'FEIERTAG\') OR ((LENGTH(date)-LENGTH(REPLACE(date, \'\n\', \'\'))) > 3) OR STR_TO_DATE(date,\'%d.%m.%y\') > DATE_SUB(NOW(), INTERVAL 30 DAY)';
+                'INSTR(project,\'FEIERTAG\') OR ((LENGTH(date)-LENGTH(REPLACE(date, \'\n\', \'\'))) > 3) OR ' .
+                $monthlyWeekdayCondition .
+                ' OR STR_TO_DATE(date,\'%d.%m.%y\') > DATE_SUB(NOW(), INTERVAL 30 DAY)';
             $query[] =
-                'INSTR(project,\'FEIERTAG\') OR ((LENGTH(date)-LENGTH(REPLACE(date, \'\n\', \'\'))) > 3) OR STR_TO_DATE(date,\'%d.%m.%y\') < DATE_ADD(NOW(), INTERVAL 30 DAY)';
+                'INSTR(project,\'FEIERTAG\') OR ((LENGTH(date)-LENGTH(REPLACE(date, \'\n\', \'\'))) > 3) OR ' .
+                $monthlyWeekdayCondition .
+                ' OR STR_TO_DATE(date,\'%d.%m.%y\') < DATE_ADD(NOW(), INTERVAL 30 DAY)';
             $query[] = 'status IN (\'fixed\')';
             $query[] = 'project NOT LIKE \'%Mittagessen%\'';
             $query[] = 'project NOT LIKE \'%Abendessen%\'';
